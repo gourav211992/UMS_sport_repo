@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    @include('ums.sports.sports-meta.header')
+</head>
+<body class="vertical-layout vertical-menu-modern navbar-floating footer-static menu-collapsed" data-open="click"
+    data-menu="vertical-menu-modern" data-col="">
+    @include('ums.sports.sports-meta.navbar')
+
+    @if(Request::path() !== 'sports-login' && Request::path() !== 'registration' && Request::path() !== 'sport-registration' && !Str::startsWith(Request::path(), 'sports/profile/' ) && !Str::startsWith(Request::path(), 'update/registration' ))
+    @include('ums.sports.sports-meta.sidebar')
+    @endif
+
+    {{-- @include('ums.sports.sports-meta.sidebar')
+    @include('ums.sports.sports-meta.navbar') --}}
+
+    @yield('content')
+    @if(Request::path() !== 'sports-login' && Request::path() !== 'registration')
+    @include('ums.sports.sports-meta.footer')
+@endif
+
+    @include('ums.sports.sports-meta.script')
+
+
+    
+</body>
+</html>

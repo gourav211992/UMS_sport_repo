@@ -1,0 +1,121 @@
+/*================================================================================
+	Item Name: Vuexy - Vuejs, HTML & Laravel Admin Dashboard Template
+	Version: 2.0
+	Author: PIXINVENT
+	Author URL: http://www.themeforest.net/user/pixinvent
+================================================================================
+
+NOTE:
+------
+PLACE HERE YOUR OWN SCSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
+WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+
+.upload-drop button { padding: 8px 35px 8px 12px; box-shadow: none !important; color: #212B36; font-weight: normal; font-size: 14px;
+	background: url(sown-arrow.svg) no-repeat right 12px center; border: 1px solid #C5C5C5; border-radius: 9px;  }
+
+.upload-drop .dropdown-menu { padding: 0px; background: #FFFFFF; box-shadow: 0px 10px 11px #00000012; border: 1px solid #B589DB; border-radius: 9px; }
+.upload-drop .dropdown-item { background: transparent !important; padding: 9px 16px; color: #212B36; font-weight: 500; font-size: 14px; border: 1px solid #EBEBEB; }
+.upload-drop .dropdown-item:first-child { border-top-left-radius: 9px; border-top-right-radius: 9px; }
+.upload-drop .dropdown-item:last-child { border-bottom-right-radius: 9px; border-bottom-left-radius: 9px; }
+
+/*tab css*/
+.leftadvance-menu { background: #ffff; border-radius: 8px}
+.leftadvance-menu li { list-style: none;  }
+.leftadvance-menu  .nav-link { color: #999; padding: 20px 32px; font-size: 14px; font-weight: 500}
+.leftadvance-menu  .nav-link img { width: 25px; margin-right: 10px; opacity: 0.7}
+.leftadvance-menu  .nav-link.active img { opacity: 1; filter: brightness(0) saturate(100%) invert(15%) sepia(44%) saturate(4446%) hue-rotate(263deg) brightness(113%) contrast(120%); }
+.leftadvance-menu  .nav-link.active { color: #6B12B7; font-weight: bold}
+.leftadvance-menu .nav-link:after { background: #6B12B7 !important; }
+/*========*/
+
+.network-box { min-height: 60px; padding: 15px 10px; background: #FFFFFF; border-radius: 10px; text-align: center; display: flex; align-items: center; justify-content: center; }
+.network-box p { color: #5D596D; font-weight: 500; font-size: 14px; margin: 0px; }
+.network-box img { margin-right: 9px; }
+.top-haed h2 { color: #000000; font-weight: 500; font-size: 20px; margin: 0px; }
+.top-haed p { color: #6F6B7D; font-weight: 500; font-size: 12px; margin: 0px; }
+.main-card { background: #FFFFFF; border-radius: 14px; padding: 20px 20px; min-height: 100%; }
+.green-badge { display: inline-flex; align-items: center; padding: 3px 7px; background: #D8FFEA; border-radius: 50px; color: #000000; font-weight: 500; font-size: 12px;  }
+.green-badge img { margin-left: 7px; }
+.card-select {  height: 40px; color: #000000; font-weight: normal; font-size: 13px; border: 1px solid #EBEBEB; border-radius: 40px; appearance: none;  
+background: url(sown-arrow.svg) no-repeat right 12px center #fff; }
+.card-select:focus { box-shadow: none; outline: none; border: 1px solid #EBEBEB; }
+.green-badge.red { background: #FFF0F1; }
+
+.upload-box { background: #FCFCFC; border: 1px dashed #B589DB; border-radius: 8px; padding: 26px 10px; text-align: center; }
+.upload-box p { color: #A4A2AE; font-weight: 500; font-size: 12px; margin: 0px; padding-top: 10px; }
+.upload-btn-wrapper {position: relative; overflow: hidden; display: block;}
+.uploadBtnnew {  background: #7367F0; color: #fff; outline: none; font-size: 13px; border-radius: 4px; padding: 7px 40px;  font-weight: 500; }
+.upload-btn-wrapper input[type=file] {font-size: 100px; position: absolute; left: -124px; top: 0; opacity: 0; cursor: pointer; height: 500px; font-size: 20px; width: 900px;}
+.file-sizetext { color: #A4A2AE; font-weight: 500; font-size: 12px; margin: 0px; padding-top: 5px; }
+.blue-colortable { color: #6B12B7 !important; }
+.contract-tab { background: #EBEEEE; border-radius: 8px; padding-top: 8px; padding-left: 20px; }
+.contract-tab .nav-item { margin-right: 20px; }
+
+.contract-tab .nav-item .nav-link { padding: 0.61rem 26px; }
+.contract-tab .nav-link:after { background: #1772EB !important; }
+.contract-tab .nav-link.active { color: #6F6B7D; }
+.days-text { font-weight: 500 !important; font-size: 10px !important; }
+.gray-icon { color: #AEAEAE; height: 26px; width: 26px; }
+
+/*======================*/
+.td-bluetext { color: #6B12B7; }
+.td-greentext { color: #28C76F; }
+.user-logotd img { margin-right: 8px; }
+.user-td { display: flex; align-items: center; }
+.user-td img { margin-right: 8px; }
+.td-redtext { color: #DD2025; }
+
+.charts-datapoint { margin-top: 7px; display: flex; background: #FFFFFF; border: 1px solid #EBEBEB; border-radius: 8px; padding: 8px 12px; }
+
+.dots-datapoints { margin-right: 7px; background: #07D16A; width: 7px; height: 9px; display: block; border-radius: 4px; }
+.charts-datapoint p { color: #000000; font-weight: normal; font-size: 14px; margin: 0px; line-height: 16px; }
+.charts-datapoint p span { font-weight: normal; font-size: 12px; color: #A4A2AE; }
+.dots-datapoints.purple { background: #B589DB; }
+.dots-datapoints.pink { background: #C6178A; }
+.dots-datapoints.orange { background: #FF9F43; }
+.dots-datapoints.darkblue { background: #6B12B7; }
+
+.saved-badge { padding: 4px 10px; background: #FFFFFF; border: 1px solid #6B12B7; border-radius: 20px; color: #000000; font-weight: 500; font-size: 10px; }
+.amount-box { background: #FBFBDA; text-align: center; padding: 15px; border-radius: 20px; }
+.amount-box.blue { background: #EEF3FF; }
+.amount-box.green { background: #E1FFEE; }
+.amount-box.red { background: #FFF5EB; }
+
+.rate-badge { border: 1px solid #28C76F; border-radius: 20px; padding: 4px 5px; color: #000000; font-weight: 500; font-size: 11px; }
+.rate-badge .feather, [data-feather]  { color: #28C76F; }
+
+.contract-details h6 { color: #000000; font-weight: 500; font-size: 14px; margin: 0px; }
+.contract-details p { color: #000000ab; font-weight: 400; font-size: 12px; margin: 0px; padding-top: 4px; }
+.contract-details p span { color: #6B12B7; }
+
+.tooltip-inner { background-color:#6B12B7 !important; color: #fff !important;  }
+.tooltip.bs-tooltip-top .tooltip-arrow::before { border-top-color: #6B12B7 !important; }
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before { border-bottom-color: #6B12B7 !important; }
+.tooltip.bs-tooltip-left .tooltip-arrow::before { border-left-color: #6B12B7 !important; }
+.tooltip.bs-tooltip-right .tooltip-arrow::before { border-right-color: #6B12B7 !important; }
+
+/* responsive */
+
+@media screen and (max-width: 575px) {  
+
+	.leftadvance-menu { flex-wrap: inherit; overflow-x: scroll; }
+	.leftadvance-menu::-webkit-scrollbar { display: none; }
+	.leftadvance-menu .nav-link { padding: 12px 15px; }
+	.top-haed h2 { font-size: 18px; }
+	.card-select { height: 35px; font-size: 12px; }
+	.contract-tab { flex-wrap: inherit; overflow-x: scroll; }
+	.contract-tab::-webkit-scrollbar { display: none; }
+	.contract-tab .nav-item .nav-link { padding: 0.61rem 20px; 	}
+	.contract-details h6 { font-size: 13px; }
+	.contract-details p { font-size: 11px; }
+
+ }
+
+
+
+
+
+
+
+
+

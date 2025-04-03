@@ -1,0 +1,171 @@
+html body { background: #f6f6f6 }
+.card {  border-radius: 20px }
+.vertical-layout.vertical-menu-modern.menu-collapsed .app-content, .vertical-layout.vertical-menu-modern.menu-collapsed .footer {
+    margin-left: 0;
+}
+.card-statistics .statistics-body {
+    padding: 20px  !important;
+}
+html .content .content-wrapper .content-header-title { font-size: 18px; font-weight: 700; color: #000}
+.breadcrumb { padding: 0; font-size: 12px; font-weight: 500}
+
+.travelexp-summry p.card-text { font-size: 12px; font-weight: 500; margin-top: 2px; color: #999  }
+.travelexp-summry h6 { font-size: 12px; font-weight: 600; margin: 20px 0 0  }
+.travelexp-summry h4 { font-size: 22px; }
+
+.travelexp-summry .avatar .avatar-content {
+    width: 38px !important;
+    height: 38px !important;
+}
+
+.travelexp-summry  .avatar .avatar-content .avatar-icon {
+    width: 17px !important;
+    height: 17px !important;
+}
+
+.top-navigation { margin-bottom: 0; margin-top: 5px }
+.top-navigation li { list-style: none; display: inline; }
+.top-navigation li a { font-size: 12px; color: #414141; padding: 12px 15px; font-weight: 500 }
+.top-navigation li a:hover { color: #6b12b7; }
+.top-navigation li a .feather { margin-bottom: 3px; margin-right: 3px; }
+
+.apexcharts-legend-marker { border-radius: 0 !important}
+.customernewsection-form .loandetailhistory.nav-tabs .nav-link { padding: 11px 2px; margin-right: 24px; }
+.summary-box { border: #eee 2px solid; border-radius: 10px; padding: 15px 15px 0px}
+
+
+.exp-heade-top { font-size: 13px; color: #000; border-bottom: #dddddd thin solid; padding:10px; background: #eae9fa; border-radius: 30px; }
+.exp-heade-top svg { width: 16px; height: 16px; color: #6b12b7; margin-right: 5px}
+
+.expviewdetailsher { overflow: visible; max-height: inherit; margin: 16px 0}
+
+.timeline .timeline-point-success svg { stroke: #ffffff !important;}
+.timeline .timeline-item .timeline-point.timeline-point-indicator { left: -8px; }
+.timeline .timeline-item .timeline-point.timeline-point-indicator { width: 16px; height: 16px}
+.timeline .timeline-item .timeline-point.timeline-point-indicator:before { width: 24px; height: 24px }
+
+
+.expempinfodetail h6 { font-size: 12px }
+
+.loanapplicationlist .text-end { padding-right: 40px !important}
+
+
+.final-statusontop { background: #fbfafa; border: #eee thin solid; display: flex; align-items: center; border-radius: 10px; max-width: 200px; overflow: hidden; margin-top: 20px}
+.final-statusontop h5 { font-size: 12px; color: #000; font-weight: bold;  margin: 10px 20px 0 0;    }
+.final-statusontop .ststaicon { background: #fe9e43; height: 64px; color: #fff; padding: 10px; margin-right: 15px; line-height: 40px }
+.final-statusontop .ststaicon svg { width: 18px; height: 18px }
+.final-statusontop p { font-size: 12px; color: #999; margin: 0 0 10px; text-align: left}
+
+
+.travelexp-form .form-control, .travelexp-form .form-select, .travelexp-form .select2-container--default .select2-selection--single, .travelexp-form .select2-container--default.select2-container--focus .select2-selection--multiple, .travelexp-form .select2-container--default .select2-selection--multiple {
+    font-size: 12px;
+    border-radius: 7px;
+}
+
+
+.budget-form label { position: absolute; ;left: 10px; background: #fff; padding: 0 5px; top: -9px; z-index: 1;}
+.budget-form .form-control, .budget-form .form-select { padding: 16px 15px}
+.budget-form .select2-container--default .select2-selection--single { padding: 16px 6px; height: 52px }
+.budget-form .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 21px }
+.budget-form .select2-container--default .select2-selection--single .select2-selection__arrow b { top: 19px; }
+
+
+.custom-option-item-check + .custom-option-item { background-color: rgba(115, 103, 240, 0.12); border-color: transparent; }
+.custom-option-item-check + .custom-option-item  span {color: #000 !important; margin-top: 15px }
+.custom-option-item-check  + .custom-option-item svg { color: #7367f0; }
+
+
+.travelclassinput { display: flex; flex-wrap: wrap; margin: 0 0 40px 0} 
+.travelclassinput .custom-option-item-check + .custom-option-item { background-color: rgba(115, 103, 240, 0.12); border-color: transparent; padding: 8px 25px; font-size: 12px; border-radius: 25px; color: #000} 
+.travelclassinput .custom-option-item-check + .custom-option-item span {  color: #000} 
+
+.travelclassinput .custom-option-item-check:checked + .custom-option-item { border-color: rgba(115, 103, 240, 1); } 
+
+.leftadvance-menu { background: #ffff; border-radius: 8px}
+.leftadvance-menu li { list-style: none;  }
+.leftadvance-menu .nav-link { color: #999; padding: 20px 32px; font-size: 14px; font-weight: 500}
+.leftadvance-menu .nav-link img { width: 25px; margin-right: 10px; opacity: 0.7}
+.leftadvance-menu .nav-link.active img { opacity: 1; filter: brightness(0) saturate(100%) invert(15%) sepia(44%) saturate(4446%) hue-rotate(263deg) brightness(113%) contrast(120%); }
+.leftadvance-menu .nav-link.active { color: #6B12B7; font-weight: bold}
+.leftadvance-menu .nav-link:after { background: #6B12B7 !important; }
+
+
+
+.search-btnfligt { font-size: 14px; padding: 18px 35px; border-radius: 10px}
+
+.text-primary-new { color: #6B12B7 !important; }
+.admin-info { font-size: 13px !important;  font-weight: bold }
+
+
+.flight-top-filter {
+    background: #eeedfd;
+    border-radius: 8px;
+    padding:10px 10px;
+    margin-bottom: 20px
+}
+
+.flightinfo { display: flex; align-items: center }
+.flightinfo img { width: 32px; margin-right: 10px; flex-shrink: 0; }
+.flightinfo h6 { font-size: 11px; font-weight: 600;  color: #6B12B7; margin-bottom: 0 }
+.flightinfo p { font-size: 10px; color: #6e6b7b; margin: 0 }
+
+.flight-detailstable { background: #fff;  }
+.flight-detailstable td { border: none !important; padding: 20px 10px!important; background: #fff }
+.flight-detailstable th { border: none !important; padding: 10px!important }
+.flight-detailstable td button { padding: 10px 15px !important; font-size: 12px}
+
+
+
+.flight-detailstablenew { border-collapse: separate; border-spacing: 0 15px; background: none; }
+.flight-detailstablenew tr { box-shadow: 0 0 25px 0px rgba(0, 0, 0, 0.05) }
+
+
+
+.flighttime { font-size: 13px; color: #000;   font-weight: 600}
+.flighthour { font-size: 12px; text-align: center; color: #4b4b4b;  }
+.flightamt { font-size: 22px; color: #000; font-weight: 700  }
+.flighthour p { font-size: 12px; color: #b5b5b5; margin: 5px 0 0; text-align: center; font-weight: 400; border-top: #6B12B7 2px solid; display: inline-block}
+
+.flightbookbtn { text-align: right}
+
+
+.price-rangetxt  p { margin:10px 0 0; font-size: 13px; font-weight: 600;}
+
+.expsumarybox { position: relative; border: #eee thin solid; border-radius: 10px; padding: 15px 15px 5px; margin-bottom: 20px; box-shadow: 0 0 20px 3px rgba(0, 0, 0, 0.07);}
+.delteexpbtn { position: absolute; top: 25px; right: 10px}
+.delteexpbtn svg { margin-left: 5px; }
+
+
+#donut-apptask .apexcharts-canvas .apexcharts-pie .apexcharts-datalabel-label, #donut-opentask .apexcharts-canvas .apexcharts-pie .apexcharts-datalabel-label { font-size: 12px !important}
+
+.card-statistics .card-header {
+    padding-left: 25px;
+}
+
+.attachmentbifingo { border: #eee thin solid; border-radius: 5px; padding: 5px; width: 100px; height: 100px; display: inline-block}
+.attachmentbifingo img { object-fit: cover; object-position: top; width: 100%; height: 100%; border-radius: 5px}
+
+
+.myrequesttablecbox.dataTable { border: #eee thin solid}
+.myrequesttablecbox.dataTable tr th {
+        background-color: #e5e5e5 !important;
+            border-right: #d5d5d5 thin solid;
+}
+
+.myrequesttablecbox.dataTable tr th:last-child { 
+            border-right: none
+}
+
+.myrequesttablecbox.dataTable tr td { 
+            border-right: #eee thin solid;
+}
+
+.myrequesttablecbox.dataTable tr td .badge {
+     font-size: 90%
+}
+
+
+
+
+
+ 
