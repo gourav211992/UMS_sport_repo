@@ -12,4 +12,9 @@ class batch extends Model
     protected $fillable=['batch_name','batch_year','status'];
     protected $guarded=[];
 
+    public function sections()
+    {
+        return $this->hasMany(Section::class);
+    }
+
 }

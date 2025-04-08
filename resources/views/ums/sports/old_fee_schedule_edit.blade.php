@@ -23,12 +23,13 @@
                     </div>
                 </div>
                 <div class="content-header-right text-sm-end col-md-6 mb-50 mb-sm-0">
-                        <div class="form-group breadcrumb-right">
-                            <button onClick="javascript: history.go(-1)"
+                <button onClick="javascript: history.go(-1)"
                                 class="btn btn-secondary btn-sm mb-50 mb-sm-0"><i data-feather="arrow-left-circle"></i>
-                                Back</button>
-                            <form action="{{ url('sports-fee-schedule/update/' . $sportFeeMaster->id) }}" method="POST">
-                                @csrf
+                                Back</button>    
+                <form action="{{ url('sports-fee-schedule/update/' . $sportFeeMaster->id) }}" method="POST">
+                        @csrf
+                        <div class="form-group breadcrumb-right">
+                            
                             <button type="submit" onClick="captureTableData()"
                                 class="btn btn-primary btn-sm mb-50 mb-sm-0"><i data-feather="check-circle"></i>
                                 Submit</button>
@@ -150,10 +151,14 @@
 
                                                 <select class="form-select" id="batch_year" name="batch_year">
                                                     <option value="" selected>-----Select Year-----</option>
-                                                    @foreach ($sections->pluck('year')->unique() as $batch_year)
-                                                    <option value="{{ $batch_year }}"
-                                                        {{ (isset($sportFeeMaster) && $sportFeeMaster->batch_year == $batch_year) ? 'selected' : '' }}>
-                                                        {{ $batch_year }}
+                                                    @php
+                                                    $selectedYear = isset($sportFeeMaster) ? $sportFeeMaster->batch_year : null;
+                                                    $sectionYears= App\Models\ums\Section::where('name', $sportFeeMaster->section)->pluck('year')->unique();
+                                                    @endphp
+
+                                                    @foreach ($sectionYears as $year)
+                                                    <option value="{{ $year }}" {{ $selectedYear == $year ? 'selected' : '' }}>
+                                                        {{ $year }}
                                                     </option>
                                                     @endforeach
                                                 </select>
@@ -174,12 +179,11 @@
 
                                                 <select class="form-select" name="batch_name" id="batch_name">
                                                     <option value="" selected>-----Select-----</option>
-                                                    @foreach ($sections->pluck('batch')->unique() as $batch)
-                                                    <option value="{{ $batch}}"
-                                                        {{ old('batch_name', $sportFeeMaster->batch== $batch  )  ? 'selected' : '' }}>
-                                                        {{ ucfirst($batch) }}
+                                                    @if (isset($sportFeeMaster))
+                                                    <option value="{{ $sportFeeMaster->batch }}" selected>
+                                                        {{ $sportFeeMaster->batch }}
                                                     </option>
-                                                    @endforeach
+                                                    @endif
                                                 </select>
                                             </div>
 
@@ -190,6 +194,8 @@
                                         <!-- Section -->
 
                                         <!-- Quota -->
+
+
                                         <div class="row align-items-center mb-1">
                                             <div class="col-md-3">
                                                 <label class="form-label">Quota <span
@@ -207,6 +213,32 @@
                                                 </select>
                                             </div>
                                         </div>
+
+                                        <div class="row align-items-center mb-2">
+                                            <div class="col-md-3">
+                                                    <label class="form-label">Display <span
+                                                            class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-5">
+                                                   
+                                                    <div class="demo-inline-spacing">
+                                                        <div class="form-check form-check-primary mt-25">
+                                                            <input type="radio" id="customColorRadio3" name="display"
+                                                                class="form-check-input"  value="1"
+                                                                 checked=  {{ old('display', $sportFeeMaster->display ?? '') == '1' ? 'checked' : '' }}>
+                                                            <label class="form-check-label fw-bolder"
+                                                                for="customColorRadio3">Enable</label>
+                                                        </div>
+                                                        <div class="form-check form-check-primary mt-25">
+                                                            <input type="radio" id="customColorRadio4" name="display" value="0"
+                                                                class="form-check-input"
+                                                                {{ old('display', $sportFeeMaster->display ?? '') == '0' ? 'checked' : '' }}>
+                                                            <label class="form-check-label fw-bolder"
+                                                                for="customColorRadio4">Disable</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                     </div>
                                     <!-- Hidden fee_details input -->
                                     <input type="hidden" name="fee_details" id="form_details">
@@ -551,9 +583,9 @@
     });
 </script>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         // Fetch Batch Years on Section Select
-        $('#section').change(function () {
+        $('#section').change(function() {
             var sectionName = $(this).val();
             $('#batch_year').html('<option value="" selected>-----Select Year-----</option>');
             $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
@@ -566,10 +598,10 @@
                         section_name: sectionName,
                         _token: "{{ csrf_token() }}"
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.length > 0) {
-                            $.each(response, function (index, item) {
-                                $('#batch_year').append('<option value="' + item    + '">' + item + '</option>');
+                            $.each(response, function(index, item) {
+                                $('#batch_year').append('<option value="' + item + '">' + item + '</option>');
                             });
                             $('#batch_year').prop('disabled', false);
                         } else {
@@ -584,7 +616,7 @@
         });
 
         // Fetch Batch Names on Year Select
-        $('#batch_year').change(function () {
+        $('#batch_year').change(function() {
             var sectionName = $('#section').val();
             var batchYear = $(this).val();
             $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
@@ -598,9 +630,9 @@
                         batch_year: batchYear,
                         _token: "{{ csrf_token() }}"
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.length > 0) {
-                            $.each(response, function (index, item) {
+                            $.each(response, function(index, item) {
                                 $('#batch_name').append('<option value="' + item.batch + '">' + item.batch + '</option>');
                             });
                             $('#batch_name').prop('disabled', false);

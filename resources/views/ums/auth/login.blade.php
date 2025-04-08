@@ -16,6 +16,13 @@
 
 
     <style>
+        /* background: "sports/assets/frontend/css/landing/university-bgmain.jpg"; */
+        /* background: {{asset('sports/img/sport-image-login')}};
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+         */
+
+    
         .eyebtn {
             cursor: pointer;
         }
@@ -44,12 +51,17 @@
                     <div class="login-box mt-2 min-Loginheight">
                         <div class="row">
                             <div class="col-sm-12 col-md-7 position-relative min-Loginheight">
-                                <div class="uplogo">
+                            <!-- Sports Quest image -->
+                                <div class="container m-auto login-image-container d-none d-md-block p-3" style="align-self: center">
+    <img src="{{ asset('sports/img/sport-image-login.jpg') }}" class="img-fluid" />
+</div>
+                                <!-- Old UMS Image and logo  -->
+                            <!-- <div class="uplogo">
                                     <img src="{{asset('assets/admin/img/login-logo.png')}}" />
                                 </div>
                                 <div class="yogiimg">
                                      <img src="{{asset('assets/admin/img/loginbg.png')}}"   />
-                                </div>
+                                </div> -->
                             </div>
                             <div class="col-sm-12 col-md-4">
                                 <div class="loginArea">

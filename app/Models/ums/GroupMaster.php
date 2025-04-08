@@ -12,14 +12,34 @@ class GroupMaster extends Model
     protected $table = 'master_group';
     protected $dates = ['deleted_at'];
 
+
     // Fillable fields
-    protected $fillable = [
-        'group_name',
-        'status',
-        'section_name',
-        'section_year',
-        'section_batch'
-    ];
+    protected $fillable = ['name','batch_year','status', 'section_id','section_name','batch_name', 'batch_id']; // Mass assignable fields
+
+    // Relationship with Section (each GroupMaster belongs to a Section)
+    public function section()
+    {
+        return $this->belongsTo(Section::class, 'section_id'); // Foreign key section_id
+    }
+
+    // Relationship with Batch (each GroupMaster belongs to a Batch)
+    public function batch()
+    {
+        return $this->belongsTo(Batch::class, 'batch'); // Foreign key batch_id
+    }
+
+
+
+    
+    
+    
+    // protected $fillable = [
+    //     'group_name',
+    //     'status',
+    //     'section_name',
+    //     'section_year',
+    //     'section_batch'
+    // ];
 
     // Optionally, define a relationship with Section if required
     // public function section()

@@ -48,31 +48,32 @@
                                                     <label class="form-label">Section</label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <select class="form-select" name="section" disabled>
-                                                        <option value="" selected>-----Select-----</option>
-                                                        @foreach ($section as $items)
-                                                            <option value="{{ $items->id }}" 
-                                                                @if($group->section_id == $items->id) selected @endif>
-                                                                {{ ucfirst($items->name) }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
+                                                    
+
+                                                    <input type="text" class="form-control" value="{{ $group->section_name }}" disabled>
                                                 </div>
                                             </div>
+                                            
+                                            <!-- Year Field -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
-                                                    <label class="form-label">section Batch <span class="text-danger">*</span></label>
+                                                    <label class="form-label">Batch Year <span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <input type="text" disabled name="section_batch" value="{{ old('section_batch', $group->section_batch) }}" class="form-control" />
+                                                  
+                                                <input type="text" class="form-control" value="{{ $group->section_year }}"  disabled>
                                                 </div>
                                             </div>
+                                            
+                                            <!-- Batch Field -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Section year <span class="text-danger">*</span></label>
+                                                    <label class="form-label">Batch Name<span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <input type="text" disabled name="section_year" value="{{ old('section_year', $group->section_year) }}" class="form-control" />
+                                                   
+                                                    
+                                                <input type="text" class="form-control" value="{{ $group->section_batch }} " disabled>
                                                 </div>
                                             </div>
                                             <!-- Status Field -->

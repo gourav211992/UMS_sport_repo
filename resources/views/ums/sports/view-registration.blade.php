@@ -379,54 +379,46 @@
                                                     </div>
 
                                                     <div class="row align-items-center mb-1">
-                                                        <div class="col-md-2">
-                                                            <label class="form-label">Batch Year <span class="text-danger">*</span></label>
-                                                        </div>
                                                         <div class="col-md-3">
-                                                            <select class="form-select" id="batch_year" name="batch_year">
-                                                                <option value="">Select Year</option>
-                                                                @foreach ($batchYears as $by)
-                                                                    <option value="{{ $by->batch_year }}" @if($selectedBatch && $by->batch_year == $selectedBatch->batch_year) selected @endif>
-                                                                        {{ $by->batch_year }}
-                                                                    </option>
+                                                            <label class="form-label">Batch Name <span class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <select class="form-select" id="batch_name" name="batch_id">
+                                                                <option value="">-----Select Batch-----</option>
+                                                                @foreach($batch as $ba)
+                                                                    <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif >{{ $ba->batch }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
                                                     </div>
-
+{{--                                                    <div class="row align-items-center mb-1">--}}
+{{--                                                        <div class="col-md-3">--}}
+{{--                                                            <label class="form-label">Batch Year <span class="text-danger">*</span></label>--}}
+{{--                                                        </div>--}}
+{{--                                                        <div class="col-md-5">--}}
+{{--                                                            <select class="form-select" id="batch_year" name="batch_year" disabled>--}}
+{{--                                                                <option value="">-----Select Year-----</option>--}}
+{{--                                                                @foreach($batch as $ba)--}}
+{{--                                                                    <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif>{{ $ba->batch_year }}</option>--}}
+{{--                                                                @endforeach--}}
+{{--                                                            </select>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
                                                     <div class="row align-items-center mb-1">
-                                                        <div class="col-md-2">
-                                                            <label class="form-label">Batch Name <span class="text-danger">*</span></label>
-                                                        </div>
                                                         <div class="col-md-3">
-                                                            <select class="form-select" id="batch_name" name="batch_id">
-                                                                <option value="">Select Name</option>
-                                                                @foreach ($batch as $b)
-                                                                    @if($b->batch_year == ($selectedBatch ? $selectedBatch->batch_year : ''))
-                                                                        <option value="{{ $b->id }}" @if($selectedBatch && $b->id == $selectedBatch->id) selected @endif>
-                                                                            {{ $b->batch_name }}
-                                                                        </option>
-                                                                    @endif
+                                                            <label class="form-label">Section <span class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <select class="form-select" name="section_id" id="section">
+                                                                <option value="">-----Select Section-----</option>
+                                                                @foreach($sections as $section)
+                                                                    <option value="{{ $section->id }}" @if ($section->id == $registration->section_id) selected @endif>{{ $section->section }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
                                                     </div>
 
                                                     <input type="hidden" id="selected_batch_name" value="{{ $selectedBatch ? $selectedBatch->batch_name : '' }}">
-
-                                                    <div class="row align-items-center mb-1">
-                                                        <div class="col-md-2">
-                                                            <label class="form-label">Section <span class="text-danger">*</span></label>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <select class="form-select" name="section_id">
-                                                                <option value="">Select</option>
-                                                                @foreach ($sections as $s)
-                                                                    <option value="{{ $s->id }}" {{ $registration->section_id == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                    </div>
 
                                                     <div class="row align-items-center mb-1">
                                                         <div class="col-md-2">

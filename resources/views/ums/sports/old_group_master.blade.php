@@ -43,10 +43,10 @@
                                          <tr>
                                             <th>#</th>
                                             
-                                            <th>Name</th>
-                                            <th>Section</th>
-                                            <th>SectionBatch</th>
-                                            <th>SectionYear</th>
+                                            <th> Group Name</th>
+                                            <th>Section Name</th>
+                                            <th>Batch Name</th>
+                                            <th>Batch Year</th>
 
                                             <th>Status</th>
                                             <th>Action</th>
@@ -60,7 +60,7 @@
                                              <tr>
                                                 <td>{{$index+1}}</td>
                                                 <td>{{$item->group_name}}</td>
-                                                <td>{{$item->section->name}}</td>
+                                                <td>{{$item->section_name}}</td>
                                                 <td>{{$item->section_batch}}</td>
                                                 <td>{{$item->section_year}}</td>
                                                

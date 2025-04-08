@@ -65,8 +65,8 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>Batch Name</th>
                                             <th>Batch Year </th>
+                                            <th>Batch Name</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
@@ -76,8 +76,8 @@
                                         <tr>
                                             <!-- <td>{{ $row->id }}</td> -->
                                             <td>{{ $loop->iteration }}</td>
-                                            <td class="fw-bolder text-dark">{{ $row->batch_name }}</td>
                                             <td class="fw-bolder text-dark">{{ $row->batch_year }}</td>
+                                            <td class="fw-bolder text-dark">{{ $row->batch_name }}</td>
                                             <td><span class="badge rounded-pill 
                                                         {{ $row->status == 'active' ? 'badge-light-success' : 'badge-light-danger' }}">
                                                     {{ ucfirst($row->status) }}

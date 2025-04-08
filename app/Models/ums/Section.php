@@ -17,4 +17,10 @@ class Section extends Model
     {
         return $this->hasMany(GroupMaster::class, 'section_id');
     }
+
+    public function batch()
+    {
+        return $this->belongsTo(Batch::class);
+    }
+
 }

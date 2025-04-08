@@ -1,7 +1,6 @@
 @extends('ums.sports.sports-meta.admin-sports-meta')
 
 @section('content')
-
 <div class="app-content content">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
@@ -30,7 +29,7 @@
 
         <form id="cat_form" method="POST" action="{{ route('group-master-update', $group->id) }}">
             @csrf
-            @method('PUT') <!-- Method spoofing to use PUT for update -->
+            @method('PUT')
             <div class="content-body">
                 <section id="basic-datatable">
                     <div class="row">
@@ -40,52 +39,71 @@
                                     <div class="row">
                                         <div class="col-md-8">
                                             <!-- Group Name Field -->
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Group Name <span class="text-danger">*</span></label>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <input type="text" name="group_name" value="{{ old('group_name', $group->group_name) }}" class="form-control" />
-                                                </div>
-                                            </div>
-                                            
+                                           
+
                                             <!-- Section Field -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
                                                     <label class="form-label">Section</label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <select class="form-select" name="section" id="section" onchange="updateSectionDetails()">
-                                                        <option value="" selected>-----Select-----</option>
-                                                        @foreach ($section as $items)
-                                                            <option value="{{ $items->id }}" 
-                                                                @if($group->section_id == $items->id) selected @endif
-                                                                data-batch="{{ $items->batch }}" 
-                                                                data-year="{{ $items->year }}">
-                                                                {{ ucfirst($items->name) }}
+                                                    <select id="section" name="section_name" class="form-control">
+                                                        <option value="">Select Section</option>
+                                                        @foreach($sections->pluck('name')->unique() as $section)
+                                                            <option value="{{ $section}}" @if($group->section_name == $section) selected @endif>
+                                                                {{ $section }}
                                                             </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
                                             </div>
-
-                                            <!-- Batch Name Field (Disabled) -->
+                                            
+                                            <!-- Year Field -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Batch Name</label>
+                                                    <label class="form-label">Batch Year <span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <input type="text" name="batch_name" id="batch_name" value="{{ old('batch_name', $group->section_batch) }}" class="form-control" disabled />
+                                                    <select id="batch_year" name="section_year" class="form-control">
+                                                    @php
+                                                    $selectedYear = isset($group) ? $group->section_name : null;
+                                                    $sectionYears= App\Models\ums\Section::where('name', $group->section_name)->pluck('year')->unique();
+                                                    @endphp
+
+                                                    @foreach ($sectionYears as $year)
+                                                    <option value="{{ $year }}" {{ $selectedYear == $year ? 'selected' : '' }}>
+                                                        {{ $year }}
+                                                    </option>
+                                                    @endforeach
+                                                    </select>
                                                 </div>
                                             </div>
-
-                                            <!-- Section Year Field (Disabled) -->
+                                            
+                                            <!-- Batch Field -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Section Year</label>
+                                                    <label class="form-label">Batch Name<span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <input type="text" name="section_year" id="section_year" value="{{ old('section_year', $group->section_year) }}" class="form-control" disabled />
+                                                    <select id="batch_name" name="section_batch" class="form-control">
+                                                    @if (isset($group))
+                                                    <option value="{{ $group->section_batch }}" selected>
+                                                        {{ $group->section_batch }}
+                                                    </option>
+                                                    @endif
+                                                       
+                                                    </select>
+                                                    
+                                                </div>
+                                            </div>
+                                            
+
+                                            <div class="row align-items-center mb-1">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Group Name <span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <input type="text" name="group_name" value="{{ old('group_name', $group->group_name) }}" class="form-control" />
                                                 </div>
                                             </div>
 
@@ -107,7 +125,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-        
+
                                         </div>
                                     </div>
                                 </div>
@@ -117,34 +135,81 @@
                 </section>
             </div>
         </form>
-        
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
-    // This function is triggered when selecting a section
-    function updateSectionDetails() {
-        var sectionSelect = document.getElementById("section");
-        var sectionId = sectionSelect.value;
-        var batchInput = document.getElementById("batch_name");
-        var yearInput = document.getElementById("section_year");
+  $(document).ready(function () {
+        // Fetch Batch Years on Section Select
+        $('#section').change(function () {
+            var sectionName = $(this).val();
+            $('#batch_year').html('<option value="" selected>-----Select Year-----</option>');
+            $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
 
-        // Loop through the options to find the selected section
-        for (var i = 0; i < sectionSelect.options.length; i++) {
-            var option = sectionSelect.options[i];
-            if (option.value == sectionId) {
-                // Populate batch and year fields
-                batchInput.value = option.getAttribute("data-batch");
-                yearInput.value = option.getAttribute("data-year");
-                break;
+            if (sectionName) {
+                $.ajax({
+                    url: "{{ route('get.batch.year') }}",
+                    type: "POST",
+                    data: {
+                        section_name: sectionName,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (response) {
+                        if (response.length > 0) {
+                            $.each(response, function (index, item) {
+                                $('#batch_year').append('<option value="' + item    + '">' + item + '</option>');
+                            });
+                            $('#batch_year').prop('disabled', false);
+                        } else {
+                            $('#batch_year').prop('disabled', true);
+                        }
+                    }
+                });
+            } else {
+                $('#batch_year').prop('disabled', true);
+                $('#batch_name').prop('disabled', true);
             }
-        }
-    }
+        });
 
-    // Trigger the function on page load if a section is already selected
-    document.addEventListener("DOMContentLoaded", function() {
-        updateSectionDetails();
+        // Fetch Batch Names on Year Select
+        $('#batch_year').change(function () {
+            var sectionName = $('#section').val();
+            var batchYear = $(this).val();
+            $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
+
+            if (sectionName && batchYear) {
+                $.ajax({
+                    url: "{{ route('get.batch.names') }}",
+                    type: "POST",
+                    data: {
+                        section_name: sectionName,
+                        batch_year: batchYear,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (response) {
+                        if (response.length > 0) {
+                            $.each(response, function (index, item) {
+                                $('#batch_name').append('<option value="' + item.batch + '">' + item.batch + '</option>');
+                            });
+                            $('#batch_name').prop('disabled', false);
+                        } else {
+                            $('#batch_name').prop('disabled', true);
+                        }
+                    }
+                });
+            } else {
+                $('#batch_name').prop('disabled', true);
+            }
+        });
     });
+
 </script>
+
+
+
+
+
+
 
 @endsection

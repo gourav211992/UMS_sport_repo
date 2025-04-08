@@ -100,6 +100,7 @@
                                                 <label for="password" class="form-label">Password</label>
                                                 <!-- <a href="javascript:void(0)" class="fw-bold"><small> Forgot
                                                         Password?</small></a> -->
+                                                <a href="{{ route('sports.password.request') }}" class="fw-bold"><small> Forgot Password?</small></a>
                                             </div>
                                             <div
                                                 class="input-group input-group-merge form-password-toggle passwordinputnew">

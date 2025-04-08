@@ -1,5 +1,5 @@
     @extends('ums.sports.sports-meta.admin-sports-meta')
-@section('content')
+    @section('content')
 
     <!-- BEGIN: Content-->
     <div class="app-content content ">
@@ -29,7 +29,7 @@
                             <button onClick="saveDraft()" class="btn btn-outline-primary btn-sm mb-50 mb-sm-0"><i
                                     data-feather="save"></i> Save as Draft</button>
                             <button onClick="proceed()"
-{{--                                    data-bs-toggle="modal" data-bs-target="#disclaimer"--}}
+                                {{--                                    data-bs-toggle="modal" data-bs-target="#disclaimer"--}}
                                 class="btn btn-primary btn-sm mb-50 mb-sm-0"><i data-feather="check-circle"></i>
                                 Proceed</button>
                         </div>
@@ -41,90 +41,90 @@
 
 
                 <form action="{{ route('sport-registration-post') }}" method="post"
-                                                id="postRegister" enctype="multipart/form-data">
-                                                @csrf
+                    id="postRegister" enctype="multipart/form-data">
+                    @csrf
 
-                <section id="basic-datatable">
-                    <div class="row">
-                        <div class="col-12">
+                    <section id="basic-datatable">
+                        <div class="row">
+                            <div class="col-12">
 
-                            <div class="card">
-                                <div class="card-body customernewsection-form">
+                                <div class="card">
+                                    <div class="card-body customernewsection-form">
 
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="newheader  border-bottom mb-2 pb-25">
-                                                <h4 class="card-title text-theme">Basic Information</h4>
-                                                <p class="card-text">Fill the details</p>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="newheader  border-bottom mb-2 pb-25">
+                                                    <h4 class="card-title text-theme">Basic Information</h4>
+                                                    <p class="card-text">Fill the details</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                        @if (session('success'))
+                                            @if (session('success'))
                                             <div class="alert alert-success">
                                                 {{ session('success') }}
                                             </div>
-                                        @endif
+                                            @endif
 
-                                        <!-- Error Message -->
-                                        @if (session('error'))
+                                            <!-- Error Message -->
+                                            @if (session('error'))
                                             <div class="alert alert-danger">
                                                 {{ session('error') }}
                                             </div>
-                                        @endif
-{{--                                        @dump($errors)--}}
-                                        <!-- Validation Errors -->
-                                        @if ($errors->any())
+                                            @endif
+                                            {{-- @dump($errors)--}}
+                                            <!-- Validation Errors -->
+                                            @if ($errors->any())
                                             <div class="alert alert-danger">
                                                 <ul>
                                                     @foreach ($errors->all() as $error)
-                                                        <li>{{ $error }}</li> <!-- Display each individual error -->
+                                                    <li>{{ $error }}</li> <!-- Display each individual error -->
                                                     @endforeach
                                                 </ul>
                                             </div>
-                                        @endif
-                                        <div class="col-md-8">
+                                            @endif
+                                            <div class="col-md-8">
 
 
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Series <span class="text-danger">*</span></label>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <select class="form-select @error('book_id') is-invalid @enderror" name="book_id" id="series" required>
-                                                        <option value="" disabled {{ old('book_id') ? '' : 'selected' }}>Select</option>
-                                                        @foreach ($series as $ser)
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Series <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <select class="form-select @error('book_id') is-invalid @enderror" name="book_id" id="series" required>
+                                                            <option value="" disabled {{ old('book_id') ? '' : 'selected' }}>Select</option>
+                                                            @foreach ($series as $ser)
                                                             <option value="{{ $ser->id }}" {{ old('book_id') == $ser->id ? 'selected' : '' }}>
                                                                 {{ $ser->book_name }}
                                                             </option>
-                                                        @endforeach
-                                                    </select>
-                                                    @error('book_id')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                    @enderror
+                                                            @endforeach
+                                                        </select>
+                                                        @error('book_id')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Temporary ID <span class="text-danger">*</span></label>
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Temporary ID <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="text" class="form-control @error('document_number') is-invalid @enderror"
+                                                            name="document_number" readonly id="requestno" value="{{ old('document_number') }}">
+
+                                                        <input type="hidden" name="status" id="status" value="{{old('status')}}">
+                                                        <input type="hidden" name="doc_no" id="doc_no" value="{{old('doc_no')}}">
+                                                        <input type="hidden" name="book_code" id="book_code_input" value="{{old('book_code')}}">
+                                                        <input type="hidden" name="doc_number_type" id="doc_number_type" value="{{old('doc_number_type')}}">
+                                                        <input type="hidden" name="doc_reset_pattern" id="doc_reset_pattern" value="{{old('doc_reset_pattern')}}">
+                                                        <input type="hidden" name="doc_prefix" id="doc_prefix" value="{{old('doc_prefix')}}">
+                                                        <input type="hidden" name="doc_suffix" id="doc_suffix" value="{{old('doc_suffix')}}">
+
+                                                        @error('document_number')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-5">
-                                                    <input type="text" class="form-control @error('document_number') is-invalid @enderror"
-                                                           name="document_number" readonly id="requestno" value="{{ old('document_number') }}">
-
-                                                    <input type="hidden" name="status" id="status" value="{{old('status')}}">
-                                                    <input type="hidden" name="doc_no" id="doc_no" value="{{old('doc_no')}}">
-                                                    <input type="hidden" name="book_code" id="book_code_input" value="{{old('book_code')}}">
-                                                    <input type="hidden" name="doc_number_type" id="doc_number_type" value="{{old('doc_number_type')}}">
-                                                    <input type="hidden" name="doc_reset_pattern" id="doc_reset_pattern" value="{{old('doc_reset_pattern')}}">
-                                                    <input type="hidden" name="doc_prefix" id="doc_prefix" value="{{old('doc_prefix')}}">
-                                                    <input type="hidden" name="doc_suffix" id="doc_suffix" value="{{old('doc_suffix')}}">
-
-                                                    @error('document_number')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="row align-items-center mb-1">
+                                                <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Reg. Date <span
                                                                 class="text-danger">*</span></label>
@@ -135,19 +135,19 @@
                                                             class="form-control" name="document_date" id="document_date"
                                                             value="{{ old('document_date', date('Y-m-d')) }}">
                                                         @error('document_date')
-                                                            <div class="text-danger">{{ $message }}</div>
+                                                        <div class="text-danger">{{ $message }}</div>
                                                         @enderror
                                                     </div>
                                                 </div>
 
-                                            <div class="row align-items-center mb-1">
+                                                <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Name <span class="text-danger">*</span></label>
                                                     </div>
 
                                                     <div class="col-md-3">
                                                         <input type="text" placeholder="First Name" class="form-control @error('name') is-invalid @enderror"
-                                                               name="name" value="{{ old('name', $user->first_name) }}">
+                                                            name="name" value="{{ old('name', $user->first_name) }}">
                                                         @error('name')
                                                         <div class="text-danger">{{ $message }}</div>
                                                         @enderror
@@ -155,7 +155,7 @@
 
                                                     <div class="col-md-3">
                                                         <input type="text" placeholder="Middle Name" class="form-control @error('middle_name') is-invalid @enderror"
-                                                               name="middle_name" value="{{ old('middle_name', $user->middle_name) }}">
+                                                            name="middle_name" value="{{ old('middle_name', $user->middle_name) }}">
                                                         @error('middle_name')
                                                         <div class="text-danger">{{ $message }}</div>
                                                         @enderror
@@ -163,113 +163,109 @@
 
                                                     <div class="col-md-3">
                                                         <input type="text" placeholder="Last Name" class="form-control @error('last_name') is-invalid @enderror"
-                                                               name="last_name" value="{{ old('last_name', $user->last_name) }}">
+                                                            name="last_name" value="{{ old('last_name', $user->last_name) }}">
                                                         @error('last_name')
                                                         <div class="text-danger">{{ $message }}</div>
                                                         @enderror
                                                     </div>
                                                 </div>
 
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Gender <span class="text-danger">*</span></label>
-                                                </div>
-
-                                                <div class="col-md-5">
-                                                    <div class="demo-inline-spacing">
-                                                        <div class="form-check form-check-primary mt-25">
-                                                            <input type="radio" id="customColorRadio1" name="gender" class="form-check-input @error('gender') is-invalid @enderror"
-                                                                   value="male" {{ old('gender') == 'male' ? 'checked' : '' }}>
-                                                            <label class="form-check-label fw-bolder" for="customColorRadio1">Male</label>
-                                                        </div>
-                                                        <div class="form-check form-check-primary mt-25">
-                                                            <input type="radio" id="service" name="gender" class="form-check-input @error('gender') is-invalid @enderror"
-                                                                   value="female" {{ old('gender') == 'female' ? 'checked' : '' }}>
-                                                            <label class="form-check-label fw-bolder" for="service">Female</label>
-                                                        </div>
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Gender <span class="text-danger">*</span></label>
                                                     </div>
-                                                    @error('gender')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
 
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Sport Name <span class="text-danger">*</span></label>
+                                                    <div class="col-md-5">
+                                                        <div class="demo-inline-spacing">
+                                                            <div class="form-check form-check-primary mt-25">
+                                                                <input type="radio" id="customColorRadio1" name="gender" class="form-check-input @error('gender') is-invalid @enderror"
+                                                                    value="male" {{ old('gender') == 'male' ? 'checked' : '' }}>
+                                                                <label class="form-check-label fw-bolder" for="customColorRadio1">Male</label>
+                                                            </div>
+                                                            <div class="form-check form-check-primary mt-25">
+                                                                <input type="radio" id="service" name="gender" class="form-check-input @error('gender') is-invalid @enderror"
+                                                                    value="female" {{ old('gender') == 'female' ? 'checked' : '' }}>
+                                                                <label class="form-check-label fw-bolder" for="service">Female</label>
+                                                            </div>
+                                                        </div>
+                                                        @error('gender')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
                                                 </div>
 
-                                                <div class="col-md-5">
-                                                    <select class="form-select @error('sport_id') is-invalid @enderror" name="sport_id" id="sport_id">
-                                                        <option value="" disabled {{ old('sport_id') ? '' : 'selected' }}>Select</option>
-                                                        @foreach ($sport_types as $type)
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Sport Name <span class="text-danger">*</span></label>
+                                                    </div>
+
+                                                    <div class="col-md-5">
+                                                        <select class="form-select @error('sport_id') is-invalid @enderror" name="sport_id" id="sport_id">
+                                                            <option value="" disabled {{ old('sport_id') ? '' : 'selected' }}>Select</option>
+                                                            @foreach ($sport_types as $type)
                                                             <option value="{{ $type->id }}" {{ old('sport_id') == $type->id ? 'selected' : '' }}>
                                                                 {{ $type->sport_name }}
                                                             </option>
-                                                        @endforeach
-                                                    </select>
-                                                    @error('sport_id')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                    @enderror
+                                                            @endforeach
+                                                        </select>
+                                                        @error('sport_id')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Section <span class="text-danger">*</span></label>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <select class="form-select" name="section_id" id="section">
-                                                        <option value="" selected>-----Select Section-----</option>
-                                                        @foreach ($sections->unique('name') as $item)
-                                                            <option value="{{ $item->id }}" data-name="{{ $item->name }}">
-                                                                {{ ucfirst($item->name) }}
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Batch Name <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <select class="form-select" name="batch_id" id="batch_name" required>
+                                                            <option value="" selected>-----Select Batch-----</option>
+                                                            @foreach ($batches as $batch)
+                                                            <option value="{{ $batch->id }}" {{ old('batch_id') == $batch->id ? 'selected' : '' }}>
+                                                                {{ $batch->batch }}
                                                             </option>
-                                                        @endforeach
-                                                    </select>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('batch_id')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Batch Year <span class="text-danger">*</span></label>
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Section <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <select class="form-select" name="section_id" id="section" required>
+                                                            <option value="" selected>-----Select Section-----</option>
+                                                            <!-- Sections will be loaded dynamically based on batch selection -->
+                                                        </select>
+                                                        @error('section_id')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-5">
-                                                    <select class="form-select" name="batch_year" id="batch_year">
-                                                        <option value="" selected>-----Select Year-----</option>
-                                                    </select>
-                                                </div>
-                                            </div>
 
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Batch Name <span class="text-danger">*</span></label>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <select class="form-select" name="batch_id" id="batch_name">
-                                                        <option value="" selected>-----Select Batch-----</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Quota <span class="text-danger">*</span></label>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <select class="form-select" name="quota_id" id="quota" disabled>
-                                                        <option value="" selected>-----Select-----</option>
-                                                        @foreach ($quotas as $quota)
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Quota <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <select class="form-select" name="quota_id" id="quota" disabled>
+                                                            <option value="" selected>-----Select-----</option>
+                                                            @foreach ($quotas as $quota)
                                                             <option value="{{ $quota->id }}" @if($quota->quota_name == 'General') selected @endif>
                                                                 {{ ucfirst($quota->quota_name) }}
                                                             </option>
-                                                        @endforeach
-                                                    </select>
-                                                    <input type="hidden" value="{{ $qouta_id->id  }}" name="quota_id" id="sport_id">
+                                                            @endforeach
+                                                        </select>
+                                                        <input type="hidden" value="{{ $qouta_id->id  }}" name="quota_id" id="sport_id">
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row align-items-center mb-1">
+                                                <!-- <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
                                                     <label class="form-label">Group <span class="text-danger">*</span></label>
                                                 </div>
@@ -286,848 +282,848 @@
                                                     <div class="text-danger">{{ $message }}</div>
                                                     @enderror
                                                 </div>
+                                            </div> -->
+
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="date" class="form-control @error('dob') is-invalid @enderror" name="dob" id="dobInput"
+                                                            value="{{ old('dob') }}"
+                                                            onfocus="this.min=getDate(-50); this.max=getDate(-10);"
+                                                            onblur="validateDOB()">
+                                                        <small id="dobError" class="text-danger"></small>
+                                                        @error('dob')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Date of Joining <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="date" class="form-control" name="doj" id="dojInput"
+                                                            onfocus="this.min=getDate(-1); this.max=getDate(1);"
+                                                            onblur="validateDOJ()" >
+                                                        <small id="dojError" class="text-danger"></small>
+                                                    </div>
+                                                </div>
+
                                             </div>
 
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                            <div class="col-md-4 border-start">
+                                                <div class="appli-photobox">
+                                                    <p id="photoSizeText">Photo Size<br />25mm X 35mm</p>
+                                                    <img id="previewImg" src="{{ old('image') ? asset('storage/' . old('image')) : '' }}" alt="Profile Image" style="max-width: 150px; border-radius: 5px; display: {{ old('image') ? 'block' : 'none' }};">
                                                 </div>
-                                                <div class="col-md-5">
-                                                    <input type="date" class="form-control @error('dob') is-invalid @enderror" name="dob" id="dobInput"
-                                                           value="{{ old('dob') }}"
-                                                           onfocus="this.min=getDate(-50); this.max=getDate(-10);"
-                                                           onblur="validateDOB()">
-                                                    <small id="dobError" class="text-danger"></small>
-                                                    @error('dob')
+
+                                                <div class="mt-2 text-center">
+                                                    <div class="image-uploadhide">
+                                                        <label for="imageUpload" class="btn btn-outline-primary btn-sm waves-effect">
+                                                            <i data-feather="upload"></i> Upload Profile Image
+                                                        </label>
+                                                        <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;">
+                                                    </div>
+                                                    @error('image')
                                                     <div class="text-danger">{{ $message }}</div>
                                                     @enderror
                                                 </div>
+
+                                                <div class="row align-items-center mb-2 mt-4 justify-content-center text-center">
+                                                    <div class="col-md-12">
+                                                        <label class="form-label text-primary"><strong>Status</strong></label>
+                                                        <div class="demo-inline-spacing justify-content-center">
+                                                            <div class="form-check form-check-primary mt-25">
+                                                                <input type="radio" id="customColorRadio3" name="image_status" class="form-check-input" value="active" {{ old('status', 'active') == 'active' ? 'checked' : '' }}>
+                                                                <label class="form-check-label fw-bolder" for="customColorRadio3">Active</label>
+                                                            </div>
+                                                            <div class="form-check form-check-primary mt-25 me-0">
+                                                                <input type="radio" id="customColorRadio4" name="image_status" class="form-check-input" value="inactive" {{ old('status') == 'inactive' ? 'checked' : '' }}>
+                                                                <label class="form-check-label fw-bolder" for="customColorRadio4">Inactive</label>
+                                                            </div>
+                                                        </div>
+                                                        @error('status')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            {{--                                            <div class="row align-items-center mb-1">--}}
-{{--                                                <div class="col-md-3">--}}
-{{--                                                    <label class="form-label">Date of Joining <span class="text-danger">*</span></label>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-5">--}}
-{{--                                                    <input type="date" class="form-control" name="doj" id="dojInput"--}}
-{{--                                                           onfocus="this.min=getDate(-1); this.max=getDate(1);"--}}
-{{--                                                           onblur="validateDOJ()" disabled>--}}
-{{--                                                    <small id="dojError" class="text-danger"></small>--}}
-{{--                                                </div>--}}
-{{--                                            </div>--}}
 
                                         </div>
 
-                                        <div class="col-md-4 border-start">
-                                            <div class="appli-photobox">
-                                                <p id="photoSizeText">Photo Size<br />25mm X 35mm</p>
-                                                <img id="previewImg" src="{{ old('image') ? asset('storage/' . old('image')) : '' }}" alt="Profile Image" style="max-width: 150px; border-radius: 5px; display: {{ old('image') ? 'block' : 'none' }};">
+
+
+
+
+                                        <div class="mt-1">
+                                            <div class="step-custhomapp bg-light">
+                                                <ul class="nav nav-tabs my-25 custapploannav" role="tablist">
+                                                    <li class="nav-item">
+                                                        <a class="nav-link active" data-bs-toggle="tab" href="#other">Other
+                                                            Details</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-bs-toggle="tab" href="#Medical">Exp. &
+                                                            Medical</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-bs-toggle="tab" href="#Hostel">Hostel</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-bs-toggle="tab" href="#Family">Family
+                                                            Details</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-bs-toggle="tab" href="#Address">Address</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-bs-toggle="tab" href="#Emergency">Emergency
+                                                            Detail</a>
+                                                    </li>
+
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-bs-toggle="tab" href="#Sponsor">Sponsor</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-bs-toggle="tab" href="#Fee">Fee</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-bs-toggle="tab"
+                                                            href="#document">Document</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-bs-toggle="tab"
+                                                            href="#payment">Payment Details</a>
+                                                    </li>
+
+                                                </ul>
                                             </div>
+                                            <div class="tab-content pb-1 px-1">
+                                                <div class="tab-pane active" id="other">
 
-                                            <div class="mt-2 text-center">
-                                                <div class="image-uploadhide">
-                                                    <label for="imageUpload" class="btn btn-outline-primary btn-sm waves-effect">
-                                                        <i data-feather="upload"></i> Upload Profile Image
-                                                    </label>
-                                                    <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;">
-                                                </div>
-                                                @error('image')
-                                                <div class="text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-
-                                            <div class="row align-items-center mb-2 mt-4 justify-content-center text-center">
-                                                <div class="col-md-12">
-                                                    <label class="form-label text-primary"><strong>Status</strong></label>
-                                                    <div class="demo-inline-spacing justify-content-center">
-                                                        <div class="form-check form-check-primary mt-25">
-                                                            <input type="radio" id="customColorRadio3" name="image_status" class="form-check-input" value="active" {{ old('status', 'active') == 'active' ? 'checked' : '' }}>
-                                                            <label class="form-check-label fw-bolder" for="customColorRadio3">Active</label>
+                                                    <div class="row mb-1 align-items-center">
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
                                                         </div>
-                                                        <div class="form-check form-check-primary mt-25 me-0">
-                                                            <input type="radio" id="customColorRadio4" name="image_status" class="form-check-input" value="inactive" {{ old('status') == 'inactive' ? 'checked' : '' }}>
-                                                            <label class="form-check-label fw-bolder" for="customColorRadio4">Inactive</label>
+
+                                                        <div class="col-md-3">
+                                                            <div class="input-group input-group-merge">
+                                                                <span class="input-group-text" id="basic-addon5"><i data-feather='phone'></i></span>
+                                                                <input type="text" class="form-control" name="mobile_number" value="{{ old('mobile_number', $user->mobile) }}">
+                                                            </div>
+                                                            @error('mobile_number')
+                                                            <div class="text-danger">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
                                                     </div>
-                                                    @error('status')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
 
-
-                                    </div>
-
-
-
-
-
-                                    <div class="mt-1">
-                                        <div class="step-custhomapp bg-light">
-                                            <ul class="nav nav-tabs my-25 custapploannav" role="tablist">
-                                                <li class="nav-item">
-                                                    <a class="nav-link active" data-bs-toggle="tab" href="#other">Other
-                                                        Details</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" data-bs-toggle="tab" href="#Medical">Exp. &
-                                                        Medical</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" data-bs-toggle="tab" href="#Hostel">Hostel</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" data-bs-toggle="tab" href="#Family">Family
-                                                        Details</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" data-bs-toggle="tab" href="#Address">Address</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" data-bs-toggle="tab" href="#Emergency">Emergency
-                                                        Detail</a>
-                                                </li>
-
-                                                <li class="nav-item">
-                                                    <a class="nav-link" data-bs-toggle="tab" href="#Sponsor">Sponsor</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" data-bs-toggle="tab" href="#Fee">Fee</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" data-bs-toggle="tab"
-                                                        href="#document">Document</a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link" data-bs-toggle="tab"
-                                                        href="#payment">Payment Details</a>
-                                                </li>
-
-                                            </ul>
-                                        </div>
-                                        <div class="tab-content pb-1 px-1">
-                                            <div class="tab-pane active" id="other">
-
-                                                <div class="row mb-1 align-items-center">
-                                                    <div class="col-md-2">
-                                                        <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                                                    </div>
-
-                                                    <div class="col-md-3">
-                                                        <div class="input-group input-group-merge">
-                                                            <span class="input-group-text" id="basic-addon5"><i data-feather='phone'></i></span>
-                                                            <input type="text" class="form-control" name="mobile_number" value="{{ old('mobile_number', $user->mobile) }}">
+                                                    <div class="row mb-1 align-items-center">
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">Email <span class="text-danger">*</span></label>
                                                         </div>
-                                                        @error('mobile_number')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
 
-                                                <div class="row mb-1 align-items-center">
-                                                    <div class="col-md-2">
-                                                        <label class="form-label">Email <span class="text-danger">*</span></label>
-                                                    </div>
-
-                                                    <div class="col-md-3">
-                                                        <div class="input-group input-group-merge">
-                                                            <span class="input-group-text" id="basic-addon5"><i data-feather='mail'></i></span>
-                                                            <input type="text" class="form-control" placeholder="hello@student.com" name="email"
-                                                                   @if($user->email != null) readonly @endif value="{{ old('email', $user->email) }}">
+                                                        <div class="col-md-3">
+                                                            <div class="input-group input-group-merge">
+                                                                <span class="input-group-text" id="basic-addon5"><i data-feather='mail'></i></span>
+                                                                <input type="text" class="form-control" placeholder="hello@student.com" name="email"
+                                                                    @if($user->email != null) readonly @endif value="{{ old('email', $user->email) }}">
+                                                            </div>
+                                                            @error('email')
+                                                            <div class="text-danger">{{ $message }}</div>
+                                                            @enderror
                                                         </div>
-                                                        @error('email')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
                                                     </div>
-                                                </div>
 
-                                                <div class="row mb-1 align-items-center">
-                                                    <div class="col-md-2">
-                                                        <label class="form-label">BAI ID</label>
+                                                    <div class="row mb-1 align-items-center">
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">BAI ID</label>
+                                                        </div>
+                                                        <div class="col-md-3 mb-sm-0 mb-1">
+                                                            <input type="text" class="form-control" name="bai_id" value="{{ old('bai_id') }}" id="bai_id">
+                                                            @error('bai_id')
+                                                            <div class="text-danger">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">BAI State</label>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <select id="other_state" class="form-select" name="bai_state">
+                                                                <option value="">Select State</option>
+                                                                <!-- Add state options here -->
+                                                            </select>
+                                                            @error('bai_state')
+                                                            <div class="text-danger">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
                                                     </div>
-                                                    <div class="col-md-3 mb-sm-0 mb-1">
-                                                        <input type="text" class="form-control" name="bai_id" value="{{ old('bai_id') }}" id="bai_id">
-                                                        @error('bai_id')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <label class="form-label">BAI State</label>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <select id="other_state" class="form-select" name="bai_state">
-                                                            <option value="">Select State</option>
-                                                            <!-- Add state options here -->
-                                                        </select>
-                                                        @error('bai_state')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
 
-                                                <!-- Modified BWF ID and Country row -->
-                                                <div class="row mb-1 align-items-center">
-                                                    <div class="col-md-2">
-                                                        <label class="form-label">BWF ID</label>
-                                                    </div>
-                                                    <div class="col-md-3 mb-sm-0 mb-1">
-                                                        <input type="text" class="form-control" name="bwf_id" value="{{ old('bwf_id') }}" id="bwf_id">
-                                                        @error('bwf_id')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <label class="form-label">Country</label>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <select id="other_country" class="form-select" name="country">
-                                                            <option value="">Select</option>
-                                                            @foreach($countries as $country)
+                                                    <!-- Modified BWF ID and Country row -->
+                                                    <div class="row mb-1 align-items-center">
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">BWF ID</label>
+                                                        </div>
+                                                        <div class="col-md-3 mb-sm-0 mb-1">
+                                                            <input type="text" class="form-control" name="bwf_id" value="{{ old('bwf_id') }}" id="bwf_id">
+                                                            @error('bwf_id')
+                                                            <div class="text-danger">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">Country</label>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <select id="other_country" class="form-select" name="country">
+                                                                <option value="">Select</option>
+                                                                @foreach($countries as $country)
                                                                 <option value="{{ $country->id }}" {{ old('country') == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                        @error('country')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
+                                                                @endforeach
+                                                            </select>
+                                                            @error('country')
+                                                            <div class="text-danger">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
                                                     </div>
+
                                                 </div>
+                                                <div class="tab-pane" id="Address">
+                                                    <div class="row">
+                                                        <!-- Permanent Address -->
+                                                        <div class="col-md-6">
+                                                            <h5 class="mt-1 mb-4 text-dark"><strong>Permanent Address</strong></h5>
 
-                                            </div>
-                                            <div class="tab-pane" id="Address">
-                                                <div class="row">
-                                                    <!-- Permanent Address -->
-                                                    <div class="col-md-6">
-                                                        <h5 class="mt-1 mb-4 text-dark"><strong>Permanent Address</strong></h5>
+                                                            <!-- Address Street 1 -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Address</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <textarea id="permanent_street1" class="form-control @error('family_details.0.permanent_street1') is-invalid @enderror"
+                                                                        placeholder="Street 1" name="family_details[0][permanent_street1]">{{ old('family_details.0.permanent_street1') }}</textarea>
+                                                                    @error('family_details.0.permanent_street1')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
 
-                                                        <!-- Address Street 1 -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Address</label>
+                                                            <!-- Address Street 2 -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4"></div>
+                                                                <div class="col-md-6">
+                                                                    <textarea id="permanent_street2" class="form-control @error('family_details.0.permanent_street2') is-invalid @enderror"
+                                                                        placeholder="Street 2" name="family_details[0][permanent_street2]">{{ old('family_details.0.permanent_street2') }}</textarea>
+                                                                    @error('family_details.0.permanent_street2')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                            <div class="col-md-6">
-                    <textarea id="permanent_street1" class="form-control @error('family_details.0.permanent_street1') is-invalid @enderror"
-                              placeholder="Street 1" name="family_details[0][permanent_street1]">{{ old('family_details.0.permanent_street1') }}</textarea>
-                                                                @error('family_details.0.permanent_street1')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
 
-                                                        <!-- Address Street 2 -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4"></div>
-                                                            <div class="col-md-6">
-                    <textarea id="permanent_street2" class="form-control @error('family_details.0.permanent_street2') is-invalid @enderror"
-                              placeholder="Street 2" name="family_details[0][permanent_street2]">{{ old('family_details.0.permanent_street2') }}</textarea>
-                                                                @error('family_details.0.permanent_street2')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
+                                                            <!-- Town -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Town</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" id="permanent_town" class="form-control @error('family_details.0.permanent_town') is-invalid @enderror"
+                                                                        name="family_details[0][permanent_town]" value="{{ old('family_details.0.permanent_town') }}" />
+                                                                    @error('family_details.0.permanent_town')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <!-- Town -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Town</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" id="permanent_town" class="form-control @error('family_details.0.permanent_town') is-invalid @enderror"
-                                                                       name="family_details[0][permanent_town]" value="{{ old('family_details.0.permanent_town') }}" />
-                                                                @error('family_details.0.permanent_town')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Country Dropdown -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Country</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <select id="permanent_country" class="form-select @error('family_details.0.permanent_country') is-invalid @enderror"
+                                                            <!-- Country Dropdown -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Country</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <select id="permanent_country" class="form-select @error('family_details.0.permanent_country') is-invalid @enderror"
                                                                         name="family_details[0][permanent_country]" onchange="loadStates(this.value, 'permanent')">
-                                                                    <option>Select</option>
-                                                                    @foreach($countries as $country)
+                                                                        <option>Select</option>
+                                                                        @foreach($countries as $country)
                                                                         <option value="{{ $country->id }}" {{ old('family_details.0.permanent_country') == $country->id ? 'selected' : '' }}>
                                                                             {{ $country->name }}
                                                                         </option>
-                                                                    @endforeach
-                                                                </select>
-                                                                @error('family_details.0.permanent_country')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
+                                                                        @endforeach
+                                                                    </select>
+                                                                    @error('family_details.0.permanent_country')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <!-- State Dropdown -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">State</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <select id="permanent_state" class="form-select @error('family_details.0.permanent_state') is-invalid @enderror"
+                                                            <!-- State Dropdown -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">State</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <select id="permanent_state" class="form-select @error('family_details.0.permanent_state') is-invalid @enderror"
                                                                         name="family_details[0][permanent_state]" onchange="loadCities(this.value, 'permanent')">
-                                                                    <option>Select State</option>
-                                                                    <!-- Load states dynamically here -->
-                                                                </select>
-                                                                @error('family_details.0.permanent_state')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
+                                                                        <option>Select State</option>
+                                                                        <!-- Load states dynamically here -->
+                                                                    </select>
+                                                                    @error('family_details.0.permanent_state')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <!-- City Dropdown -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">City</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <select id="permanent_district" class="form-select @error('family_details.0.permanent_district') is-invalid @enderror"
+                                                            <!-- City Dropdown -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">City</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <select id="permanent_district" class="form-select @error('family_details.0.permanent_district') is-invalid @enderror"
                                                                         name="family_details[0][permanent_district]">
-                                                                    <option>Select City</option>
-                                                                    <!-- Load cities dynamically here -->
-                                                                </select>
-                                                                @error('family_details.0.permanent_district')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
+                                                                        <option>Select City</option>
+                                                                        <!-- Load cities dynamically here -->
+                                                                    </select>
+                                                                    @error('family_details.0.permanent_district')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Pin Code -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Pin Code</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" id="permanent_pincode" class="form-control @error('family_details.0.permanent_pincode') is-invalid @enderror"
+                                                                        name="family_details[0][permanent_pincode]" value="{{ old('family_details.0.permanent_pincode') }}" />
+                                                                    @error('family_details.0.permanent_pincode')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
                                                         </div>
 
-                                                        <!-- Pin Code -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Pin Code</label>
+                                                        <!-- Correspondence Address -->
+                                                        <div class="col-md-6">
+                                                            <div class="mt-1 mb-2 d-flex flex-column">
+                                                                <h5 class="text-dark mb-0 me-1"><strong>Correspondence Address</strong></h5>
+                                                                <div class="form-check form-check-primary mt-25 custom-checkbox">
+                                                                    <input type="checkbox" class="form-check-input" id="colorCheck2" onclick="copyPermanentAddress(this)">
+                                                                    <label class="form-check-label" for="colorCheck2">Same As Permanent Address</label>
+                                                                </div>
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" id="permanent_pincode" class="form-control @error('family_details.0.permanent_pincode') is-invalid @enderror"
-                                                                       name="family_details[0][permanent_pincode]" value="{{ old('family_details.0.permanent_pincode') }}" />
-                                                                @error('family_details.0.permanent_pincode')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-                                                    </div>
 
-                                                    <!-- Correspondence Address -->
-                                                    <div class="col-md-6">
-                                                        <div class="mt-1 mb-2 d-flex flex-column">
-                                                            <h5 class="text-dark mb-0 me-1"><strong>Correspondence Address</strong></h5>
-                                                            <div class="form-check form-check-primary mt-25 custom-checkbox">
-                                                                <input type="checkbox" class="form-check-input" id="colorCheck2" onclick="copyPermanentAddress(this)">
-                                                                <label class="form-check-label" for="colorCheck2">Same As Permanent Address</label>
+                                                            <!-- Correspondence Address Street 1 -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Address</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <textarea id="correspondence_street1" class="form-control @error('family_details.0.correspondence_street1') is-invalid @enderror"
+                                                                        placeholder="Street 1" name="family_details[0][correspondence_street1]">{{ old('family_details.0.correspondence_street1') }}</textarea>
+                                                                    @error('family_details.0.correspondence_street1')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <!-- Correspondence Address Street 1 -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Address</label>
+                                                            <!-- Correspondence Address Street 2 -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4"></div>
+                                                                <div class="col-md-6">
+                                                                    <textarea id="correspondence_street2" class="form-control @error('family_details.0.correspondence_street2') is-invalid @enderror"
+                                                                        placeholder="Street 2" name="family_details[0][correspondence_street2]">{{ old('family_details.0.correspondence_street2') }}</textarea>
+                                                                    @error('family_details.0.correspondence_street2')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                            <div class="col-md-6">
-                    <textarea id="correspondence_street1" class="form-control @error('family_details.0.correspondence_street1') is-invalid @enderror"
-                              placeholder="Street 1" name="family_details[0][correspondence_street1]">{{ old('family_details.0.correspondence_street1') }}</textarea>
-                                                                @error('family_details.0.correspondence_street1')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
 
-                                                        <!-- Correspondence Address Street 2 -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4"></div>
-                                                            <div class="col-md-6">
-                    <textarea id="correspondence_street2" class="form-control @error('family_details.0.correspondence_street2') is-invalid @enderror"
-                              placeholder="Street 2" name="family_details[0][correspondence_street2]">{{ old('family_details.0.correspondence_street2') }}</textarea>
-                                                                @error('family_details.0.correspondence_street2')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
+                                                            <!-- Correspondence Town -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Town</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" id="correspondence_town" class="form-control @error('family_details.0.correspondence_town') is-invalid @enderror"
+                                                                        name="family_details[0][correspondence_town]" value="{{ old('family_details.0.correspondence_town') }}" />
+                                                                    @error('family_details.0.correspondence_town')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <!-- Correspondence Town -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Town</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" id="correspondence_town" class="form-control @error('family_details.0.correspondence_town') is-invalid @enderror"
-                                                                       name="family_details[0][correspondence_town]" value="{{ old('family_details.0.correspondence_town') }}" />
-                                                                @error('family_details.0.correspondence_town')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Correspondence Country Dropdown -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Country</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <select id="correspondence_country" class="form-select @error('family_details.0.correspondence_country') is-invalid @enderror"
+                                                            <!-- Correspondence Country Dropdown -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Country</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <select id="correspondence_country" class="form-select @error('family_details.0.correspondence_country') is-invalid @enderror"
                                                                         name="family_details[0][correspondence_country]" onchange="loadStates(this.value, 'correspondence')">
-                                                                    <option>Select</option>
-                                                                    @foreach($countries as $country)
+                                                                        <option>Select</option>
+                                                                        @foreach($countries as $country)
                                                                         <option value="{{ $country->id }}" {{ old('family_details.0.correspondence_country') == $country->id ? 'selected' : '' }}>
                                                                             {{ $country->name }}
                                                                         </option>
-                                                                    @endforeach
-                                                                </select>
-                                                                @error('family_details.0.correspondence_country')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
+                                                                        @endforeach
+                                                                    </select>
+                                                                    @error('family_details.0.correspondence_country')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <!-- Correspondence State Dropdown -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">State</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <select id="correspondence_state" class="form-select @error('family_details.0.correspondence_state') is-invalid @enderror"
+                                                            <!-- Correspondence State Dropdown -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">State</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <select id="correspondence_state" class="form-select @error('family_details.0.correspondence_state') is-invalid @enderror"
                                                                         name="family_details[0][correspondence_state]" onchange="loadCities(this.value, 'correspondence')">
-                                                                    <option>Select State</option>
-                                                                    <!-- Load states dynamically here -->
-                                                                </select>
-                                                                @error('family_details.0.correspondence_state')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
+                                                                        <option>Select State</option>
+                                                                        <!-- Load states dynamically here -->
+                                                                    </select>
+                                                                    @error('family_details.0.correspondence_state')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <!-- Correspondence City Dropdown -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">City</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <select id="correspondence_district" class="form-select @error('family_details.0.correspondence_district') is-invalid @enderror"
+                                                            <!-- Correspondence City Dropdown -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">City</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <select id="correspondence_district" class="form-select @error('family_details.0.correspondence_district') is-invalid @enderror"
                                                                         name="family_details[0][correspondence_district]">
-                                                                    <option>Select City</option>
-                                                                    <!-- Load cities dynamically here -->
-                                                                </select>
-                                                                @error('family_details.0.correspondence_district')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
+                                                                        <option>Select City</option>
+                                                                        <!-- Load cities dynamically here -->
+                                                                    </select>
+                                                                    @error('family_details.0.correspondence_district')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <!-- Correspondence Pin Code -->
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Pin Code</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" id="correspondence_pincode" class="form-control @error('family_details.0.correspondence_pincode') is-invalid @enderror"
-                                                                       name="family_details[0][correspondence_pincode]" value="{{ old('family_details.0.correspondence_pincode') }}" />
-                                                                @error('family_details.0.correspondence_pincode')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="tab-pane" id="Family">
-                                                <div class="table-responsive">
-                                                    <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border" id="familyTable">
-                                                        <thead>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Relation</th>
-                                                            <th>Name</th>
-                                                            <th>Contact No</th>
-                                                            <th>Email</th>
-                                                            <th>Guardian</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        <tr class="family-row">
-                                                            <td>#</td>
-                                                            <td>
-                                                                <select class="form-select mw-100 relation @error('family_details.0.relation') is-invalid @enderror" name="family_details[0][relation]">
-                                                                    <option>Select</option>
-                                                                    <option value="Father" {{ old('family_details.0.relation') == 'Father' ? 'selected' : '' }}>Father</option>
-                                                                    <option value="Mother" {{ old('family_details.0.relation') == 'Mother' ? 'selected' : '' }}>Mother</option>
-                                                                    <option value="Grandfather" {{ old('family_details.0.relation') == 'Grandfather' ? 'selected' : '' }}>Grandfather</option>
-                                                                    <option value="Grandmother" {{ old('family_details.0.relation') == 'Grandmother' ? 'selected' : '' }}>Grandmother</option>
-                                                                    <option value="Uncle" {{ old('family_details.0.relation') == 'Uncle' ? 'selected' : '' }}>Uncle</option>
-                                                                    <option value="Aunt" {{ old('family_details.0.relation') == 'Aunt' ? 'selected' : '' }}>Aunt</option>
-                                                                    <option value="Sibling" {{ old('family_details.0.relation') == 'Sibling' ? 'selected' : '' }}>Sibling</option>
-                                                                    <option value="Local Guardian" {{ old('family_details.0.relation') == 'Local Guardian' ? 'selected' : '' }}>Local Guardian</option>
-                                                                    <option value="Other" {{ old('family_details.0.relation') == 'Other' ? 'selected' : '' }}>Other</option>
-                                                                </select>
-                                                                @error('family_details.0.relation')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </td>
-                                                            <td>
-                                                                <input type="text" class="form-control mw-100 name @error('family_details.0.name') is-invalid @enderror" name="family_details[0][name]" value="{{ old('family_details.0.name') }}">
-                                                                @error('family_details.0.name')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </td>
-                                                            <td>
-                                                                <input type="text" class="form-control mw-100 contact @error('family_details.0.contact_no') is-invalid @enderror" name="family_details[0][contact_no]" value="{{ old('family_details.0.contact_no') }}">
-                                                                @error('family_details.0.contact_no')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </td>
-                                                            <td>
-                                                                <input type="text" class="form-control mw-100 email @error('family_details.0.email') is-invalid @enderror" name="family_details[0][email]" value="{{ old('family_details.0.email') }}">
-                                                                @error('family_details.0.email')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </td>
-                                                            <td>
-                                                                <input type="radio" name="family_details[0][is_guardian]" class="guardian" {{ old('family_details.0.is_guardian') ? 'checked' : '' }}>
-                                                                @error('family_details.0.is_guardian')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </td>
-                                                            <td>
-                                                                <a href="#" class="text-primary add-contact-row"><i data-feather="plus-square" class="me-50"></i></a>
-                                                                <a href="#" class="text-danger delete-row"><i data-feather="trash-2" class="me-50"></i></a>
-                                                            </td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <a href="#" class="text-primary add-contactpeontxt"><i data-feather='plus'></i> Add New</a>
-                                            </div>
-
-
-                                            <div class="tab-pane" id="Emergency">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <h5 class="mt-1 mb-2 text-dark"><strong>Emergency 1 Details</strong></h5>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Name <span class="text-danger">*</span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" name="emergency_contacts[0][name]" class="form-control @error('emergency_contacts.0.name') is-invalid @enderror" value="{{ old('emergency_contacts.0.name') }}" required />
-                                                                @error('emergency_contacts.0.name')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Relation <span class="text-danger">*</span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" name="emergency_contacts[0][relation]" class="form-control @error('emergency_contacts.0.relation') is-invalid @enderror" value="{{ old('emergency_contacts.0.relation') }}" required />
-                                                                @error('emergency_contacts.0.relation')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Phone No. <span class="text-danger">*</span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" name="emergency_contacts[0][contact_no]" class="form-control @error('emergency_contacts.0.contact_no') is-invalid @enderror" value="{{ old('emergency_contacts.0.contact_no') }}" required />
-                                                                @error('emergency_contacts.0.contact_no')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Email Id <span class="text-danger">*</span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" name="emergency_contacts[0][email]" class="form-control @error('emergency_contacts.0.email') is-invalid @enderror" value="{{ old('emergency_contacts.0.email') }}" required />
-                                                                @error('emergency_contacts.0.email')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <h5 class="mt-1 mb-2 text-dark"><strong>Emergency 2 Details</strong></h5>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Name <span class="text-danger">*</span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" name="emergency_contacts[1][name]" class="form-control @error('emergency_contacts.1.name') is-invalid @enderror" value="{{ old('emergency_contacts.1.name') }}" required />
-                                                                @error('emergency_contacts.1.name')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Relation <span class="text-danger">*</span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" name="emergency_contacts[1][relation]" class="form-control @error('emergency_contacts.1.relation') is-invalid @enderror" value="{{ old('emergency_contacts.1.relation') }}" required />
-                                                                @error('emergency_contacts.1.relation')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Phone No. <span class="text-danger">*</span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" name="emergency_contacts[1][contact_no]" class="form-control @error('emergency_contacts.1.contact_no') is-invalid @enderror" value="{{ old('emergency_contacts.1.contact_no') }}" required />
-                                                                @error('emergency_contacts.1.contact_no')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Email Id <span class="text-danger">*</span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" name="emergency_contacts[1][email]" class="form-control @error('emergency_contacts.1.email') is-invalid @enderror" value="{{ old('emergency_contacts.1.email') }}" required />
-                                                                @error('emergency_contacts.1.email')
-                                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                                @enderror
+                                                            <!-- Correspondence Pin Code -->
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Pin Code</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" id="correspondence_pincode" class="form-control @error('family_details.0.correspondence_pincode') is-invalid @enderror"
+                                                                        name="family_details[0][correspondence_pincode]" value="{{ old('family_details.0.correspondence_pincode') }}" />
+                                                                    @error('family_details.0.correspondence_pincode')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-
-
-                                            <div class="tab-pane" id="Medical">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <h5 class="mt-1 mb-2 text-dark"><strong>Badminton Exp.</strong></h5>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Total Experience (No of Years)</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="number" class="form-control" name="badminton_experience" value="{{ old('badminton_experience') }}" />
-                                                                @error('badminton_experience')
-                                                                <span class="text-danger">{{ $message }}</span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Highest Achievement</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" class="form-control" name="highest_achievement" value="{{ old('highest_achievement') }}" />
-                                                                @error('highest_achievement')
-                                                                <span class="text-danger">{{ $message }}</span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Level of Play</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <select class="form-select" name="level_of_play">
-                                                                    <option value="">Select</option>
-                                                                    <option value="Beginner" {{ old('level_of_play') == 'Beginner' ? 'selected' : '' }}>Level 1</option>
-                                                                    <option value="Intermediate" {{ old('level_of_play') == 'Intermediate' ? 'selected' : '' }}>Level 2</option>
-                                                                    <option value="Advanced" {{ old('level_of_play') == 'Advanced' ? 'selected' : '' }}>Level 2</option>
-                                                                </select>
-                                                                @error('level_of_play')
-                                                                <span class="text-danger">{{ $message }}</span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-                                                        <h5 class="mt-1 mb-2 text-dark"><strong>Medical Information</strong></h5>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Any Medical Conditions/Allergies</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" class="form-control" name="medical_conditions" value="{{ old('medical_conditions') }}" />
-                                                                @error('medical_conditions')
-                                                                <span class="text-danger">{{ $message }}</span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Current Medications</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" class="form-control" name="current_medications" value="{{ old('current_medications') }}" />
-                                                                @error('current_medications')
-                                                                <span class="text-danger">{{ $message }}</span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Dietary Restrictions</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" class="form-control" name="dietary_restrictions" value="{{ old('dietary_restrictions') }}" />
-                                                                @error('dietary_restrictions')
-                                                                <span class="text-danger">{{ $message }}</span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Blood Group</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="text" class="form-control" name="blood_group" value="{{ old('blood_group') }}" />
-                                                                @error('blood_group')
-                                                                <span class="text-danger">{{ $message }}</span>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="tab-pane active" id="other">
-                                                        <div class="table-responsive">
-                                                            <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border" id="trainingTable">
-                                                                <thead>
+                                                <div class="tab-pane" id="Family">
+                                                    <div class="table-responsive">
+                                                        <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border" id="familyTable">
+                                                            <thead>
                                                                 <tr>
                                                                     <th>#</th>
-                                                                    <th>Previous Coach</th>
-                                                                    <th>Training Academy</th>
-                                                                    <th width="150px">Action</th>
+                                                                    <th>Relation</th>
+                                                                    <th>Name</th>
+                                                                    <th>Contact No</th>
+                                                                    <th>Email</th>
+                                                                    <th>Guardian</th>
+                                                                    <th>Action</th>
                                                                 </tr>
-                                                                </thead>
-                                                                <tbody id="trainingBody">
-                                                                @foreach (old('previous_coach', ['']) as $index => $previous_coach)
-                                                                    <tr>
-                                                                        <td>{{ $loop->iteration }}</td>
-                                                                        <td><input type="text" class="form-control mw-100" name="previous_coach[]" value="{{ $previous_coach }}" /></td>
-                                                                        <td><input type="text" class="form-control mw-100" name="training_academy[]" value="{{ old('training_academy.'.$index) }}" /></td>
-                                                                        <td>
-                                                                            <a href="javascript:void(0)" class="text-primary add-row">
-                                                                                <i class="fas fa-plus-square"></i>
-                                                                            </a>
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                                </tbody>
-                                                            </table>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr class="family-row">
+                                                                    <td>#</td>
+                                                                    <td>
+                                                                        <select class="form-select mw-100 relation @error('family_details.0.relation') is-invalid @enderror" name="family_details[0][relation]">
+                                                                            <option>Select</option>
+                                                                            <option value="Father" {{ old('family_details.0.relation') == 'Father' ? 'selected' : '' }}>Father</option>
+                                                                            <option value="Mother" {{ old('family_details.0.relation') == 'Mother' ? 'selected' : '' }}>Mother</option>
+                                                                            <option value="Grandfather" {{ old('family_details.0.relation') == 'Grandfather' ? 'selected' : '' }}>Grandfather</option>
+                                                                            <option value="Grandmother" {{ old('family_details.0.relation') == 'Grandmother' ? 'selected' : '' }}>Grandmother</option>
+                                                                            <option value="Uncle" {{ old('family_details.0.relation') == 'Uncle' ? 'selected' : '' }}>Uncle</option>
+                                                                            <option value="Aunt" {{ old('family_details.0.relation') == 'Aunt' ? 'selected' : '' }}>Aunt</option>
+                                                                            <option value="Sibling" {{ old('family_details.0.relation') == 'Sibling' ? 'selected' : '' }}>Sibling</option>
+                                                                            <option value="Local Guardian" {{ old('family_details.0.relation') == 'Local Guardian' ? 'selected' : '' }}>Local Guardian</option>
+                                                                            <option value="Other" {{ old('family_details.0.relation') == 'Other' ? 'selected' : '' }}>Other</option>
+                                                                        </select>
+                                                                        @error('family_details.0.relation')
+                                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                                        @enderror
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text" class="form-control mw-100 name @error('family_details.0.name') is-invalid @enderror" name="family_details[0][name]" value="{{ old('family_details.0.name') }}">
+                                                                        @error('family_details.0.name')
+                                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                                        @enderror
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text" class="form-control mw-100 contact @error('family_details.0.contact_no') is-invalid @enderror" name="family_details[0][contact_no]" value="{{ old('family_details.0.contact_no') }}">
+                                                                        @error('family_details.0.contact_no')
+                                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                                        @enderror
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="text" class="form-control mw-100 email @error('family_details.0.email') is-invalid @enderror" name="family_details[0][email]" value="{{ old('family_details.0.email') }}">
+                                                                        @error('family_details.0.email')
+                                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                                        @enderror
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="radio" name="family_details[0][is_guardian]" class="guardian" {{ old('family_details.0.is_guardian') ? 'checked' : '' }}>
+                                                                        @error('family_details.0.is_guardian')
+                                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                                        @enderror
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="text-primary add-contact-row"><i data-feather="plus-square" class="me-50"></i></a>
+                                                                        <a href="#" class="text-danger delete-row"><i data-feather="trash-2" class="me-50"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <a href="#" class="text-primary add-contactpeontxt"><i data-feather='plus'></i> Add New</a>
+                                                </div>
+
+
+                                                <div class="tab-pane" id="Emergency">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h5 class="mt-1 mb-2 text-dark"><strong>Emergency 1 Details</strong></h5>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="emergency_contacts[0][name]" class="form-control @error('emergency_contacts.0.name') is-invalid @enderror" value="{{ old('emergency_contacts.0.name') }}" required />
+                                                                    @error('emergency_contacts.0.name')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Relation <span class="text-danger">*</span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="emergency_contacts[0][relation]" class="form-control @error('emergency_contacts.0.relation') is-invalid @enderror" value="{{ old('emergency_contacts.0.relation') }}" required />
+                                                                    @error('emergency_contacts.0.relation')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Phone No. <span class="text-danger">*</span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="emergency_contacts[0][contact_no]" class="form-control @error('emergency_contacts.0.contact_no') is-invalid @enderror" value="{{ old('emergency_contacts.0.contact_no') }}" required />
+                                                                    @error('emergency_contacts.0.contact_no')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Email Id <span class="text-danger">*</span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="emergency_contacts[0][email]" class="form-control @error('emergency_contacts.0.email') is-invalid @enderror" value="{{ old('emergency_contacts.0.email') }}" required />
+                                                                    @error('emergency_contacts.0.email')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <h5 class="mt-1 mb-2 text-dark"><strong>Emergency 2 Details</strong></h5>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="emergency_contacts[1][name]" class="form-control @error('emergency_contacts.1.name') is-invalid @enderror" value="{{ old('emergency_contacts.1.name') }}" required />
+                                                                    @error('emergency_contacts.1.name')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Relation <span class="text-danger">*</span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="emergency_contacts[1][relation]" class="form-control @error('emergency_contacts.1.relation') is-invalid @enderror" value="{{ old('emergency_contacts.1.relation') }}" required />
+                                                                    @error('emergency_contacts.1.relation')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Phone No. <span class="text-danger">*</span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="emergency_contacts[1][contact_no]" class="form-control @error('emergency_contacts.1.contact_no') is-invalid @enderror" value="{{ old('emergency_contacts.1.contact_no') }}" required />
+                                                                    @error('emergency_contacts.1.contact_no')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Email Id <span class="text-danger">*</span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="emergency_contacts[1][email]" class="form-control @error('emergency_contacts.1.email') is-invalid @enderror" value="{{ old('emergency_contacts.1.email') }}" required />
+                                                                    @error('emergency_contacts.1.email')
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
 
-                                            <div class="tab-pane" id="Sponsor">
-                                                <div class="tab-content pb-1">
-                                                    <div class="tab-pane active" id="other">
-                                                        <div class="table-responsive">
-                                                            <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border" id="sponsorTable">
-                                                                <thead>
+
+                                                <div class="tab-pane" id="Medical">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h5 class="mt-1 mb-2 text-dark"><strong>Badminton Playing Exp.</strong></h5>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Total Playing Experience (No of Years)</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="number" class="form-control" name="badminton_experience" value="{{ old('badminton_experience') }}" />
+                                                                    @error('badminton_experience')
+                                                                    <span class="text-danger">{{ $message }}</span>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Highest Achievement</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" class="form-control" name="highest_achievement" value="{{ old('highest_achievement') }}" />
+                                                                    @error('highest_achievement')
+                                                                    <span class="text-danger">{{ $message }}</span>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Level of Play</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <select class="form-select" name="level_of_play">
+                                                                        <option value="">Select</option>
+                                                                        <option value="Beginner" {{ old('level_of_play') == 'Beginner' ? 'selected' : '' }}>Level 1</option>
+                                                                        <option value="Intermediate" {{ old('level_of_play') == 'Intermediate' ? 'selected' : '' }}>Level 2</option>
+                                                                        <option value="Advanced" {{ old('level_of_play') == 'Advanced' ? 'selected' : '' }}>Level 2</option>
+                                                                    </select>
+                                                                    @error('level_of_play')
+                                                                    <span class="text-danger">{{ $message }}</span>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <h5 class="mt-1 mb-2 text-dark"><strong>Medical Information</strong></h5>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Any Medical Conditions/Allergies</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" class="form-control" name="medical_conditions" value="{{ old('medical_conditions') }}" />
+                                                                    @error('medical_conditions')
+                                                                    <span class="text-danger">{{ $message }}</span>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Current Medications</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" class="form-control" name="current_medications" value="{{ old('current_medications') }}" />
+                                                                    @error('current_medications')
+                                                                    <span class="text-danger">{{ $message }}</span>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Dietary Restrictions</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" class="form-control" name="dietary_restrictions" value="{{ old('dietary_restrictions') }}" />
+                                                                    @error('dietary_restrictions')
+                                                                    <span class="text-danger">{{ $message }}</span>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Blood Group</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" class="form-control" name="blood_group" value="{{ old('blood_group') }}" />
+                                                                    @error('blood_group')
+                                                                    <span class="text-danger">{{ $message }}</span>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="tab-pane active" id="other">
+                                                            <div class="table-responsive">
+                                                                <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border" id="trainingTable">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>#</th>
+                                                                            <th>Previous Coach</th>
+                                                                            <th>Training Academy</th>
+                                                                            <th width="150px">Action</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody id="trainingBody">
+                                                                        @foreach (old('previous_coach', ['']) as $index => $previous_coach)
+                                                                        <tr>
+                                                                            <td>{{ $loop->iteration }}</td>
+                                                                            <td><input type="text" class="form-control mw-100" name="previous_coach[]" value="{{ $previous_coach }}" /></td>
+                                                                            <td><input type="text" class="form-control mw-100" name="training_academy[]" value="{{ old('training_academy.'.$index) }}" /></td>
+                                                                            <td>
+                                                                                <a href="javascript:void(0)" class="text-primary add-row">
+                                                                                    <i class="fas fa-plus-square"></i>
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="tab-pane" id="Sponsor">
+                                                    <div class="tab-content pb-1">
+                                                        <div class="tab-pane active" id="other">
+                                                            <div class="table-responsive">
+                                                                <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border" id="sponsorTable">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>#</th>
+                                                                            <th>Sponsor Name</th>
+                                                                            <th>Sponsor SPOC</th>
+                                                                            <th>SPOC Phone No.</th>
+                                                                            <th>SPOC Email Id</th>
+                                                                            <th>SPOC Email Position</th>
+                                                                            <th width="150px">Action</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr id="fee_tr">
+                                                                            <td>1</td>
+                                                                            <td>
+                                                                                <input type="text" class="form-control mw-100" name="sponsor[0][name]" value="{{ old('sponsor.0.name') }}" required />
+                                                                                @error('sponsor.0.name')
+                                                                                <span class="text-danger">{{ $message }}</span>
+                                                                                @enderror
+                                                                            </td>
+                                                                            <td>
+                                                                                <input type="text" class="form-control mw-100" name="sponsor[0][spoc]" value="{{ old('sponsor.0.spoc') }}" required />
+                                                                                @error('sponsor.0.spoc')
+                                                                                <span class="text-danger">{{ $message }}</span>
+                                                                                @enderror
+                                                                            </td>
+                                                                            <td>
+                                                                                <input type="text" class="form-control mw-100" name="sponsor[0][phone]" value="{{ old('sponsor.0.phone') }}" required />
+                                                                                @error('sponsor.0.phone')
+                                                                                <span class="text-danger">{{ $message }}</span>
+                                                                                @enderror
+                                                                            </td>
+                                                                            <td>
+                                                                                <input type="text" class="form-control mw-100" name="sponsor[0][email]" value="{{ old('sponsor.0.email') }}" />
+                                                                                @error('sponsor.0.email')
+                                                                                <span class="text-danger">{{ $message }}</span>
+                                                                                @enderror
+                                                                            </td>
+                                                                            <td>
+                                                                                <input type="text" class="form-control mw-100" name="sponsor[0][email_position]" value="{{ old('sponsor.0.email_position') }}" />
+                                                                                @error('sponsor.0.email_position')
+                                                                                <span class="text-danger">{{ $message }}</span>
+                                                                                @enderror
+                                                                            </td>
+                                                                            <td>
+                                                                                <a href="javascript:void(0)" class="text-primary add-sponsor-row">
+                                                                                    <i data-feather="plus-square"></i>
+                                                                                </a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="tab-pane" id="Fee">
+                                                    <div class="table-responsive">
+                                                        <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border" id="feeTable">
+                                                            <thead>
                                                                 <tr>
                                                                     <th>#</th>
-                                                                    <th>Sponsor Name</th>
-                                                                    <th>Sponsor SPOC</th>
-                                                                    <th>SPOC Phone No.</th>
-                                                                    <th>SPOC Email Id</th>
-                                                                    <th>SPOC Email Position</th>
+                                                                    <th>Fee Title</th>
+                                                                    <th>Total Fees</th>
+                                                                    <th>Fee Sponsorship<br /> %</th>
+                                                                    <th>Fee Sponsorship<br /> Value</th>
+                                                                    <th>Fee Discount<br /> %</th>
+                                                                    <th>Fee Discount<br /> Value</th>
+                                                                    <th>Fee Sponsorship<br />+ Discount %</th>
+                                                                    <th>Fee Sponsorship<br /> + Discount Value</th>
+                                                                    <th>Net Fee<br /> Payable %</th>
+                                                                    <th>Net Fee<br /> Payable Value</th>
                                                                     <th width="150px">Action</th>
                                                                 </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                <tr id="fee_tr">
-                                                                    <td>1</td>
-                                                                    <td>
-                                                                        <input type="text" class="form-control mw-100" name="sponsor[0][name]" value="{{ old('sponsor.0.name') }}" required />
-                                                                        @error('sponsor.0.name')
-                                                                        <span class="text-danger">{{ $message }}</span>
-                                                                        @enderror
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text" class="form-control mw-100" name="sponsor[0][spoc]" value="{{ old('sponsor.0.spoc') }}" required />
-                                                                        @error('sponsor.0.spoc')
-                                                                        <span class="text-danger">{{ $message }}</span>
-                                                                        @enderror
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text" class="form-control mw-100" name="sponsor[0][phone]" value="{{ old('sponsor.0.phone') }}" required />
-                                                                        @error('sponsor.0.phone')
-                                                                        <span class="text-danger">{{ $message }}</span>
-                                                                        @enderror
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text" class="form-control mw-100" name="sponsor[0][email]" value="{{ old('sponsor.0.email') }}" />
-                                                                        @error('sponsor.0.email')
-                                                                        <span class="text-danger">{{ $message }}</span>
-                                                                        @enderror
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text" class="form-control mw-100" name="sponsor[0][email_position]" value="{{ old('sponsor.0.email_position') }}" />
-                                                                        @error('sponsor.0.email_position')
-                                                                        <span class="text-danger">{{ $message }}</span>
-                                                                        @enderror
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="javascript:void(0)" class="text-primary add-sponsor-row">
-                                                                            <i data-feather="plus-square"></i>
-                                                                        </a>
-                                                                    </td>
-                                                                </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-
-                                            <div class="tab-pane" id="Fee">
-                                                <div class="table-responsive">
-                                                    <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border" id="feeTable">
-                                                        <thead>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Fee Title</th>
-                                                            <th>Total Fees</th>
-                                                            <th>Fee Sponsorship<br /> %</th>
-                                                            <th>Fee Sponsorship<br /> Value</th>
-                                                            <th>Fee Discount<br /> %</th>
-                                                            <th>Fee Discount<br /> Value</th>
-                                                            <th>Fee Sponsorship<br />+ Discount %</th>
-                                                            <th>Fee Sponsorship<br /> + Discount Value</th>
-                                                            <th>Net Fee<br /> Payable %</th>
-                                                            <th>Net Fee<br /> Payable Value</th>
-                                                            <th width="150px">Action</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        @foreach ($feeDetails as $key => $fees)
-                                                            @php
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($feeDetails as $key => $fees)
+                                                                @php
                                                                 // Calculate missing values if not provided in $fees
                                                                 $totalFees = old("feeDetails.$key.total_fees", $fees['total_fees'] ?? 0);
                                                                 $feeSponsorshipPercent = old("feeDetails.$key.fee_sponsorship_percent", $fees['fee_sponsorship_percent'] ?? 0);
@@ -1138,222 +1134,222 @@
                                                                 $feeSponsorshipPlusDiscountValue = $feeSponsorshipValue + $feeDiscountValue;
                                                                 $netFeePayablePercent = 100 - $feeSponsorshipPlusDiscountPercent;
                                                                 $netFeePayableValue = $totalFees - $feeSponsorshipPlusDiscountValue;
-                                                            @endphp
-                                                            <tr>
-                                                                <td>{{ $key + 1 }}</td>
-                                                                <td>
-                                                                    <input type="text" name="feeDetails[{{ $key }}][title]" class="form-control" value="{{ old("feeDetails.$key.title", $fees['title'] ?? 'N/A') }}" disabled />
-                                                                </td>
-                                                                <td>
-                                                                    <input type="number" name="feeDetails[{{ $key }}][total_fees]" class="form-control" value="{{ $totalFees }}" disabled />
-                                                                </td>
-                                                                <td>
-                                                                    <input type="number" name="feeDetails[{{ $key }}][fee_sponsorship_percent]" class="form-control" value="{{ $feeSponsorshipPercent }}" disabled />
-                                                                </td>
-                                                                <td>
-                                                                    <input type="number" name="feeDetails[{{ $key }}][fee_sponsorship_value]" class="form-control" value="{{ $feeSponsorshipValue }}" disabled />
-                                                                </td>
-                                                                <td>
-                                                                    <input type="number" name="feeDetails[{{ $key }}][fee_discount_percent]" class="form-control" value="{{ $feeDiscountPercent }}" disabled />
-                                                                </td>
-                                                                <td>
-                                                                    <input type="number" name="feeDetails[{{ $key }}][fee_discount_value]" class="form-control" value="{{ $feeDiscountValue }}" disabled />
-                                                                </td>
-                                                                <td>{{ $feeSponsorshipPlusDiscountPercent }}%</td>
-                                                                <td>{{ $feeSponsorshipPlusDiscountValue }}</td>
-                                                                <td>{{ $netFeePayablePercent }}%</td>
-                                                                <td>{{ $netFeePayableValue }}</td>
-                                                                <td>
-                                                                    @if ($key != 0)
+                                                                @endphp
+                                                                <tr>
+                                                                    <td>{{ $key + 1 }}</td>
+                                                                    <td>
+                                                                        <input type="text" name="feeDetails[{{ $key }}][title]" class="form-control" value="{{ old("feeDetails.$key.title", $fees['title'] ?? 'N/A') }}" disabled />
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="number" name="feeDetails[{{ $key }}][total_fees]" class="form-control" value="{{ $totalFees }}" disabled />
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_sponsorship_percent]" class="form-control" value="{{ $feeSponsorshipPercent }}" disabled />
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_sponsorship_value]" class="form-control" value="{{ $feeSponsorshipValue }}" disabled />
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_discount_percent]" class="form-control" value="{{ $feeDiscountPercent }}" disabled />
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_discount_value]" class="form-control" value="{{ $feeDiscountValue }}" disabled />
+                                                                    </td>
+                                                                    <td>{{ $feeSponsorshipPlusDiscountPercent }}%</td>
+                                                                    <td>{{ $feeSponsorshipPlusDiscountValue }}</td>
+                                                                    <td>{{ $netFeePayablePercent }}%</td>
+                                                                    <td>{{ $netFeePayableValue }}</td>
+                                                                    <td>
+                                                                        @if ($key != 0)
                                                                         <a href="#" class="text-danger ms-25">
                                                                             <i data-feather="trash-2" class="me-50"></i>
                                                                         </a>
-                                                                    @endif
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
+                                                                        @endif
+                                                                    </td>
+                                                                </tr>
+                                                                @endforeach
 
-                                                        <!-- Total Fees Row -->
-                                                        @php
-                                                            $totalFeesSum = array_sum(array_column($feeDetails, 'total_fees'));
-                                                            $totalNetFeePayableValue = array_sum(array_map(function ($fees) {
+                                                                <!-- Total Fees Row -->
+                                                                @php
+                                                                $totalFeesSum = array_sum(array_column($feeDetails, 'total_fees'));
+                                                                $totalNetFeePayableValue = array_sum(array_map(function ($fees) {
                                                                 return ($fees['total_fees'] ?? 0) - (($fees['fee_sponsorship_value'] ?? 0) + ($fees['fee_discount_value'] ?? 0));
-                                                            }, $feeDetails));
-                                                        @endphp
-                                                        <tr>
-                                                            <td></td>
-                                                            <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
-                                                            <td class="fw-bolder text-dark font-large-1">{{ $totalNetFeePayableValue }}</td>
-                                                            <td>
-                                                                @if($user->payment_status == 'paid')
-                                                                    <span class="badge bg-success">Paid</span>
-                                                                @else
-                                                                    <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn" data-user-id="{{ $user->id }}">Pay Now</button>
-                                                                @endif
-                                                                <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>
-                                                            </td>
-                                                        </tr>
-                                                        </tbody>
-                                                    </table>
+                                                                }, $feeDetails));
+                                                                @endphp
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
+                                                                    <td class="fw-bolder text-dark font-large-1">{{ $totalNetFeePayableValue }}</td>
+                                                                    <td>
+                                                                        @if($user->payment_status == 'paid')
+                                                                        <span class="badge bg-success">Paid</span>
+                                                                        @else
+                                                                        <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn" data-user-id="{{ $user->id }}">Pay Now</button>
+                                                                        @endif
+                                                                        <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
-                                            </div>
 
 
-                                            <div class="tab-pane" id="Hostel">
-                                                <div class="row">
-                                                    <div class="col-md-6">
+                                                <div class="tab-pane" id="Hostel">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
 
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Hostel Required</label>
-                                                            </div>
-                                                            <div class="col-md-3">
-                                                                <div class="demo-inline-spacing justify-content-center">
-                                                                    <div class="form-check form-check-primary mt-25">
-                                                                        <input type="radio" id="hostel_required_yes"
-                                                                               name="hostel_required"
-                                                                               class="form-check-input" value="yes"
-                                                                               {{ old('hostel_required') == 'yes' ? 'checked' : '' }} >
-                                                                        <label class="form-check-label fw-bolder" for="hostel_required1">Yes</label>
-                                                                    </div>
-                                                                    <div class="form-check form-check-primary mt-25 me-0">
-                                                                        <input type="radio" id="hostel_required_no"
-                                                                               name="hostel_required"
-                                                                               class="form-check-input" value="no"
-                                                                               {{ old('hostel_required') == 'no' ? 'checked' : '' }} checked>
-                                                                        <label class="form-check-label fw-bolder" for="hostel_required2">No</label>
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Hostel Required</label>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <div class="demo-inline-spacing justify-content-center">
+                                                                        <div class="form-check form-check-primary mt-25">
+                                                                            <input type="radio" id="hostel_required_yes"
+                                                                                name="hostel_required"
+                                                                                class="form-check-input" value="yes"
+                                                                                {{ old('hostel_required') == 'yes' ? 'checked' : '' }}>
+                                                                            <label class="form-check-label fw-bolder" for="hostel_required1">Yes</label>
+                                                                        </div>
+                                                                        <div class="form-check form-check-primary mt-25 me-0">
+                                                                            <input type="radio" id="hostel_required_no"
+                                                                                name="hostel_required"
+                                                                                class="form-check-input" value="no"
+                                                                                {{ old('hostel_required') == 'no' ? 'checked' : '' }} checked>
+                                                                            <label class="form-check-label fw-bolder" for="hostel_required2">No</label>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
 
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4" id="check_in_date_label">
-                                                                <label class="form-label">Check-In Date <span class="text-danger">*</span></label>
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4" id="check_in_date_label">
+                                                                    <label class="form-label">Check-In Date <span class="text-danger">*</span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="date" class="form-control" name="check_in_date" id="check_in_date" disabled
+                                                                        value="{{ old('check_in_date') }}">
+                                                                    @error('check_in_date')
+                                                                    <div class="text-danger">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <input type="date" class="form-control" name="check_in_date" id="check_in_date" disabled
-                                                                       value="{{ old('check_in_date') }}">
-                                                                @error('check_in_date')
-                                                                <div class="text-danger">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
 
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4" id="check_out_date_label">
-                                                                <label class="form-label">Check-Out Date <span class="text-danger">*</span></label>
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4" id="check_out_date_label">
+                                                                    <label class="form-label">Check-Out Date <span class="text-danger">*</span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="date" class="form-control" name="check_out_date" id="check_out_date" disabled
+                                                                        value="{{ old('check_out_date') }}">
+                                                                    @error('check_out_date')
+                                                                    <div class="text-danger">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <input type="date" class="form-control" name="check_out_date" id="check_out_date" disabled
-                                                                       value="{{ old('check_out_date') }}">
-                                                                @error('check_out_date')
-                                                                <div class="text-danger">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
 
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4" id="room_preference_label">
-                                                                <label class="form-label">Room Preference</label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <select class="form-select" name="room_preference" id="room_preference" disabled>
-                                                                    <option>Select</option>
-                                                                    <option value="single" {{ old('room_preference') == 'single' ? 'selected' : '' }}>Single</option>
-                                                                    <option value="double" {{ old('room_preference') == 'double' ? 'selected' : '' }}>Double</option>
-                                                                </select>
-                                                                @error('room_preference')
-                                                                <div class="text-danger">{{ $message }}</div>
-                                                                @enderror
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4" id="room_preference_label">
+                                                                    <label class="form-label">Room Preference</label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <select class="form-select" name="room_preference" id="room_preference" disabled>
+                                                                        <option>Select</option>
+                                                                        <option value="single" {{ old('room_preference') == 'single' ? 'selected' : '' }}>Single</option>
+                                                                        <option value="double" {{ old('room_preference') == 'double' ? 'selected' : '' }}>Double</option>
+                                                                    </select>
+                                                                    @error('room_preference')
+                                                                    <div class="text-danger">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
 
 
-                                            <div class="tab-pane" id="document">
-                                                <div class="row">
-                                                    <div class="col-md-6">
+                                                <div class="tab-pane" id="document">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
 
-                                                        <div class="row mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Identity Proof <span class="text-danger"></span></label>
+                                                            <div class="row mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Identity Proof <span class="text-danger"></span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="file" class="form-control" name="id_proof[]" />
+                                                                    @error('id_proof')
+                                                                    <div class="text-danger">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <input type="file" class="form-control" name="id_proof[]" />
-                                                                @error('id_proof')
-                                                                <div class="text-danger">{{ $message }}</div>
-                                                                @enderror
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Aadhar Card <span class="text-danger"></span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="file" class="form-control" name="aadhar_card[]" />
+                                                                    @error('aadhar_card')
+                                                                    <div class="text-danger">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
                                                             </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Parent's Aadhar Card <span class="text-danger"></span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="file" class="form-control" name="parent_aadhar[]" />
+                                                                    @error('parent_aadhar')
+                                                                    <div class="text-danger">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Birth's Certificate <span class="text-danger"></span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="file" class="form-control" name="birth_certificate[]" />
+                                                                    @error('birth_certificate')
+                                                                    <div class="text-danger">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row align-items-center mb-1">
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Medical Records <span class="text-danger"></span></label>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <input type="file" class="form-control" name="medical_record[]" />
+                                                                    @error('medical_record')
+                                                                    <div class="text-danger">{{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+
                                                         </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Aadhar Card <span class="text-danger"></span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="file" class="form-control" name="aadhar_card[]" />
-                                                                @error('aadhar_card')
-                                                                <div class="text-danger">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Parent's Aadhar Card <span class="text-danger"></span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="file" class="form-control" name="parent_aadhar[]" />
-                                                                @error('parent_aadhar')
-                                                                <div class="text-danger">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Birth's Certificate <span class="text-danger"></span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="file" class="form-control" name="birth_certificate[]" />
-                                                                @error('birth_certificate')
-                                                                <div class="text-danger">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row align-items-center mb-1">
-                                                            <div class="col-md-4">
-                                                                <label class="form-label">Medical Records <span class="text-danger"></span></label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <input type="file" class="form-control" name="medical_record[]" />
-                                                                @error('medical_record')
-                                                                <div class="text-danger">{{ $message }}</div>
-                                                                @enderror
-                                                            </div>
-                                                        </div>
-
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="tab-pane" id="payment">
-                                                <div class="row">
+                                                <div class="tab-pane" id="payment">
+                                                    <div class="row">
 
-                                                    <h2 class="mb-3">Payment Details</h2>
+                                                        <h2 class="mb-3">Payment Details</h2>
 
-                                                    <table class="table table-bordered">
-                                                        <tr>
-                                                            <th>User Name</th>
-                                                            <td>{{ old('user_name', $user->first_name . ' '. ($user->middle_name ?? ''). ' '. $user->last_name) }}</td>
-                                                        </tr>
+                                                        <table class="table table-bordered">
+                                                            <tr>
+                                                                <th>User Name</th>
+                                                                <td>{{ old('user_name', $user->first_name . ' '. ($user->middle_name ?? ''). ' '. $user->last_name) }}</td>
+                                                            </tr>
 
-                                                        @if($user->payments)
+                                                            @if($user->payments)
                                                             <tr>
                                                                 <th>Payment Status</th>
                                                                 <td>
@@ -1394,7 +1390,7 @@
                                                                 </td>
                                                             </tr>
 
-                                                               <tr>
+                                                            <tr>
                                                                 <th>Paid Amount</th>
                                                                 <td>
                                                                     <input type="text" class="form-control" name="paid_amount" value="{{ old('paid_amount', $user->payments->paid_amount ?? 'N/A') }}" />
@@ -1404,13 +1400,13 @@
                                                                 </td>
                                                             </tr>
 
-                                                                <tr>
+                                                            <tr>
                                                                 <th>Payment Document</th>
                                                                 <td>
                                                                     @if(!empty($user->payments->pay_doc))
-                                                                        <a href="{{ $user->payments->pay_doc }}" target="_blank">View Document</a>
+                                                                    <a href="{{ $user->payments->pay_doc }}" target="_blank">View Document</a>
                                                                     @else
-                                                                        No document uploaded
+                                                                    No document uploaded
                                                                     @endif
                                                                 </td>
                                                             </tr>
@@ -1424,28 +1420,28 @@
                                                                     @enderror
                                                                 </td>
                                                             </tr>
-                                                        @else
+                                                            @else
                                                             <tr>
                                                                 <th colspan="2">No payment information available</th>
                                                             </tr>
-                                                        @endif
-                                                    </table>
+                                                            @endif
+                                                        </table>
 
+                                                    </div>
                                                 </div>
+
                                             </div>
 
                                         </div>
 
+
                                     </div>
-
-
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Modal to add new record -->
+                        <!-- Modal to add new record -->
 
-                </section>
+                    </section>
                 </form>
 
             </div>
@@ -1495,10 +1491,10 @@
 
                             <div class="col-md-12 mb-1" id="refNoDiv">
                                 <label class="form-label">Ref No. <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="ref_no" id="ref_no" required/>
+                                <input type="text" class="form-control" name="ref_no" id="ref_no" required />
                             </div>
 
-                             <div class="col-md-12 mb-1">
+                            <div class="col-md-12 mb-1">
                                 <label class="form-label">Paid Amount <span class="text-danger"></span></label>
                                 <input type="text" class="form-control" name="paid_amount" />
                             </div>
@@ -1524,7 +1520,7 @@
         </div>
     </div>
 
- 
+
     <div class="modal fade" id="sponsor" tabindex="-1" aria-labelledby="shareProjectTitle" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered" style="max-width: 700px">
             <div class="modal-content">
@@ -1553,7 +1549,7 @@
                             <tbody>
                                 <tr>
                                     <td>1</td>
-                                    <td><input type="text" class="form-control mw-100"  name="sponsor[name]" /></td>
+                                    <td><input type="text" class="form-control mw-100" name="sponsor[name]" /></td>
                                     <td><input type="text" class="form-control mw-100" name="sponsor[percentage]" /></td>
                                     <td><input type="text" class="form-control mw-100" name="sponsor[value]" /></td>
                                     <td>
@@ -1669,7 +1665,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const hostelRequiredYes = document.getElementById('hostel_required_yes');
             const hostelRequiredNo = document.getElementById('hostel_required_no');
             const checkInDate = document.getElementById('check_in_date');
@@ -1764,34 +1760,38 @@
                 $('#country').prop('required', true);
             }
         });
-        // Add event listeners to relevant fields
-        $('#sport_id, #batch_name, #quota').change(function() {
-            // Check if all required fields are selected
-            const sportId = $('#sport_id').val();
-            const sectionId = $('#section').val();
-            const batchYear = $('#batch_year').val();
-            const batchId = $('#batch_name').val();
-            const quotaId = $('#quota').val();
+        $('#batch_name').change(function() {
+            let batchId = $(this).val();
+            $('#section').html('<option value="" selected>-----Select Section-----</option>');
 
-            // if (sportId && sectionId && batchYear && batchId && quotaId) {
-                fetchFeeStructure();
-            // }
+            if (batchId) {
+                $.ajax({
+                    url: "{{ route('get.sections.by.batch') }}",
+                    type: "POST",
+                    data: {
+                        batch_id: batchId,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.length > 0) {
+                            $.each(response, function(index, section) {
+                                $('#section').append('<option value="' + section.id + '">' + section.section + '</option>');
+                            });
+                        }
+                    }
+                });
+            }
+        });
+        $('#section').change(function() {
+            fetchFeeStructure();
         });
 
-        function fetchFeeStructure()
-        {
-            // Get all required values
-            // alert('testing');
+        function fetchFeeStructure() {
             const sportId = $('#sport_id').val();
             const sectionId = $('#section').val();
             const batchYear = $('#batch_year').val();
             const batchId = $('#batch_name').val();
             const quotaId = $('#quota').val();
-
-            // Make sure all fields are selected
-            // if (!sportId || !sectionId || !batchYear || !batchId || !quotaId) {
-            //     return;
-            // }
 
             $.ajax({
                 url: '{{ route("fetch.fee.structure") }}',
@@ -1804,7 +1804,7 @@
                     batch_id: batchId,
                     quota_id: quotaId
                 },
-                success: function (response) {
+                success: function(response) {
                     console.log(response);
                     if (response.status === 'success') {
                         updateFeeTable(response.feeStructure);
@@ -1812,7 +1812,7 @@
                         alert('Failed to fetch fee structure.');
                     }
                 },
-                error: function () {
+                error: function() {
                     alert('An error occurred while fetching the fee structure.');
                 }
             });
@@ -1924,7 +1924,7 @@
         }
 
 
-        function updateMandatoryStatus(feeId,feeTitle, isChecked) {
+        function updateMandatoryStatus(feeId, feeTitle, isChecked) {
             console.log("Updating Mandatory Status for Fee ID:", feeId, "Checked:", isChecked);
 
             let feeItem = feeStructure.find(f => f.id == feeId);
@@ -1962,19 +1962,19 @@
                     fee_title: feeTitle,
                     is_checked: isChecked ? 1 : 0
                 },
-                success: function (response) {
+                success: function(response) {
                     console.log("Update Success:", response);
                     alert('Mandatory status updated successfully!');
                     // updateTotalFee()
                 },
-                error: function (xhr, status, error) {
+                error: function(xhr, status, error) {
                     console.log("Update Error:", error);
                     alert('An error occurred while updating mandatory status.');
                 }
             });
         }
 
-        $(document).on('click', '.add-sponsor-btn', function () {
+        $(document).on('click', '.add-sponsor-btn', function() {
             let index = $(this).data('index');
             console.log('Index being set:', index); // Log index for debugging
             console.log('feeStructure before modal opens:', feeStructure);
@@ -1982,7 +1982,7 @@
         });
 
         // Handle the Save Sponsor button in the modal
-        $('#saveSponsor').on('click', function () {
+        $('#saveSponsor').on('click', function() {
             let sponsorAmount = Number($('#sponsorAmount').val());
             let index = $('#feeIndex').val();
 
@@ -2004,129 +2004,80 @@
 
 
 
-        $('#section').change(function () {
-            var sectionId = $(this).val();
-            var sectionName = $(this).find(':selected').data('name');
+        var sectionId = $('#section').val();
+        var sectionName = $('#section').find(':selected').data('name');
 
-            $('#batch_year').html('<option value="" selected>-----Select Year-----</option>');
-            $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
-
-            if (sectionId && sectionName) {
-                $.ajax({
-                    url: "{{ route('get.batch.year.student') }}",
-                    type: "POST",
-                    data: {
-                        section_name: sectionName,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function (response) {
-                        if (response.length > 0) {
-                            $.each(response, function (index, item) {
-                                $('#batch_year').append('<option value="' + item + '">' + item + '</option>');
-                            });
-                            $('#batch_year').prop('disabled', false);
-                        } else {
-                            $('#batch_year').prop('disabled', true);
-                        }
-                    }
-                });
+        $('#other_state').change(function() {
+            let stateId = $(this).val();
+            if (stateId) {
+                loadCities(stateId, 'other');
             } else {
-                $('#batch_year').prop('disabled', true);
-                $('#batch_name').prop('disabled', true);
+                $('#other_district').html('<option value="">Select City</option>');
             }
-            const sportId = $('#sport_id').val();
-            // const sectionId = $('#section').val();
-            const batchYear = $('#batch_year').val();
-            const batchId = $('#batch_name').val();
-            const quotaId = $('#quota').val();
-
-            // if (sportId && sectionId && batchYear && batchId && quotaId) {
-                fetchFeeStructure();
-            // }
         });
 
-        $('#batch_year').change(function () {
-            var sectionId = $('#section').val();
-            var sectionName = $('#section').find(':selected').data('name');
-            var batchYear = $(this).val();
 
-            $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
 
-            if (sectionId && sectionName && batchYear) {
-                $.ajax({
-                    url: "{{ route('get.batch.names.student') }}",
-                    type: "POST",
-                    data: {
-                        section_name: sectionName,
-                        batch_year: batchYear,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function (response) {
-                        if (response.length > 0) {
-                            $.each(response, function (index, item) {
-                                console.log(index, item)
-                                $('#batch_name').append('<option value="' + item.id + '">' + item.batch + '</option>');
-                            });
-                            $('#batch_name').prop('disabled', false);
-                        } else {
-                            $('#batch_name').prop('disabled', true);
-                        }
-                    }
-                });
-            } else {
-                $('#batch_name').prop('disabled', true);
+        document.addEventListener('DOMContentLoaded', function () {
+            const hostelRequiredYes = document.getElementById('hostel_required_yes');
+            const hostelRequiredNo = document.getElementById('hostel_required_no');
+            const checkInDate = document.getElementById('check_in_date');
+            const checkInDateLabel = document.getElementById('check_in_date_label');
+            const checkOutDate = document.getElementById('check_out_date');
+            const checkOutDateLabel = document.getElementById('check_out_date_label');
+            const roomPreference = document.getElementById('room_preference');
+            const roomPreferenceLabel = document.getElementById('room_preference_label');
+
+            // Function to toggle hostel fields
+            function toggleHostelFields() {
+                if (hostelRequiredYes.checked) {
+                    // Enable fields when "Yes" is selected
+                    checkInDate.disabled = false;
+                    checkOutDate.disabled = false;
+                    roomPreference.disabled = false;
+                    checkInDate.style.display = 'block';
+                    checkOutDate.style.display = 'block';
+                    roomPreference.style.display = 'block';
+                    checkInDateLabel.style.display = 'block';
+                    checkOutDateLabel.style.display = 'block';
+                    roomPreferenceLabel.style.display = 'block';
+
+                    // Make fields required
+                    checkInDate.required = true;
+                    checkOutDate.required = true;
+                    roomPreference.required = true;
+                } else {
+                    // Disable fields when "No" is selected or initially
+                    checkInDate.disabled = true;
+                    checkOutDate.disabled = true;
+                    roomPreference.disabled = true;
+
+                    // Remove required attribute
+                    checkInDate.required = false;
+                    checkOutDate.required = false;
+                    roomPreference.required = false;
+
+                    // Clear values
+                    checkInDate.value = '';
+                    checkOutDate.value = '';
+                    roomPreference.value = '';
+
+                    checkInDate.style.display = 'none';
+                    checkOutDate.style.display = 'none';
+                    roomPreference.style.display = 'none';
+                    checkInDateLabel.style.display = 'none';
+                    checkOutDateLabel.style.display = 'none';
+                    roomPreferenceLabel.style.display = 'none';
+                }
             }
-            const sportId = $('#sport_id').val();
-            // const sectionId = $('#section').val();
-            // const batchYear = $('#batch_year').val();
-            const batchId = $('#batch_name').val();
-            const quotaId = $('#quota').val();
 
-            // if (sportId && sectionId && batchYear && batchId && quotaId) {
-                fetchFeeStructure();
-            // }
+            // Add event listeners to both radio buttons
+            hostelRequiredYes.addEventListener('change', toggleHostelFields);
+            hostelRequiredNo.addEventListener('change', toggleHostelFields);
+
+            // Initial call to set the correct state on page load
+            toggleHostelFields();
         });
-        // Add event listeners to relevant fields
-        // $('#sport_id, #section, #batch_year, #batch_name, #quota').change(function() {
-        //     fetchFeeStructure();
-        // });
-
-        // Function to update totals when percentages change
-        $(document).on('change', '.sponsorship-percent, .discount-percent', function() {
-            const row = $(this).closest('tr');
-            const totalFees = parseFloat(row.find('.total-fees').val()) || 0;
-            const sponsorshipPercent = parseFloat(row.find('.sponsorship-percent').val()) || 0;
-            const discountPercent = parseFloat(row.find('.discount-percent').val()) || 0;
-
-            // Calculate values
-            const sponsorshipValue = (totalFees * sponsorshipPercent / 100).toFixed(2);
-            const discountValue = (totalFees * discountPercent / 100).toFixed(2);
-
-            // Update fields
-            row.find('.sponsorship-value').val(sponsorshipValue);
-            row.find('.discount-value').val(discountValue);
-
-            // Update calculated fields
-            row.find('td:nth-child(8)').text((sponsorshipPercent + discountPercent) + '%');
-            row.find('td:nth-child(9)').text((parseFloat(sponsorshipValue) + parseFloat(discountValue)).toFixed(2));
-            row.find('td:nth-child(10)').text((100 - (sponsorshipPercent + discountPercent)) + '%');
-            row.find('td:nth-child(11)').text((totalFees - (parseFloat(sponsorshipValue) + parseFloat(discountValue))).toFixed(2));
-
-            // Update the total row
-            updateTotalRow();
-        });
-
-        // Function to update the total row
-        function updateTotalRow() {
-            let totalNetFee = 0;
-
-            $('#feeTable tbody tr:not(:last)').each(function() {
-                const netFee = parseFloat($(this).find('td:nth-child(11)').text()) || 0;
-                totalNetFee += netFee;
-            });
-
-            $('#feeTable tbody tr:last td:nth-child(11)').text(totalNetFee.toFixed(2));
-        }
         function getDate(yearsAgo) {
             let d = new Date();
             d.setFullYear(d.getFullYear() + yearsAgo);
@@ -2145,6 +2096,7 @@
                 errorField.textContent = "";
             }
         }
+
         function validateDOJ() {
             let doj = document.getElementById("dojInput").value;
             let minDate = getDate(-1);
@@ -2157,152 +2109,15 @@
                 errorField.textContent = "";
             }
         }
-        $(document).ready(function() {
-            // Handle form submission
-            function toggleBankName() {
-                var payMode = $('select[name="pay_mode"]').val();
+        const futureDateInputs = document.querySelectorAll('.dobInput');
 
-                if (payMode === 'Cash') {
-                    $('#bankNameDiv').hide();
-                    $('#refNoDiv').hide();
-                    $('#bank_name').val('').prop('required', false);
-                    $('#ref_no').val('').prop('required', false);
-                } else {
-                    $('#bankNameDiv').show();
-                    $('#refNoDiv').show();
-                    $('#bank_name').prop('required', true);
-                    $('#ref_no').prop('required', true);
-                }
-            }
-
-            toggleBankName();
-
-            $('select[name="pay_mode"]').on('change', function() {
-                toggleBankName();
+        function disableDates() {
+            const today = new Date().toISOString().split('T')[0];
+            futureDateInputs.forEach(input => {
+                input.setAttribute('min', today);
             });
-            $('#paymentForm').on('submit', function(e) {
-                e.preventDefault();
-
-                // Get form data
-                var formData = new FormData(this);
-
-                // Disable submit button to prevent multiple submissions
-                $('#submitPayment').prop('disabled', true);
-
-                // Show loading indicator (optional)
-                $('#submitPayment').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
-
-                $.ajax({
-                    url: "{{ url('update-payment') }}",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if(response.success) {
-                            // Show success message
-                            toastr.success(response.message, 'Success');
-
-                            // Close modal after 1.5 seconds
-                            setTimeout(function() {
-                                $('#update-payment').modal('hide');
-                            }, 1500);
-                            // location.reload()
-                            // Optionally refresh part of the page or update UI
-                        } else {
-                            // Show error message
-                            toastr.error(response.message, 'Error');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        // Handle errors
-                        var errorMessage = xhr.responseJSON && xhr.responseJSON.message
-                            ? xhr.responseJSON.message
-                            : 'An error occurred while processing your request.';
-                        $('#submitPayment').prop('disabled', false);
-                        $('#submitPayment').html('Submit');
-                        toastr.error(errorMessage, 'Error');
-                    },
-                    complete: function() {
-                        // Re-enable submit button
-                        $('#submitPayment').prop('disabled', false);
-                        $('#submitPayment').html('Submit');
-                    }
-                });
-            });
-
-            // Reset form when modal is closed
-            $('#update-payment').on('hidden.bs.modal', function () {
-                $('#paymentForm')[0].reset();
-            });
-            $(document).on('click', '.pay-now-btn', function() {
-                var userId = $(this).data('user-id');
-                var $button = $(this);
-
-                // Disable button to prevent multiple clicks
-                $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
-
-                $.ajax({
-                    url: "{{ url('update-payment-status') }}", // Define the correct route
-                    type: "POST",
-                    data: {
-                        _token: '{{ csrf_token() }}', // Ensure CSRF protection
-                        user_id: userId
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            toastr.success(response.message, 'Success');
-
-                            // Replace "Pay Now" button with "Paid" badge
-                            $button.replaceWith('<span class="badge bg-success">Paid</span>');
-                            setTimeout(function() {
-                                // location.reload()
-                            }, 1500);
-
-                        } else {
-                            toastr.error(response.message, 'Error');
-                            $button.prop('disabled', false).html('Pay Now');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        var errorMessage = xhr.responseJSON && xhr.responseJSON.message
-                            ? xhr.responseJSON.message
-                            : 'An error occurred while processing your request.';
-                        toastr.error(errorMessage, 'Error');
-                        $button.prop('disabled', false).html('Pay Now');
-                    }
-                });
-            });
-
-        });
-        // document.addEventListener('DOMContentLoaded', function() {
-        //     // Get today's date in YYYY-MM-DD format
-        //     let today = new Date();
-        //     let day = String(today.getDate()).padStart(2, '0');
-        //     let month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-        //     let year = today.getFullYear();
-        //
-        //     let maxDate = year + '-' + month + '-' + day;
-        //
-        //     // Set the max attribute to today's date
-        //     document.getElementById('dobInput').setAttribute('max', maxDate);
-        // });
-        // $('#other_country').change(function() {
-        //     let countryId = $(this).val();
-        //     if (countryId) {
-        //         loadStates(countryId, 'other');
-        //     } else {
-        //         $('#other_state').html('<option value="">Select State</option>');
-        //         $('#other_district').html('<option value="">Select City</option>');
-        //     }
-        // });
-
-        // Load cities when state changes in Other Details section
-        $('#other_state').change(function() {
-            if ($(this).val() === 'Select State') {
-                $(this).val(''); // Set to empty string if "Select State" is chosen
-            }
-        });
+        }
+        disableDates();
         function loadStates(countryId, type) {
             $.ajax({
                 url: '/get-states/' + countryId,
@@ -2311,9 +2126,17 @@
                     var stateDropdown = $('#' + type + '_state');
                     stateDropdown.empty();
                     stateDropdown.append('<option value="">Select State</option>');
+
                     $.each(data, function(key, state) {
+                        // var isSelected = (state.id == selectedState) ? 'selected' : '';
                         stateDropdown.append('<option value="' + state.id + '">' + state.name + '</option>');
                     });
+
+                    // If there's a selected state but it's not in the list, add it
+                    // if (selectedState && !data.some(state => state.id == selectedState)) {
+                    //     // You might need an additional AJAX call here to get the state name
+                    //     stateDropdown.append('<option value="' + selectedState + '" selected>Previously Selected State</option>');
+                    // }
                 }
             });
         }
@@ -2332,26 +2155,45 @@
                 }
             });
         }
+        {{--document.getElementById('batch_year').addEventListener('change', function () {--}}
+        {{--    var selectedYear = this.value;--}}
+        {{--    var batchNameDropdown = document.getElementById('batch_name');--}}
 
-        document.getElementById('imageUpload').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            const previewImg = document.getElementById('previewImg');
-            const photoSizeText = document.getElementById('photoSizeText');
+        {{--    // Clear previous options--}}
+        {{--    batchNameDropdown.innerHTML = '<option value="">Select Name</option>';--}}
+        {{--    // Filter batches based on the selected year--}}
+        {{--    @json($batch).forEach(function(batch) {--}}
+        {{--        if (batch.batch_year == selectedYear) {--}}
+        {{--            var option = document.createElement('option');--}}
+        {{--            option.value = batch.id;--}}
+        {{--            option.text = batch.batch_name;--}}
+        {{--            batchNameDropdown.appendChild(option);--}}
+        {{--        }--}}
+        {{--    });--}}
+        {{--});--}}
+        document.addEventListener("DOMContentLoaded", function() {
+            const imageInput = document.getElementById("imageUpload");
+            const previewImg = document.getElementById("previewImg");
+            const photoSizeText = document.getElementById("photoSizeText");
 
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    previewImg.style.display = 'block'; // Show image
-                    photoSizeText.style.display = 'none'; // Hide text
-                };
-                reader.readAsDataURL(file);
-            }
+            imageInput.addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewImg.style.display = "block";
+                        if (photoSizeText) photoSizeText.style.display = "none";
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
         });
         function saveDraft() {
             document.getElementById('status').value = 'draft';
             document.getElementById('postRegister').submit();
         }
+
         function proceed() {
             document.getElementById('status').value = 'submitted';
             document.getElementById('postRegister').submit();
@@ -2361,18 +2203,16 @@
             getDocNumberByBookId();
         });
 
+        $(document).ready(function () {
+            let sponsorRowIndex = 1;
 
             // Function to add a new sponsor row
-            $(document).ready(function () {
-                let sponsorRowIndex = 1;
+            $(document).on("click", ".add-sponsor-row", function (e) {
+                e.preventDefault();
 
-                // Function to add a new sponsor row
-                $(document).on("click", ".add-sponsor-row", function (e) {
-                    e.preventDefault();
+                sponsorRowIndex++;
 
-                    sponsorRowIndex++;
-
-                    let newRow = `
+                let newRow = `
             <tr>
                 <td>${sponsorRowIndex}</td>
                 <td><input type="text" class="form-control mw-100" name="sponsor[${sponsorRowIndex}][name]" required /></td>
@@ -2388,30 +2228,24 @@
             </tr>
         `;
 
-                    $("#sponsorTable tbody").append(newRow);
-                    feather.replace(); // Refresh icons
-                });
-
-                // Function to delete a sponsor row
-                $(document).on("click", ".delete-sponsor-row", function (e) {
-                    e.preventDefault();
-                    $(this).closest("tr").remove();
-                    updateSponsorRowNumbers();
-                });
-
-                // Update sponsor row numbering dynamically
-                function updateSponsorRowNumbers() {
-                    $("#sponsorTable tbody tr").each(function (index) {
-                        $(this).find("td:first").text(index + 1);
-                    });
-                }
+                $("#sponsorTable tbody").append(newRow);
+                feather.replace(); // Refresh icons
             });
 
-        // document.getElementById('user_type_select').addEventListener('change', function() {
-        //     var selectedOption = this.options[this.selectedIndex];
-        //     var userType = selectedOption.getAttribute('data-type');
-        //     document.getElementById('user_type').value = userType;
-        // });
+            // Function to delete a sponsor row
+            $(document).on("click", ".delete-sponsor-row", function (e) {
+                e.preventDefault();
+                $(this).closest("tr").remove();
+                updateSponsorRowNumbers();
+            });
+
+            // Update sponsor row numbering dynamically
+            function updateSponsorRowNumbers() {
+                $("#sponsorTable tbody tr").each(function (index) {
+                    $(this).find("td:first").text(index + 1);
+                });
+            }
+        });
 
         function getDocNumberByBookId() {
             let currentDate = new Date().toISOString().split('T')[0];
@@ -2502,98 +2336,97 @@
         });
 
 
-        $(document).ready(function () {
-            let familyRowIndex = 0; // Initialize the index for family rows
+        {{--$(document).ready(function() {--}}
+        {{--    let familyRowIndex = {{ count($familyDetails) }};--}}
 
-            // Function to add a new family row
-            $(document).on("click", ".add-contactpeontxt, .add-contact-row", function (e) {
-                e.preventDefault();
+        {{--    // Add new row--}}
+        {{--    $(".add-contactpeontxt, .add-contact-row").on("click", function(e) {--}}
+        {{--        e.preventDefault();--}}
 
-                familyRowIndex++; // Increment the index for each new row
+        {{--        familyRowIndex++;--}}
 
-                let newRow = `
-            <tr class="family-row">
-                <td>#</td>
-                <td>
-                    <select class="form-select mw-100 relation" name="family_details[${familyRowIndex}][relation]">
-                        <option value="">Select</option>
-                        <option value="Father">Father</option>
-                        <option value="Mother">Mother</option>
-                        <option value="Grandfather">Grandfather</option>
-                        <option value="Grandmother">Grandmother</option>
-                        <option value="Uncle">Uncle</option>
-                        <option value="Aunt">Aunt</option>
-                        <option value="Sibling">Sibling</option>
-                        <option value="Local Guardian">Local Guardian</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </td>
-                <td><input type="text" class="form-control mw-100 name" name="family_details[${familyRowIndex}][name]"></td>
-                <td><input type="text" class="form-control mw-100 contact" name="family_details[${familyRowIndex}][contact_no]"></td>
-                <td><input type="text" class="form-control mw-100 email" name="family_details[${familyRowIndex}][email]"></td>
-                <td>
-                    <input type="radio" name="family_details[${familyRowIndex}][is_guardian]" class="guardian">
-                </td>
-                <td>
-                    <a href="#" class="text-danger delete-row"><i data-feather="trash-2" class="me-50"></i></a>
-                </td>
-            </tr>
-        `;
+        {{--        let newRow = `--}}
+        {{--<tr class="family-row">--}}
+        {{--    <td>${familyRowIndex}</td>--}}
+        {{--    <td>--}}
+        {{--        <select class="form-select mw-100 relation" name="family_details[${familyRowIndex}][relation]">--}}
+        {{--            <option>Select</option>--}}
+        {{--            <option>Father</option>--}}
+        {{--            <option>Mother</option>--}}
+        {{--            <option>Grandfather</option>--}}
+        {{--            <option>Grandmother</option>--}}
+        {{--            <option>Uncle</option>--}}
+        {{--            <option>Aunt</option>--}}
+        {{--            <option>Sibling</option>--}}
+        {{--            <option>Local Guardian</option>--}}
+        {{--            <option>Other</option>--}}
+        {{--        </select>--}}
+        {{--    </td>--}}
+        {{--    <td><input type="text" class="form-control mw-100 name" name="family_details[${familyRowIndex}][name]"></td>--}}
+        {{--    <td><input type="text" class="form-control mw-100 contact" name="family_details[${familyRowIndex}][contact_no]"></td>--}}
+        {{--    <td><input type="text" class="form-control mw-100 email" name="family_details[${familyRowIndex}][email]"></td>--}}
+        {{--    <td>--}}
+        {{--        <input type="radio" name="family_details[${familyRowIndex}][is_guardian]" class="guardian">--}}
+        {{--    </td>--}}
+        {{--    <td>--}}
+        {{--        <a href="#" class="text-danger delete-row"><i data-feather="trash-2" class="me-50"></i></a>--}}
+        {{--    </td>--}}
+        {{--</tr>--}}
+        {{--`;--}}
 
-                $("#familyTable tbody").append(newRow);
-                feather.replace(); // Refresh icons
-            });
+        {{--        $("#familyTable tbody").append(newRow);--}}
+        {{--        feather.replace();--}}
+        {{--    });--}}
 
-            // Function to delete a family row
-            $(document).on("click", ".delete-row", function (e) {
-                e.preventDefault();
-                $(this).closest("tr").remove();
-                updateFamilyRowNumbers(); // Update row numbers after deletion
-            });
+        {{--    // Delete row--}}
+        {{--    $(document).on("click", ".delete-row", function(e) {--}}
+        {{--        e.preventDefault();--}}
+        {{--        $(this).closest("tr").remove();--}}
+        {{--        updateRowNumbers();--}}
+        {{--    });--}}
 
-            // Function to update row numbers dynamically
-            function updateFamilyRowNumbers() {
-                $("#familyTable tbody tr").each(function (index) {
-                    $(this).find("td:first").text(index + 1);
-                });
-            }
-        });
+        {{--    function updateRowNumbers() {--}}
+        {{--        $("#familyTable tbody tr").each(function(index) {--}}
+        {{--            $(this).find("td:first").text(index + 1);--}}
+        {{--        });--}}
+        {{--    }--}}
+        {{--});--}}
+
 
     </script>
-<script type="text/javascript">
-    $(document).ready(function () {
-        $('#colorCheck2').change(function () {
-            if ($(this).is(':checked')) {
-                // Copy permanent address to correspondence address
-                $('#correspondence_street1').val($('#permanent_street1').val());
-                $('#correspondence_street2').val($('#permanent_street2').val());
-                $('#correspondence_town').val($('#permanent_town').val());
-                $('#correspondence_pincode').val($('#permanent_pincode').val());
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#colorCheck2').change(function() {
+                if ($(this).is(':checked')) {
+                    // Copy permanent address to correspondence address
+                    $('#correspondence_street1').val($('#permanent_street1').val());
+                    $('#correspondence_street2').val($('#permanent_street2').val());
+                    $('#correspondence_town').val($('#permanent_town').val());
+                    $('#correspondence_pincode').val($('#permanent_pincode').val());
 
-                // Copy country, state, and city
-                $('#correspondence_country').val($('#permanent_country').val()).trigger('change');
+                    // Copy country, state, and city
+                    $('#correspondence_country').val($('#permanent_country').val()).trigger('change');
 
-                // Wait for the states to load, then set the state
-                setTimeout(function() {
-                    $('#correspondence_state').val($('#permanent_state').val()).trigger('change');
-
-                    // Wait for the cities to load, then set the city
+                    // Wait for the states to load, then set the state
                     setTimeout(function() {
-                        $('#correspondence_district').val($('#permanent_district').val());
+                        $('#correspondence_state').val($('#permanent_state').val()).trigger('change');
+
+                        // Wait for the cities to load, then set the city
+                        setTimeout(function() {
+                            $('#correspondence_district').val($('#permanent_district').val());
+                        }, 500); // Adjust the timeout as needed
                     }, 500); // Adjust the timeout as needed
-                }, 500); // Adjust the timeout as needed
-            } else {
-                // Clear correspondence address fields
-                $('#correspondence_street1, #correspondence_street2, #correspondence_town, #correspondence_district, #correspondence_state, #correspondence_country, #correspondence_pincode').val('');
-            }
+                } else {
+                    // Clear correspondence address fields
+                    $('#correspondence_street1, #correspondence_street2, #correspondence_town, #correspondence_district, #correspondence_state, #correspondence_country, #correspondence_pincode').val('');
+                }
+            });
         });
-    });
+    </script>
 
-</script>
-
-@endsection
-<!-- BEGIN: Vendor JS-->
-{{--
+    @endsection
+    <!-- BEGIN: Vendor JS-->
+    {{--
     <!-- BEGIN: Vendor JS-->
      <script src="../../../app-assets/vendors/js/vendors.min.js"></script>
     <!-- BEGIN Vendor JS-->

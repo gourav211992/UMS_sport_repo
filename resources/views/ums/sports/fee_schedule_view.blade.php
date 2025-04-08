@@ -85,7 +85,7 @@
                                             </div>
 
                                             <!-- Admission Year -->
-                                            <!-- <div class="row align-items-center mb-1">
+                                            <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
                                                     <label class="form-label">Admission Yr. <span
                                                                 class="text-danger">*</span></label>
@@ -94,7 +94,7 @@
                                                     <input type="text" name="document_date" class="form-control"
                                                            value="{{ old('admission_year', $sportFeeMaster->document_date ?? '') }}">
                                                 </div>
-                                            </div> -->
+                                            </div>
                                         
                                             <!-- Sport Name -->
                                             <div class="row align-items-center mb-1">
@@ -115,28 +115,11 @@
                                         
                                             <!-- Batch -->
                                            
-                                        <div class="row align-items-center mb-1">
-                                            <div class="col-md-3">
-                                                <label class="form-label">Section<span
-                                                        class="text-danger">*</span></label>
-                                            </div>
-                                            <div class="col-md-5">
-
-                                                <select class="form-select" name="section" id="section">
-                                                    <option value="" selected>-----Select Section-----</option>
-                                                    @foreach ($sections->unique('name') as $item)
-                                                    <option value="{{ $item->name }}"
-                                                        {{ isset($sportFeeMaster) && $sportFeeMaster->section == $item->name ? 'selected' : '' }}>
-                                                        {{ $item->name }}
-                                                    </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
+                                       
 
 
                                         <!-- Batch -->
-                                        <div class="row align-items-center mb-1">
+                                        {{-- <div class="row align-items-center mb-1">
                                             <div class="col-md-3">
                                                 <label class="form-label">Batch Year<span
                                                         class="text-danger">*</span></label>
@@ -157,7 +140,7 @@
 
 
                                             </div>
-                                        </div>
+                                        </div> --}}
 
 
 
@@ -181,6 +164,26 @@
                                             </div>
 
 
+                                        </div>
+
+
+                                        <div class="row align-items-center mb-1">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Section<span
+                                                        class="text-danger">*</span></label>
+                                            </div>
+                                            <div class="col-md-5">
+
+                                                <select class="form-select" name="section" id="section">
+                                                    <option value="" selected>-----Select Section-----</option>
+                                                    @foreach ($sections->unique('name') as $item)
+                                                    <option value="{{ $item->name }}"
+                                                        {{ isset($sportFeeMaster) && $sportFeeMaster->section == $item->name ? 'selected' : '' }}>
+                                                        {{ $item->name }}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
                                             <!-- Quota -->
                                             <div class="row align-items-center mb-1">

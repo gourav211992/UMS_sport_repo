@@ -1,154 +1,131 @@
 @extends('ums.sports.sports-meta.admin-sports-meta')
-@section('content');
 
-<div class="app-content content ">
+@section('content')
+
+<div class="app-content content">
     <div class="content-overlay"></div>
     <div class="header-navbar-shadow"></div>
     <div class="content-wrapper container-xxl p-0">
         <div class="content-header pocreate-sticky">
             <div class="row">
                 <div class="content-header-left col-md-6 mb-2">
-                    <div class="row breadcrumbs-top">
-                        <div class="col-12">
-                            <h2 class="content-header-title float-start mb-0">Activity Master</h2>
-                            <div class="breadcrumb-wrapper">
-                                <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="index.html">Home</a>
-                                </li>  
-                                <li class="breadcrumb-item active">Add New</li> 
-                            </ol>
-                        </div>
-                        </div>
+                    <h2 class="content-header-title float-start mb-0">Activity Master</h2>
+                    <div class="breadcrumb-wrapper">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                            <li class="breadcrumb-item active">Add New</li>
+                        </ol>
                     </div>
                 </div>
                 <div class="content-header-right text-sm-end col-md-6 mb-50 mb-sm-0">
-                    <div class="form-group breadcrumb-right">   
-                        <button onClick="javascript: history.go(-1)" class="btn btn-secondary btn-sm mb-50 mb-sm-0"><i data-feather="arrow-left-circle"></i> Back</button>  
-                        <button onClick="javascript: history.go(-1)" class="btn btn-primary btn-sm mb-50 mb-sm-0"><i data-feather="check-circle"></i> Submit</button> 
-                    </div>
+                    <button onClick="javascript: history.go(-1)" class="btn btn-secondary btn-sm mb-50 mb-sm-0">
+                        <i data-feather="arrow-left-circle"></i> Back
+                    </button>
+                    <button type="submit" form="cat_form" class="btn btn-primary btn-sm mb-50 mb-sm-0">
+                        <i data-feather="check-circle"></i> Submit
+                    </button>
                 </div>
             </div>
         </div>
-        <div class="content-body">
-             
-            
-            
-            <section id="basic-datatable">
+
+        <form id="cat_form" method="POST" action="{{ route('activity-master-add') }}">
+            @csrf
+            <div class="content-body">
+                <section id="basic-datatable">
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-body customernewsection-form">
+                                <div class="card-body">
                                     <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="newheader border-bottom mb-2 pb-25">
-                                                <h4 class="card-title text-theme">Basic Information</h4>
-                                                <p class="card-text">Fill the details</p>
-                                            </div>
-                                        </div>
                                         <div class="col-md-8">
-                                            
-                                             
+                                            <!-- Sport Master Field -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
                                                     <label class="form-label">Sport Master <span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <select class="form-select">
-                                                        <option>Bedminton</option>
+                                                    <select class="form-select" name="sport_id">
+                                                        @foreach ($sportName as $name)
+                                                            <option value="{{$name->id}}">{{ ucfirst($name->sport_name) }}</option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Parent Group</label>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <select class="form-select">
-                                                        <option>Select</option>
-                                                    </select>
-                                                </div>
-                                            </div>
+
+                                            <!-- Activity Name Field -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
                                                     <label class="form-label">Activity Name <span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <input type="text"  class="form-control" />
+                                                    <input type="text" name="activity_name" class="form-control" />
                                                 </div>
                                             </div>
+
+                                            <!-- Activity Duration Field -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Duration (In Mins) <span class="text-danger">*</span></label>
+                                                    <label class="form-label"> Activity Duration (In Mins) <span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <input type="number"  class="form-control"   />    
+                                                    <input type="number" name="duration_min" class="form-control" />    
                                                 </div>
                                             </div>
+
+                                            <!-- Description Field -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Descriprtion</label>
+                                                    <label class="form-label">Description</label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <input type="text"  class="form-control"   />    
+                                                    <input type="text" name="description" class="form-control" />    
                                                 </div>
                                             </div>
-                                            
-                                        </div>
-                                        
-                                        <div class="col-md-4 border-start">
-                                                <div class="row align-items-center mb-2">
-                                                    <div class="col-md-12"> 
-                                                        <label class="form-label text-primary"><strong>Status</strong></label>   
-                                                         <div class="demo-inline-spacing">
-                                                            <div class="form-check form-check-primary mt-25">
-                                                                <input type="radio" id="customColorRadio3" name="customColorRadio3" class="form-check-input" checked="">
-                                                                <label class="form-check-label fw-bolder" for="customColorRadio3">Active</label>
-                                                            </div> 
-                                                            <div class="form-check form-check-primary mt-25">
-                                                                <input type="radio" id="customColorRadio4" name="customColorRadio3" class="form-check-input">
-                                                                <label class="form-check-label fw-bolder" for="customColorRadio4">Inactive</label>
-                                                            </div> 
-                                                        </div> 
-                                                    </div> 
-                                                 </div> 
-                                                
-                                                   
-                                                
-                                                
+
+                                            <!-- Status Field -->
+                                            <div class="row align-items-center mb-2">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Status</label>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <div class="demo-inline-spacing">
+                                                        <div class="form-check form-check-primary mt-25">
+                                                            <input type="radio" id="active" name="status" value="active" class="form-check-input" checked>
+                                                            <label class="form-check-label fw-bolder" for="active">Active</label>
+                                                        </div>
+                                                        <div class="form-check form-check-primary mt-25">
+                                                            <input type="radio" id="inactive" name="status" value="inactive" class="form-check-input">
+                                                            <label class="form-check-label fw-bolder" for="inactive">Inactive</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        
-                                        <div class="col-md-9">
-                                            <div class="table-responsive-md">
-                                                <table class="mt-1 table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>S.NO</th>
-                                                            <th>Sub Activity Name<span class="text-danger">*</span></th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="sub-category-box">
-                                                        <tr class="sub-category-template">
-                                                            <td>1</td>
-                                                            <td><input type="text" name="subcategories[0][name]" class="form-control mw-100" placeholder="Enter Sub Activity Name" /></td>
-                                                            <!-- Display subcategory initials -->
-                                                            <td>
-                                                                <a href="#" class="text-primary add-address"><i data-feather="plus-square"></i></a> 
-                                                            </td>
-                                                        </tr>
-                                                        
-                                                        <tr class="sub-category-template">
-                                                            <td>1</td>
-                                                            <td><input type="text" name="subcategories[0][name]" class="form-control mw-100" placeholder="Enter Sub Activity Name" /></td>
-                                                            <!-- Display subcategory initials -->
-                                                            <td> 
-                                                                <a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+
+                                            <!-- Sub Activity Table -->
+                                            <div class="col-md-9">
+                                                <div class="table-responsive-md">
+                                                    <table class="mt-1 table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>S.NO</th>
+                                                                <th>Sub Activity Name<span class="text-danger">*</span></th>
+                                                                <th>Duration(min)<span class="text-danger">*</span></th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="sub-category-box">
+                                                            <tr class="sub-category-template">
+                                                                <td class="row-number">1</td>
+                                                                <td><input type="text" name="subcategories[0][name]" class="form-control mw-100" placeholder="Enter Sub Activity Name" /></td>
+                                                                <td><input type="number" name="subcategories[0][duration]" class="form-control mw-100" placeholder="Enter Sub Activity Duration" /></td>
+                                                                <td>
+                                                                    <a href="#" class="text-primary add-address"><i data-feather="plus-square"></i></a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
-                                        
                                         </div>
                                     </div>
                                 </div>
@@ -156,9 +133,83 @@
                         </div>
                     </div>
                 </section>
-             
-
-        </div>
+            </div>
+        </form>
     </div>
 </div>
+
+<!-- Feather Icons -->
+<script src="https://cdn.jsdelivr.net/npm/feather-icons"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Feather icons
+        feather.replace();
+
+        let subCategoryIndex = 1;
+
+        // Add new subcategory row when the plus icon is clicked
+        document.querySelector('#sub-category-box').addEventListener('click', function (e) {
+            if (e.target.closest('.add-address')) {
+                e.preventDefault();
+
+                // Get the input values from the current row
+                let subCategoryNameField = document.querySelector('.sub-category-template input[name="subcategories[0][name]"]');
+                let subCategoryDurationField = document.querySelector('.sub-category-template input[name="subcategories[0][duration]"]');
+
+                let subCategoryName = subCategoryNameField.value.trim();
+                let subCategoryDuration = subCategoryDurationField.value.trim();
+
+                if (subCategoryName === "" || subCategoryDuration === "") {
+                    alert("Please enter both subcategory name and duration.");
+                    return;
+                }
+
+                // Create a new row to display the filled subcategory and duration
+                let newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${subCategoryIndex + 1}</td>
+                    <td><input type="text" name="subcategories[${subCategoryIndex}][name]" class="form-control mw-100" value="${subCategoryName}" /></td>
+                    <td><input type="number" name="subcategories[${subCategoryIndex}][duration]" class="form-control mw-100" value="${subCategoryDuration}" /></td>
+                    <td><a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a></td>
+                `;
+
+                // Append the new row to the table body
+                document.querySelector('#sub-category-box').appendChild(newRow);
+
+                // Reinitialize Feather icons for the new row
+                feather.replace();
+
+                // Clear the input fields and focus on the name field for the next entry
+                subCategoryNameField.value = '';
+                subCategoryDurationField.value = '';
+                subCategoryNameField.focus();
+
+                // Increment the index for the next subcategory
+                subCategoryIndex++;
+            }
+        });
+
+        // Delete a subcategory row when the delete button is clicked
+        document.querySelector('#sub-category-box').addEventListener('click', function (e) {
+            if (e.target.closest('.delete-row')) {
+                e.preventDefault();
+
+                // Remove the row
+                let row = e.target.closest('tr');
+                row.remove();
+
+                // Re-index the rows
+                let rows = document.querySelectorAll('#sub-category-box tr');
+                rows.forEach((row, index) => {
+                    row.querySelector('td:first-child').textContent = index + 1; // Update the row number
+                });
+
+                // Update subCategoryIndex based on the remaining rows
+                subCategoryIndex = rows.length;
+            }
+        });
+    });
+</script>
+
 @endsection

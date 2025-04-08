@@ -40,7 +40,7 @@
             <div class="alert alert-success alert-dismissible p-2 fade show" role="alert">
                 <strong>Success!</strong> {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                   
+            
             </div>
             @endif
 
@@ -57,9 +57,9 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>Section_Name</th>
+                                            <th>Batch Year</th>
                                             <th>Batch</th>
-                                            <th>Year</th>
+                                            <th>Section Name</th>
                                             <th>Status</th>
 
                                             <th>Action</th>
@@ -69,9 +69,9 @@
                                         @foreach ($section as $sec)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td class="fw-bolder text-dark">{{ $sec->name }}</td>
-                                            <td class="fw-bolder text-dark">{{ $sec->batch }}</td>
                                             <td class="fw-bolder text-dark">{{ $sec->year }}</td>
+                                            <td class="fw-bolder text-dark">{{ $sec->batch }}</td>
+                                            <td class="fw-bolder text-dark">{{ $sec->name }}</td>
                                             <td> <span class="badge rounded-pill 
                                                         {{ $sec->status == 'active' ? 'badge-light-success' : 'badge-light-danger' }}">
                                                     {{ ucfirst($sec->status) }}

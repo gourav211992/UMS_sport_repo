@@ -13,27 +13,37 @@
                         <h2 class="content-header-title float-start mb-0">Group Master Add</h2>
                         <div class="breadcrumb-wrapper">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="index.html">Home</a></li>  
-                                <li class="breadcrumb-item active">Add New</li> 
+                                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                                <li class="breadcrumb-item active">Add New</li>
                             </ol>
                         </div>
                     </div>
                 </div>
-            </div>             
+            </div>
         </div>
         <div class="content-body">
             <section id="basic-datatable">
                 <div class="row">
-                    <div class="col-12">  
+                    <div class="col-12">
                         <div class="card">
-                            <div class="card-body customernewsection-form"> 
+                            <div class="card-body customernewsection-form">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="newheader border-bottom mb-2 pb-25"> 
+                                        <div class="newheader border-bottom mb-2 pb-25">
                                             <h4 class="card-title text-theme">Basic Information</h4>
-                                            <p class="card-text">Fill the details</p> 
+                                            <p class="card-text">Fill the details</p>
                                         </div>
-                                    </div> 
+                                    </div>
+                                    @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    @endif
+
                                     <form id="cat_form" method="POST" action="{{ route('group-master-add') }}">
                                         @csrf
                                         <div class="col-md-9">
@@ -46,40 +56,51 @@
                                                     <input type="text" name="group_name" class="form-control" />
                                                 </div>
                                             </div>
+
                                             <!-- Section Field -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Section</label>
+                                                    <label class="form-label">Section <span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <select class="form-select" name="section" id="section" onchange="updateSectionDetails()">
-                                                        <option value="" selected>-----Select-----</option>
-                                                        @foreach ($section as $item)
-                                                            <option value="{{ $item->id }}" data-name="{{ $item->name }}" data-year="{{ $item->year }}" data-batch="{{ $item->batch }}">{{ ucfirst($item->name) }}</option>
+                                                    <select id="section" name="section_name" class="form-control">
+                                                        <option value="">Select Section</option>
+                                                        @foreach($sections as $section)
+                                                        <option value="{{ $section->name }}">{{ $section->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
                                             </div>
 
-                                            <!-- Section Name (disabled) -->
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Batch Name <span class="text-danger">*</span></label>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <input type="text" name="batch_name" id="batch_name" class="form-control" disabled />
-                                                </div>
+                                            <!-- Batch Field -->
+                                         
+
+                                        <div class="row align-items-center mb-1">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Batch Year <span class="text-danger">*</span></label>
                                             </div>
-                                            
-                                            <!-- Section Year (disabled) -->
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Section Year <span class="text-danger">*</span></label>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <input type="text" name="section_year" id="section_year" class="form-control" disabled />
-                                                </div>
+                                            <div class="col-md-5">
+                                                <select class="form-select" name="section_year" id="batch_year">
+                                                    <option value="" selected>-----Select Year-----</option>
+                                                </select>
+
                                             </div>
+                                        </div>
+
+
+
+                                        <div class="row align-items-center mb-1">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Batch Name<span
+                                                        class="text-danger">*</span></label>
+                                            </div>
+
+                                            <div class="col-md-5">
+                                                <select class="form-select" name="section_batch" id="batch_name">
+                                                    <option value="" selected>-----Select Batch-----</option>
+                                                </select>
+                                            </div>
+                                        </div>
 
                                             <!-- Status Field (Radio buttons for active/inactive) -->
                                             <div class="row align-items-center mb-2">
@@ -100,6 +121,7 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Hidden Field for Status Value -->
                                             <input type="hidden" id="status" name="status">
 
                                             <!-- Submit Button -->
@@ -110,6 +132,7 @@
                                             </div>
                                         </div>
                                     </form>
+
                                 </div>
                             </div>
                         </div>
@@ -120,40 +143,91 @@
     </div>
 </div>
 {{-- content --}}
+<script
+    src="https://code.jquery.com/jquery-3.7.1.min.js">
+</script>
+
 
 <script>
-    // This function is triggered when selecting a section
-    function updateSectionDetails() {
-        var sectionSelect = document.getElementById("section");
-        var sectionId = sectionSelect.value;
-        var batchInput = document.getElementById("batch_name");
-        var sectionYearInput = document.getElementById("section_year");
+   $(document).ready(function () {
+        // Fetch Batch Years on Section Select
+        $('#section').change(function () {
+            var sectionName = $(this).val();
+            $('#batch_year').html('<option value="" selected>-----Select Year-----</option>');
+            $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
 
-        // Loop through the options to find the selected section
-        for (var i = 0; i < sectionSelect.options.length; i++) {
-            var option = sectionSelect.options[i];
-            if (option.value == sectionId) {
-                // Populate batch name and section year based on selected section
-                batchInput.value = option.getAttribute("data-batch");
-                sectionYearInput.value = option.getAttribute("data-year");
-                break;
+            if (sectionName) {
+                $.ajax({
+                    url: "{{ route('get.batch.year') }}",
+                    type: "POST",
+                    data: {
+                        section_name: sectionName,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (response) {
+                        if (response.length > 0) {
+                            $.each(response, function (index, item) {
+                                $('#batch_year').append('<option value="' + item    + '">' + item + '</option>');
+                            });
+                            $('#batch_year').prop('disabled', false);
+                        } else {
+                            $('#batch_year').prop('disabled', true);
+                        }
+                    }
+                });
+            } else {
+                $('#batch_year').prop('disabled', true);
+                $('#batch_name').prop('disabled', true);
             }
-        }
-    }
+        });
 
-    // This function is triggered when submitting the form
+        // Fetch Batch Names on Year Select
+        $('#batch_year').change(function () {
+            var sectionName = $('#section').val();
+            var batchYear = $(this).val();
+            $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
+
+            if (sectionName && batchYear) {
+                $.ajax({
+                    url: "{{ route('get.batch.names') }}",
+                    type: "POST",
+                    data: {
+                        section_name: sectionName,
+                        batch_year: batchYear,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (response) {
+                        if (response.length > 0) {
+                            $.each(response, function (index, item) {
+                                $('#batch_name').append('<option value="' + item.batch + '">' + item.batch + '</option>');
+                            });
+                            $('#batch_name').prop('disabled', false);
+                        } else {
+                            $('#batch_name').prop('disabled', true);
+                        }
+                    }
+                });
+            } else {
+                $('#batch_name').prop('disabled', true);
+            }
+        });
+    });
+</script>
+<script>
     function submitCat(form) {
-        // Disabling the submit button while submitting
         form.querySelector('button[type="submit"]').disabled = true;
 
-        // Get the value of the selected status radio button
         var status = document.querySelector('input[name="status"]:checked').value;
 
-        // Set the status value before submitting the form
         document.getElementById('status').value = status;
 
-        // Submit the form
         form.submit();
     }
+
+    $('.alphaOnly').keyup(function() {
+        this.value = this.value.replace(/[^a-z|A-Z\.]/g, '');
+    });
 </script>
+
+
 @endsection

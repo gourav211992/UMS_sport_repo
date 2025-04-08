@@ -204,37 +204,6 @@
                                                         @enderror
                                                     </div>
                                                 </div>
-
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Section <span class="text-danger">*</span></label>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <select class="form-select" name="section_id" id="section">
-                                                            <option value="">-----Select Section-----</option>
-                                                            @foreach ($sections->unique('name') as $s)
-                                                                <option value="{{ $s->id }}" data-name="{{ $s->name }}" {{ old('section_id', $registration->section_id) == $s->id ? 'selected' : '' }}>
-                                                                    {{ ucfirst($s->name) }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Batch Year <span class="text-danger">*</span></label>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <select class="form-select" id="batch_year" name="batch_year">
-                                                            <option value="">-----Select Year-----</option>
-                                                            @if($selectedBatch)
-                                                                <option value="{{ $selectedBatch->year }}" selected>{{ $selectedBatch->year }}</option>
-                                                            @endif
-                                                        </select>
-                                                    </div>
-                                                </div>
-
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Batch Name <span class="text-danger">*</span></label>
@@ -242,12 +211,39 @@
                                                     <div class="col-md-5">
                                                         <select class="form-select" id="batch_name" name="batch_id">
                                                             <option value="">-----Select Batch-----</option>
-                                                            @if($selectedBatch)
-                                                                <option value="{{ $selectedBatch->id }}" selected>{{ $selectedBatch->batch }}</option>
-                                                            @endif
+                                                            @foreach($batch as $ba)
+                                                                    <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif >{{ $ba->batch }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                 </div>
+{{--                                                <div class="row align-items-center mb-1">--}}
+{{--                                                    <div class="col-md-3">--}}
+{{--                                                        <label class="form-label">Batch Year <span class="text-danger">*</span></label>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="col-md-5">--}}
+{{--                                                        <select class="form-select" id="batch_year" name="batch_year" disabled>--}}
+{{--                                                            <option value="">-----Select Year-----</option>--}}
+{{--                                                            @foreach($batch as $ba)--}}
+{{--                                                                <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif>{{ $ba->batch_year }}</option>--}}
+{{--                                                            @endforeach--}}
+{{--                                                        </select>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Section <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <select class="form-select" name="section_id" id="section">
+                                                            <option value="">-----Select Section-----</option>
+                                                            @foreach($sections as $section)
+                                                                <option value="{{ $section->id }}" @if ($section->id == $registration->section_id) selected @endif>{{ $section->section }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+
 
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
@@ -298,7 +294,7 @@
                                                 </div>
 
                                                 <!-- Date of Joining -->
-                                                <!-- <div class="row align-items-center mb-1">
+                                                <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Date of Joining <span class="text-danger">*</span></label>
                                                     </div>
@@ -310,7 +306,7 @@
                                                         <div class="text-danger">{{ $message }}</div>
                                                         @enderror
                                                     </div>
-                                                </div> -->
+                                                </div>
                                             </div>
                                             <div class="col-md-6 border-start">
                                                 @if($registration->image)
@@ -828,13 +824,13 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
 
-                                                            <h5 class="mt-1 mb-2 text-dark"><strong>Badminton Exp.</strong>
+                                                            <h5 class="mt-1 mb-2 text-dark"><strong>Badminton Playing Exp.</strong>
                                                             </h5>
 
 
                                                             <div class="row align-items-center mb-1">
                                                                 <div class="col-md-4">
-                                                                    <label class="form-label">Total Experience (No of
+                                                                    <label class="form-label">Total Playing Experience (No of
                                                                         Years)</label>
                                                                 </div>
 
@@ -1173,6 +1169,7 @@
                                                                     $feeSponsorshipPlusDiscountValue = $feeSponsorshipValue + $feeDiscountValue;
                                                                     $netFeePayablePercent = 100 - $feeSponsorshipPlusDiscountPercent;
                                                                     $netFeePayableValue = $totalFees - $feeSponsorshipPlusDiscountValue;
+                                                                     $isMandatory = $fees['mandatory'] ?? false;
                                                                 @endphp
                                                                 <tr>
                                                                     <td>{{ $key + 1 }}</td>
@@ -1187,6 +1184,10 @@
                                                                     <td><input type="number" class="form-control" value="{{ $netFeePayablePercent }}" readonly></td>
                                                                     <td><input type="number" class="form-control" value="{{ $netFeePayableValue }}" readonly></td>
                                                                     <td>
+                                                                        <input type="checkbox" class="form-check-input mandatory-checkbox"
+                                                                               name="fee_details[{{$key}}][mandatory]"
+                                                                               @if($isMandatory) checked @endif
+                                                                               @if($isMandatory) disabled @endif>
 {{--                                                                        <a href="#sponsor" data-bs-toggle="modal">--}}
 {{--                                                                            <span class="btn-outline-primary font-small-2 px25 btn btn-sm">Add Sponsor</span>--}}
 {{--                                                                        </a>--}}
@@ -1240,14 +1241,21 @@
                                                             @php
                                                                 $totalFeesSum = array_sum(array_column($feeDetails, 'total_fees'));
                                                                 $totalNetFeePayableValue = array_sum(array_map(function ($fees) {
-                                                                    return ($fees['total_fees'] ?? 0) - (($fees['fee_sponsorship_value'] ?? 0) + ($fees['fee_discount_value'] ?? 0));
+                                                                return ($fees['total_fees'] ?? 0) - (($fees['fee_sponsorship_value'] ?? 0) + ($fees['fee_discount_value'] ?? 0));
                                                                 }, $feeDetails));
                                                             @endphp
                                                             <tr>
                                                                 <td></td>
                                                                 <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
                                                                 <td class="fw-bolder text-dark font-large-1">{{ $totalNetFeePayableValue }}</td>
-                                                                <td></td>
+                                                                <td>
+                                                                    @if($user->payment_status == 'paid')
+                                                                        <span class="badge bg-success">Paid</span>
+                                                                    @else
+                                                                        <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn" data-user-id="{{ $user->id }}">Pay Now</button>
+                                                                    @endif
+                                                                    <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>
+                                                                </td>
                                                             </tr>
                                                             </tbody>
                                                         </table>
@@ -1282,7 +1290,7 @@
                                                             </div>
 
                                                             <div class="row align-items-center mb-1">
-                                                                <div class="col-md-4">
+                                                                <div class="col-md-4" id="check_in_date_label">
                                                                     <label class="form-label">Check-In Date <span class="text-danger">*</span></label>
                                                                 </div>
                                                                 <div class="col-md-6">
@@ -1292,7 +1300,7 @@
                                                             </div>
 
                                                             <div class="row align-items-center mb-1">
-                                                                <div class="col-md-4">
+                                                                <div class="col-md-4" id="check_out_date_label">
                                                                     <label class="form-label">Check-Out Date <span class="text-danger">*</span></label>
                                                                 </div>
                                                                 <div class="col-md-6">
@@ -1302,7 +1310,7 @@
                                                             </div>
 
                                                             <div class="row align-items-center mb-1">
-                                                                <div class="col-md-4">
+                                                                <div class="col-md-4" id="room_preference_label">
                                                                     <label class="form-label">Room Preference</label>
                                                                 </div>
                                                                 <div class="col-md-6">
@@ -1532,19 +1540,31 @@
             }
         });
         $(document).ready(function() {
-            $('#sport_id, #batch_name, #quota').change(function() {
-                // Check if all required fields are selected
-                const sportId = $('#sport_id').val();
-                const sectionId = $('#section').val();
-                const batchYear = $('#batch_year').val();
-                const batchId = $('#batch_name').val();
-                const quotaId = $('#quota').val();
+            $('#batch_name').change(function() {
+                let batchId = $(this).val();
+                $('#section').html('<option value="" selected>-----Select Section-----</option>');
 
-                // if (sportId && sectionId && batchYear && batchId && quotaId) {
-                fetchFeeStructure();
-                // }
+                if (batchId) {
+                    $.ajax({
+                        url: "{{ route('get.sections.by.batch') }}",
+                        type: "POST",
+                        data: {
+                            batch_id: batchId,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.length > 0) {
+                                $.each(response, function(index, section) {
+                                    $('#section').append('<option value="' + section.id + '">' + section.section + '</option>');
+                                });
+                            }
+                        }
+                    });
+                }
             });
-
+            $('#section').change(function() {
+                fetchFeeStructure();
+            });
             function fetchFeeStructure()
             {
                 // Get all required values
@@ -1804,71 +1824,6 @@
         });
     }
 
-    // Section change event
-    $('#section').change(function () {
-        var sectionId = $(this).val();
-        var sectionName = $(this).find(':selected').data('name');
-
-        $('#batch_year').html('<option value="">-----Select Year-----</option>');
-        $('#batch_name').html('<option value="">-----Select Batch-----</option>');
-
-        if (sectionId && sectionName) {
-            $.ajax({
-                url: "{{ route('get.batch.year.student') }}",
-                type: "POST",
-                data: {
-                    section_name: sectionName,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function (response) {
-                    if (response.length > 0) {
-                        $.each(response, function (index, item) {
-                            $('#batch_year').append('<option value="' + item + '">' + item + '</option>');
-                        });
-                        $('#batch_year').prop('disabled', false);
-                    }
-                }
-            });
-        } else {
-            $('#batch_year').prop('disabled', true);
-            $('#batch_name').prop('disabled', true);
-        }
-        fetchFeeStructure();
-    });
-
-    // Batch Year change event
-    $('#batch_year').change(function () {
-        var sectionName = $('#section').find(':selected').data('name');
-        var batchYear = $(this).val();
-
-        $('#batch_name').html('<option value="">-----Select Batch-----</option>');
-
-        if (sectionName && batchYear) {
-            $.ajax({
-                url: "{{ route('get.batch.names.student') }}",
-                type: "POST",
-                data: {
-                    section_name: sectionName,
-                    batch_year: batchYear,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function (response) {
-                    if (response.length > 0) {
-                        $.each(response, function (index, item) {
-                            var selected = (item.id == selectedBatchId) ? 'selected' : '';
-                            $('#batch_name').append('<option value="' + item.id + '" ' + selected + '>' + item.batch + '</option>');
-                        });
-
-                        $('#batch_name').prop('disabled', false);
-                    }
-                }
-            });
-        } else {
-            $('#batch_name').prop('disabled', true);
-        }
-        fetchFeeStructure();
-    });
-
     // If batch year is preselected, trigger change event to fetch batch names
     if (selectedBatchYear) {
         $('#batch_year').trigger('change');
@@ -2042,22 +1997,22 @@
                 }
             });
         }
-        document.getElementById('batch_year').addEventListener('change', function () {
-            var selectedYear = this.value;
-            var batchNameDropdown = document.getElementById('batch_name');
+        {{--document.getElementById('batch_year').addEventListener('change', function () {--}}
+        {{--    var selectedYear = this.value;--}}
+        {{--    var batchNameDropdown = document.getElementById('batch_name');--}}
 
-            // Clear previous options
-            batchNameDropdown.innerHTML = '<option value="">Select Name</option>';
-            // Filter batches based on the selected year
-            @json($batch).forEach(function(batch) {
-                if (batch.batch_year == selectedYear) {
-                    var option = document.createElement('option');
-                    option.value = batch.id;
-                    option.text = batch.batch_name;
-                    batchNameDropdown.appendChild(option);
-                }
-            });
-        });
+        {{--    // Clear previous options--}}
+        {{--    batchNameDropdown.innerHTML = '<option value="">Select Name</option>';--}}
+        {{--    // Filter batches based on the selected year--}}
+        {{--    @json($batch).forEach(function(batch) {--}}
+        {{--        if (batch.batch_year == selectedYear) {--}}
+        {{--            var option = document.createElement('option');--}}
+        {{--            option.value = batch.id;--}}
+        {{--            option.text = batch.batch_name;--}}
+        {{--            batchNameDropdown.appendChild(option);--}}
+        {{--        }--}}
+        {{--    });--}}
+        {{--});--}}
         document.addEventListener("DOMContentLoaded", function() {
             const imageInput = document.getElementById('{{ $registration->image ? "replace-image" : "imageUpload" }}');
             const previewImg = document.getElementById("previewImg");

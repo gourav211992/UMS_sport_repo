@@ -219,44 +219,40 @@
 
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Section <span class="text-danger">*</span></label>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <select class="form-select" name="section_id" id="section">
-                                                            <option value="">-----Select Section-----</option>
-                                                            @foreach ($sections->unique('name') as $s)
-                                                                <option value="{{ $s->id }}" data-name="{{ $s->name }}" {{ old('section_id', $registration->section_id) == $s->id ? 'selected' : '' }}>
-                                                                    {{ ucfirst($s->name) }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Batch Year <span class="text-danger">*</span></label>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <select class="form-select" id="batch_year" name="batch_year">
-                                                            <option value="">-----Select Year-----</option>
-                                                            @if($selectedBatch)
-                                                                <option value="{{ $selectedBatch->year }}" selected>{{ $selectedBatch->year }}</option>
-                                                            @endif
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
                                                         <label class="form-label">Batch Name <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
                                                         <select class="form-select" id="batch_name" name="batch_id">
                                                             <option value="">-----Select Batch-----</option>
-                                                            @if($selectedBatch)
-                                                                <option value="{{ $selectedBatch->id }}" selected>{{ $selectedBatch->batch }}</option>
-                                                            @endif
+                                                            @foreach($batch as $ba)
+                                                                <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif >{{ $ba->batch }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+{{--                                                <div class="row align-items-center mb-1">--}}
+{{--                                                    <div class="col-md-3">--}}
+{{--                                                        <label class="form-label">Batch Year <span class="text-danger">*</span></label>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="col-md-5">--}}
+{{--                                                        <select class="form-select" id="batch_year" name="batch_year" disabled>--}}
+{{--                                                            <option value="">-----Select Year-----</option>--}}
+{{--                                                            @foreach($batch as $ba)--}}
+{{--                                                                <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif>{{ $ba->batch_year }}</option>--}}
+{{--                                                            @endforeach--}}
+{{--                                                        </select>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Section <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <select class="form-select" name="section_id" id="section">
+                                                            <option value="">-----Select Section-----</option>
+                                                            @foreach($sections as $section)
+                                                                <option value="{{ $section->id }}" @if ($section->id == $registration->section_id) selected @endif>{{ $section->section }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                 </div>
@@ -1307,7 +1303,7 @@
                                                             <tr>
                                                                 <td></td>
                                                                 <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
-                                                                <td class="fw-bolder text-dark font-large-1">{{ $totalNetFeePayableValue }}</td>
+                                                                <td class="fw-bolder text-dark font-large-1" id="totalNetFeePayableValue">{{ $totalNetFeePayableValue }}</td>
 {{--                                                                <td></td>--}}
                                                                 <td>
                                                                     @if($registration->user->payment_status == 'paid')
@@ -1886,17 +1882,33 @@
             }
         });
         $(document).ready(function() {
-            $('#sport_id, #batch_name, #quota').change(function() {
-                // Check if all required fields are selected
-                const sportId = $('#sport_id').val();
-                const sectionId = $('#section').val();
-                const batchYear = $('#batch_year').val();
-                const batchId = $('#batch_name').val();
-                const quotaId = $('#quota').val();
+            $('#batch_name').change(function() {
+                let batchId = $(this).val();
+                $('#section').html('<option value="" selected>-----Select Section-----</option>');
 
-                // if (sportId && sectionId && batchYear && batchId && quotaId) {
+                if (batchId) {
+                    $.ajax({
+                        url: "{{ route('get.sections.by.batch') }}",
+                        type: "POST",
+                        data: {
+                            batch_id: batchId,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.length > 0) {
+                                $.each(response, function(index, section) {
+                                    $('#section').append('<option value="' + section.id + '">' + section.section + '</option>');
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+            $('#section').change(function() {
                 fetchFeeStructure();
-                // }
+            });
+            $('#quota_id').change(function() {
+                fetchFeeStructure();
             });
 
             function fetchFeeStructure() {
@@ -1906,7 +1918,7 @@
                 const sectionId = $('#section').val();
                 const batchYear = $('#batch_year').val();
                 const batchId = $('#batch_name').val();
-                const quotaId = $('#quota').val();
+                const quotaId = $('#quota_id').val();
 
                 // Make sure all fields are selected
                 // if (!sportId || !sectionId || !batchYear || !batchId || !quotaId) {
@@ -1993,7 +2005,7 @@
         <tr class="total-row">
             <td></td>
             <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
-            <td class="fw-bolder text-dark font-large-1">${totalNetFeePayableValue.toFixed(2)}</td>
+            <td class="fw-bolder text-dark font-large-1" id="totalNetFeePayableValue">${totalNetFeePayableValue.toFixed(2)}</td>
             <td></td>
         </tr>
     `);
@@ -2021,37 +2033,29 @@
                 var currentSponsorship = feeStructure[index]?.fee_sponsorship_value || 0;
                 $('#sponsorAmount').val(currentSponsorship);
             });
-            $('#saveSponsor').on('click', function() {
+            $('#saveSponsor').on('click', function () {
                 let sponsorAmount = Number($('#sponsorAmount').val());
                 let index = $('#feeIndex').val();
+                let totalNetFeePayableValue = Number($('#totalNetFeePayableValue').text());
+                console.log(feeStructure);
+                console.log('Sponsor amount:', sponsorAmount); // Log sponsorAmount for debugging
+                console.log('Index from modal input:', index); // Log index from the hidden input for debugging
+                console.log('Net fee:', totalNetFeePayableValue); // Log index from the hidden input for debugging
+                // console.log('feeStructure array:', feeStructure); // Log the entire feeStructure array
+                // console.log(`feeStructure[${index}]:`, feeStructure[index]); // Log the specific feeStructure entry
 
-                // Validate input
-                if (isNaN(sponsorAmount) || sponsorAmount < 0) {
-                    alert('Please enter a valid sponsorship amount');
-                    return;
-                }
-
-                if (!feeStructure[index]) {
-                    alert('Invalid fee structure index');
-                    return;
-                }
-
-                // Update the sponsorship value
-                feeStructure[index].fee_sponsorship_value = sponsorAmount;
-
-                // Calculate the sponsorship percent
-                let totalFees = Number(feeStructure[index].total_fees) || 0;
-                if (totalFees > 0) {
-                    feeStructure[index].fee_sponsorship_percent = (sponsorAmount / totalFees * 100).toFixed(2);
+                // Check if the index is valid and the feeStructure entry exists
+                if (!isNaN(sponsorAmount) && sponsorAmount > 0) {
+                    // feeStructure[index].fee_sponsorship_value = sponsorAmount;
+                    // console.log('Sponsorship value updated:', feeStructure[index]); // Log the updated fee structure entry
+                    let totalFee = totalNetFeePayableValue - sponsorAmount;
+                    $('#totalNetFeePayableValue').text(totalFee);
+                    $('#sponsorModal').modal('hide'); // Close the modal
+                    // updateFeeTable(feeStructure); // Recalculate and update the fee table
                 } else {
-                    feeStructure[index].fee_sponsorship_percent = 0;
+                    console.error('Invalid index or sponsorship amount.');
                 }
-
-                // Close the modal and update the table
-                $('#sponsorModal').modal('hide');
-                updateFeeTable(feeStructure);
             });
-
             $(document).on('change', '.sponsorship-percent', function() {
                 let row = $(this).closest('tr');
                 let totalFee = parseFloat(row.find('.total-fee').val()) || 0;
@@ -2341,20 +2345,20 @@
                 });
             }
         });
-        document.getElementById('batch_year').addEventListener('change', function () {
-            var selectedYear = this.value;
-            var batchNameDropdown = document.getElementById('batch_name');
-            batchNameDropdown.innerHTML = '<option value="">Select Name</option>'
-            console.log(@json($batch));
-            @json($batch).forEach(function(batch) {
-                    if (batch.batch_year == selectedYear) {
-                        var option = document.createElement('option');
-                        option.value = batch.id;
-                        option.text = batch.batch_name;
-                        batchNameDropdown.appendChild(option);
-                    }
-                });
-        });
+        {{--document.getElementById('batch_year').addEventListener('change', function () {--}}
+        {{--    var selectedYear = this.value;--}}
+        {{--    var batchNameDropdown = document.getElementById('batch_name');--}}
+        {{--    batchNameDropdown.innerHTML = '<option value="">Select Name</option>'--}}
+        {{--    console.log(@json($batch));--}}
+        {{--    @json($batch).forEach(function(batch) {--}}
+        {{--            if (batch.batch_year == selectedYear) {--}}
+        {{--                var option = document.createElement('option');--}}
+        {{--                option.value = batch.id;--}}
+        {{--                option.text = batch.batch_name;--}}
+        {{--                batchNameDropdown.appendChild(option);--}}
+        {{--            }--}}
+        {{--        });--}}
+        {{--});--}}
 
         document.getElementById('batch_name').addEventListener('change', function () {
             var selectedBatchName = this.options[this.selectedIndex].text;
@@ -2706,151 +2710,151 @@
             });
         }
     </script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#quota_id').trigger('change');
-            $(document).ready(function () {
-                $('#colorCheck2').change(function () {
-                    if ($(this).is(':checked')) {
-                        // Copy permanent address fields to correspondence address fields
-                        $('#correspondence_street1').val($('#permanent_street1').val());
-                        $('#correspondence_street2').val($('#permanent_street2').val());
-                        $('#correspondence_town').val($('#permanent_town').val());
-                        $('#correspondence_pincode').val($('#permanent_pincode').val());
+{{--    <script type="text/javascript">--}}
+{{--        $(document).ready(function () {--}}
+{{--            $('#quota_id').trigger('change');--}}
+{{--            $(document).ready(function () {--}}
+{{--                $('#colorCheck2').change(function () {--}}
+{{--                    if ($(this).is(':checked')) {--}}
+{{--                        // Copy permanent address fields to correspondence address fields--}}
+{{--                        $('#correspondence_street1').val($('#permanent_street1').val());--}}
+{{--                        $('#correspondence_street2').val($('#permanent_street2').val());--}}
+{{--                        $('#correspondence_town').val($('#permanent_town').val());--}}
+{{--                        $('#correspondence_pincode').val($('#permanent_pincode').val());--}}
 
-                        // Copy country, state, and city
-                        $('#correspondence_country').val($('#permanent_country').val()).trigger('change');
+{{--                        // Copy country, state, and city--}}
+{{--                        $('#correspondence_country').val($('#permanent_country').val()).trigger('change');--}}
 
-                        // Wait for the states to load, then set the state
-                        setTimeout(function () {
-                            $('#correspondence_state').val($('#permanent_state').val()).trigger('change');
+{{--                        // Wait for the states to load, then set the state--}}
+{{--                        setTimeout(function () {--}}
+{{--                            $('#correspondence_state').val($('#permanent_state').val()).trigger('change');--}}
 
-                            // Wait for the cities to load, then set the city
-                            setTimeout(function () {
-                                $('#correspondence_district').val($('#permanent_district').val());
-                            }, 500); // Adjust the timeout as needed
-                        }, 500); // Adjust the timeout as needed
-                    } else {
-                        // Clear correspondence address fields
-                        $('#correspondence_street1, #correspondence_street2, #correspondence_town, #correspondence_district, #correspondence_state, #correspondence_country, #correspondence_pincode').val('');
-                    }
-                });
-            });
-            $('#quota_id').on('change', function () {
-                let quotaId = $(this).val();
-                if (quotaId) {
-                    fetchFeeStructure(quotaId);
-                }
-            });
+{{--                            // Wait for the cities to load, then set the city--}}
+{{--                            setTimeout(function () {--}}
+{{--                                $('#correspondence_district').val($('#permanent_district').val());--}}
+{{--                            }, 500); // Adjust the timeout as needed--}}
+{{--                        }, 500); // Adjust the timeout as needed--}}
+{{--                    } else {--}}
+{{--                        // Clear correspondence address fields--}}
+{{--                        $('#correspondence_street1, #correspondence_street2, #correspondence_town, #correspondence_district, #correspondence_state, #correspondence_country, #correspondence_pincode').val('');--}}
+{{--                    }--}}
+{{--                });--}}
+{{--            });--}}
+{{--            $('#quota_id').on('change', function () {--}}
+{{--                let quotaId = $(this).val();--}}
+{{--                if (quotaId) {--}}
+{{--                    fetchFeeStructure(quotaId);--}}
+{{--                }--}}
+{{--            });--}}
 
-            function fetchFeeStructure(quotaId) {
-                $.ajax({
-                    url: '{{ route("fetch.fee.structure") }}', // Replace with your route
-                    type: 'GET',
-                    data: {
-                        quota_id: quotaId
-                    },
-                    success: function (response) {
-                        console.log(response);
-                        if (response.status === 'success') {
-                            updateFeeTable(response.feeStructure);
-                        } else {
-                            alert('Failed to fetch fee structure.');
-                        }
-                    },
-                    error: function () {
-                        alert('An error occurred while fetching the fee structure.');
-                    }
-                });
-            }
+{{--            function fetchFeeStructure(quotaId) {--}}
+{{--                $.ajax({--}}
+{{--                    url: '{{ route("fetch.fee.structure") }}', // Replace with your route--}}
+{{--                    type: 'GET',--}}
+{{--                    data: {--}}
+{{--                        quota_id: quotaId--}}
+{{--                    },--}}
+{{--                    success: function (response) {--}}
+{{--                        console.log(response);--}}
+{{--                        if (response.status === 'success') {--}}
+{{--                            updateFeeTable(response.feeStructure);--}}
+{{--                        } else {--}}
+{{--                            alert('Failed to fetch fee structure.');--}}
+{{--                        }--}}
+{{--                    },--}}
+{{--                    error: function () {--}}
+{{--                        alert('An error occurred while fetching the fee structure.');--}}
+{{--                    }--}}
+{{--                });--}}
+{{--            }--}}
 
-            function updateFeeTable(feeStructure) {
-                let feeTableBody = $('#feeTable tbody');
-                feeTableBody.empty(); // Clear existing rows
+{{--            function updateFeeTable(feeStructure) {--}}
+{{--                let feeTableBody = $('#feeTable tbody');--}}
+{{--                feeTableBody.empty(); // Clear existing rows--}}
 
-                let totalNetFeePayableValue = 0;
+{{--                let totalNetFeePayableValue = 0;--}}
 
-                feeStructure.forEach((fee, index) => {
-                    console.log(fee);
-                    let totalFees = Number(fee.total_fees) || 0;
-                    let feeSponsorshipPercent = Number(fee.fee_sponsorship_percent) || 0;
-                    let feeSponsorshipValue = Number(fee.fee_sponsorship_value) || (totalFees * feeSponsorshipPercent / 100);
-                    let feeDiscountPercent = Number(fee.fee_discount_percent) || 0;
-                    let feeDiscountValue = Number(fee.fee_discount_value) || (totalFees * feeDiscountPercent / 100);
-                    let feeSponsorshipPlusDiscountPercent = feeSponsorshipPercent + feeDiscountPercent;
-                    let feeSponsorshipPlusDiscountValue = feeSponsorshipValue + feeDiscountValue;
-                    let netFeePayablePercent = 100 - feeSponsorshipPlusDiscountPercent;
-                    let netFeePayableValue = totalFees - feeSponsorshipPlusDiscountValue;
+{{--                feeStructure.forEach((fee, index) => {--}}
+{{--                    console.log(fee);--}}
+{{--                    let totalFees = Number(fee.total_fees) || 0;--}}
+{{--                    let feeSponsorshipPercent = Number(fee.fee_sponsorship_percent) || 0;--}}
+{{--                    let feeSponsorshipValue = Number(fee.fee_sponsorship_value) || (totalFees * feeSponsorshipPercent / 100);--}}
+{{--                    let feeDiscountPercent = Number(fee.fee_discount_percent) || 0;--}}
+{{--                    let feeDiscountValue = Number(fee.fee_discount_value) || (totalFees * feeDiscountPercent / 100);--}}
+{{--                    let feeSponsorshipPlusDiscountPercent = feeSponsorshipPercent + feeDiscountPercent;--}}
+{{--                    let feeSponsorshipPlusDiscountValue = feeSponsorshipValue + feeDiscountValue;--}}
+{{--                    let netFeePayablePercent = 100 - feeSponsorshipPlusDiscountPercent;--}}
+{{--                    let netFeePayableValue = totalFees - feeSponsorshipPlusDiscountValue;--}}
 
-                    // Add the value to total
-                    totalNetFeePayableValue += netFeePayableValue;
+{{--                    // Add the value to total--}}
+{{--                    totalNetFeePayableValue += netFeePayableValue;--}}
 
-                    let row = `
-        <tr>
-            <td>${index + 1}</td>
-            <td><input type="text" class="form-control" name="fee_details[${index}][title]" value="${fee.title}" readonly></td>
-            <td><input type="number" class="form-control" name="fee_details[${index}][total_fees]" value="${totalFees}"></td>
-            <td><input type="number" class="form-control" name="fee_details[${index}][fee_sponsorship_percent]" value="${feeSponsorshipPercent}"></td>
-            <td><input type="number" class="form-control" name="fee_details[${index}][fee_sponsorship_value]" value="${feeSponsorshipValue.toFixed(2)}" readonly></td>
-            <td><input type="number" class="form-control" name="fee_details[${index}][fee_discount_percent]" value="${feeDiscountPercent}"></td>
-            <td><input type="number" class="form-control" name="fee_details[${index}][fee_discount_value]" value="${feeDiscountValue.toFixed(2)}" readonly></td>
-            <td><input type="number" class="form-control" value="${feeSponsorshipPlusDiscountPercent}" readonly></td>
-            <td><input type="number" class="form-control" value="${feeSponsorshipPlusDiscountValue.toFixed(2)}" readonly></td>
-            <td><input type="number" class="form-control" value="${netFeePayablePercent}" readonly></td>
-            <td><input type="number" class="form-control" value="${netFeePayableValue.toFixed(2)}" readonly></td>
-            <td>
-                <a href="#sponsor" data-bs-toggle="modal">
-                    <span class="btn-outline-primary font-small-2 px25 btn btn-sm">Add Sponsor</span>
-                </a>
-                ${index !== 0 ? '<a href="#" class="text-danger ms-25"><i data-feather="trash-2" class="me-50"></i></a>' : ''}
-            </td>
-        </tr>
-        `;
-                    feeTableBody.append(row);
-                });
+{{--                    let row = `--}}
+{{--        <tr>--}}
+{{--            <td>${index + 1}</td>--}}
+{{--            <td><input type="text" class="form-control" name="fee_details[${index}][title]" value="${fee.title}" readonly></td>--}}
+{{--            <td><input type="number" class="form-control" name="fee_details[${index}][total_fees]" value="${totalFees}"></td>--}}
+{{--            <td><input type="number" class="form-control" name="fee_details[${index}][fee_sponsorship_percent]" value="${feeSponsorshipPercent}"></td>--}}
+{{--            <td><input type="number" class="form-control" name="fee_details[${index}][fee_sponsorship_value]" value="${feeSponsorshipValue.toFixed(2)}" readonly></td>--}}
+{{--            <td><input type="number" class="form-control" name="fee_details[${index}][fee_discount_percent]" value="${feeDiscountPercent}"></td>--}}
+{{--            <td><input type="number" class="form-control" name="fee_details[${index}][fee_discount_value]" value="${feeDiscountValue.toFixed(2)}" readonly></td>--}}
+{{--            <td><input type="number" class="form-control" value="${feeSponsorshipPlusDiscountPercent}" readonly></td>--}}
+{{--            <td><input type="number" class="form-control" value="${feeSponsorshipPlusDiscountValue.toFixed(2)}" readonly></td>--}}
+{{--            <td><input type="number" class="form-control" value="${netFeePayablePercent}" readonly></td>--}}
+{{--            <td><input type="number" class="form-control" value="${netFeePayableValue.toFixed(2)}" readonly></td>--}}
+{{--            <td>--}}
+{{--                <a href="#sponsor" data-bs-toggle="modal">--}}
+{{--                    <span class="btn-outline-primary font-small-2 px25 btn btn-sm">Add Sponsor</span>--}}
+{{--                </a>--}}
+{{--                ${index !== 0 ? '<a href="#" class="text-danger ms-25"><i data-feather="trash-2" class="me-50"></i></a>' : ''}--}}
+{{--            </td>--}}
+{{--        </tr>--}}
+{{--        `;--}}
+{{--                    feeTableBody.append(row);--}}
+{{--                });--}}
 
-                // Update the total fees row
-                feeTableBody.append(`
-    <tr>
-        <td></td>
-        <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
-        <td class="fw-bolder text-dark font-large-1">${totalNetFeePayableValue.toFixed(2)}</td>
-        <td></td>
-    </tr>
-    `);
+{{--                // Update the total fees row--}}
+{{--                feeTableBody.append(`--}}
+{{--    <tr>--}}
+{{--        <td></td>--}}
+{{--        <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>--}}
+{{--        <td class="fw-bolder text-dark font-large-1" id="totalNetFeePayableValue">${totalNetFeePayableValue.toFixed(2)}</td>--}}
+{{--        <td></td>--}}
+{{--    </tr>--}}
+{{--    `);--}}
 
-                feather.replace(); // Refresh icons
-            }
-
-
-            // function updateFeeDetails() {
-            //     let feeDetails = [];
-            //     $('#feeTable tbody tr').each(function () {
-            //         let row = $(this);
-            //         let feeDetail = {
-            //             title: row.find('input[name="title[]"]').val(),
-            //             total_fees: row.find('input[name="total_fees[]"]').val(),
-            //             fee_sponsorship_percent: row.find('input[name="fee_sponsorship_percent[]"]').val(),
-            //             fee_sponsorship_value: row.find('input[name="fee_sponsorship_value[]"]').val(),
-            //             fee_discount_percent: row.find('input[name="fee_discount_percent[]"]').val(),
-            //             fee_discount_value: row.find('input[name="fee_discount_value[]"]').val(),
-            //             fee_sponsorship_plus_discount_percent: row.find('input[name="fee_sponsorship_plus_discount_percent[]"]').val(),
-            //             fee_sponsorship_plus_discount_value: row.find('input[name="fee_sponsorship_plus_discount_value[]"]').val(),
-            //             net_fee_payable_percent: row.find('input[name="net_fee_payable_percent[]"]').val(),
-            //             net_fee_payable_value: row.find('input[name="net_fee_payable_value[]"]').val(),
-            //         };
-            //         feeDetails.push(feeDetail);
-            //     });
-            //     $('#feeDetailsInput').val(JSON.stringify(feeDetails));
-            // }
-            //
-            // $('#feeTable').on('change', 'input', function () {
-            //     updateFeeDetails();
-            // });
+{{--                feather.replace(); // Refresh icons--}}
+{{--            }--}}
 
 
-        });
+{{--            // function updateFeeDetails() {--}}
+{{--            //     let feeDetails = [];--}}
+{{--            //     $('#feeTable tbody tr').each(function () {--}}
+{{--            //         let row = $(this);--}}
+{{--            //         let feeDetail = {--}}
+{{--            //             title: row.find('input[name="title[]"]').val(),--}}
+{{--            //             total_fees: row.find('input[name="total_fees[]"]').val(),--}}
+{{--            //             fee_sponsorship_percent: row.find('input[name="fee_sponsorship_percent[]"]').val(),--}}
+{{--            //             fee_sponsorship_value: row.find('input[name="fee_sponsorship_value[]"]').val(),--}}
+{{--            //             fee_discount_percent: row.find('input[name="fee_discount_percent[]"]').val(),--}}
+{{--            //             fee_discount_value: row.find('input[name="fee_discount_value[]"]').val(),--}}
+{{--            //             fee_sponsorship_plus_discount_percent: row.find('input[name="fee_sponsorship_plus_discount_percent[]"]').val(),--}}
+{{--            //             fee_sponsorship_plus_discount_value: row.find('input[name="fee_sponsorship_plus_discount_value[]"]').val(),--}}
+{{--            //             net_fee_payable_percent: row.find('input[name="net_fee_payable_percent[]"]').val(),--}}
+{{--            //             net_fee_payable_value: row.find('input[name="net_fee_payable_value[]"]').val(),--}}
+{{--            //         };--}}
+{{--            //         feeDetails.push(feeDetail);--}}
+{{--            //     });--}}
+{{--            //     $('#feeDetailsInput').val(JSON.stringify(feeDetails));--}}
+{{--            // }--}}
+{{--            //--}}
+{{--            // $('#feeTable').on('change', 'input', function () {--}}
+{{--            //     updateFeeDetails();--}}
+{{--            // });--}}
 
-    </script>
+
+{{--        });--}}
+
+{{--    </script>--}}
     <!-- Modals and scripts can be reused from the registration.blade.php -->
 @endsection

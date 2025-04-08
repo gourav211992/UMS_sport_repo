@@ -204,9 +204,22 @@ use App\Http\Controllers\ums\sports\SportMasterController;
 use App\Http\Controllers\ums\sports\GroupMasterController;
 
 
-use App\Http\Controllers\ums\sports\ActivityMasterController;
+// use App\Http\Controllers\ums\sports\ActivityMasterController;
 
 use App\Http\Controllers\ums\sports\SportFeeController;
+use App\Http\Controllers\Auth\SportsForgotPasswordController;
+use App\Http\Controllers\Auth\SportsResetPasswordController;
+
+use App\Http\Controllers\ums\sports\Activity\ScreeningMasterController;
+use App\Http\Controllers\ums\sports\Activity\ActivityMasterController;
+
+
+
+// Password Reset Routes
+Route::get('sports/password/reset', [SportsForgotPasswordController::class, 'showForgotForm'])->name('sports.password.request');
+Route::post('sports/password/email', [SportsForgotPasswordController::class, 'sendResetLink'])->name('sports.password.email');
+Route::get('sports/password/reset/{token}', [SportsForgotPasswordController::class, 'showResetForm'])->name('sports.password.reset');
+Route::post('sports/password/reset', [SportsForgotPasswordController::class, 'resetPassword'])->name('sports.password.update');
 
 Route::post('sport-type-add', [SportsMasterController::class, 'SportTypeAdd'])->name('sport-type-add');
 Route::get('sport-type', [SportsMasterController::class, 'indexSportType'])->name('sport-type');
@@ -231,11 +244,12 @@ Route::group(['middleware' => ['sports']], function()
     Route::get('/update/registration/{id}', [SportRegisterController::class, 'profileRegistration'])->name('update.registration');
     Route::post('/get-batch-years-student', [SportRegisterController::class, 'get_batch_year'])->name('get.batch.year.student');
     Route::post('/get-batch-names-student', [SportRegisterController::class, 'get_batch_names'])->name('get.batch.names.student');
+    Route::post('/get-sections-by-batch', [SportRegisterController::class, 'getSectionsByBatch'])->name('get.sections.by.batch');
     Route::get('/get-quotas/{batchId}', [SportRegisterController::class, 'getQuotas']);
 });
 Route::get('/fetch-fee-structure', [SportRegisterController::class, 'fetchFeeStructure'])->name('fetch.fee.structure');
 Route::put('/sport-registration-update/{id}', [SportRegisterController::class, 'postRegistrationUpdate'])->name('sport-registration-update');
-Route::get('/edit-registration/{id}', [SportRegisterController::class, 'edit'])->name('edit-registration');
+Route::get('/edit-registration/{id}', [SportRegisterController::class, 'edit'])->name('edit-registration')->middleware(['admin_or_sports']);
 Route::get('/view-registration/{id}', [SportRegisterController::class, 'viewRegistration'])->name('view-registration');
 Route::get('/sports-students', [SportRegisterController::class, 'fetch'])->name('sports-students');
 Route::get('/get-states/{countryId}', [SportRegisterController::class, 'getStates'])->name('get.states');
@@ -265,10 +279,22 @@ Route::get('sports-register',function ()
 })->name('sports.register');
 // Route::view('sport-master','ums.sports.sport_master');
 // Route::view('sport-master-add','ums.sports.sport_master_add');
-Route::view('activity-master','ums.sports.activity.activity_master');
+// Route::view('activity-master','ums.sports.activity.activity_master');
 // Route::view('activity-master-add','ums.sports.activity.activity_master_add');
+
+//blades
 Route::view('activity-scheduler','ums.sports.activity.activity_scheduler');
 Route::view('activity-scheduler-add','ums.sports.activity.activity_scheduler_add');
+Route::view('activity-attendance','ums.sports.activity.activity_attendance');
+Route::view('activity-assessment','ums.sports.activity.activity_assessment');
+Route::view('mark-attendance','ums.sports.activity.mark_attendance');
+Route::view('view-mark-attendance','ums.sports.activity.view_mark_attendance');
+Route::view('view-mark-access','ums.sports.activity.view_mark_access');
+Route::view('mark-assess','ums.sports.activity.mark_assess');
+
+//blades
+
+
 
 //register and login
 Route::post('/sports-register', [SportsController::class, 'register'])->name('sports-register');
@@ -276,6 +302,33 @@ Route::post('/post-sports-login', [SportsController::class, 'login'])->name('pos
 Route::get('/sports-logout', [SportsController::class, 'logout'])->name('sport.logout');
 Route::post('/verify-otp', [SportsController::class, 'verifyOTP'])->name('verify.otp');
 Route::get('/verify-email', [SportsController::class, 'verifyEmail'])->name('verify.email');
+
+
+// Activity Marter 
+
+Route::get('activity-master', [ActivityMasterController::class, 'index'])->name('activity-master');
+Route::get('activity-master-add', [ActivityMasterController::class, 'activityMaster'])->name('activity-master-add');
+Route::get('activity-master-edit/{id}', [ActivityMasterController::class, 'ActivityEdit'])->name('activity-master-edit');
+Route::get('activity-master-view/{id}', [ActivityMasterController::class, 'ActivityView'])->name('activity-master-view');
+Route::post('activity-master-edit/{id}', [ActivityMasterController::class, 'ActivityUpdate'])->name('activity-master-edit');
+Route::post('activity-master-add', [ActivityMasterController::class, 'activityMasterAdd'])->name('activity-master-add');
+Route::get('activity-master-delete/{id}', [ActivityMasterController::class, 'ActivityDelete'])->name('activity-master-delete');
+
+
+
+//Screening Master 
+
+Route::get('screening-master',[ScreeningMasterController::class,'list']);
+Route::get('screening-master-add',[ScreeningMasterController::class,'index'])->name('screening-master/add');
+Route::post('screening-add',[ScreeningMasterController::class,'store'])->name('screening-add');
+Route::get('screening-master-delete/{id}',[ScreeningMasterController::class,'screening_delete']);
+// Route::post('screening-edit/{id}',[ScreeningMasterController::class,'store'])->name('screening-edit');
+Route::post('screening-update/{id}', [ScreeningMasterController::class, 'update'])->name('screening.update');
+
+Route::get('screening-master-edit/{id}',[ScreeningMasterController::class,'edit']);
+Route::get('screening-master-view/{id}',[ScreeningMasterController::class,'viewpage']);
+
+
 
 
 
@@ -289,10 +342,6 @@ Route::get('sport-master-edit/{id}', [SportsMasterController::class, 'SportMaste
 Route::put('sport-master-edit/{id}', [SportsMasterController::class, 'SportMasterUpdate'])->name('sport-master-update');
 Route::get('sport-master-delete/{id}', [SportsMasterController::class, 'softDelete']);
 Route::get('sport-master-view/{id}', [SportsMasterController::class, 'SportMasterView'])->name('sport-master-view');
-
-//activity
-Route::get('activity-master-add', [ActivityMasterController::class, 'activityMaster'])->name('activity-master-add');
-Route::post('activity-master-add', [ActivityMasterController::class, 'activityMasterAdd'])->name('activity-master-add');
 
 
 //fee master
@@ -308,18 +357,6 @@ Route::get('quota-delete/{id}', [SportMasterController::class, 'delete'])->name(
 
 Route::post('/sports-fee-schedule/clone/{id}',[SportFeeController::class,'clone'])->name('sports-fee-schedule.clone');
 
-
-// sections_master
-
-// Route::view('section-master/add','ums.sports.master.sections_master_add')->name('section.add');
-// Route::get('section-master/add',[SportMasterController::class,'section_index'])->name('section.add');
-
-// Route::post('section-add',[SportMasterController::class,'section_add']);
-// Route::get('section-master', [SportMasterController::class, 'section_list'])->name('section.index');
-// ;
-// Route::get('section-edit/{id}', [SportMasterController::class, 'sec_edits'])->name('section.edit');
-// Route::post('section-update/{id}', [SportMasterController::class, 'section_edit'])->name('section.update');
-// Route::get('section-delete/{id}', [SportMasterController::class, 'sec_delete'])->name('section.delete');
 
 Route::get('section-master/add',[SportMasterController::class,'section_index'])->name('section.add');
 
@@ -349,19 +386,17 @@ Route::put('/master-batches-update/{id}', [SportMasterController::class, 'update
 Route::delete('/master-batches-delete/{id}', [SportMasterController::class, 'destroy'])->name('batches-destroy');
 
 
-
-Route::get('/sports-fee-schedule',[SportFeeController::class,'listing']);
-Route::get('/sports-fee-schedule/add',[SportFeeController::class,'index']);
-Route::post('fee-master/add',[SportFeeController::class,'store']);
-Route::get('/sports-fee-schedule/edit/{id}',[SportFeeController::class,'edit']);
-Route::get('/sports-fee-schedule/view/{id}',[SportFeeController::class,'ViewPage']);
-Route::post('sports-fee-schedule/update/{id}',[SportFeeController::class,'update']);
-Route::get('sports-fee-schedule/delete/{id}',[SportFeeController::class,'fee_delete']);
-
-Route::get('/get-batches-name', [SportFeeController::class,'get_batch_name'])->name('get-batches-name');
+Route::get('/get-batch-names', [SportFeeController::class,'get_batch_name'])->name('get-batches-name');
 
 Route::post('/get-batch-year', [SportFeeController::class, 'get_batch_year'])->name('get.batch.year');
 Route::post('/get-batch-names', [SportFeeController::class, 'get_batch_names'])->name('get.batch.names');
+
+
+Route::post('/get-section-names', [SportFeeController::class, 'get_section_names'])->name('section.fetch');
+Route::post('/get-batch-names', [SportFeeController::class, 'get_batch_name'])->name('get-batches-name');
+
+// import
+Route::post('fee-import', [SportFeeController::class, 'import'])->name('excel.import');
 
 //Group Master
 
@@ -388,6 +423,7 @@ Route::post('/enquery-login', [UmsHomeController::class, 'enquery_login'])->name
 Route::post('forgot-password', [UmsHomeController::class, 'forgotPassword'])->name('user-forgot-password');
 Route::get('forgot-password-change', [UmsHomeController::class, '@forgotPasswordChange'])->name('user-forgot-password-change');
 Route::post('forgot-password-change', [UmsHomeController::class, '@forgotPasswordChangeSave']);
+
 Route::get('user-dashboard', [UserHomeController::class, 'userDashboardAndProfile'])->name('user.dashboard');
 Route::get('user-application-form', [UserHomeController::class, 'application_form'])->name('user-application-form');
 Route ::post('/application-course-list',[UserHomeController::class,'applicationCourseList']);
@@ -397,6 +433,17 @@ Route::get('/education-single-row', [UserHomeController::class,'education_single
 Route::get('entrance-admit-card/{id}', [UserHomeController::class,'entranceAdmitCard']);
 Route::post('application-form', [UserHomeController::class, 'applicationSave'])->middleware('auth');
 Route::group(['middleware' => ['admin']], function () {
+    Route::get('/sports-fee-schedule',[SportFeeController::class,'listing']);
+    Route::get('/sports-fee-schedule/add',[SportFeeController::class,'index']);
+    Route::post('fee-master/add',[SportFeeController::class,'store']);
+    Route::get('/sports-fee-schedule/edit/{id}',[SportFeeController::class,'edit']);
+    Route::get('/sports-fee-schedule/view/{id}',[SportFeeController::class,'ViewPage']);
+    Route::post('sports-fee-schedule/update/{id}',[SportFeeController::class,'update']);
+    Route::get('sports-fee-schedule/delete/{id}',[SportFeeController::class,'fee_delete']);
+
+    //clone 
+    Route::post('/sports-fee-schedule/clone/{id}',[SportFeeController::class,'clone'])->name('sports-fee-schedule-clone');
+
 //    Route::post('application-form', [UserHomeController::class, 'applicationSave']);
 Route::get('/ums-dashboard', [UmsHomeController::class, 'dashboard'])->name('ums.dashboard');
 Route::post('/ums-logout', [UmsHomeController::class, 'logout'])->name('ums.logout');
