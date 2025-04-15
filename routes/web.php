@@ -227,6 +227,7 @@ Route::get('sport-type-add', [SportsMasterController::class, 'showSportTypeAddFo
 Route::get('sport-type-edit/{id}', [SportsMasterController::class, 'SportTypeEdit'])->name('sport-type-edit');
 Route::put('sport-type-edit/{id}', [SportsMasterController::class, 'SportTypeUpdate'])->name('sport-type-update');
 Route::get('sport-type-delete/{id}', [SportsMasterController::class, 'sportTypeDelete'])->name('sport-type-delete');
+Route::post('/get-sections-by-batch', [SportRegisterController::class, 'getSectionsByBatch'])->name('get.sections.by.batch');
 
 
 // Sports Routes
@@ -244,7 +245,6 @@ Route::group(['middleware' => ['sports']], function()
     Route::get('/update/registration/{id}', [SportRegisterController::class, 'profileRegistration'])->name('update.registration');
     Route::post('/get-batch-years-student', [SportRegisterController::class, 'get_batch_year'])->name('get.batch.year.student');
     Route::post('/get-batch-names-student', [SportRegisterController::class, 'get_batch_names'])->name('get.batch.names.student');
-    Route::post('/get-sections-by-batch', [SportRegisterController::class, 'getSectionsByBatch'])->name('get.sections.by.batch');
     Route::get('/get-quotas/{batchId}', [SportRegisterController::class, 'getQuotas']);
 });
 Route::get('/fetch-fee-structure', [SportRegisterController::class, 'fetchFeeStructure'])->name('fetch.fee.structure');

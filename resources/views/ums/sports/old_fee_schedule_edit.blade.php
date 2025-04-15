@@ -23,13 +23,12 @@
                     </div>
                 </div>
                 <div class="content-header-right text-sm-end col-md-6 mb-50 mb-sm-0">
-                <button onClick="javascript: history.go(-1)"
-                                class="btn btn-secondary btn-sm mb-50 mb-sm-0"><i data-feather="arrow-left-circle"></i>
-                                Back</button>    
-                <form action="{{ url('sports-fee-schedule/update/' . $sportFeeMaster->id) }}" method="POST">
+                    <form action="{{ url('sports-fee-schedule/update/' . $sportFeeMaster->id) }}" method="POST">
                         @csrf
                         <div class="form-group breadcrumb-right">
-                            
+                            <button onClick="javascript: history.go(-1)"
+                                class="btn btn-secondary btn-sm mb-50 mb-sm-0"><i data-feather="arrow-left-circle"></i>
+                                Back</button>
                             <button type="submit" onClick="captureTableData()"
                                 class="btn btn-primary btn-sm mb-50 mb-sm-0"><i data-feather="check-circle"></i>
                                 Submit</button>
@@ -88,7 +87,7 @@
                                         </div>
 
                                         <!-- Admission Year -->
-                                        <!-- <div class="row align-items-center mb-1">
+                                        {{-- <div class="row align-items-center mb-1">
                                             <div class="col-md-3">
                                                 <label class="form-label">Admission Yr. <span
                                                         class="text-danger">*</span></label>
@@ -97,7 +96,7 @@
                                                 <input type="text" name="document_date" class="form-control"
                                                     value="{{ old('admission_year', $sportFeeMaster->document_date ?? '') }}">
                                             </div>
-                                        </div> -->
+                                        </div> --}}
 
                                         <!-- Sport Name -->
                                         <div class="row align-items-center mb-1">
@@ -118,77 +117,62 @@
                                             </div>
                                         </div>
 
+                                        <div class="row align-items-center mb-1">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Batch Year <span class="text-danger">*</span></label>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <select class="form-select" name="batch_year" id="batch_year">
+                                                    <option value="" selected>-----Select Year-----</option>
+                                                    @foreach ($batchs->pluck('batch_year')->unique() as $batch)
+                                                    <option value="{{ $batch }}"
+                                                        @if (isset($sportFeeMaster) && $sportFeeMaster->batch_year == $batch) selected @endif>
+                                                        {{ ucfirst($batch) }}</option>
+                                                @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
 
                                         <div class="row align-items-center mb-1">
                                             <div class="col-md-3">
-                                                <label class="form-label">Section<span
-                                                        class="text-danger">*</span></label>
+                                                <label class="form-label">Batch Name <span class="text-danger">*</span></label>
+                                            </div>
+                                        
+                                            <div class="col-md-5">
+                                                <select class="form-select" name="batch_name" id="batch_name">
+
+                                                    <option value="" selected>-----Select Batch-----</option>
+                                                    @foreach ($batchs as $batch)
+                                                    <option value="{{ $batch->batch_name }}" 
+                                                        @if (isset($sportFeeMaster) && $sportFeeMaster->batch == $batch->batch_name) selected @endif>
+                                                        {{ ucfirst($batch->batch_name) }}
+                                                    </option>
+                                                @endforeach
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row align-items-center mb-1">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Section</label><span
+                                                class="text-danger">*</span>
                                             </div>
                                             <div class="col-md-5">
-
                                                 <select class="form-select" name="section" id="section">
                                                     <option value="" selected>-----Select Section-----</option>
-                                                    @foreach ($sections->unique('name') as $item)
-                                                    <option value="{{ $item->name }}"
-                                                        {{ isset($sportFeeMaster) && $sportFeeMaster->section == $item->name ? 'selected' : '' }}>
-                                                        {{ $item->name }}
-                                                    </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-
-
-                                        <!-- Batch -->
-                                        <div class="row align-items-center mb-1">
-                                            <div class="col-md-3">
-                                                <label class="form-label">Batch Year<span
-                                                        class="text-danger">*</span></label>
-                                            </div>
-
-                                            <div class="col-md-5">
-
-
-                                                <select class="form-select" id="batch_year" name="batch_year">
-                                                    <option value="" selected>-----Select Year-----</option>
-                                                    @php
-                                                    $selectedYear = isset($sportFeeMaster) ? $sportFeeMaster->batch_year : null;
-                                                    $sectionYears= App\Models\ums\Section::where('name', $sportFeeMaster->section)->pluck('year')->unique();
-                                                    @endphp
-
-                                                    @foreach ($sectionYears as $year)
-                                                    <option value="{{ $year }}" {{ $selectedYear == $year ? 'selected' : '' }}>
-                                                        {{ $year }}
-                                                    </option>
-                                                    @endforeach
-                                                </select>
-
-
-                                            </div>
-                                        </div>
-
-
-
-                                        <div class="row align-items-center mb-1">
-                                            <div class="col-md-3">
-                                                <label class="form-label">Batch Name<span
-                                                        class="text-danger">*</span></label>
-                                            </div>
-
-                                            <div class="col-md-5">
-
-                                                <select class="form-select" name="batch_name" id="batch_name">
-                                                    <option value="" selected>-----Select-----</option>
                                                     @if (isset($sportFeeMaster))
-                                                    <option value="{{ $sportFeeMaster->batch }}" selected>
-                                                        {{ $sportFeeMaster->batch }}
+                                                    <option value="{{ $sportFeeMaster->section }}" selected>
+                                                        {{ $sportFeeMaster->section }}
                                                     </option>
                                                     @endif
                                                 </select>
                                             </div>
-
-
                                         </div>
+
+
+
 
 
                                         <!-- Section -->
@@ -240,6 +224,7 @@
                                                 </div>
                                             </div>
                                     </div>
+
                                     <!-- Hidden fee_details input -->
                                     <input type="hidden" name="fee_details" id="form_details">
 
@@ -353,10 +338,17 @@
                                                         @foreach ($feeDetails as $key => $fees)
                                                         <tr id="fee_tr" class="fee_tr">
                                                             <td>{{ $key + 1 }}</td>
-                                                            <td><input type="text" class="form-control mw-100"
-                                                                    name="title[]"
-                                                                    value="{{ old('title.' . $key, $fees['title'] ?? '') }}"
-                                                                    required /></td>
+                                                            <td>
+                                                                <select class="form-control mw-100" name="title" required style="width: 300px">
+                                                                    <option value="" disabled>Select Title</option>
+                                                                    @foreach ($fee_head as $head)
+                                                                        <option value="{{ $head->fee_head }}" 
+                                                                            @if (isset($fees) && $fees['title']== $head->fee_head) selected @endif>
+                                                                            {{ $head->fee_head }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
                                                             <td><input type="text" class="form-control mw-100"
                                                                     name="Total_fee[]"
                                                                     value="{{ old('Total_fee.' . $key, $fees['total_fees'] ?? '') }}"
@@ -370,7 +362,7 @@
                                                             <td><input type="text" class="form-control mw-100"
                                                                     name="fee_discount_value[]"
                                                                     id="fee_discount_value"
-                                                                    readonly
+                                                                   
                                                                     value="{{ old('fee_discount_value.' . $key, $fees['fee_discount_value'] ?? '') }}" />
 
                                                             </td>
@@ -466,7 +458,7 @@
 
         rows.forEach(row => {
             let rowData = {
-                title: row.querySelector('td:nth-child(2) input').value,
+                title: row.querySelector('td:nth-child(2) select').value,
                 total_fees: row.querySelector('td:nth-child(3) input').value,
                 fee_discount_percent: row.querySelector('td:nth-child(4) input').value,
                 fee_discount_value: row.querySelector('td:nth-child(5) input').value,
@@ -489,19 +481,61 @@
 <script>
     $(document).ready(function() {
         // Event listener for changes in the Total Fee or Discount
-        $(document).on('input', '#total_fee, #fee_discount', function() {
-            var $row = $(this).closest('tr'); // Get the closest row
-            var totalFee = parseFloat($row.find('#total_fee').val()) || 0;
-            var discount = parseFloat($row.find('#fee_discount').val()) || 0;
+        $(document).on('input', '#total_fee, #fee_discount, #fee_discount_value', function() {
+    var $row = $(this).closest('tr');
+    var totalFee = parseFloat($row.find('#total_fee').val()) || 0;
+    var discount = parseFloat($row.find('#fee_discount').val()) || 0;
+    var discountValue = parseFloat($row.find('#fee_discount_value').val()) || 0;
 
-            // Calculate the discount value and net fee
-            var discountValue = (totalFee * discount) / 100;
-            var netFee = totalFee - discountValue;
+    // Condition 1: If user updates discount percentage, calculate discount value
+    if(discount>0){
+    if ($(this).attr('id') === 'fee_discount') {
+        discountValue = (totalFee * discount) / 100;
+        $row.find('#fee_discount_value').val(discountValue.toFixed(2));
+    }}
+    var rowTitle = $row.find('.title').text().trim() || "This Row"; 
+    if(totalFee<discount){
+       
+        $row.find('#fee_discount').val(0);
+        discount = 0;
+        $row.find('#fee_discount_value').val(0);
+        discountValue = 0;
+    }
 
-            // Set the calculated values in the corresponding fields
-            $row.find('#fee_discount_value').val(discountValue.toFixed(2));
-            $row.find('#net_fee').val(netFee.toFixed(2));
-        });
+    // Condition 2: If user updates discount value, calculate discount percentage
+    if ($(this).attr('id') === 'fee_discount_value') {
+        // Validation: Discount Value should not be more than Total Fee
+        if (discountValue > totalFee) {
+            alert("Discount value cannot be greater than Total Fee!");
+            $row.find('#fee_discount_value').val(0);
+            discountValue = 0;
+        }
+        discount = (discountValue / totalFee) * 100||0;
+        $row.find('#fee_discount').val(discount.toFixed(2));
+    }
+
+    var netFee = totalFee - discountValue;
+    $row.find('#net_fee').val(netFee.toFixed(2));
+});
+
+// Enable fee_discount_value input field
+$(document).ready(function() {
+    $('#fee_discount_value').prop('readonly', false);
+});
+
+
+
+
+// Handle Bulk Upload
+
+$(document).ready(function() {
+    setTimeout(function() {
+        $('#fee_tr input').trigger('input'); // Trigger input event after bulk upload
+    }, 500);
+});
+
+
+
 
         // Event listener for adding new row
         $('body').on('click', '.add-contact-row', function(e) {
@@ -523,10 +557,20 @@
             var newRow = `
                 <tr>
                     <td></td> <!-- Serial number will be added dynamically -->
-                    <td><input type="text" class="form-control mw-100" value="" /></td>
+                    <td>
+                                                                <select class="form-control mw-100" name="title" required style="width: 300px">
+                                                                    <option value="" disabled>Select Title</option>
+                                                                    @foreach ($fee_head as $head)
+                                                                        <option value="{{ $head->fee_head }}" 
+                                                                            @if (isset($fees) && $fees['title']== $head->fee_head) selected @endif>
+                                                                            {{ $head->fee_head }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
                     <td><input type="number" class="form-control mw-100" value="" id="total_fee" /></td>
                     <td><input type="number" class="form-control mw-100" value="" id="fee_discount" /></td>
-                    <td><input type="text" class="form-control mw-100" value="" id="fee_discount_value" readonly /></td>
+                    <td><input type="text" class="form-control mw-100" value="" id="fee_discount_value"  /></td>
                     <td><input type="text" class="form-control mw-100" value="" id="net_fee" readonly /></td>
                     <td><input type="checkbox" class="form-check-input" /></td>
                     <td><select class="form-select mw-100">
@@ -583,68 +627,67 @@
     });
 </script>
 <script>
-    $(document).ready(function() {
-        // Fetch Batch Years on Section Select
-        $('#section').change(function() {
-            var sectionName = $(this).val();
-            $('#batch_year').html('<option value="" selected>-----Select Year-----</option>');
-            $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
+     $(document).ready(function () {
+    
+        $('#batch_year').change(function () {
+        var batchYear = $(this).val();
+        $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
+        // $('#section').html('<option value="" selected>-----Select Section-----</option>');
 
-            if (sectionName) {
-                $.ajax({
-                    url: "{{ route('get.batch.year') }}",
-                    type: "POST",
-                    data: {
-                        section_name: sectionName,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if (response.length > 0) {
-                            $.each(response, function(index, item) {
-                                $('#batch_year').append('<option value="' + item + '">' + item + '</option>');
-                            });
-                            $('#batch_year').prop('disabled', false);
-                        } else {
-                            $('#batch_year').prop('disabled', true);
-                        }
+        if (batchYear) {
+            $.ajax({
+                url: "{{ route('get-batches-name') }}",
+                type: "POST",
+                data: {
+                    batch_year: batchYear,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (response) {
+                    if (response.length > 0) {
+                        $.each(response, function (index, item) {
+                            $('#batch_name').append('<option value="' + item.batch_name + '">' + item.batch_name + '</option>');
+                        });
+                        $('#batch_name').prop('disabled', false);
+                    } else {
+                        $('#batch_name').prop('disabled', true);
                     }
-                });
-            } else {
-                $('#batch_year').prop('disabled', true);
-                $('#batch_name').prop('disabled', true);
+                }
+            });
+        } else {
+            $('#batch_name').prop('disabled', true);
+        }
+    });
+    // Fetch Sections on Batch Select
+    $('#batch_name').on('change', function () { // Corrected .on() syntax
+    var batchName = $(this).val();
+    $('#section').html('<option value="" selected>-----Select Section-----</option>');
+
+    if (batchName) {
+        $.ajax({
+            url: "{{ route('section.fetch') }}", // Fixed URL syntax
+            type: "POST",
+            data: {
+                batch_name: batchName,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function (response) {
+                if (response.length > 0) {
+                    $.each(response, function (index, item) {
+                        $('#section').append('<option value="' + item.name + '">' + item.name + '</option>');
+                    });
+                    $('#section').prop('disabled', false); // Enable after adding options
+                } else {
+                    $('#section').prop('disabled', true);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error: ", status, error); // Debugging AJAX failure
             }
         });
-
-        // Fetch Batch Names on Year Select
-        $('#batch_year').change(function() {
-            var sectionName = $('#section').val();
-            var batchYear = $(this).val();
-            $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
-
-            if (sectionName && batchYear) {
-                $.ajax({
-                    url: "{{ route('get.batch.names') }}",
-                    type: "POST",
-                    data: {
-                        section_name: sectionName,
-                        batch_year: batchYear,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if (response.length > 0) {
-                            $.each(response, function(index, item) {
-                                $('#batch_name').append('<option value="' + item.batch + '">' + item.batch + '</option>');
-                            });
-                            $('#batch_name').prop('disabled', false);
-                        } else {
-                            $('#batch_name').prop('disabled', true);
-                        }
-                    }
-                });
-            } else {
-                $('#batch_name').prop('disabled', true);
-            }
-        });
+    } else {
+        $('#section').prop('disabled', true);
+    }
+});
     });
 </script>
 

@@ -60,148 +60,178 @@
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
                                                     <label class="form-label">Series <span
-                                                                class="text-danger">*</span></label>
+                                                            class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
                                                     <select class="form-select" name="book_id" id="series" required>
                                                         <option value="" disabled>Select</option>
                                                         @foreach ($series as $ser)
-                                                            <option value="{{ $ser->id }}" {{ $sportFeeMaster->book_id == $ser->id ? 'selected' : '' }}>{{ $ser->book_name }}</option>
+                                                        <option value="{{ $ser->id }}" {{ $sportFeeMaster->book_id == $ser->id ? 'selected' : '' }}>{{ $ser->book_name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
                                             </div>
-
+    
                                             <!-- Schedule No. -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
                                                     <label class="form-label">Schedule No. <span
-                                                                class="text-danger">*</span></label>
+                                                            class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
                                                     <input type="text" class="form-control" name="document_number"
-                                                           value="{{ old('schedule_no', $sportFeeMaster->document_number ?? '') }}" />
+                                                        value="{{ old('schedule_no', $sportFeeMaster->document_number ?? '') }}" />
                                                 </div>
                                             </div>
-
+    
                                             <!-- Admission Year -->
-                                            <div class="row align-items-center mb-1">
+                                            {{-- <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
                                                     <label class="form-label">Admission Yr. <span
-                                                                class="text-danger">*</span></label>
+                                                            class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
                                                     <input type="text" name="document_date" class="form-control"
-                                                           value="{{ old('admission_year', $sportFeeMaster->document_date ?? '') }}">
+                                                        value="{{ old('admission_year', $sportFeeMaster->document_date ?? '') }}">
                                                 </div>
-                                            </div>
-                                        
+                                            </div> --}}
+    
                                             <!-- Sport Name -->
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Sport Name <span class="text-danger">*</span></label>
+                                                    <label class="form-label">Sport Name <span
+                                                            class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
                                                     <select class="form-select" name="sport_name">
                                                         <option value="" selected>-----Select-----</option>
                                                         @foreach ($sportmaster as $sport)
-                                                            <option value="{{ $sport->sport_name }}" {{ old('sport_name', $sportFeeMaster->sport_name ?? '') == $sport->sport_name ? 'selected' : '' }}>
-                                                                {{ ucfirst($sport->sport_name) }}
-                                                            </option>
+                                                        <option value="{{ $sport->sport_name }}"
+                                                            {{ old('sport_name', $sportFeeMaster->sport_name ?? '') == $sport->sport_name ? 'selected' : '' }}>
+                                                            {{ ucfirst($sport->sport_name) }}
+                                                        </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
                                             </div>
-                                        
-                                            <!-- Batch -->
-                                           
-                                       
-
-
-                                        <!-- Batch -->
-                                        {{-- <div class="row align-items-center mb-1">
-                                            <div class="col-md-3">
-                                                <label class="form-label">Batch Year<span
-                                                        class="text-danger">*</span></label>
-                                            </div>
-
-                                            <div class="col-md-5">
-
-
-                                                <select class="form-select" id="batch_year" name="batch_year">
-                                                    <option value="" selected>-----Select Year-----</option>
-                                                    @foreach ($sections->pluck('year')->unique() as $batch_year)
-                                                    <option value="{{ $batch_year }}"
-                                                        {{ (isset($sportFeeMaster) && $sportFeeMaster->batch_year == $batch_year) ? 'selected' : '' }}>
-                                                        {{ $batch_year }}
-                                                    </option>
-                                                    @endforeach
-                                                </select>
-
-
-                                            </div>
-                                        </div> --}}
-
-
-
-                                        <div class="row align-items-center mb-1">
-                                            <div class="col-md-3">
-                                                <label class="form-label">Batch Name<span
-                                                        class="text-danger">*</span></label>
-                                            </div>
-
-                                            <div class="col-md-5">
-
-                                                <select class="form-select" name="batch_name" id="batch_name">
-                                                    <option value="" selected>-----Select-----</option>
-                                                    @foreach ($sections->pluck('batch')->unique() as $batch)
-                                                    <option value="{{ $batch}}"
-                                                        {{ old('batch_name', $sportFeeMaster->batch== $batch  )  ? 'selected' : '' }}>
-                                                        {{ ucfirst($batch) }}
-                                                    </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-
-                                        </div>
-
-
-                                        <div class="row align-items-center mb-1">
-                                            <div class="col-md-3">
-                                                <label class="form-label">Section<span
-                                                        class="text-danger">*</span></label>
-                                            </div>
-                                            <div class="col-md-5">
-
-                                                <select class="form-select" name="section" id="section">
-                                                    <option value="" selected>-----Select Section-----</option>
-                                                    @foreach ($sections->unique('name') as $item)
-                                                    <option value="{{ $item->name }}"
-                                                        {{ isset($sportFeeMaster) && $sportFeeMaster->section == $item->name ? 'selected' : '' }}>
-                                                        {{ $item->name }}
-                                                    </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                            <!-- Quota -->
+    
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Quota <span class="text-danger">*</span></label>
+                                                    <label class="form-label">Batch Year <span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <select class="form-select" name="batch_year" id="batch_year">
+                                                        <option value="" selected>-----Select Year-----</option>
+                                                        @foreach ($batchs->pluck('batch_year')->unique() as $batch)
+                                                        <option value="{{ $batch }}"
+                                                            @if (isset($sportFeeMaster) && $sportFeeMaster->batch_year == $batch) selected @endif>
+                                                            {{ ucfirst($batch) }}</option>
+                                                    @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+    
+    
+                                            <div class="row align-items-center mb-1">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Batch Name <span class="text-danger">*</span></label>
+                                                </div>
+                                            
+                                                <div class="col-md-5">
+                                                    <select class="form-select" name="batch_name" id="batch_name">
+    
+                                                        <option value="" selected>-----Select Batch-----</option>
+                                                        @foreach ($batchs as $batch)
+                                                        <option value="{{ $batch->batch_name }}" 
+                                                            @if (isset($sportFeeMaster) && $sportFeeMaster->batch == $batch->batch_name) selected @endif>
+                                                            {{ ucfirst($batch->batch_name) }}
+                                                        </option>
+                                                    @endforeach
+    
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row align-items-center mb-1">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Section</label><span
+                                                    class="text-danger">*</span>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <select class="form-select" name="section" id="section">
+                                                        <option value="" selected>-----Select Section-----</option>
+                                                        @if (isset($sportFeeMaster))
+                                                        <option value="{{ $sportFeeMaster->section }}" selected>
+                                                            {{ $sportFeeMaster->section }}
+                                                        </option>
+                                                        @endif
+                                                    </select>
+                                                </div>
+                                            </div>
+    
+    
+    
+    
+    
+                                            <!-- Section -->
+    
+                                            <!-- Quota -->
+    
+    
+                                            <div class="row align-items-center mb-1">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Quota <span
+                                                            class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
                                                     <select class="form-select" name="quota">
                                                         <option value="" selected>-----Select-----</option>
                                                         @foreach ($quotas as $quota)
-                                                            <option value="{{ $quota->quota_name }}" {{ old('quota', $sportFeeMaster->quota ?? '') == $quota->quota_name ? 'selected' : '' }}>
-                                                                {{ ucfirst($quota->quota_name) }}
-                                                            </option>
+                                                        <option value="{{ $quota->quota_name }}"
+                                                            {{ old('quota', $sportFeeMaster->quota ?? '') == $quota->quota_name ? 'selected' : '' }}>
+                                                            {{ ucfirst($quota->quota_name) }}
+                                                        </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
                                             </div>
+                                            <div class="row align-items-center mb-1">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Start & End Date <span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-5 d-flex gap-2">
+                                                    <input type="date" name="start_date" class="form-control" id="start_date" value="{{$sportFeeMaster->start_date}}" required />
+                                                    <input type="date" name="end_date" class="form-control" id="end_date" value="{{$sportFeeMaster->end_date}}" required />
+                                                </div>
+                                            </div>
+    
+                                            <div class="row align-items-center mb-2">
+                                                <div class="col-md-3">
+                                                        <label class="form-label">Display <span
+                                                                class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                       
+                                                        <div class="demo-inline-spacing">
+                                                            <div class="form-check form-check-primary mt-25">
+                                                                <input type="radio" id="customColorRadio3" name="display"
+                                                                    class="form-check-input"  value="1"
+                                                                     checked=  {{ old('display', $sportFeeMaster->display ?? '') == '1' ? 'checked' : '' }}>
+                                                                <label class="form-check-label fw-bolder"
+                                                                    for="customColorRadio3">Enable</label>
+                                                            </div>
+                                                            <div class="form-check form-check-primary mt-25">
+                                                                <input type="radio" id="customColorRadio4" name="display" value="0"
+                                                                    class="form-check-input"
+                                                                    {{ old('display', $sportFeeMaster->display ?? '') == '0' ? 'checked' : '' }}>
+                                                                <label class="form-check-label fw-bolder"
+                                                                    for="customColorRadio4">Disable</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                         </div>
+    
                                             <!-- Hidden fee_details input -->
                                             <input type="hidden" name="fee_details" id="form_details">
                                         
@@ -279,6 +309,11 @@
                                                                 $net_fee = old("net_fee.$key", $fees['net_fee_payable_value'] ?? '');
                                                                 $mandatory = old("guardian.$key", $fees['mandatory'] ?? false);
                                                                 $payment_mode = old("payment_mode.$key", $fees['payment_mode'] ?? '');
+
+
+
+
+
                                                             @endphp
 
                                                             <tr id="fee_tr">
@@ -328,7 +363,21 @@
                                                         
                                                         
                                                         </tbody>
-                                                        
+                                                        <tfoot>
+                                                            <tr>
+                                                                <td colspan="2"></td>
+                                                               
+                                                                
+                                                                <td  colspan="1" class="fw-bold mw-100" style="color: black" >Total Fee:<span class="fw-bold" id="total_fee1">{{$fees['grand_total_fees']}}</span></td>
+                                                               
+                                                               
+                                                                <td colspan="2" class="fw-bold " style="color: black" >Total Discount Value  :    <span class="fw-bold" id="fee_discount1">{{$fees['grand_total_discount']}}</span></td>
+                                                               
+                                                            
+                                                                <td class="fw-bold " style="color: black">Total Payable:<span class="fw-bold" id="total_payable">{{$fees['grand_total_payable']}}</span></td>
+                                                                <td colspan="3"></td>
+                                                            </tr>
+                                                        </tfoot>
 
 
                                                     </table>

@@ -35,7 +35,7 @@
             <div class="row match-height">
                 <div class="col-md-12">
                     <div class="card card-statistics new-cardbox">
-                        <div class="card-body">
+                        <!-- <div class="card-body">
                             <div class="row">
                                 <div class="col-md-3">
                                     <div class="taskboxassign">
@@ -98,7 +98,130 @@
                                 </div>
 
                             </div>
+                        </div> -->
+                    
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md">
+                                    <div class="taskboxassign">
+                                        <div class="taslcatrdnum">
+                                            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-box">
+                                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                                </svg></div>
+                                            <h4>{{ $totalRegisteredStudents }}</h4>
+
+                                        </div>
+                                        <p>Total<br>Registeration</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md">
+                                    <div class="taskboxassign">
+                                        <div class="taslcatrdnum">
+                                            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                                fill="none"stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+                                                stroke-linejoin="round" class="feather feather-dollar-sign avatar-icon">
+                                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14.5a3.5 3.5 0 0 1 0 7H6"></path>
+                                            </svg>
+                                            </div>
+                                            <h4>{{ $totalPaidStudents }}</h4>
+
+                                        </div>
+                                        <p>Paid<br>Status</p>
+                                    </div>
+                                </div>
+
+                                <div class="col-md">
+                                    <div class="taskboxassign">
+                                        <div class="taslcatrdnum">
+                                            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" class="feather feather-check-circle avatar-icon">
+                                                <path d="M9 12l2 2l4 -4"></path>
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                            </svg>
+                                            </div>
+                                            <h4>{{ $totalApprovedStudents }}</h4>
+
+                                        </div>
+                                        <p>Approved<br> Status</p>
+                                    </div>
+                                </div>
+                                {{-- <div class="col-md-3">
+                                    <div class="taskboxassign">
+                                        <div class="taslcatrdnum">
+                                            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-box avatar-icon">
+                                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                                </svg></div>
+                                            <h4>{{ $totalRejectedStudents }}</h4>
+
+
+                                        </div>
+                                        <p>Rejected<br> Status</p>
+                                    </div>
+                                </div> --}}
+                                
+                                <div class="col-md">
+                                    <div class="taskboxassign">
+                                        <div class="taslcatrdnum">
+                                            <div>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" class="feather feather-slash avatar-icon">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                                            </svg>
+                                            
+                                            </div>
+                                            <h4>{{ $totalRejectedStudents }}</h4>
+                                        </div>
+                                        <p>Rejected<br> Status</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md">
+                                    <div class="taskboxassign">
+                                        <div class="taslcatrdnum">
+                                            <div>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="feather feather-clock avatar-icon">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                                </svg>
+                                            </div>
+                                            <h4>{{  $totalOnholdStudents }}</h4>
+                                        </div>
+                                        <p>On-Hold<br> Status</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md">
+                                    <div class="taskboxassign">
+                                        <div class="taslcatrdnum">
+                                            <div>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="feather feather-edit avatar-icon">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14l4-4h9a2 2 0 0 0 2-2V8"></path>
+                                                    <polyline points="16 3 21 8 8 21 3 21 3 16 16 3"></polyline>
+                                                </svg>
+                                            </div>
+                                            <h4>{{ $totaldraftStudents }}</h4>
+                                        </div>
+                                        <p>Draft<br> Status</p>
+                                    </div>
+                                </div>
+                                
+
+                            </div>
                         </div>
+                    
                     </div>
                 </div>
             </div>
@@ -107,7 +230,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="table-responsive candidates-tables">
-                                <table class="datatables-basic table table-striped myrequesttablecbox loanapplicationlist tasklist">
+                                <table class="datatables-basic table table-striped myrequesttablecbox ">
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -116,8 +239,9 @@
                                             <th>Name</th>
                                             <th>Gender</th>
                                             <th>Date of Birth</th>
+                                            <th>Age</th>
                                             <th>Date of Joining</th>
-                                            <th>Batch</th>
+                                            <!-- <th>Batch</th> -->
                                             <th>Payment Status</th>
                                             <th>Status</th>
                                             <th>Action</th>
@@ -132,8 +256,14 @@
                                             <td>{{ $student->name }}</td>
                                             <td>{{ $student->gender ?: 'Not Provided' }}</td>
                                             <td>{{ \Carbon\Carbon::parse($student->dob)->format('d-m-Y') }}</td>
+                                            <td>
+                                                @php
+                                                    $age = \Carbon\Carbon::parse($student->dob)->age;
+                                                @endphp
+                                                {{ $age }} years
+                                            </td>
                                             <td>{{ \Carbon\Carbon::parse($student->doj)->format('d-m-Y') }}</td>
-                                            <td>{{ $student->batch ? $student->batch->batch_name : 'Not Provided' }}</td>
+                                            <!-- <td>{{ $student->batch ? $student->batch->batch_name : 'Not Provided' }}</td> -->
                                             <td>
                                                 @php
                                                 $paymentStatus = $student->user->payment_status ?? 'pending';

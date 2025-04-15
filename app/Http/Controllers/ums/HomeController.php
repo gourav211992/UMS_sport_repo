@@ -239,39 +239,37 @@ class HomeController extends Controller
         return view('no-record',['module'=>'dashboard']);
     }
 
-    public function forgotPassword(Request $request){
-		$validator = Validator::make($request->all(), [
+    public function forgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-		]);
+        ]);
 
-		if ($validator->fails()) {    
-			return response()->json($validator->messages(), 200);
-		}
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
 
-		$user = User::whereEmail($request->email)->first();
-		$token = sha1(time());
-		if($user) {
-			$user->remember_token = $token;
-			$user->save();
-			$email = $request->email;
-			$name = $user->name;
-			$subject = 'Forgot Password';
-			$content = url('forgot-password-change').'?token='.$token;
+        $user = User::whereEmail($request->email)->first();
+        if ($user) {
+            $token = sha1(time());
+            $user->remember_token = $token;
+            $user->save();
 
-			Mail::raw($content, function ($message) use ($email,$name,$subject){
-				// $message->from(env('MAIL_DEFAULT_FROM', ''), 'Your Application');
-				$message->to(explode(',', $email));
-				$message->subject($subject);
-				// $message->to($email, $name)->subject($subject);
-			});
-			$data['status'] = true;
-			$data['message'] = 'Password Change link has been sent on your email ID';
-		}else{
-			$data['status'] = false;
-			$data['message'] = 'Invalid Email ID. Please register first';
-		}
-		return response()->json($data);
-	}
+            $email = $request->email;
+            $name = $user->name;
+            $subject = 'Forgot Password';
+            $content = url('forgot-password-change') . '?token=' . $token;
+
+            Mail::raw($content, function ($message) use ($email, $name, $subject) {
+                $message->to($email, $name)->subject($subject);
+            });
+
+            return back()->with('success', 'Password Change link has been sent on your email ID');
+        } else {
+            return back()->withErrors(['email' => 'Invalid Email ID. Please register first'])->withInput();
+        }
+    }
+
 
     public function forgotPasswordChange(Request $request)
     {

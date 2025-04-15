@@ -61,14 +61,13 @@
                                                         <label class="form-label">Sport Master <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <select class="form-select"  name="sport_id" id="sport_id">
+                                                        <select class="form-select"  name="sport_id" required>
                                                             <option>---Select sport----</option>
 															@foreach ($sports as $sport)
 															    <option value="{{$sport->id}}">{{$sport->sport_name}}</option>
 																
 															@endforeach
                                                         </select>
-                                                        <span class="text-danger error-sport_id"></span>
                                                     </div>
                                                 </div>
                                                  
@@ -77,8 +76,7 @@
                                                         <label class="form-label">Screening Name <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <input type="text"  class="form-control" name="screening_name"  />
-                                                        <span class="text-danger error-screening_name"></span>
+                                                        <input type="text"  class="form-control" name="screening_name" required />
                                                     </div>
                                                 </div>
                                                 
@@ -87,8 +85,7 @@
                                                         <label class="form-label">Descriprtion</label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <input type="text"  class="form-control" name="description"/>  
-
+                                                        <input type="text"  class="form-control" name="description"  required  />    
                                                     </div>
                                                 </div>
                                                 
@@ -138,7 +135,6 @@
 																				<td class="sno">1</td>
 																				<td>
 																					<input type="text" class="form-control parameter-input mw-100" placeholder="Enter Parameter Name" />
-                                                                                    <span class="text-danger error-parameter_details"></span>
 																				</td>
 																				<td>
 																					<a href="#" class="text-primary add-row"><i data-feather="plus-square"></i></a>
@@ -239,48 +235,21 @@ feather.replace();
 
 </script>
 
-
 <script>
     $(document).ready(function() {
         $('#myForm').submit(function(e) {
-            e.preventDefault(); // Prevent form from submitting normally
+            e.preventDefault(); 
+       var input=  $('.parameter-input').val().trim();
+	   if(input == ''){
+           alert('Please enter a parameter name');
+           return false;
+       }
+            $('#alertContainer').html('');
 
-            // Clear previous error messages
-            $('.text-danger').text('');
-
-            let valid = true; // Flag to track if form is valid
-
-            // Validate Sport selection
-            if ($('#sport_id').val() === '---Select sport----') {
-                $('.error-sport_id').text('*Required.');
-                valid = false;
-            }
-
-            // Validate Screening Name
-            if ($("input[name='screening_name']").val().trim() === '') {
-                $('.error-screening_name').text('*Required.');
-                valid = false;
-            }
-
-            // Validate Description
-            // if ($("input[name='description']").val().trim() === '') {
-            //     $('.error-description').text('Description is required.');
-            //     valid = false;
-            // }
-
-            // Validate Parameter Names in the table
-            let isParameterValid = true;
-            $('#parameter-table-body .parameter-row').each(function () {
-                let parameterValue = $(this).find('.parameter-input').val().trim();
-                if (parameterValue === '') {
-                    isParameterValid = false;
-                    $(this).find('.error-parameter_details').text('*Required.');
-                }
-            });
-
-            // If all validations pass, submit the form
+          
             var formData = new FormData(this);
 
+           
             $.ajax({
                 url: "{{ url('screening-add') }}",
                 method: 'POST',
@@ -291,6 +260,7 @@ feather.replace();
                     var alertClass = response.success ? 'alert-success' : 'alert-danger';
                     var message = response.success ? response.message : response.message;
 
+                  
                     var alertHTML = `
                         <div class="alert p-2 ${alertClass} alert-dismissible fade show" role="alert">
                             <strong>${response.success ? 'Success' : 'Error'}!</strong> ${message}
@@ -300,27 +270,32 @@ feather.replace();
                     $('#alertContainer').html(alertHTML);
 
                     if (response.success) {
-                        $('#myForm')[0].reset();  
+                        $('#myForm')[0].reset();
+						
                     }
-
-                    if(response.key !== true){
-                        setTimeout(() => {
-                            window.location.href = "{{ url('screening-master') }}";
-                        }, 500);
-                    }
+					setTimeout(() => {
+									window.location.href = "{{ url('screening-master') }}";
+								},500);
                 },
                 error: function(xhr, status, error) {
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        $.each(errors, function (key, value) {
-                            $('.error-' + key).text(value[0]);
-                        });
-                    }
+                    
+                    $('#alertContainer').html(`
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error!</strong> Something went wrong with the request.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `);
                 }
             });
         });
     });
 </script>
+
+
+
+
+
+
+	
+
 @endsection
-
-

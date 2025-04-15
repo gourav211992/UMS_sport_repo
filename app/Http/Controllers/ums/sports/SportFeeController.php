@@ -93,6 +93,8 @@ class SportFeeController extends Controller
             'batch' => 'required|string|max:255',
             'section' => 'required|string|max:255',
             'quota' => 'required|string|max:255',
+            'start_date'=>'required',
+            'end_date'=>'required',
             'fee_details' => 'required|',
             'document_number'  => 'required|string|max:255',
             'document_date'    => 'required|date',
@@ -128,6 +130,9 @@ class SportFeeController extends Controller
             $sportFeeMaster->batch_year= $request->batch_year;
             $sportFeeMaster->section = $request->section;
             $sportFeeMaster->quota = $request->quota;
+            $sportFeeMaster->start_date= $request->start_date;
+            $sportFeeMaster->end_date= $request->end_date;
+
             $sportFeeMaster->status = $request->status;
 
             $sportFeeMaster->fee_details = $request->fee_details;
@@ -213,6 +218,8 @@ class SportFeeController extends Controller
             'batch' => 'required|string|max:255',
            'section' => 'required|string|max:255',
             'quota' => 'required|string|max:255',
+            'start_date'=>'required',
+            'end_date'=>'required',
             'fee_details' => 'required|', 
         ]);
 
@@ -232,6 +239,8 @@ class SportFeeController extends Controller
             
             $sportFeeMaster->section = $request->section;
             $sportFeeMaster->quota = $request->quota;
+            $sportFeeMaster->start_date= $request->start_date;
+            $sportFeeMaster->end_date= $request->end_date;
             $sportFeeMaster->status = $request->status;
             $sportFeeMaster->fee_details = $request->fee_details;
             $sportFeeMaster->save();

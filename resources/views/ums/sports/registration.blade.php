@@ -28,10 +28,9 @@
                                     data-feather="arrow-left-circle"></i> Back</button>
                             <button onClick="saveDraft()" class="btn btn-outline-primary btn-sm mb-50 mb-sm-0"><i
                                     data-feather="save"></i> Save as Draft</button>
-                            <button onClick="proceed()"
-                                {{--                                    data-bs-toggle="modal" data-bs-target="#disclaimer"--}}
-                                class="btn btn-primary btn-sm mb-50 mb-sm-0"><i data-feather="check-circle"></i>
-                                Proceed</button>
+                            <button onClick="proceed()" class="btn btn-primary btn-sm mb-50 mb-sm-0">
+                                <i data-feather="check-circle"></i> Submit
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1122,73 +1121,77 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                @foreach ($feeDetails as $key => $fees)
-                                                                @php
-                                                                // Calculate missing values if not provided in $fees
-                                                                $totalFees = old("feeDetails.$key.total_fees", $fees['total_fees'] ?? 0);
-                                                                $feeSponsorshipPercent = old("feeDetails.$key.fee_sponsorship_percent", $fees['fee_sponsorship_percent'] ?? 0);
-                                                                $feeSponsorshipValue = old("feeDetails.$key.fee_sponsorship_value", $fees['fee_sponsorship_value'] ?? ($totalFees * $feeSponsorshipPercent / 100));
-                                                                $feeDiscountPercent = old("feeDetails.$key.fee_discount_percent", $fees['fee_discount_percent'] ?? 0);
-                                                                $feeDiscountValue = old("feeDetails.$key.fee_discount_value", $fees['fee_discount_value'] ?? ($totalFees * $feeDiscountPercent / 100));
-                                                                $feeSponsorshipPlusDiscountPercent = $feeSponsorshipPercent + $feeDiscountPercent;
-                                                                $feeSponsorshipPlusDiscountValue = $feeSponsorshipValue + $feeDiscountValue;
-                                                                $netFeePayablePercent = 100 - $feeSponsorshipPlusDiscountPercent;
-                                                                $netFeePayableValue = $totalFees - $feeSponsorshipPlusDiscountValue;
-                                                                @endphp
-                                                                <tr>
-                                                                    <td>{{ $key + 1 }}</td>
-                                                                    <td>
-                                                                        <input type="text" name="feeDetails[{{ $key }}][title]" class="form-control" value="{{ old("feeDetails.$key.title", $fees['title'] ?? 'N/A') }}" disabled />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="number" name="feeDetails[{{ $key }}][total_fees]" class="form-control" value="{{ $totalFees }}" disabled />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_sponsorship_percent]" class="form-control" value="{{ $feeSponsorshipPercent }}" disabled />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_sponsorship_value]" class="form-control" value="{{ $feeSponsorshipValue }}" disabled />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_discount_percent]" class="form-control" value="{{ $feeDiscountPercent }}" disabled />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_discount_value]" class="form-control" value="{{ $feeDiscountValue }}" disabled />
-                                                                    </td>
-                                                                    <td>{{ $feeSponsorshipPlusDiscountPercent }}%</td>
-                                                                    <td>{{ $feeSponsorshipPlusDiscountValue }}</td>
-                                                                    <td>{{ $netFeePayablePercent }}%</td>
-                                                                    <td>{{ $netFeePayableValue }}</td>
-                                                                    <td>
-                                                                        @if ($key != 0)
-                                                                        <a href="#" class="text-danger ms-25">
-                                                                            <i data-feather="trash-2" class="me-50"></i>
-                                                                        </a>
-                                                                        @endif
-                                                                    </td>
-                                                                </tr>
-                                                                @endforeach
+{{--                                                                @foreach ($feeDetails as $key => $fees)--}}
+{{--                                                                @php--}}
+{{--                                                                // Calculate missing values if not provided in $fees--}}
+{{--                                                                $totalFees = old("feeDetails.$key.total_fees", $fees['total_fees'] ?? 0);--}}
+{{--                                                                $feeSponsorshipPercent = old("feeDetails.$key.fee_sponsorship_percent", $fees['fee_sponsorship_percent'] ?? 0);--}}
+{{--                                                                $feeSponsorshipValue = old("feeDetails.$key.fee_sponsorship_value", $fees['fee_sponsorship_value'] ?? ($totalFees * $feeSponsorshipPercent / 100));--}}
+{{--                                                                $feeDiscountPercent = old("feeDetails.$key.fee_discount_percent", $fees['fee_discount_percent'] ?? 0);--}}
+{{--                                                                $feeDiscountValue = old("feeDetails.$key.fee_discount_value", $fees['fee_discount_value'] ?? ($totalFees * $feeDiscountPercent / 100));--}}
+{{--                                                                $feeSponsorshipPlusDiscountPercent = $feeSponsorshipPercent + $feeDiscountPercent;--}}
+{{--                                                                $feeSponsorshipPlusDiscountValue = $feeSponsorshipValue + $feeDiscountValue;--}}
+{{--                                                                $netFeePayablePercent = 100 - $feeSponsorshipPlusDiscountPercent;--}}
+{{--                                                                $netFeePayableValue = $totalFees - $feeSponsorshipPlusDiscountValue;--}}
+{{--                                                                @endphp--}}
+{{--                                                                <tr>--}}
+{{--                                                                    <td>{{ $key + 1 }}</td>--}}
+{{--                                                                    <td>--}}
+{{--                                                                        <input type="text" name="feeDetails[{{ $key }}][title]" class="form-control" value="{{ old("feeDetails.$key.title", $fees['title'] ?? 'N/A') }}" disabled />--}}
+{{--                                                                    </td>--}}
+{{--                                                                    <td>--}}
+{{--                                                                        <input type="number" name="feeDetails[{{ $key }}][total_fees]" class="form-control" value="{{ $totalFees }}" disabled />--}}
+{{--                                                                    </td>--}}
+{{--                                                                    <td>--}}
+{{--                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_sponsorship_percent]" class="form-control" value="{{ $feeSponsorshipPercent }}" disabled />--}}
+{{--                                                                    </td>--}}
+{{--                                                                    <td>--}}
+{{--                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_sponsorship_value]" class="form-control" value="{{ $feeSponsorshipValue }}" disabled />--}}
+{{--                                                                    </td>--}}
+{{--                                                                    <td>--}}
+{{--                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_discount_percent]" class="form-control" value="{{ $feeDiscountPercent }}" disabled />--}}
+{{--                                                                    </td>--}}
+{{--                                                                    <td>--}}
+{{--                                                                        <input type="number" name="feeDetails[{{ $key }}][fee_discount_value]" class="form-control" value="{{ $feeDiscountValue }}" disabled />--}}
+{{--                                                                    </td>--}}
+{{--                                                                    <td>{{ $feeSponsorshipPlusDiscountPercent }}%</td>--}}
+{{--                                                                    <td>{{ $feeSponsorshipPlusDiscountValue }}</td>--}}
+{{--                                                                    <td>{{ $netFeePayablePercent }}%</td>--}}
+{{--                                                                    <td>{{ $netFeePayableValue }}</td>--}}
+{{--                                                                    <td>--}}
+{{--                                                                        @if ($key != 0)--}}
+{{--                                                                        <a href="#" class="text-danger ms-25">--}}
+{{--                                                                            <i data-feather="trash-2" class="me-50"></i>--}}
+{{--                                                                        </a>--}}
+{{--                                                                        @endif--}}
+{{--                                                                    </td>--}}
+{{--                                                                </tr>--}}
+{{--                                                                @endforeach--}}
 
-                                                                <!-- Total Fees Row -->
-                                                                @php
-                                                                $totalFeesSum = array_sum(array_column($feeDetails, 'total_fees'));
-                                                                $totalNetFeePayableValue = array_sum(array_map(function ($fees) {
-                                                                return ($fees['total_fees'] ?? 0) - (($fees['fee_sponsorship_value'] ?? 0) + ($fees['fee_discount_value'] ?? 0));
-                                                                }, $feeDetails));
-                                                                @endphp
-                                                                <tr>
-                                                                    <td></td>
-                                                                    <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
-                                                                    <td class="fw-bolder text-dark font-large-1">{{ $totalNetFeePayableValue }}</td>
-                                                                    <td>
-                                                                        @if($user->payment_status == 'paid')
-                                                                        <span class="badge bg-success">Paid</span>
-                                                                        @else
-                                                                        <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn" data-user-id="{{ $user->id }}">Pay Now</button>
-                                                                        @endif
-                                                                        <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>
-                                                                    </td>
-                                                                </tr>
+{{--                                                                <!-- Total Fees Row -->--}}
+{{--                                                                @php--}}
+{{--                                                                $totalFeesSum = array_sum(array_column($feeDetails, 'total_fees'));--}}
+{{--                                                                $totalNetFeePayableValue = array_sum(array_map(function ($fees) {--}}
+{{--                                                                return ($fees['total_fees'] ?? 0) - (($fees['fee_sponsorship_value'] ?? 0) + ($fees['fee_discount_value'] ?? 0));--}}
+{{--                                                                }, $feeDetails));--}}
+{{--                                                                @endphp--}}
+{{--                                                                <tr>--}}
+{{--                                                                    <td></td>--}}
+{{--                                                                    <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>--}}
+{{--                                                                    <td class="fw-bolder text-dark font-large-1">{{ $totalNetFeePayableValue }}</td>--}}
+{{--                                                                    <td>--}}
+{{--                                                                        @if($user->payment_status == 'paid')--}}
+{{--                                                                        <span class="badge bg-success">Paid</span>--}}
+{{--                                                                        @else--}}
+{{--                                                                        <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"--}}
+{{--                                                                                data-bs-toggle="modal"--}}
+{{--                                                                                data-bs-target="#paymentModal"--}}
+{{--                                                                                data-user-id="{{ $user->id }}"--}}
+{{--                                                                                data-total-amount="{{ $totalNetFeePayableValue }}">Pay Now</button>--}}
+{{--                                                                        @endif--}}
+{{--                                                                        <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>--}}
+{{--                                                                    </td>--}}
+{{--                                                                </tr>--}}
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -1660,11 +1663,304 @@
             </div>
         </div>
     </div>
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel">Make Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="paymentForm">
+                        <div class="mb-3">
+                            <div class="alert alert-danger">
+                                Are you sure you're paying under the correct quota? If not, please contact the admin on ......... before proceeding with payment.
+                            </div>
+                            <label for="paymentMode" class="form-label">Payment Mode</label>
+                            <select class="form-select" id="paymentMode" required>
+                                <option value="">Select Payment Mode</option>
+                                <option value="UPI">UPI</option>
+                                <option value="IMPS">IMPS</option>
+                            </select>
+                        </div>
+
+                        <div id="upiSection" style="display:none;">
+                            <div class="text-center mb-3">
+                                <p>Scan the QR code to make payment</p>
+                                <img src="{{asset('sports/img/sampleqr.jpeg')}}"
+                                     alt="UPI QR Code" class="img-fluid">
+{{--                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=UPI_ID:your-upi-id@bank&amount={{ $totalNetFeePayableValue }}"--}}
+{{--                                     alt="UPI QR Code" class="img-fluid">--}}
+{{--                                <p class="mt-2">OR</p>--}}
+{{--                                <p>Send payment to: your-upi-id@bank</p>--}}
+                            </div>
+                        </div>
+
+                        <div id="impsSection" style="display:none;">
+                            <div class="mb-3">
+                                <label class="form-label">Bank Details for IMPS</label>
+                                <div class="card p-3">
+                                    <p><strong>Account Name:</strong> Your Academy Name</p>
+                                    <p><strong>Account Number:</strong> 1234567890</p>
+                                    <p><strong>IFSC Code:</strong> ABCD0123456</p>
+                                    <p><strong>Bank Name:</strong> Example Bank</p>
+                                </div>
+                                <p class="mt-2 text-muted">Please share the transaction reference after payment.</p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="confirmPayment">Confirm Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add this modal before the closing </body> tag -->
+    <div class="modal fade" id="paymentReasonModal" tabindex="-1" aria-labelledby="paymentReasonModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentReasonModalLabel">Payment Reason</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="paymentReasonForm">
+                        <div class="mb-3">
+                            <label for="paymentReason" class="form-label">Reason for not paying now <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="paymentReason" name="paymentReason" rows="3" required placeholder="Please provide the reason for not making payment now"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submitWithReason">Submit Form</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script>
+        $(document).ready(function() {
+            // Handle form submission for update payment
+            function toggleBankName() {
+                var payMode = $('select[name="pay_mode"]').val();
+
+                if (payMode === 'Cash') {
+                    $('#bankNameDiv').hide();
+                    $('#refNoDiv').hide();
+                    $('#bank_name').val('').prop('required', false);
+                    $('#ref_no').val('').prop('required', false);
+                } else {
+                    $('#bankNameDiv').show();
+                    $('#refNoDiv').show();
+                    $('#bank_name').prop('required', true);
+                    $('#ref_no').prop('required', true);
+                }
+            }
+
+            toggleBankName();
+
+            $('select[name="pay_mode"]').on('change', function() {
+                toggleBankName();
+            });
+            $('#submitPayment').on('click', function(e) {
+                e.preventDefault();  // Prevent the default form submission
+
+                // Disable the button to prevent multiple submissions
+                $('#submitPayment').prop('disabled', true);
+
+                // Show loading indicator
+                $('#submitPayment').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
+
+                // Collect all input values manually
+                var formData = new FormData();
+                formData.append('user_id', $('input[name="user_id"]').val());
+                formData.append('confirm_payment', $('input[name="confirm_payment"]').val());
+                formData.append('bank_name', $('#bank_name').val());
+                formData.append('pay_mode', $('select[name="pay_mode"]').val());
+                formData.append('ref_no', $('input[name="ref_no"]').val());
+                formData.append('pay_doc', $('input[name="pay_doc"]')[0].files[0]);
+                formData.append('pay_remark', $('textarea[name="pay_remark"]').val());
+
+                // Perform the Ajax request
+                $.ajax({
+                    url: "{{ route('update-payment') }}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,  // Important for FormData
+                    contentType: false,   // Important for FormData
+                    success: function(response) {
+                        if(response.success) {
+                            // Show success message
+                            toastr.success(response.message, 'Success');
+
+                            // Close the modal after 1.5 seconds
+                            setTimeout(function() {
+                                $('#update-payment').modal('hide');
+                            }, 1500);
+                            // location.reload()
+                            // Optionally refresh part of the page or update the UI
+                        } else {
+                            // Show error message
+                            toastr.error(response.message, 'Error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle errors
+                        var errorMessage = xhr.responseJSON && xhr.responseJSON.message
+                            ? xhr.responseJSON.message
+                            : 'An error occurred while processing your request.';
+                        toastr.error(errorMessage, 'Error');
+                    },
+                    complete: function() {
+                        // Re-enable the submit button
+                        $('#submitPayment').prop('disabled', false);
+                        $('#submitPayment').html('Submit');
+                    }
+                });
+            });
+
+            // Reset form when modal is closed
+            $('#update-payment').on('hidden.bs.modal', function () {
+                $('#paymentForm')[0].reset();
+            });
+        });
+        $(document).ready(function() {
+            // Store the form submission function
+            let formSubmissionFunction = null;
+
+            // Override the proceed function to check payment status
+            function proceed() {
+                // Check if payment is made (you'll need to implement this check based on your logic)
+                const isPaymentMade = checkIfPaymentIsMade(); // Implement this function
+
+                if (!isPaymentMade) {
+                    // Show payment reason modal
+                    $('#paymentReasonModal').modal('show');
+                    // Store the original submission function
+                    formSubmissionFunction = function() {
+                        document.getElementById('status').value = 'submitted';
+                        document.getElementById('postRegister').submit();
+                    };
+                } else {
+                    // If payment is made, submit directly
+                    document.getElementById('status').value = 'submitted';
+                    document.getElementById('postRegister').submit();
+                }
+            }
+
+            // Function to check if payment is made (you need to implement this based on your logic)
+            function checkIfPaymentIsMade() {
+                // Example: Check if payment status is 'paid'
+                // You might need to check your fee table or payment status
+                return $('.badge.bg-success:contains("Paid")').length > 0;
+            }
+
+            // Handle the submit with reason button
+            $('#submitWithReason').click(function() {
+                const reason = $('#paymentReason').val().trim();
+
+                if (!reason) {
+                    toastr.error('Please provide a reason for not paying now');
+                    return;
+                }
+
+                // Add the reason to a hidden input or append to form
+                if (!$('#paymentReasonInput').length) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        id: 'paymentReasonInput',
+                        name: 'payment_reason',
+                        value: reason
+                    }).appendTo('#postRegister');
+                } else {
+                    $('#paymentReasonInput').val(reason);
+                }
+
+                // Close the modal
+                $('#paymentReasonModal').modal('hide');
+
+                // Submit the form
+                if (formSubmissionFunction) {
+                    formSubmissionFunction();
+                }
+            });
+
+            // Reset the reason when modal is closed
+            $('#paymentReasonModal').on('hidden.bs.modal', function() {
+                $('#paymentReason').val('');
+            });
+
+            // Make the functions available globally
+            window.proceed = proceed;
+            window.saveDraft = saveDraft;
+        });
+        $(document).ready(function() {
+            // Handle payment mode selection
+            $('#paymentMode').change(function() {
+                const mode = $(this).val();
+                $('#upiSection, #impsSection').hide();
+
+                if (mode === 'UPI') {
+                    $('#upiSection').show();
+                } else if (mode === 'IMPS') {
+                    $('#impsSection').show();
+                }
+            });
+            // Handle confirm payment button
+            $('#confirmPayment').click(function() {
+                const paymentMode = $('#paymentMode').val();
+
+                if (!paymentMode) {
+                    toastr.error('Please select a payment mode');
+                    return;
+                }
+
+                const userId = $('.pay-now-btn').data('user-id');
+                const amount = $('.pay-now-btn').data('total-amount');
+
+                // Disable confirm button to prevent multiple submissions
+                $('#confirmPayment').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
+
+                // Send AJAX request to update payment status
+                $.ajax({
+                    url: "{{ url('update-payment-status') }}",
+                    type: "POST",
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        user_id: userId,
+                        payment_mode: paymentMode
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(`Payment of ₹${amount} via ${paymentMode} was successful`, 'Success');
+
+                            // Close the modal
+                            $('#paymentModal').modal('hide');
+
+                            // Replace button with "Paid" badge
+                            $('.pay-now-btn').replaceWith('<span class="badge bg-success">Paid</span>');
+                        } else {
+                            toastr.error(response.message, 'Error');
+                            $('#confirmPayment').prop('disabled', false).html('Confirm Payment');
+                        }
+                    },
+                    error: function(xhr) {
+                        var errorMessage = xhr.responseJSON && xhr.responseJSON.message
+                            ? xhr.responseJSON.message
+                            : 'Something went wrong. Please try again.';
+                        toastr.error(errorMessage, 'Error');
+                        $('#confirmPayment').prop('disabled', false).html('Confirm Payment');
+                    }
+                });
+            });
+        });
         document.addEventListener('DOMContentLoaded', function() {
             const hostelRequiredYes = document.getElementById('hostel_required_yes');
             const hostelRequiredNo = document.getElementById('hostel_required_no');
@@ -1837,73 +2133,73 @@
                 let netFeePayablePercent = 100 - feeSponsorshipPlusDiscountPercent;
                 let netFeePayableValue = totalFees - feeSponsorshipPlusDiscountValue;
 
-                // Check if mandatory or checked
-                if (fee.mandatory || (fee.mandatory === false && fee.isChecked)) {
-                    totalNetFeePayableValue += netFeePayableValue;
-                }
-
-                let mandatoryCheckbox = `<input type="checkbox" class="form-check-input mandatory-checkbox"
+                // Create checkbox with proper state
+                let mandatoryCheckbox = `
+<input type="hidden" name="fee_details[${index}][mandatory]" value=" ${fee.mandatory ? 1 : 0}">
+            <input type="checkbox" class="form-check-input mandatory-checkbox"
                 data-index="${index}"
                 data-fee-id="${fee.id}"
                 data-title="${fee.title}"
-                ${fee.mandatory ? 'checked readonly' : ''}
+                ${fee.mandatory ? 'checked' : ''}
                 ${fee.mandatory ? 'disabled' : ''}
-                ${(fee.mandatory === false && fee.isChecked) ? 'checked' : ''}>`;
+                name="fee_details[${index}][mandatory]"
+                ${(fee.mandatory || fee.is_checked) ? 'checked' : ''}>
+        `;
 
                 let row = `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td><input type="text" class="form-control" name="fee_details[${index}][title]" value="${fee.title}" readonly></td>
-                    <td><input type="number" class="form-control" name="fee_details[${index}][total_fees]" value="${totalFees}" readonly></td>
-                    <td><input type="number" class="form-control" name="fee_details[${index}][fee_sponsorship_percent]" value="${feeSponsorshipPercent}" readonly></td>
-                    <td><input type="number" class="form-control" name="fee_details[${index}][fee_sponsorship_value]" value="${feeSponsorshipValue.toFixed(2)}" readonly></td>
-                    <td><input type="number" class="form-control" name="fee_details[${index}][fee_discount_percent]" value="${feeDiscountPercent}" readonly></td>
-                    <td><input type="number" class="form-control" name="fee_details[${index}][fee_discount_value]" value="${feeDiscountValue.toFixed(2)}" readonly></td>
-                    <td><input type="number" class="form-control" value="${feeSponsorshipPlusDiscountPercent}" readonly></td>
-                    <td><input type="number" class="form-control" value="${feeSponsorshipPlusDiscountValue.toFixed(2)}" readonly></td>
-                    <td><input type="number" class="form-control" value="${netFeePayablePercent}" readonly></td>
-                    <td><input type="number" class="form-control net-fee-value" value="${netFeePayableValue.toFixed(2)}" readonly></td>
-                    <td>${mandatoryCheckbox}</td>
-                    <td>
-                        ${index !== 0 ? '' : ''}
-                    </td>
-                </tr>
-            `;
-                feeTableBody.append(row);
-            });
-
-            // Update the total fees row
-            feeTableBody.append(`
             <tr>
-                <td></td>
-                <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
-                <td class="fw-bolder text-dark font-large-1 total-net-fee">${totalNetFeePayableValue.toFixed(2)}</td>
-                <td></td>
+                <td>${index + 1}</td>
+                <td><input type="text" class="form-control" name="fee_details[${index}][title]" value="${fee.title}" readonly></td>
+                <td><input type="number" class="form-control" name="fee_details[${index}][total_fees]" value="${totalFees}" readonly></td>
+                <td><input type="number" class="form-control" name="fee_details[${index}][fee_sponsorship_percent]" value="${feeSponsorshipPercent}" readonly></td>
+                <td><input type="number" class="form-control" name="fee_details[${index}][fee_sponsorship_value]" value="${feeSponsorshipValue.toFixed(2)}" readonly></td>
+                <td><input type="number" class="form-control" name="fee_details[${index}][fee_discount_percent]" value="${feeDiscountPercent}" readonly></td>
+                <td><input type="number" class="form-control" name="fee_details[${index}][fee_discount_value]" value="${feeDiscountValue.toFixed(2)}" readonly></td>
+                <td><input type="number" class="form-control" value="${feeSponsorshipPlusDiscountPercent}" readonly></td>
+                <td><input type="number" class="form-control" value="${feeSponsorshipPlusDiscountValue.toFixed(2)}" readonly></td>
+                <td><input type="number" class="form-control" value="${netFeePayablePercent}" readonly></td>
+                <td><input type="number" class="form-control net-fee-value" value="${netFeePayableValue.toFixed(2)}" readonly></td>
+                <td>${mandatoryCheckbox}</td>
+                <td>
+                    ${index !== 0 ? '' : ''}
+                </td>
             </tr>
-        `);
+        `;
 
-            feather.replace(); // Refresh icons
+                feeTableBody.append(row);
 
-            // Bind change event to checkboxes
-            $('.mandatory-checkbox').off('change').on('change', function() {
-                let index = $(this).data('index');
-                let feeId = $(this).data('fee-id');
-                let feeTitle = $(this).data('title');
-                let isChecked = $(this).is(':checked');
-
-                // Update the fee structure
-                if (feeStructure[index]) {
-                    feeStructure[index].isChecked = isChecked;
+                // Add to total if mandatory or checked
+                if (fee.mandatory) {
+                    totalNetFeePayableValue += netFeePayableValue;
                 }
-
-                // Recalculate the total
-                updateTotalFee();
-
-                // Send AJAX request to update database if needed
-                updateMandatoryStatus(feeId, feeTitle, isChecked);
             });
-        }
 
+            // Add total row
+            feeTableBody.append(`
+        <tr>
+            <td></td>
+            <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
+            <td class="fw-bolder text-dark font-large-1 total-net-fee">${totalNetFeePayableValue.toFixed(2)}</td>
+            <td>
+                @if($user->payment_status == 'paid')
+            <span class="badge bg-success">Paid</span>
+@else
+            <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#paymentModal"
+                    data-user-id="{{ $user->id }}"
+                            data-total-amount="${totalNetFeePayableValue.toFixed(2)}">Pay Now</button>
+                @endif
+            <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>
+        </td>
+    </tr>
+`);
+
+            feather.replace();
+        }
+        $(document).on('change', '.mandatory-checkbox', function() {
+            updateTotalFee();
+        });
         // Function to update the total fee
         function updateTotalFee() {
             let totalNetFeePayableValue = 0;
@@ -1913,7 +2209,7 @@
                 let checkbox = $(this).find('.mandatory-checkbox');
                 let netFeeValue = parseFloat($(this).find('.net-fee-value').val()) || 0;
 
-                // If checkbox is checked or mandatory, add to total
+                // If checkbox is checked or mandatory (disabled), add to total
                 if (checkbox.is(':checked') || checkbox.prop('disabled')) {
                     totalNetFeePayableValue += netFeeValue;
                 }
@@ -1921,6 +2217,9 @@
 
             // Update the total display
             $('.total-net-fee').text(totalNetFeePayableValue.toFixed(2));
+
+            // Update the Pay Now button with the new total amount
+            $('.pay-now-btn').data('total-amount', totalNetFeePayableValue.toFixed(2));
         }
 
 
@@ -2194,10 +2493,10 @@
             document.getElementById('postRegister').submit();
         }
 
-        function proceed() {
-            document.getElementById('status').value = 'submitted';
-            document.getElementById('postRegister').submit();
-        }
+        // function proceed() {
+        //     document.getElementById('status').value = 'submitted';
+        //     document.getElementById('postRegister').submit();
+        // }
         $('#series').on('change', function() {
             // alert(12);
             getDocNumberByBookId();

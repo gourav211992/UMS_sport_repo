@@ -149,8 +149,8 @@
                             id="dropdown-user" href="#" data-bs-toggle="dropdown" aria-haspopup="true"
                             aria-expanded="false">
                             <span class="avatar">
-                                <!--                                        <img class="round" src="../../../app-assets/images/portrait/small/avatar-s-11.jpg" alt="avatar" height="32" width="32">-->
-                                NG
+                                                                       <img class="round" src="../../../app-assets/images/portrait/small/dummy.jpeg" alt="avatar" height="35" width="32">
+                                <!-- NG -->
                             </span>
                         </a>
                         <div class="dropdown-menu drop-newmenu dropdown-menu-end" aria-labelledby="dropdown-user">

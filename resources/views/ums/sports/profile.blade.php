@@ -132,19 +132,19 @@
                                             </li>
                                             <li class="mb-75">
                                                 <span class="fw-bolder me-25">Guardian Name:</span>
-                                                <span>{{ $familyDetails->name ?? 'Not Provided' }}</span>
+                                                <span>{{ $familyDetails->name ?? 'N/A' }}</span>
                                             </li>
                                             <li class="mb-75">
                                                 <span class="fw-bolder me-25">Guardian No.:</span>
-                                                <span>{{ $student->mobile ?? 'Not Provided' }}</span>
+                                                <span>{{ $student->mobile ?? 'N/A' }}</span>
                                             </li>
                                             <li class="mb-75">
                                                 <span class="fw-bolder me-25">Guardian Email:</span>
-                                                <span>{{ $student->email ?? 'Not Provided' }}</span>
+                                                <span>{{ $student->email ?? 'N/A' }}</span>
                                             </li>
                                             <li class="mb-75">
                                                 <span class="fw-bolder me-25">Country:</span>
-                                                <span>{{ $student->registration->country ?? 'Not Provided' }}</span>
+                                                <span>{{ $student->registration->country ?? 'N/A' }}</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -222,12 +222,12 @@
                                             <div class="mb-2 pb-50">
                                                 <!-- <h5>Registration No</h5> -->
                                                 <h5>Permanent ID</h5>
-                                                <span>{{ $student->registration->registration_number ?? 'Not Provided' }} </span>
+                                                <span>{{ $student->registration->registration_number ?? 'N/A' }} </span>
                                             </div>
                                             <div class="mb-2 pb-50">
                                                 <!-- <h5>Registration No</h5> -->
                                                 <h5>Temporary ID</h5>
-                                                <span>{{ $student->registration->document_number ?? 'Not Provided' }} </span>
+                                                <span>{{ $student->registration->document_number ?? 'N/A' }} </span>
                                             </div>
                                             <div class="mb-2 pb-50">
                                                 <h5>Date of Joining</h5>
@@ -235,7 +235,7 @@
                                             </div>
                                             <div class="mb-2 mb-md-1">
                                                 <h5>Address</h5>
-                                                <span>{{ $familyDetails->permanent_street1 ?? 'Not Provided' }}<span class="badge badge-light-primary ms-50">Primary</span></span>
+                                                <span>{{ $familyDetails->permanent_street1 ?? 'N/A' }}<span class="badge badge-light-primary ms-50">Primary</span></span>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -256,7 +256,7 @@
                                             @elseif($student->registration->status == 'on-hold')
                                             <div class="alert alert-warning mb-2" role="alert">
                                                 <div class="alert-body fw-normal font-small-3"><i
-                                                        data-feather='alert-triangle'></i> Admin, please review your profile; you can now pay your fees and submit your profile.</div>
+                                                        data-feather='alert-triangle'></i>  Admin has reviewed your profile, so you can now pay your fees and submit your profile.</div>
                                             </div>
                                             @endif
                                             <!-- <div class="plan-statistics pt-1">
@@ -274,7 +274,7 @@
                                         @if($student->registration->status == 'draft' || $student->registration->status == 'rejected' || $student->registration->status == 'on-hold')
                                         <div class="col-12">
                                             <a class="btn btn-primary me-1 mt-1" href="{{route('update.registration',$student->registration->id)}}">
-                                                Update Profile
+                                                Profile Detail
                                             </a>
                                         </div>
                                         @endif
@@ -327,7 +327,8 @@
                                                             <td class="poprod-decpt">{{$date}}</td>
                                                             <td>{{$totalFees}}</td>
                                                             <td>{{$paid_amount}}</td>
-                                                            <td>{{$totalFees-$paid_amount}}</td>
+{{--                                                            <td>{{$totalFees-$paid_amount}}</td>--}}
+                                                            <td></td>
                                                             <td><span
                                                                     class="badge rounded-pill @if($student->payment_status == 'paid') badge-light-success @else badge-light-warning @endif  badgeborder-radius">{{$student->payment_status??'Pending'}}</span>
                                                             </td>
@@ -341,7 +342,11 @@
                                                                 <span class="badge bg-success badge rounded-pill">Paid</span>
                                                                 @else
                                                                 <!-- <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn" data-user-id="{{ $student->id }}">Pay Now</button> -->
-                                                                <button data-bs-toggle="modal" data-bs-target="#pay_now" class="btn btn-success btn-sm px-25 font-small-2 py-25 ">Pay Now</button>
+                                                                <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#paymentModal"
+                                                                        data-user-id="{{ $user->id }}"
+                                                                        >Pay Now</button>
                                                                 @endif
                                                                 {{-- @if($student->payments != null)--}}
                                                                 <button
@@ -696,11 +701,124 @@
             </div>
         </div>
     </div>
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel">Make Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="paymentForm">
+                        <div class="mb-3">
+                            <label for="paymentMode" class="form-label">Payment Mode</label>
+                            <select class="form-select" id="paymentMode" required>
+                                <option value="">Select Payment Mode</option>
+                                <option value="UPI">UPI</option>
+                                <option value="IMPS">IMPS</option>
+                            </select>
+                        </div>
+
+                        <div id="upiSection" style="display:none;">
+                            <div class="text-center mb-3">
+                                <p>Scan the QR code to make payment</p>
+                                <img src="{{asset('sports/img/sampleqr.jpeg')}}"
+                                     alt="UPI QR Code" class="img-fluid">
+                                {{--                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=UPI_ID:your-upi-id@bank&amount={{ $totalNetFeePayableValue }}"--}}
+                                {{--                                     alt="UPI QR Code" class="img-fluid">--}}
+                                {{--                                <p class="mt-2">OR</p>--}}
+                                {{--                                <p>Send payment to: your-upi-id@bank</p>--}}
+                            </div>
+                        </div>
+
+                        <div id="impsSection" style="display:none;">
+                            <div class="mb-3">
+                                <label class="form-label">Bank Details for IMPS</label>
+                                <div class="card p-3">
+                                    <p><strong>Account Name:</strong> Your Academy Name</p>
+                                    <p><strong>Account Number:</strong> 1234567890</p>
+                                    <p><strong>IFSC Code:</strong> ABCD0123456</p>
+                                    <p><strong>Bank Name:</strong> Example Bank</p>
+                                </div>
+                                <p class="mt-2 text-muted">Please share the transaction reference after payment.</p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="confirmPayment">Confirm Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script>
+
+        $(document).ready(function() {
+            // Handle payment mode selection
+            $('#paymentMode').change(function() {
+                const mode = $(this).val();
+                $('#upiSection, #impsSection').hide();
+
+                if (mode === 'UPI') {
+                    $('#upiSection').show();
+                } else if (mode === 'IMPS') {
+                    $('#impsSection').show();
+                }
+            });
+            // Handle confirm payment button
+            $('#confirmPayment').click(function() {
+                const paymentMode = $('#paymentMode').val();
+
+                if (!paymentMode) {
+                    toastr.error('Please select a payment mode');
+                    return;
+                }
+
+                const userId = $('.pay-now-btn').data('user-id');
+                const amount = $('.pay-now-btn').data('total-amount');
+
+                // Disable confirm button to prevent multiple submissions
+                $('#confirmPayment').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
+
+                // Send AJAX request to update payment status
+                $.ajax({
+                    url: "{{ url('update-payment-status') }}",
+                    type: "POST",
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        user_id: userId,
+                        payment_mode: paymentMode
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(`Payment of ₹${amount} via ${paymentMode} was successful`, 'Success');
+
+                            // Close the modal
+                            $('#paymentModal').modal('hide');
+
+                            // Replace button with "Paid" badge
+                            $('.pay-now-btn').replaceWith('<span class="badge bg-success">Paid</span>');
+                        } else {
+                            toastr.error(response.message, 'Error');
+                            $('#confirmPayment').prop('disabled', false).html('Confirm Payment');
+                        }
+                    },
+                    error: function(xhr) {
+                        var errorMessage = xhr.responseJSON && xhr.responseJSON.message
+                            ? xhr.responseJSON.message
+                            : 'Something went wrong. Please try again.';
+                        toastr.error(errorMessage, 'Error');
+                        $('#confirmPayment').prop('disabled', false).html('Confirm Payment');
+                    }
+                });
+            });
+        });
         $(document).ready(function() {
             // Handle form submission
             function toggleBankName() {
@@ -781,44 +899,44 @@
             $('#update-payment').on('hidden.bs.modal', function() {
                 $('#paymentForm')[0].reset();
             });
-            $(document).on('click', '.pay-now-btn', function() {
-                var userId = $(this).data('user-id');
-                var $button = $(this);
+            {{--$(document).on('click', '.pay-now-btn', function() {--}}
+            {{--    var userId = $(this).data('user-id');--}}
+            {{--    var $button = $(this);--}}
 
-                // Disable button to prevent multiple clicks
-                $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
+            {{--    // Disable button to prevent multiple clicks--}}
+            {{--    $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');--}}
 
-                $.ajax({
-                    url: "{{ url('update-payment-status') }}", // Define the correct route
-                    type: "POST",
-                    data: {
-                        _token: '{{ csrf_token() }}', // Ensure CSRF protection
-                        user_id: userId
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            toastr.success(response.message, 'Success');
+            {{--    $.ajax({--}}
+            {{--        url: "{{ url('update-payment-status') }}", // Define the correct route--}}
+            {{--        type: "POST",--}}
+            {{--        data: {--}}
+            {{--            _token: '{{ csrf_token() }}', // Ensure CSRF protection--}}
+            {{--            user_id: userId--}}
+            {{--        },--}}
+            {{--        success: function(response) {--}}
+            {{--            if (response.success) {--}}
+            {{--                toastr.success(response.message, 'Success');--}}
 
-                            // Replace "Pay Now" button with "Paid" badge
-                            $button.replaceWith('<span class="badge bg-success">Paid</span>');
-                            setTimeout(function() {
-                                // location.reload()
-                            }, 1500);
+            {{--                // Replace "Pay Now" button with "Paid" badge--}}
+            {{--                $button.replaceWith('<span class="badge bg-success">Paid</span>');--}}
+            {{--                setTimeout(function() {--}}
+            {{--                    // location.reload()--}}
+            {{--                }, 1500);--}}
 
-                        } else {
-                            toastr.error(response.message, 'Error');
-                            $button.prop('disabled', false).html('Pay Now');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        var errorMessage = xhr.responseJSON && xhr.responseJSON.message ?
-                            xhr.responseJSON.message :
-                            'An error occurred while processing your request.';
-                        toastr.error(errorMessage, 'Error');
-                        $button.prop('disabled', false).html('Pay Now');
-                    }
-                });
-            });
+            {{--            } else {--}}
+            {{--                toastr.error(response.message, 'Error');--}}
+            {{--                $button.prop('disabled', false).html('Pay Now');--}}
+            {{--            }--}}
+            {{--        },--}}
+            {{--        error: function(xhr, status, error) {--}}
+            {{--            var errorMessage = xhr.responseJSON && xhr.responseJSON.message ?--}}
+            {{--                xhr.responseJSON.message :--}}
+            {{--                'An error occurred while processing your request.';--}}
+            {{--            toastr.error(errorMessage, 'Error');--}}
+            {{--            $button.prop('disabled', false).html('Pay Now');--}}
+            {{--        }--}}
+            {{--    });--}}
+            {{--});--}}
         });
     </script>
     @endsection

@@ -17,10 +17,44 @@ class ActivityMasterController extends Controller
     }
 
 
+
+// public function activityMasterAdd(Request $request)
+// {
+//     // Validate the form input
+//     $validatedData = $request->validate([
+//         'sport_id' => 'required|string|max:255',
+//         'activity_name' => 'required|string|max:255',
+    
+//         'subcategories' => 'required|array',
+//         'subcategories.*.name' => 'required|string|max:255',
+//         'duration_min' => 'required|integer',
+//         'description' => 'required|string|max:255',
+//         'status' => 'required|in:active,inactive',
+//     ]);
+   
+//     // Filter out empty subcategories
+//     $validSubcategories = array_filter($validatedData['subcategories'], function($subcategory) {
+//         return !empty($subcategory['name']);
+//     });
+
+//     // Create the activity master record
+//     ActivityMaster::create([
+//         'sport_id' => $validatedData['sport_id'],
+//         'activity_name' => $validatedData['activity_name'],
+        
+//         'sub_activities' => json_encode(array_column($validSubcategories, 'name')), // Save subcategories as JSON
+//         'activity_duration_min' => $validatedData['duration_min'],
+//         'description' => $validatedData['description'],
+//         'status' => $validatedData['status'],
+//     ]);
+
+//     // Redirect back with success message
+//     return redirect()->route('activity-master')->with('success', 'Activity has been added successfully!');
+// }
+
 public function activityMasterAdd(Request $request)
 {
     // Validate the form input
-    // dd($request->all());
     $validatedData = $request->validate([
         'sport_id' => 'required|string|max:255',
         'activity_name' => 'required|string|max:255',
@@ -28,20 +62,9 @@ public function activityMasterAdd(Request $request)
         'subcategories.*.name' => 'required|string|max:255',
         'subcategories.*.duration' => 'required|integer', // Validate subactivity duration
         'duration_min' => 'required|integer', // Activity duration
-        'description' => '',
-        // 'description' => 'required|string|max:255',
+        'description' => 'required|string|max:255',
         'status' => 'required|in:active,inactive',
-    ],
-    
-);
-    $existingActivity =ActivityMaster::where('sport_id', $validatedData['sport_id'])
-    ->where('activity_name', $validatedData['activity_name'])
-    ->first();
-
-    if ($existingActivity) {
-        // If the activity name already exists, return an error
-        return back()->with('error', 'Activity  data already exists.');
-    }
+    ]);
 
     // Filter out empty subcategories (if any)
     $validSubcategories = array_filter($validatedData['subcategories'], function($subcategory) {
@@ -69,8 +92,6 @@ public function activityMasterAdd(Request $request)
 
 
 
-
-
 public function index(Request $request)
 {
     $activityMaster = ActivityMaster::with('sport')
@@ -79,18 +100,15 @@ public function index(Request $request)
     if (!empty($request->activity_name)) {
         $activityMaster->where('activity_name', 'LIKE', '%' . $request->activity_name . '%');
     }
-    if (!empty($request->sport_id)) {
-        $activityMaster->where('sport_id', 'LIKE', '%' . $request->sport_id . '%');
-    }
 
     $activityMaster = $activityMaster->get();
-    $sportName=Sport_master::all();
+
     // Decode sub_activities to a PHP array
     foreach ($activityMaster as $activity) {
         $activity->sub_activities = json_decode($activity->sub_activities, true) ?? [];
     }
 
-    return view('ums.sports.activity.activity_master', compact('activityMaster','sportName'));
+    return view('ums.sports.activity.activity_master', compact('activityMaster'));
 }
 
 
@@ -100,7 +118,7 @@ public function ActivityDelete(Request $request,$slug) {
         
     activityMaster::where('id', $slug)->delete();
 
-    // session()->flash('delete', 'Activity has been deleted successfully!');
+    session()->flash('delete', 'Activity has been deleted successfully!');
 
     return redirect()->route('activity-master')->with('success','Deleted Successfully');
     
@@ -110,7 +128,7 @@ public function ActivityEdit($id)
     $activity = ActivityMaster::find($id);
 
     if ($activity && $activity->sub_activities) {
-        
+        // Decode the sub_activities JSON string into an array
         $sub_activity = json_decode($activity->sub_activities, true); 
     }
 
@@ -186,4 +204,3 @@ public function ActivityView($id)
 
 
 }
-

@@ -218,6 +218,34 @@
                                                 </div>
 
                                                 <div class="row align-items-center mb-1">
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Batch Name <span class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <select class="form-select" id="batch_name" name="batch_id">
+                                                                <option value="">-----Select Batch-----</option>
+                                                                @foreach($batch as $ba)
+                                                                    <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif >{{ $ba->batch }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                </div>
+
+                                                <div class="row align-items-center mb-1">
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Section <span class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <select class="form-select" name="section_id" id="section">
+                                                                <option value="">-----Select Section-----</option>
+                                                                @foreach($sections as $section)
+                                                                    <option value="{{ $section->id }}" @if ($section->id == $registration->section_id) selected @endif>{{ $section->section }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Quota <span
                                                                     class="text-danger">*</span></label>
@@ -232,6 +260,21 @@
                                                         </select>
                                                     </div>
                                                 </div>
+
+                                                <div class="row align-items-center mb-1">
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Group <span
+                                                                        class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <select class="form-select" name="group">
+                                                                <option>Select</option>
+                                                                @foreach($groups as $group)
+                                                                    <option value="{{$group->id}}" @if($registration->group == $group->id) selected @endif>{{$group->group_name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
 
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
@@ -378,7 +421,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="row align-items-center mb-1">
+                                                    <!-- <div class="row align-items-center mb-1">
                                                         <div class="col-md-3">
                                                             <label class="form-label">Batch Name <span class="text-danger">*</span></label>
                                                         </div>
@@ -390,7 +433,7 @@
                                                                 @endforeach
                                                             </select>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
 {{--                                                    <div class="row align-items-center mb-1">--}}
 {{--                                                        <div class="col-md-3">--}}
 {{--                                                            <label class="form-label">Batch Year <span class="text-danger">*</span></label>--}}
@@ -404,7 +447,7 @@
 {{--                                                            </select>--}}
 {{--                                                        </div>--}}
 {{--                                                    </div>--}}
-                                                    <div class="row align-items-center mb-1">
+                                                    <!-- <div class="row align-items-center mb-1">
                                                         <div class="col-md-3">
                                                             <label class="form-label">Section <span class="text-danger">*</span></label>
                                                         </div>
@@ -416,11 +459,11 @@
                                                                 @endforeach
                                                             </select>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
 
                                                     <input type="hidden" id="selected_batch_name" value="{{ $selectedBatch ? $selectedBatch->batch_name : '' }}">
 
-                                                    <div class="row align-items-center mb-1">
+                                                    <!-- <div class="row align-items-center mb-1">
                                                         <div class="col-md-2">
                                                             <label class="form-label">Group <span
                                                                         class="text-danger">*</span></label>
@@ -433,7 +476,7 @@
                                                                 @endforeach
                                                             </select>
                                                         </div>
-                                                    </div>
+                                                    </div> -->
 
                                                     <div class="row align-items-center mb-1">
                                                         <div class="col-md-2">

@@ -25,7 +25,7 @@ class GroupMaster extends Model
     // Relationship with Batch (each GroupMaster belongs to a Batch)
     public function batch()
     {
-        return $this->belongsTo(Batch::class, 'batch'); // Foreign key batch_id
+        return $this->belongsTo(batch::class, 'batch_id'); // Foreign key batch_id
     }
 
 

@@ -197,6 +197,15 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        <div class="row align-items-center mb-1">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Start & End Date <span class="text-danger">*</span></label>
+                                            </div>
+                                            <div class="col-md-5 d-flex gap-2">
+                                                <input type="date" name="start_date" class="form-control" id="start_date" value="{{$sportFeeMaster->start_date}}" required />
+                                                <input type="date" name="end_date" class="form-control" id="end_date" value="{{$sportFeeMaster->end_date}}" required />
+                                            </div>
+                                        </div>
 
                                         <div class="row align-items-center mb-2">
                                             <div class="col-md-3">
@@ -300,41 +309,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {{-- <tr id="fee_tr">
-                                                                <td>1</td>
-                                                                <td><input type="text" class="form-control mw-100" name="title" value="{{ old('title', $feeDetails[0]['title'] ?? '') }}" required/></td>
-                                                        <td><input type="text" class="form-control mw-100" name="Total_fee" value="{{ old('Total_fee', $feeDetails[0]['total_fees'] ?? '') }}" required /></td>
-                                                        <td><input type="text" class="form-control mw-100" name="fee_discount" value="{{ old('fee_discount', $feeDetails[0]['fee_discount_percent'] ?? '') }}" required /></td>
-                                                        <td><input type="text" class="form-control mw-100" name="fee_discount_value" value="{{ old('fee_discount_value', $feeDetails[0]['fee_discount_value'] ?? '') }}" /></td>
-                                                        <td><input type="text" class="form-control mw-100" name="net_fee" value="{{ old('net_fee', $feeDetails[0]['net_fee_payable_value'] ?? '') }}" /></td>
-                                                        <td>
-                                                            <div class="demo-inline-spacing">
-                                                                <div class="form-check form-check-primary mt-25">
-                                                                    <input type="checkbox" id="guardian1" name="guardian" {{ old('guardian', $feeDetails[0]['mandatory'] ?? false) ? 'checked' : '' }} class="form-check-input">
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <select class="form-select mw-100" name="payment_mode">
-                                                                <option>Select</option>
-                                                                @php
-                                                                $paymentMode = old('payment_mode', $feeDetails[0]['payment_mode'] ?? ''); // Default to empty if not set
-                                                                @endphp
-                                                                <option value="Weekly" {{ $paymentMode == 'Weekly' ? 'selected' : '' }}>Weekly</option>
-                                                                <option value="Monthly" {{ $paymentMode == 'Monthly' ? 'selected' : '' }}>Monthly</option>
-                                                                <option value="Quarterly" {{ $paymentMode == 'Quarterly' ? 'selected' : '' }}>Quarterly</option>
-                                                                <option value="Semi-Yearly" {{ $paymentMode == 'Semi-Yearly' ? 'selected' : '' }}>Semi-Yearly</option>
-                                                                <option value="Yearly" {{ $paymentMode == 'Yearly' ? 'selected' : '' }}>Yearly</option>
-                                                                <option value="One Time" {{ $paymentMode == 'One Time' ? 'selected' : '' }}>One Time</option>
-                                                            </select>
-                                                        </td>
-
-                                                        <td>
-                                                            <a href="#" class="text-primary add-contact-row">
-                                                                <i id="icon" data-feather="plus-square"></i>
-                                                            </a>
-                                                        </td>
-                                                        </tr> --}}
+                                                       
                                                         @foreach ($feeDetails as $key => $fees)
                                                         <tr id="fee_tr" class="fee_tr">
                                                             <td>{{ $key + 1 }}</td>
@@ -349,7 +324,7 @@
                                                                     @endforeach
                                                                 </select>
                                                             </td>
-                                                            <td><input type="text" class="form-control mw-100"
+                                                            <td><input type="text" class="form-control mw-100 total_fee"
                                                                     name="Total_fee[]"
                                                                     value="{{ old('Total_fee.' . $key, $fees['total_fees'] ?? '') }}"
                                                                     id="total_fee"
@@ -359,14 +334,14 @@
                                                                     value="{{ old('fee_discount.' . $key, $fees['fee_discount_percent'] ?? '') }}"
                                                                     id="fee_discount"
                                                                     required /></td>
-                                                            <td><input type="text" class="form-control mw-100"
+                                                            <td><input type="text" class="form-control mw-100 fee_discount_value"
                                                                     name="fee_discount_value[]"
                                                                     id="fee_discount_value"
                                                                    
                                                                     value="{{ old('fee_discount_value.' . $key, $fees['fee_discount_value'] ?? '') }}" />
 
                                                             </td>
-                                                            <td><input type="text" class="form-control mw-100"
+                                                            <td><input type="text" class="form-control mw-100 net_fee" 
                                                                     name="net_fee[]"
                                                                     id="net_fee"
                                                                     readonly
@@ -403,7 +378,7 @@
                                                                 <a href="#"
                                                                     class="{{ $key == 0 ? 'text-primary add-contact-row' : 'text-danger delete-item' }}">
                                                                     <i id="icon"
-                                                                        data-feather="{{ $key == 0 ? 'plus-square' : 'trash' }}"></i>
+                                                                        data-feather="{{ $key == 0 ? 'plus-square' : 'trash-2' }}"></i>
                                                                 </a>
 
                                                             </td>
@@ -411,6 +386,22 @@
                                                         @endforeach
 
                                                     </tbody>
+                                                     <tfoot>
+                                                        <tr>
+                                                            <td colspan="2"></td>
+                                                           
+                                                            
+                                                            <td  colspan="1" class="fw-bold mw-100" style="color: black" >Total Fee:<span class="fw-bold" id="total_fee1"></span></td>
+                                                           
+                                                           
+                                                            <td colspan="2" class="fw-bold " style="color: black" >Total Discount Value  :    <span class="fw-bold" id="fee_discount1"></span></td>
+                                                           
+                                                        
+                                                            <td class="fw-bold " style="color: black">Total Payable:<span class="fw-bold" id="total_payable"></span></td>
+                                                            <td colspan="3"></td>
+                                                        </tr>
+                                                    </tfoot>
+                                                   
 
 
 
@@ -431,7 +422,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Modal to add new record -->
+           
                 </form>
             </section>
 
@@ -452,73 +443,156 @@
     })
 </script>
 <script>
+    // function captureTableData() {
+    //     let tableData = [];
+    //     let rows = document.querySelectorAll('.table tbody tr');
+
+    //     rows.forEach(row => {
+    //         let rowData = {
+    //             title: row.querySelector('td:nth-child(2) select').value,
+    //             total_fees: row.querySelector('td:nth-child(3) input').value,
+    //             fee_discount_percent: row.querySelector('td:nth-child(4) input').value,
+    //             fee_discount_value: row.querySelector('td:nth-child(5) input').value,
+    //             net_fee_payable_value: row.querySelector('td:nth-child(6) input').value,
+    //             mandatory: row.querySelector('td:nth-child(7) input').checked,
+    //             payment_mode: row.querySelector('td:nth-child(8) select').value
+    //         };
+    //         tableData.push(rowData);
+    //         console.log(rowData);
+    //         document.getElementById('form_details').value = JSON.stringify(tableData);
+
+
+    //     });
+    //     var fees_total = document.getElementById('#total_fee1').text;
+    //     var fees_discount_value = document.getElementById('#fee_discount1').text;
+    //     var fees_net = document.getElementById('#total_payable').text;
+
+
+
+    // }
+
     function captureTableData() {
-        let tableData = [];
-        let rows = document.querySelectorAll('.table tbody tr');
+    let tableData = [];
+    let rows = document.querySelectorAll('.table tbody tr');
 
-        rows.forEach(row => {
-            let rowData = {
-                title: row.querySelector('td:nth-child(2) select').value,
-                total_fees: row.querySelector('td:nth-child(3) input').value,
-                fee_discount_percent: row.querySelector('td:nth-child(4) input').value,
-                fee_discount_value: row.querySelector('td:nth-child(5) input').value,
-                net_fee_payable_value: row.querySelector('td:nth-child(6) input').value,
-                mandatory: row.querySelector('td:nth-child(7) input').checked,
-                payment_mode: row.querySelector('td:nth-child(8) select').value
-            };
-            tableData.push(rowData);
-            console.log(rowData);
-            document.getElementById('form_details').value = JSON.stringify(tableData);
+   
+    let grand_total_fees = document.getElementById('total_fee1')?.textContent.trim() || "0";
+    let grand_total_discount = document.getElementById('fee_discount1')?.textContent.trim() || "0";
+    let grand_total_payable = document.getElementById('total_payable')?.textContent.trim() || "0";
+
+    rows.forEach(row => {
+        let rowData = {
+            title: row.querySelector('td:nth-child(2) select').value,
+            total_fees: row.querySelector('td:nth-child(3) input').value,
+            fee_discount_percent: row.querySelector('td:nth-child(4) input').value,
+            fee_discount_value: row.querySelector('td:nth-child(5) input').value,
+            net_fee_payable_value: row.querySelector('td:nth-child(6) input').value,
+            mandatory: row.querySelector('td:nth-child(7) input').checked,
+            payment_mode: row.querySelector('td:nth-child(8) select').value,
+           
+            
+        
+            grand_total_fees: grand_total_fees,
+            grand_total_discount: grand_total_discount,
+            grand_total_payable: grand_total_payable
+        };
+        tableData.push(rowData);
+    });
+
+  
+    document.getElementById('form_details').value = JSON.stringify(tableData);
+
+    
+    console.log(tableData);
+}
 
 
-        });
-
-
-    }
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var today = new Date().toISOString().split('T')[0];
+        $('#start_date').attr('min', today);
+        $('#end_date').attr('min', today);
+    });
+</script>
 
 <script>
-    $(document).ready(function() {
-        // Event listener for changes in the Total Fee or Discount
-        $(document).on('input', '#total_fee, #fee_discount, #fee_discount_value', function() {
-    var $row = $(this).closest('tr');
-    var totalFee = parseFloat($row.find('#total_fee').val()) || 0;
-    var discount = parseFloat($row.find('#fee_discount').val()) || 0;
-    var discountValue = parseFloat($row.find('#fee_discount_value').val()) || 0;
+   $(document).ready(function () {
+    $(document).on('input', '#total_fee, #fee_discount, #fee_discount_value', function () {
+        var $row = $(this).closest('tr');
+        var totalFee = parseFloat($row.find('#total_fee').val()) || 0;
+        var discountPercent = parseFloat($row.find('#fee_discount').val()) || 0;
+        var discountValue = parseFloat($row.find('#fee_discount_value').val()) || 0;
 
-    // Condition 1: If user updates discount percentage, calculate discount value
-    if(discount>0){
-    if ($(this).attr('id') === 'fee_discount') {
-        discountValue = (totalFee * discount) / 100;
-        $row.find('#fee_discount_value').val(discountValue.toFixed(2));
-    }}
-    var rowTitle = $row.find('.title').text().trim() || "This Row"; 
-    if(totalFee<discount){
-       
-        $row.find('#fee_discount').val(0);
-        discount = 0;
-        $row.find('#fee_discount_value').val(0);
-        discountValue = 0;
-    }
+        var inputId = $(this).attr('id');
 
-    // Condition 2: If user updates discount value, calculate discount percentage
-    if ($(this).attr('id') === 'fee_discount_value') {
-        // Validation: Discount Value should not be more than Total Fee
-        if (discountValue > totalFee) {
-            alert("Discount value cannot be greater than Total Fee!");
-            $row.find('#fee_discount_value').val(0);
-            discountValue = 0;
+        // If percent is changed
+        if (inputId === 'fee_discount') {
+            if (discountPercent > 100) {
+                alert("Discount % cannot be greater than 100!");
+                discountPercent = 0;
+                $row.find('#fee_discount').val(0);
+            }
+            discountValue = (totalFee * discountPercent) / 100;
+            if (discountValue > totalFee) {
+                discountValue = 0;
+                $row.find('#fee_discount_value').val(0);
+                alert("Discount value cannot be greater than Total Fee!");
+            } else {
+                $row.find('#fee_discount_value').val(discountValue.toFixed(2));
+            }
         }
-        discount = (discountValue / totalFee) * 100||0;
-        $row.find('#fee_discount').val(discount.toFixed(2));
-    }
 
-    var netFee = totalFee - discountValue;
-    $row.find('#net_fee').val(netFee.toFixed(2));
-});
+        // If discount value is changed
+        if (inputId === 'fee_discount_value') {
+            if (discountValue > totalFee) {
+                alert("Discount value cannot be greater than Total Fee!");
+                discountValue = 0;
+                $row.find('#fee_discount_value').val(0);
+            }
+            discountPercent = totalFee > 0 ? (discountValue / totalFee) * 100 : 0;
+            if (discountPercent > 100) discountPercent = 100;
+            $row.find('#fee_discount').val(discountPercent.toFixed(2));
+        }
 
-// Enable fee_discount_value input field
+        // Always calculate net fee
+        var netFee = totalFee - discountValue;
+        if (netFee < 0) netFee = 0;
+
+        $row.find('#net_fee').val(netFee.toFixed(2));
+
+        // Optional: total payable calculation
+        calculateTotalPayable();
+    });
+
+
+
+    function calculateTotalPayable() {
+    let total_fee = 0;
+    let total_fee_discount = 0;
+    let net_total = 0;
+
+    $('tr').each(function () {
+        var isChecked = $(this).find('input[name="guardian[]"]').is(':checked');
+
+        if (isChecked) {
+            let tf = parseFloat($(this).find('.total_fee').val()) || 0;
+            let df = parseFloat($(this).find('.fee_discount_value').val()) || 0;
+            let nf = parseFloat($(this).find('.net_fee').val()) || 0;
+
+            total_fee += tf;
+            total_fee_discount += df;
+            net_total += nf;
+        }
+    });
+
+    $('#total_payable').text(net_total.toFixed(2));
+    $('#fee_discount1').text(total_fee_discount.toFixed(2));
+    $('#total_fee1').text(total_fee.toFixed(2));
+}
+
+
 $(document).ready(function() {
     $('#fee_discount_value').prop('readonly', false);
 });
@@ -526,104 +600,124 @@ $(document).ready(function() {
 
 
 
-// Handle Bulk Upload
-
+$(document).on('change', 'input[name="guardian[]"]', function () {
+    calculateTotalPayable();
+});
 $(document).ready(function() {
     setTimeout(function() {
-        $('#fee_tr input').trigger('input'); // Trigger input event after bulk upload
+        $('#fee_tr input').trigger('input'); 
     }, 500);
 });
 
 
 
 
-        // Event listener for adding new row
-        $('body').on('click', '.add-contact-row', function(e) {
-            e.preventDefault();
-            var $currentRow = $(this).closest('tr'); // Get current row
-            var table = $(this).closest('table'); // Get the table
+function updateRows(table) {
+    var rows = table.find('tbody tr');
 
-            // Check if at least one field is filled in the current row before adding a new one
-            var isValid = $currentRow.find('input[type=text]').filter(function() {
-                return $(this).val().trim() !== '';
-            }).length > 0;
+    rows.each(function (index) {
+       
+        $(this).find('td:first').text(index + 1);
 
-            if (!isValid) {
-                alert('At least one field must be filled before adding a new row.');
-                return;
-            }
+      
+        var actionTd = $(this).find('td:last');
+        if (index === 0) {
+            
+            actionTd.html(`
+                <a href="#" class="text-primary add-contact-row">
+                    <i data-feather="plus-square"></i>
+                </a>
+            `);
+        } else {
+           
+            actionTd.html(`
+                <a href="#" class="text-danger delete-item">
+                    <i data-feather="trash-2"></i>
+                </a>
+            `);
+        }
+    });
 
-            // Generate a new row
-            var newRow = `
-                <tr>
-                    <td></td> <!-- Serial number will be added dynamically -->
-                    <td>
-                                                                <select class="form-control mw-100" name="title" required style="width: 300px">
-                                                                    <option value="" disabled>Select Title</option>
-                                                                    @foreach ($fee_head as $head)
-                                                                        <option value="{{ $head->fee_head }}" 
-                                                                            @if (isset($fees) && $fees['title']== $head->fee_head) selected @endif>
-                                                                            {{ $head->fee_head }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </td>
-                    <td><input type="number" class="form-control mw-100" value="" id="total_fee" /></td>
-                    <td><input type="number" class="form-control mw-100" value="" id="fee_discount" /></td>
-                    <td><input type="text" class="form-control mw-100" value="" id="fee_discount_value"  /></td>
-                    <td><input type="text" class="form-control mw-100" value="" id="net_fee" readonly /></td>
-                    <td><input type="checkbox" class="form-check-input" /></td>
-                    <td><select class="form-select mw-100">
-                        <option>Select</option>
-                        <option>Weekly</option>
-                        <option>Monthly</option>
-                        <option>Quarterly</option>
-                        <option>Semi-Yearly</option>
-                        <option>Yearly</option>
-                        <option>One Time</option>
-                    </select></td>
-                    <td><a href="#" class="text-primary add-contact-row">
-                        <i data-feather="plus-square"></i>
-                    </a></td>
-                </tr>
+    feather.replace();
+}
+
+
+$('body').on('click', '.add-contact-row', function (e) {
+    e.preventDefault();
+
+    
+    var table = $(this).closest('table');
+
+    const $lastRow = table.find('tbody tr:last');
+
+
+let isValid = true;
+$lastRow.find('input[required], select[required]').each(function () {
+    const val = $(this).val();
+    if (val === null || val === '' || val === 'Select') {
+        isValid = false;
+       
+    } else {
+      
+    }
+});
+
+if (!isValid) {
+    alert('Please fill all required fields before adding a new row.');
+    return;
+}
+    var newRow = `
+                 <tr>
+                            <td></td> <!-- Serial number will be added dynamically -->
+                            <td>
+                                                                                <select class="form-control mw-100" name="title" required style="width: 300px">
+                                                                                    <option value="" disabled selected>Select Title</option>
+                                                                                    @foreach ($fee_head as $head)
+                                                                                    <option value="{{ $head->fee_head }}">{{ $head->fee_head }}</option>
+                                                                                  @endforeach
+                                                                                </select>
+                                                                    </td> 
+                            <td><input type="number" class="form-control mw-100 total_fee" value="" id="total_fee" required /></td>
+                            <td><input type="number" class="form-control mw-100" value="" id="fee_discount" /></td>
+                            <td><input type="text" class="form-control mw-100 fee_discount_value" value="" id="fee_discount_value"  /></td>
+                            <td><input type="text" class="form-control mw-100 net_fee" value="" id="net_fee" readonly /></td>
+                            <td><input type="checkbox" class="form-check-input" /></td>
+                            <td>
+                                <select class="form-select mw-100">
+                                    <option>Select</option>
+                                    <option>Weekly</option>
+                                    <option>Monthly</option>
+                                    <option>Quarterly</option>
+                                    <option>Semi-Yearly</option>
+                                    <option>Yearly</option>
+                                    <option>One Time</option>
+                                </select>
+                            </td>
+                            <td>
+                                <a href="#" class="text-primary add-contact-row">
+                                    <i data-feather="plus-square"></i>
+                                </a>
+                            </td>
+                        </tr>
+            
             `;
 
-            // Append the new row to the table
-            table.find('tbody').prepend(newRow);
-            feather.replace(); // Re-run Feather to update icons
-
-            // Update serial numbers
-            var rows = table.find('tbody tr');
-            rows.each(function(index) {
-                $(this).find('td:first').text(index + 1);
-            });
-
-            // Update icons for the newly added row
-            rows.each(function(index) {
-                var deleteIcon = $(this).find('#icon');
-                var changeClass = $(this).find('a');
-                if (index === 0) {
-                    deleteIcon.attr('data-feather', 'plus-square');
-                } else {
-                    changeClass.attr('class', 'delete-item');
-                    deleteIcon.attr('data-feather', 'trash');
-                    deleteIcon.addClass('text-danger');
-                }
-            });
-
-            feather.replace();
+    table.find('tbody').append(newRow);
+    updateRows(table); 
+});
 
 
-            $('tbody').on('click', '.delete-item', function() {
-                var row = $(this).closest('tr');
-                row.remove();
-                row.removeClass('delete-item');
-                var rows = table.find('tbody tr');
-                rows.each(function(index) {
-                    $(this).find('td:first').text(index + 1);
-                });
-            });
-        });
+$('body').on('click', '.delete-item', function (e) {
+    e.preventDefault();
+
+    var row = $(this).closest('tr');
+    var table = $(this).closest('table');
+
+    row.remove(); 
+    calculateTotalPayable();
+    updateRows(table); 
+});
+
     });
 </script>
 <script>
@@ -632,7 +726,6 @@ $(document).ready(function() {
         $('#batch_year').change(function () {
         var batchYear = $(this).val();
         $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
-        // $('#section').html('<option value="" selected>-----Select Section-----</option>');
 
         if (batchYear) {
             $.ajax({
@@ -658,13 +751,13 @@ $(document).ready(function() {
         }
     });
     // Fetch Sections on Batch Select
-    $('#batch_name').on('change', function () { // Corrected .on() syntax
+    $('#batch_name').on('change', function () { 
     var batchName = $(this).val();
     $('#section').html('<option value="" selected>-----Select Section-----</option>');
 
     if (batchName) {
         $.ajax({
-            url: "{{ route('section.fetch') }}", // Fixed URL syntax
+            url: "{{ route('section.fetch') }}", 
             type: "POST",
             data: {
                 batch_name: batchName,
@@ -675,13 +768,13 @@ $(document).ready(function() {
                     $.each(response, function (index, item) {
                         $('#section').append('<option value="' + item.name + '">' + item.name + '</option>');
                     });
-                    $('#section').prop('disabled', false); // Enable after adding options
+                    $('#section').prop('disabled', false); 
                 } else {
                     $('#section').prop('disabled', true);
                 }
             },
             error: function (xhr, status, error) {
-                console.error("AJAX Error: ", status, error); // Debugging AJAX failure
+                console.error("AJAX Error: ", status, error);
             }
         });
     } else {

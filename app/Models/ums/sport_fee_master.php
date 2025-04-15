@@ -38,6 +38,8 @@ class sport_fee_master extends Model
         'company_id',
         'section',
         'quota',
+        'start_date',
+        'end_date',
         'status',
         'sport_name',
         'fee_details',

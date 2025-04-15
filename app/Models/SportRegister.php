@@ -67,7 +67,8 @@ class SportRegister extends Model
         'hostel_absence_reason',
         'gender',
         'remarks',
-        'registration_number'
+        'registration_number',
+        'payment_reason'
     ];
 
     public function trainingDetails()

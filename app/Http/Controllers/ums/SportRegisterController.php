@@ -117,6 +117,12 @@ class SportRegisterController extends Controller
             'dietary_restrictions'  => 'nullable|string|max:255',
             'blood_group'           => 'nullable|string|max:5',
             'status'                => 'required|string|max:255',
+            'mobile_number'      => ['nullable', 'digits:10'],
+            'family_details.*.contact_no' => ['nullable', 'digits:10'],
+            'emergency_contacts.*.contact_no' => ['nullable', 'digits:10'],
+            'family_details.*.permanent_pincode' => ['nullable', 'digits:6'],
+            'family_details.*.correspondence_pincode' => ['nullable', 'digits:6'],
+            'payment_reason' => 'nullable|string|max:255',
             'bai_id' => [
                 'nullable',
                 'string',
@@ -262,12 +268,12 @@ class SportRegisterController extends Controller
         if ($request->has('family_details')) {
             $familyData = [];
             foreach ($request->family_details as $family) {
-                if (!empty($family['name']) && !empty($family['contact_no'])) {
+//                if (!empty($family['name']) && !empty($family['contact_no'])) {
                     $familyData[] = [
                         'registration_id'          => $sports->id,
-                        'relation'                 => $family['relation'],
-                        'name'                     => $family['name'],
-                        'contact_no'               => $family['contact_no'],
+                        'relation'                 => $family['relation']?? null,
+                        'name'                     => $family['name'] ?? null,
+                        'contact_no'               => $family['contact_no'] ?? null,
                         'email'                    => $family['email'] ?? null,
                         'permanent_street1'        => $family['permanent_street1'] ?? null,
                         'permanent_street2'        => $family['permanent_street2'] ?? null,
@@ -287,7 +293,7 @@ class SportRegisterController extends Controller
                         'created_at'               => now(),
                         'updated_at'               => now(),
                     ];
-                }
+//                }
             }
 //            dd($familyData);
             if (!empty($familyData)) {
@@ -397,7 +403,7 @@ class SportRegisterController extends Controller
 
         $student = User::find($user->id);
 //        dd($student->registration);
-        return redirect()->route('sports.profile', ['id' => $user->id])->with('success', 'Registration successful');
+        return redirect()->route('sports.profile', ['id' => $user->id])->with('success', 'Registration pending');
 
     } catch (\Exception $e) {
         Log::error('Registration failed: ', [
@@ -530,6 +536,8 @@ public function fetch(Request $request)
 
         $totalApprovedStudents = SportRegister::where('sport_registers.status', 'approved')->count();
         $totalRejectedStudents = SportRegister::where('sport_registers.status', 'rejected')->count();
+        $totalOnholdStudents = SportRegister::where('sport_registers.status', 'on-hold')->count();
+        $totaldraftStudents = SportRegister::where('sport_registers.status', 'draft')->count();
 
     } else {
        
@@ -539,6 +547,8 @@ public function fetch(Request $request)
         $totalPaidStudents = (clone $query)->where('users.payment_status', 'paid')->count();
         $totalApprovedStudents = (clone $query)->where('sport_registers.status', 'approved')->count();
         $totalRejectedStudents = (clone $query)->where('sport_registers.status', 'rejected')->count();
+        $totalOnholdStudents = (clone $query)->where('sport_registers.status', 'on-hold')->count();
+        $totaldraftStudents = (clone $query)->where('sport_registers.status', 'draft')->count();
     }
 
     $batchs = Batch::all();
@@ -560,7 +570,8 @@ public function fetch(Request $request)
         'selectebatchname',
         'selecteprofilestatus',
         'selectpaymentstatus',
-
+        'totalOnholdStudents',
+        'totaldraftStudents'
     ));
 
 }
@@ -850,6 +861,19 @@ public function confirm(  Request $request, $id){
         if ($request->has('remarks')) {
             $validated['remarks'] = $request->input('remarks');
         }
+        $feeDependentChanged = false;
+        $feeDependentFields = [
+            'quota_id' => $registration->quota_id,
+            'batch_id' => $registration->batch_id,
+            'group' => $registration->group,
+        ];
+
+        foreach ($feeDependentFields as $field => $oldValue) {
+            if ($request->input($field) != $oldValue) {
+                $feeDependentChanged = true;
+                break;
+            }
+        }
         // Optional fields
         $optionalFields = [
             'mobile_number',
@@ -1028,14 +1052,24 @@ public function confirm(  Request $request, $id){
                     SportSponsor::insert($sponsorData);
                 }
             }
+//            if ($request->has('fee_details')) {
+//                $feeDetails = $request->input('fee_details');
+//                $quota = Quota::find($request->input('quota_id'));
+//                $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
+//
+//                if ($sportFeeMaster) {
+//                    $sportFeeMaster->fee_details = json_encode($feeDetails);
+//                    $sportFeeMaster->save();
+//                }
+//            }
             if ($request->has('fee_details')) {
                 $feeDetails = $request->input('fee_details');
-                $quota = Quota::find($request->input('quota_id'));
-                $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
+//                $quota = Quota::find($request->input('quota_id'));
+//                $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
 
-                if ($sportFeeMaster) {
-                    $sportFeeMaster->fee_details = json_encode($feeDetails);
-                    $sportFeeMaster->save();
+                if ($registration) {
+                    $registration->fee_details = json_encode($feeDetails);
+                    $registration->save();
                 }
             }
             DB::commit();
@@ -1046,6 +1080,13 @@ public function confirm(  Request $request, $id){
                 });
             }
             if ($request->status == 'approved') {
+                $sendApprovedEmail = false;
+
+                // Only send email if there were fee-dependent changes or this is a new approval
+                if ($registration->status != 'approved' || $feeDependentChanged) {
+                    $sendApprovedEmail = true;
+                }
+
                 if (!$registration->registration_number) {
                     $levelCode = '';
                     switch ($request->input('level_of_play')) {
@@ -1075,11 +1116,23 @@ public function confirm(  Request $request, $id){
                     $newRegistrationNumber = 'SQ' . $levelCode . $newNumber;
                     $registration->registration_number = $newRegistrationNumber;
                     $registration->save();
+
+                    // If this is a new registration number, we should send the email
+                    $sendApprovedEmail = true;
                 }
-                Mail::send('ums.sports.approved_email', ['user' => $user,'remarks'=>$request->remarks,'name'=>$request->name], function($message) use ($user) {
-                    $message->to($user->email);
-                    $message->subject('Application Approved');
-                });
+
+                if ($sendApprovedEmail) {
+                    Mail::send('ums.sports.approved_email', [
+                        'user' => $user,
+                        'remarks' => $request->remarks,
+                        'name' => $request->name,
+                        'fee_changes' => $feeDependentChanged,
+                        'registration_number' => $registration->registration_number
+                    ], function($message) use ($user) {
+                        $message->to($user->email);
+                        $message->subject('Application Approved');
+                    });
+                }
             }
             return redirect()->route('sports-students')->with('success', 'Registration updated successfully');
 
@@ -1284,6 +1337,12 @@ public function confirm(  Request $request, $id){
             'dietary_restrictions'  => 'nullable|string|max:255',
             'blood_group'           => 'nullable|string|max:5',
             'status'                => 'required|string|max:255',
+            'mobile_number'      => ['nullable', 'digits:10'],
+            'family_details.*.contact_no' => ['nullable', 'digits:10'],
+            'emergency_contacts.*.contact_no' => ['nullable', 'digits:10'],
+            'family_details.*.permanent_pincode' => ['nullable', 'digits:6'],
+            'family_details.*.correspondence_pincode' => ['nullable', 'digits:6'],
+            'payment_reason' => 'nullable|string|max:255',
             'bai_id' => [
                 'nullable',
                 'string',
@@ -1430,12 +1489,13 @@ public function confirm(  Request $request, $id){
                 $submittedFamilyIds = [];
 
                 foreach ($request->family_details as $family) {
-                    if (!empty($family['name']) && !empty($family['contact_no'])) {
+//                    dd($family);
+//                    if (!empty($family['name']) && !empty($family['contact_no'])) {
                         $familyData = [
                             'registration_id'          => $registration->id,
-                            'relation'                 => $family['relation'],
-                            'name'                     => $family['name'],
-                            'contact_no'               => $family['contact_no'],
+                            'relation'                 => $family['relation'] ?? null,
+                            'name'                     => $family['name'] ?? null,
+                            'contact_no'               => $family['contact_no'] ?? null,
                             'email'                    => $family['email'] ?? null,
                             'permanent_street1'        => $family['permanent_street1'] ?? null,
                             'permanent_street2'        => $family['permanent_street2'] ?? null,
@@ -1457,15 +1517,17 @@ public function confirm(  Request $request, $id){
 
                         if (isset($family['id']) && in_array($family['id'], $existingFamilyIds)) {
                             // Update existing record
+//                            dd('exists:'.$family);
                             SportFamilyDetail::where('id', $family['id'])
                                 ->update($familyData);
                             $submittedFamilyIds[] = $family['id'];
                         } else {
                             // Create new record
+//                            dd('not exists:');
                             $newFamily = SportFamilyDetail::create($familyData);
                             $submittedFamilyIds[] = $newFamily->id;
                         }
-                    }
+//                    }
                 }
 
                 // Delete any family records that weren't submitted (were removed from the form)
@@ -1536,7 +1598,7 @@ public function confirm(  Request $request, $id){
             DB::commit();
             $student = User::find($user->id);
 //        dd($student->registration);
-            return redirect()->route('sports.profile', ['id' => $user->id])->with('success', 'Registration Updated successful');
+            return redirect()->route('sports.profile', ['id' => $user->id])->with('success', 'Registration Pending');
 
         } catch (\Exception $e) {
             DB::rollBack();

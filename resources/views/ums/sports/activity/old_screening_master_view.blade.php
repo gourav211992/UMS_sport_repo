@@ -73,7 +73,6 @@
 																</option>
 															@endforeach
 														</select>
-														<span class="text-danger error-sport_id"></span>
 													</div>
 												</div>
 
@@ -84,8 +83,6 @@
 													</div>
 													<div class="col-md-5">
 														<input type="text" class="form-control" name="screening_name"  value="{{$sport_screening->screening_name}}"/>
-														<span class="text-danger error-screening_name"></span>
-
 													</div>
 												</div>
 
@@ -152,8 +149,6 @@
 																				<input type="text"
 																					class="form-control parameter-input mw-100"
 																					placeholder="Enter Parameter Name" />
-																					<span class="text-danger error-parameter_details"></span>
-
 																			</td>
 																			<td>
 																				<a href="#" class="text-primary add-row"><i
@@ -211,154 +206,15 @@
 		</script>
 
 		<script>
+            // disable all input and select fields 
+            function disableForm() {
+                $('input').prop('disabled', true);
+                $('select').prop('disabled', true);
+                // $('button').prop('disabled', true);
+            }
+            disableForm();
+            // enable all input and select fields
 
+        </script>
 
-
-
-			function updateSerialsAndNames() {
-				$('#parameter-table-body .parameter-row').each(function (index) {
-					$(this).find('.sno').text(index + 1); 
-
-					if (!$(this).hasClass('add-template')) {
-						$(this).find('.parameter-input').attr('name', `parameters[${index}][name]`); // Start with index = 0
-					}
-				});
-			}
-
-			function collectJsonData() {
-				let data = [];
-				$('#parameter-table-body .parameter-row').each(function () {
-					let value = $(this).find('.parameter-input').val(); 
-					data.push({ parametername: value });
-				});
-				$('#parameter-json-data').val(JSON.stringify(data));
-			}
-
-			$(document).on('click', '.add-row', function (e) {
-				e.preventDefault();
-
-				let addRow = $('.add-template');
-				let inputVal = addRow.find('input').val().trim();
-
-				if (inputVal === '') {
-					alert('Please enter a parameter name before adding a new row.');
-					return;
-				}
-				collectJsonData();
-				let clone = addRow.clone(false, false).removeClass('add-template');
-
-				clone.find('input').val('');
-
-				clone.find('td:last').html(
-					'<a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>'
-				);
-
-				$('#parameter-table-body').append(clone);
-
-				feather.replace();
-
-				updateSerialsAndNames();
-				collectJsonData();
-			});
-
-			$(document).on('click', '.delete-row', function (e) {
-				e.preventDefault();
-				$(this).closest('tr').remove();
-				updateSerialsAndNames();
-				collectJsonData();
-			});
-
-			$(document).on('input', '.parameter-input', function () {
-				collectJsonData();
-			});
-
-			$(document).ready(function () {
-				updateSerialsAndNames();
-				collectJsonData();
-			});
-
-			
-			feather.replace();
-
-</script>
-
-<script>
-		$(document).ready(function () {
-			$('#myForm').submit(function (e) {
-				e.preventDefault();
-		
-				let isValid = true;
-		
-				// Reset previous error messages
-				$('.error-screening_name').text('');
-				$('.error-sport_id').text('');
-				$('.error-parameter_details').text('');
-		
-				// Check if required fields are empty
-				if ($('select[name="sport_id"]').val() === '' || $('select[name="sport_id"]').val() === '---select sport---') {
-					$('.error-sport_id').text('Please select a sport.');
-					isValid = false;
-				}
-		
-				if ($('input[name="screening_name"]').val().trim() === '') {
-					$('.error-screening_name').text('Screening Name is required.');
-					isValid = false;
-				}
-		
-				// Parameter check (if empty)
-				let parameterFilled = false;
-				$('#parameter-table-body .parameter-row').each(function () {
-					if ($(this).find('.parameter-input').val().trim() !== '') {
-						parameterFilled = true;
-					}
-				});
-		
-				if (!parameterFilled) {
-					$('.error-parameter_details').text('Please add at least one parameter.');
-					isValid = false;
-				}
-		
-				// If form is valid, submit the form
-				if (isValid) {
-					$('#alertContainer').html('');
-		
-					let formData = new FormData(this);
-		
-					$.ajax({
-						url: "{{ url('screening-update/' . $sport_screening->id) }}",
-						method: 'POST',
-						data: formData,
-						processData: false,
-						contentType: false,
-						success: function (response) {
-							let alertClass = response.success ? 'alert-success' : 'alert-danger';
-							let alertHTML = `
-							<div class="alert p-2 ${alertClass} alert-dismissible fade show" role="alert">
-								<strong>${response.success ? 'Success' : 'Error'}:</strong> ${response.message}
-								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-							</div>
-							`;
-							$('#alertContainer').html(alertHTML);
-		
-							if (response.success) {
-								$('#myForm')[0].reset();
-								setTimeout(() => {
-									window.location.href = "{{ url('screening-master') }}";
-								}, 500);
-							}
-						},
-						error: function (xhr) {
-							$('#alertContainer').html(`
-							<div class="alert alert-danger alert-dismissible fade show" role="alert">
-								<strong>Error!</strong> Something went wrong.
-								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-							</div>
-							`);
-						}
-					});
-				}
-			});
-		});
-	</script>
-	
 @endsection

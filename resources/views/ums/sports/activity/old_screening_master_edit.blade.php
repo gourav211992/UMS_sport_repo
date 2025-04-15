@@ -73,7 +73,6 @@
 																</option>
 															@endforeach
 														</select>
-														<span class="text-danger error-sport_id"></span>
 													</div>
 												</div>
 
@@ -84,8 +83,6 @@
 													</div>
 													<div class="col-md-5">
 														<input type="text" class="form-control" name="screening_name"  value="{{$sport_screening->screening_name}}"/>
-														<span class="text-danger error-screening_name"></span>
-
 													</div>
 												</div>
 
@@ -152,8 +149,6 @@
 																				<input type="text"
 																					class="form-control parameter-input mw-100"
 																					placeholder="Enter Parameter Name" />
-																					<span class="text-danger error-parameter_details"></span>
-
 																			</td>
 																			<td>
 																				<a href="#" class="text-primary add-row"><i
@@ -280,50 +275,21 @@
 			
 			feather.replace();
 
-</script>
+		</script>
 
-<script>
-		$(document).ready(function () {
-			$('#myForm').submit(function (e) {
-				e.preventDefault();
-		
-				let isValid = true;
-		
-				// Reset previous error messages
-				$('.error-screening_name').text('');
-				$('.error-sport_id').text('');
-				$('.error-parameter_details').text('');
-		
-				// Check if required fields are empty
-				if ($('select[name="sport_id"]').val() === '' || $('select[name="sport_id"]').val() === '---select sport---') {
-					$('.error-sport_id').text('Please select a sport.');
-					isValid = false;
-				}
-		
-				if ($('input[name="screening_name"]').val().trim() === '') {
-					$('.error-screening_name').text('Screening Name is required.');
-					isValid = false;
-				}
-		
-				// Parameter check (if empty)
-				let parameterFilled = false;
-				$('#parameter-table-body .parameter-row').each(function () {
-					if ($(this).find('.parameter-input').val().trim() !== '') {
-						parameterFilled = true;
-					}
-				});
-		
-				if (!parameterFilled) {
-					$('.error-parameter_details').text('Please add at least one parameter.');
-					isValid = false;
-				}
-		
-				// If form is valid, submit the form
-				if (isValid) {
+		<script>
+			$(document).ready(function () {
+				$('#myForm').submit(function (e) {
+					e.preventDefault();
+					var input=  $('.parameter-input').val().trim();
+	   if(input == ''){
+           alert('Please enter a parameter name');
+           return false;
+       }
 					$('#alertContainer').html('');
-		
+
 					let formData = new FormData(this);
-		
+
 					$.ajax({
 						url: "{{ url('screening-update/' . $sport_screening->id) }}",
 						method: 'POST',
@@ -337,14 +303,16 @@
 								<strong>${response.success ? 'Success' : 'Error'}:</strong> ${response.message}
 								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 							</div>
-							`;
+						`;
 							$('#alertContainer').html(alertHTML);
-		
+
 							if (response.success) {
+							
 								$('#myForm')[0].reset();
 								setTimeout(() => {
 									window.location.href = "{{ url('screening-master') }}";
-								}, 500);
+								},500);
+								
 							}
 						},
 						error: function (xhr) {
@@ -353,12 +321,11 @@
 								<strong>Error!</strong> Something went wrong.
 								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 							</div>
-							`);
+						`);
 						}
 					});
-				}
+				});
 			});
-		});
-	</script>
-	
+		</script>
+
 @endsection

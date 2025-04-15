@@ -23,7 +23,6 @@
                         <i data-feather="arrow-left-circle"></i> Back
                     </button>
                     <button type="submit" class="btn btn-primary btn-sm mb-50 mb-sm-0">
-                        {{-- <a href="{{url('activity_master')}}"></a> --}}
                         <i data-feather="check-circle"></i> Submit
                     </button>
                 </div>
@@ -203,13 +202,16 @@
 		</script>
 
 		<script>
+
+
+
+
 			function updateSerialsAndNames() {
 				$('#parameter-table-body .parameter-row').each(function (index) {
 					$(this).find('.sno').text(index + 1); 
 
 					if (!$(this).hasClass('add-template')) {
 						$(this).find('.parameter-input').attr('name', `parameters[${index}][name]`); // Start with index = 0
-						$(this).find('.parameter-duration').attr('duration', `parameters[${index}][duration]`); // Start with index = 0
 					}
 				});
 			}
@@ -231,7 +233,7 @@
 				let inputVal = addRow.find('input').val().trim();
 
 				if (inputVal === '') {
-					// alert('Please enter a parameter name before adding a new row.');
+					alert('Please enter a parameter name before adding a new row.');
 					return;
 				}
 				collectJsonData();
@@ -280,12 +282,11 @@
 				$('#myForm').submit(function (e) {
 					e.preventDefault();
 					var input=  $('.parameter-input').val().trim();
-					var input1=  $('.parameter-duration').val().trim();
-	               if(input == '' || input1 == ''){
-                    //    alert('Please enter a parameter name');
-                       return false;
-                   }
-	            	$('#alertContainer').html('');
+	   if(input == ''){
+           alert('Please enter a parameter name');
+           return false;
+       }
+					$('#alertContainer').html('');
 
 					let formData = new FormData(this);
 
@@ -314,100 +315,17 @@
 								
 							}
 						},
-						// error: function (xhr) {
-						// 	$('#alertContainer').html(`
-						// 	<div class="alert alert-danger alert-dismissible fade show" role="alert">
-						// 		<strong>Error!</strong> Something went wrong.
-						// 		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-						// 	</div>
-						// `);
-						// }
+						error: function (xhr) {
+							$('#alertContainer').html(`
+							<div class="alert alert-danger alert-dismissible fade show" role="alert">
+								<strong>Error!</strong> Something went wrong.
+								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
+						`);
+						}
 					});
 				});
 			});
 		</script>
 
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            feather.replace();
-    
-            // Form submission handler
-            document.getElementById('myForm').addEventListener('submit', function(e) {
-                e.preventDefault(); // Prevent default form submission
-    
-                // Fields to validate
-                let activityName = document.querySelector('input[name="activity_name"]');
-                let durationMin = document.querySelector('input[name="duration_min"]');
-                let subActivities = document.querySelectorAll('.parameter-input'); // For sub activities
-                let isValid = true;
-    
-                // Clear previous error messages
-                clearPreviousErrors();
-    
-                // Validate activity name
-                if (activityName.value.trim() === '') {
-                    isValid = false;
-                    showError(activityName, 'required.');
-                }
-    
-                // Validate duration
-                if (durationMin.value.trim() === '' || isNaN(durationMin.value.trim())) {
-                    isValid = false;
-                    showError(durationMin, 'required .');
-                }
-    
-                // Validate sub activity inputs (at least one)
-                let subActivitiesFilled = false;
-                subActivities.forEach(function(input) {
-                    if (input.value.trim() !== '') {
-                        subActivitiesFilled = true;
-                    }
-                });
-    
-                if (!subActivitiesFilled) {
-                    isValid = false;
-                    // Display error for sub activities (in general)
-                    showError(subActivities[0], 'required.');
-                }
-    
-                // If validation fails, prevent form submission
-                if (!isValid) {
-                    e.preventDefault();
-                } else {
-                    // Continue with form submission (AJAX or regular)
-                    this.submit(window.location.href = "{{ url('activity-master') }}");
-                }
-            });
-    
-            // Function to show error message
-            function showError(inputElement, message) {
-                // Add 'is-invalid' class
-                inputElement.classList.add('is-invalid');
-    
-                // If error message is not already present, create it
-                if (!document.querySelector(`#${inputElement.name}-error`)) {
-                    let errorMsg = document.createElement('div');
-                    errorMsg.id = `${inputElement.name}-error`;
-                    errorMsg.classList.add('text-danger');
-                    errorMsg.textContent = message;
-                    inputElement.parentElement.appendChild(errorMsg);
-                }
-            }
-    
-            // Function to clear previous error messages
-            function clearPreviousErrors() {
-                let errorElements = document.querySelectorAll('.is-invalid');
-                errorElements.forEach(function(element) {
-                    element.classList.remove('is-invalid');
-                });
-    
-                let errorMessages = document.querySelectorAll('.text-danger');
-                errorMessages.forEach(function(message) {
-                    message.remove();
-                });
-            }
-        });
-    </script>
-    
 @endsection

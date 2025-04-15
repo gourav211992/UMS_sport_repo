@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Imports;
+<?php namespace App\Imports;
 
 use App\Http\Controllers\BookController;
 use App\Models\ums\batch;
@@ -16,7 +14,6 @@ use App\Models\Book;
 use App\Helpers\Helper;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Concerns\ToCollection;
-
 class FeeImport implements ToCollection, WithHeadingRow
 {
     protected $bookId;
@@ -31,7 +28,7 @@ class FeeImport implements ToCollection, WithHeadingRow
         foreach ($rows as $row) {
             // Validate required fields
             if (collect($row)->filter()->isEmpty()) {
-                return null;
+                return null; // Skip completely empty rows
             }
             if (!isset($row['batch_year'], $row['batch_name'], $row['section'])) {
                 Log::error('Row skipped due to missing required fields: ' . json_encode($row));
@@ -54,37 +51,23 @@ class FeeImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
-
+            // Generate Document Number
             $docNumberData = Helper::generateDocumentNumberNew($book->id, Carbon::now()->toDateString());
             if (!$docNumberData) {
                 Log::error('Failed to generate document number: ' . json_encode($row));
                 continue;
             }
 
-
+            // Parse Fee Details
             $feeDetailsArray = [];
             if (isset($row['fee_head'], $row['fee_amount'])) {
-                // $feeHeads = explode(",", (string) $row['fee_head']);
-                // $feeAmounts = explode(",", (string) $row['fee_amount']);
-                // $feeDiscounts = explode(",", (string) ($row['fee_discount'] ?? ''));
-                // $feeDiscountValues = explode(",", (string) ($row['fee_discount_value'] ?? ''));
-                // $netFees = explode(",", (string) ($row['net_fee'] ?? ''));
-                // $frequencies = explode(",", (string) ($row['frequency'] ?? ''));
-                // $mandatory = explode(",", (string) ($row['mandatory'] ?? ''));
-                $clean = function ($str) {
-                    $str = preg_replace('/\s*[,]\s*/', ',', $str);
-                    $str = preg_replace('/[^\w\s,]/', '', $str);
-                    return $str;
-                };
-
-                $feeHeads = explode(",", $clean((string) $row['fee_head']));
-                $feeAmounts = explode(",", $clean((string) $row['fee_amount']));
-                $feeDiscounts = explode(",", $clean((string) ($row['fee_discount'] ?? '')));
-                $feeDiscountValues = explode(",", $clean((string) ($row['fee_discount_value'] ?? '')));
-                $netFees = explode(",", $clean((string) ($row['net_fee'] ?? '')));
-                $frequencies = explode(",", $clean((string) ($row['frequency'] ?? '')));
-                $mandatory = explode(",", $clean((string) ($row['mandatory'] ?? '')));
-
+                $feeHeads = explode(",", (string) $row['fee_head']);
+                $feeAmounts = explode(",", (string) $row['fee_amount']);
+                $feeDiscounts = explode(",", (string) ($row['fee_discount'] ?? ''));
+                $feeDiscountValues = explode(",", (string) ($row['fee_discount_value'] ?? ''));
+                $netFees = explode(",", (string) ($row['net_fee'] ?? ''));
+                $frequencies = explode(",", (string) ($row['frequency'] ?? ''));
+                $mandatory = explode(",", (string) ($row['mandatory'] ?? ''));
 
                 foreach ($feeHeads as $index => $feeHead) {
                     if (trim($feeHead) === '') {
@@ -103,40 +86,7 @@ class FeeImport implements ToCollection, WithHeadingRow
                 }
             }
 
-
-            // function excelToDateSmart($value, $format = 'Y-m-d')
-            // {
-            //     $value = trim((string) $value);
-
-            //     // Handle Excel serial number
-            //     if (is_numeric($value)) {
-            //         return date($format, strtotime("1899-12-30 +$value days"));
-            //     }
-
-            //     // Try to parse a date in m/d/Y format (like 4/14/2025)
-            //     $date = DateTime::createFromFormat('n/j/Y', $value);
-            //     if ($date !== false) {
-            //         return $date->format($format);
-            //     }
-
-            //     // Fallback to general strtotime
-            //     return date($format, strtotime($value));
-            // }
-
-
-
-
-
-            function excelToDateSmart($value, $format = 'Y-m-d')
-            {
-                $value = trim((string) $value);
-                if (is_numeric($value)) {
-                    return date($format, strtotime("1899-12-30 +$value days"));
-                }
-                return date($format, strtotime($value));
-            }
-
-
+            // Create the Sport Fee Master Record
             sport_fee_master::create([
                 'series' => null,
                 'organization_id' => 8,
@@ -154,8 +104,6 @@ class FeeImport implements ToCollection, WithHeadingRow
                 'batch' => trim((string) $row['batch_name']),
                 'section' => trim((string) $row['section']),
                 'quota' => trim((string) ($row['quota'] ?? '')),
-                'start_date' => excelToDateSmart($row['from_date']),
-                'end_date'   => excelToDateSmart($row['to_date']),
                 'status' => 'active',
                 'sport_name' => 'Badminton',
                 'fee_details' => json_encode($feeDetailsArray),
@@ -165,3 +113,4 @@ class FeeImport implements ToCollection, WithHeadingRow
         }
     }
 }
+

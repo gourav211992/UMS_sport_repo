@@ -108,7 +108,8 @@
 
                     <p>Dear {{$name}},</p>
 
-                    <p>We are excited to inform you that your profile has been thoroughly reviewed and <strong>APPROVED</strong>. Congratulations on successfully completing our verification process!</p>
+                    <p>We are excited to inform you that your profile has been thoroughly reviewed and <strong>APPROVED</strong>. Congratulations on successfully completing our verification process!</p><br>
+                    <p>Registration Number: {{$registration_number}}</p>
 
 
                     <div style="text-align: center;">

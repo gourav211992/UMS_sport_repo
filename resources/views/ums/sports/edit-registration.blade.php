@@ -290,6 +290,7 @@
                                                         </div>
                                                     </div>
 
+                                                <!-- Date of Birth Section -->
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
@@ -297,8 +298,22 @@
                                                     <div class="col-md-5">
                                                         <input type="date" class="form-control" name="dob" id="dobInput"
                                                                onfocus="this.min=getDate(-50); this.max=getDate(-10);"
-                                                               onblur="validateDOB()" value="{{ $registration->dob }}">
+                                                               onblur="validateDOB(); calculateAge();"
+                                                               value="{{ old('dob', $registration->dob) }}">
                                                         <small id="dobError" class="text-danger"></small>
+                                                        @error('dob')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+
+                                                <!-- Age Field -->
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Age</label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="text" class="form-control" id="ageInput" disabled>
                                                     </div>
                                                 </div>
 {{--                                                @dump($registration)--}}
@@ -897,7 +912,7 @@
                                                                 </div>
 
                                                                 <div class="col-md-6">
-                                                                    <input type="text" class="form-control" name="badminton_experience" value="{{$sportRegistrationDetails->badminton_experience ?? ''}}"/>
+                                                                    <input type="number" class="form-control" name="badminton_experience" value="{{$sportRegistrationDetails->badminton_experience ?? ''}}"/>
                                                                 </div>
                                                             </div>
 
@@ -1213,6 +1228,7 @@
                                                                 <th>Fee Sponsorship<br /> + Discount Value</th>
                                                                 <th>Net Fee<br /> Payable %</th>
                                                                 <th>Net Fee<br /> Payable Value</th>
+                                                                <th>Mandatory</th>
                                                                 <th width="150px">Action</th>
                                                             </tr>
                                                             </thead>
@@ -1229,6 +1245,7 @@
                                                                     $feeSponsorshipPlusDiscountValue = $feeSponsorshipValue + $feeDiscountValue;
                                                                     $netFeePayablePercent = 100 - $feeSponsorshipPlusDiscountPercent;
                                                                     $netFeePayableValue = $totalFees - $feeSponsorshipPlusDiscountValue;
+                                                                    $isMandatory = $fees['mandatory'] ?? false;
                                                                 @endphp
                                                                 <tr>
                                                                     <td>{{ $key + 1 }}</td>
@@ -1238,12 +1255,23 @@
                                                                     <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_sponsorship_value]" value="{{ $feeSponsorshipValue }}"></td>
                                                                     <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_discount_percent]" value="{{ $feeDiscountPercent }}"></td>
                                                                     <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_discount_value]" value="{{ $feeDiscountValue }}"></td>
-                                                                    <td><input type="number" class="form-control" value="{{ $feeSponsorshipPlusDiscountPercent }}"></td>
-                                                                    <td><input type="number" class="form-control" value="{{ $feeSponsorshipPlusDiscountValue }}"></td>
-                                                                    <td><input type="number" class="form-control" value="{{ $netFeePayablePercent }}"></td>
-                                                                    <td><input type="number" class="form-control" value="{{ $netFeePayableValue }}"></td>
+                                                                    <td><input type="number" class="form-control total-discount-percent" value="{{ $feeSponsorshipPlusDiscountPercent }}"></td>
+                                                                    <td><input type="number" class="form-control total-discount-value" value="{{ $feeSponsorshipPlusDiscountValue }}"></td>
+                                                                    <td><input type="number" class="form-control net-percent" value="{{ $netFeePayablePercent }}"></td>
+                                                                    <td><input type="number" class="form-control net-value" name="fee_details[{{$key}}][net_value]" value="{{ $netFeePayableValue }}"></td>
                                                                     <td>
-                                                                        <a href="#sponsorModal" data-bs-toggle="modal">
+                                                                        <input type="hidden"
+                                                                               name="fee_details[{{$key}}][mandatory]"
+                                                                               value="{{$isMandatory ? 1: 0}}">
+                                                                        <input type="checkbox" class="form-check-input mandatory-checkbox"
+                                                                               data-index="{{$key}}"
+                                                                               data-title="{{$fees['title']}}"
+                                                                               name="fee_details[{{$key}}][mandatory]"
+                                                                               @if($isMandatory) checked @endif
+                                                                               @if($isMandatory) disabled @endif>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#sponsorModal" data-bs-toggle="modal" data-index="{{$key}}">
                                                                             <span class="btn-outline-primary font-small-2 px25 btn btn-sm">Add Sponsor</span>
                                                                         </a>
 {{--                                                                        @if ($key != 0)--}}
@@ -1295,24 +1323,44 @@
 
                                                             <!-- Total Fees Row -->
                                                             @php
-                                                                $totalFeesSum = array_sum(array_column($feeDetails, 'total_fees'));
-                                                                $totalNetFeePayableValue = array_sum(array_map(function ($fees) {
-                                                                    return ($fees['total_fees'] ?? 0) - (($fees['fee_sponsorship_value'] ?? 0) + ($fees['fee_discount_value'] ?? 0));
-                                                                }, $feeDetails));
+                                                                $totalFeesSum = 0;
+    $totalNetFeePayableValue = 0;
+
+    foreach ($feeDetails as $fees) {
+        $isMandatory = $fees['mandatory'] ?? false;
+
+        if ($isMandatory) {
+            $totalFees = $fees['total_fees'] ?? 0;
+            $feeSponsorshipValue = $fees['fee_sponsorship_value'] ?? (($fees['total_fees'] ?? 0) * ($fees['fee_sponsorship_percent'] ?? 0) / 100);
+            $feeDiscountValue = $fees['fee_discount_value'] ?? (($fees['total_fees'] ?? 0) * ($fees['fee_discount_percent'] ?? 0) / 100);
+
+            $totalFeesSum += $totalFees;
+            $totalNetFeePayableValue += $totalFees - ($feeSponsorshipValue + $feeDiscountValue);
+        }
+    }
                                                             @endphp
                                                             <tr>
                                                                 <td></td>
                                                                 <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
-                                                                <td class="fw-bolder text-dark font-large-1" id="totalNetFeePayableValue">{{ $totalNetFeePayableValue }}</td>
+                                                                <td class="fw-bolder text-dark font-large-1 total-net-fee" id="totalNetFeePayableValue">{{ $totalNetFeePayableValue }}</td>
 {{--                                                                <td></td>--}}
                                                                 <td>
-                                                                    @if($registration->user->payment_status == 'paid')
-                                                                        <button type="button" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Paid</button>
+{{--                                                                    @if($registration->user->payment_status == 'paid')--}}
+{{--                                                                        <button type="button" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Paid</button>--}}
+{{--                                                                    @else--}}
+{{--                                                                        @if(empty($user->payments))--}}
+                                                                    @if($user->payment_status == 'paid')
+                                                                        <span class="badge bg-success">Paid</span>
                                                                     @else
-                                                                        @if(empty($user->payments))
-                                                                            <button type="button" data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Details</button>
-                                                                        @endif
+                                                                        <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#paymentModal"
+                                                                                data-user-id="{{ $user->id }}"
+                                                                                data-total-amount="{{ $totalNetFeePayableValue }}">Pay Now</button>
                                                                     @endif
+                                                                            <button type="button" data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Details</button>
+{{--                                                                        @endif--}}
+{{--                                                                    @endif--}}
                                                                 </td>
                                                             </tr>
                                                             </tbody>
@@ -1736,6 +1784,405 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script>
+        $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $('#batch_name').change(function() {
+                let batchId = $(this).val();
+                $('#section').html('<option value="" selected>-----Select Section-----</option>');
+
+                if (batchId) {
+                    $.ajax({
+                        url: "{{ route('get.sections.by.batch') }}",
+                        type: "POST",
+                        data: {
+                            batch_id: batchId,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.length > 0) {
+                                $.each(response, function(index, section) {
+                                    $('#section').append('<option value="' + section.id + '">' + section.section + '</option>');
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("AJAX Error:", xhr.responseText);
+                        }
+                    });
+                }
+            });
+            $('#section').change(function() {
+                fetchFeeStructure();
+            });
+            $('#quota_id').change(function() {
+                fetchFeeStructure();
+            });
+
+            function fetchFeeStructure() {
+                // Get all required values
+                // alert('testing');
+                const sportId = $('#sport_id').val();
+                const sectionId = $('#section').val();
+                const batchYear = $('#batch_year').val();
+                const batchId = $('#batch_name').val();
+                const quotaId = $('#quota_id').val();
+
+                // Make sure all fields are selected
+                // if (!sportId || !sectionId || !batchYear || !batchId || !quotaId) {
+                //     return;
+                // }
+
+                $.ajax({
+                    url: '{{ route("fetch.fee.structure") }}',
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        sport_id: sportId,
+                        section_id: sectionId,
+                        batch_year: batchYear,
+                        batch_id: batchId,
+                        quota_id: quotaId
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if (response.status === 'success') {
+                            updateFeeTable(response.feeStructure);
+                        } else {
+                            alert('Failed to fetch fee structure.');
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred while fetching the fee structure.');
+                    }
+                });
+            }
+            let feeStructure = [];
+
+// Function to update the fee table
+            function updateFeeTable(feeData) {
+                feeStructure = feeData; // Update the global feeStructure
+                let feeTableBody = $('#feeTable tbody');
+                feeTableBody.empty(); // Clear existing rows
+
+                let totalNetFeePayableValue = 0;
+
+                feeData.forEach((fee, index) => {
+                    let totalFees = Number(fee.total_fees) || 0;
+                    let feeSponsorshipPercent = Number(fee.fee_sponsorship_percent) || 0;
+                    let feeSponsorshipValue = Number(fee.fee_sponsorship_value) || (totalFees * feeSponsorshipPercent / 100);
+                    let feeDiscountPercent = Number(fee.fee_discount_percent) || 0;
+                    let feeDiscountValue = Number(fee.fee_discount_value) || (totalFees * feeDiscountPercent / 100);
+                    let feeSponsorshipPlusDiscountPercent = feeSponsorshipPercent + feeDiscountPercent;
+                    let feeSponsorshipPlusDiscountValue = feeSponsorshipValue + feeDiscountValue;
+                    let netFeePayablePercent = 100 - feeSponsorshipPlusDiscountPercent;
+                    let netFeePayableValue = totalFees - feeSponsorshipPlusDiscountValue;
+                    let mandatoryCheckbox = `
+<input type="hidden" name="fee_details[${index}][mandatory]" value=" ${fee.mandatory ? 1 : 0}">
+            <input type="checkbox" class="form-check-input mandatory-checkbox"
+                data-index="${index}"
+                data-fee-id="${fee.id}"
+                data-title="${fee.title}"
+                ${fee.mandatory ? 'checked' : ''}
+                ${fee.mandatory ? 'disabled' : ''}
+                name="fee_details[${index}][mandatory]"
+                ${(fee.mandatory || fee.is_checked) ? 'checked' : ''}>
+        `;
+                    // Add row to the table
+                    let row = `
+            <tr>
+                <td>${index + 1}</td>
+                <td><input type="text" class="form-control" name="fee_details[${index}][title]" value="${fee.title || ''}" readonly></td>
+                <td><input type="number" class="form-control total-fee" name="fee_details[${index}][total_fees]" value="${totalFees}" readonly></td>
+                <td><input type="number" class="form-control sponsorship-percent" name="fee_details[${index}][fee_sponsorship_percent]" value="${feeSponsorshipPercent}"></td>
+                <td><input type="number" class="form-control sponsorship-value" name="fee_details[${index}][fee_sponsorship_value]" value="${feeSponsorshipValue.toFixed(2)}" readonly></td>
+                <td><input type="number" class="form-control discount-percent" name="fee_details[${index}][fee_discount_percent]" value="${feeDiscountPercent}"></td>
+                <td><input type="number" class="form-control discount-value" name="fee_details[${index}][fee_discount_value]" value="${feeDiscountValue.toFixed(2)}" readonly></td>
+                <td><input type="number" class="form-control total-discount-percent" value="${feeSponsorshipPlusDiscountPercent}" readonly></td>
+                <td><input type="number" class="form-control total-discount-value" value="${feeSponsorshipPlusDiscountValue.toFixed(2)}" readonly></td>
+                <td><input type="number" class="form-control net-percent" value="${netFeePayablePercent}" readonly></td>
+                <td><input type="number" class="form-control net-value" value="${netFeePayableValue.toFixed(2)}" readonly></td>
+                <td>${mandatoryCheckbox}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-outline-primary add-sponsor-btn" data-index="${index}" data-bs-toggle="modal" data-bs-target="#sponsorModal">
+                        Add Sponsor
+                    </button>
+                    ${index !== 0 ? '<a href="#" class="text-danger ms-25 delete-fee-row"><i data-feather="trash-2" class="me-50"></i></a>' : ''}
+                </td>
+            </tr>
+        `;
+                    feeTableBody.append(row);
+
+                    // Add to total only if applicable
+                    if (fee.mandatory) {
+                        totalNetFeePayableValue += netFeePayableValue;
+                    }
+                });
+
+                // Add total row
+                feeTableBody.append(`
+        <tr>
+            <td></td>
+            <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
+            <td class="fw-bolder text-dark font-large-1 total-net-fee">${totalNetFeePayableValue.toFixed(2)}</td>
+            <td>
+                @if($user->payment_status == 'paid')
+                <span class="badge bg-success">Paid</span>
+@else
+                <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#paymentModal"
+                        data-user-id="{{ $user->id }}"
+                            data-total-amount="${totalNetFeePayableValue.toFixed(2)}">Pay Now</button>
+                @endif
+                <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>
+            </td>
+        </tr>
+    `);
+
+                feather.replace();
+            }
+            $(document).on('input', '.mandatory-checkbox', function() {
+                updateTotalFee();
+            });
+            // Function to update the total fee
+            function updateTotalFee() {
+                let totalNetFeePayableValue = 0;
+
+                // Loop through all fee rows (excluding the total row)
+                $('#feeTable tbody tr').not(':last').each(function() {
+                    const row = $(this);
+                    const checkbox = row.find('.mandatory-checkbox');
+
+                    // Check if checkbox is checked or is disabled (which means it's mandatory)
+                    const isMandatory = checkbox.is(':checked') || checkbox.prop('disabled');
+
+                    if (isMandatory) {
+                        // Get the net payable value from the readonly input
+                        const netValue = parseFloat(row.find('.net-value').val()) || 0;
+                        totalNetFeePayableValue += netValue;
+                        console.log(totalNetFeePayableValue,netValue)
+                    }
+                });
+
+                // Update the total display
+                $('.total-net-fee').text(totalNetFeePayableValue.toFixed(2));
+
+                // Update the Pay Now button with the new total amount
+                $('.pay-now-btn').data('total-amount', totalNetFeePayableValue.toFixed(2));
+            }
+
+            $(document).on('click', '.add-sponsor-btn', function() {
+                let index = $(this).data('index');
+                $('#feeIndex').val(index);
+
+                // Pre-fill the modal with current sponsorship value if exists
+                if (feeStructure[index]) {
+                    let currentSponsorship = feeStructure[index].fee_sponsorship_value || 0;
+                    $('#sponsorAmount').val(currentSponsorship);
+                }
+            });
+
+            $('#sponsorModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var index = button.data('index'); // Extract info from data-* attributes
+                $('#feeIndex').val(index);
+
+                // Pre-fill the modal with current sponsorship value if exists
+                var currentSponsorship = feeStructure[index]?.fee_sponsorship_value || 0;
+                $('#sponsorAmount').val(currentSponsorship);
+            });
+            $('#saveSponsor').on('click', function () {
+                let sponsorAmount = Number($('#sponsorAmount').val());
+                let index = $('#feeIndex').val();
+                let totalNetFeePayableValue = Number($('#totalNetFeePayableValue').text());
+                let row = $(this).closest('tr');
+                // let netValue = row.find('.net-value').val();
+                const inputValue = document.querySelector(`input[name="fee_details[${index}][total_fees]"]`).value;
+                const netValue = document.querySelector(`input[name="fee_details[${index}][net_value]"]`).value;
+                const sponsorValue = document.querySelector(`input[name="fee_details[${index}][fee_sponsorship_value]"]`).value;
+                let sponsorPercentage = 0;
+                if (netValue > 0) {
+                    sponsorPercentage = (sponsorValue / netValue) * 100;
+                }
+                console.log('row net value:' + inputValue)
+                console.log(feeStructure);
+                console.log('Sponsor amount:', sponsorAmount); // Log sponsorAmount for debugging
+                console.log('Index from modal input:', index); // Log index from the hidden input for debugging
+                console.log('Net fee:', totalNetFeePayableValue); // Log index from the hidden input for debugging
+                // console.log('feeStructure array:', feeStructure); // Log the entire feeStructure array
+                // console.log(`feeStructure[${index}]:`, feeStructure[index]); // Log the specific feeStructure entry
+
+                // Check if the index is valid and the feeStructure entry exists
+                if (!isNaN(sponsorAmount) && sponsorAmount > 0) {
+                    // feeStructure[index].fee_sponsorship_value = sponsorAmount;
+                    // console.log('Sponsorship value updated:', feeStructure[index]); // Log the updated fee structure entry
+                    let totalNetFee = totalNetFeePayableValue - sponsorAmount;
+                    let totalFee = inputValue - sponsorAmount;
+                    let totalNetValue = netValue - sponsorAmount;
+                    let totalSponsor = Number(sponsorValue) + Number(sponsorAmount);
+                    $('#totalNetFeePayableValue').text(totalNetFee);
+                    document.querySelector(`input[name="fee_details[${index}][total_fees]"]`).value = totalFee;
+                    document.querySelector(`input[name="fee_details[${index}][net_value]"]`).value = totalNetValue;
+                    document.querySelector(`input[name="fee_details[${index}][fee_sponsorship_value]"]`).value = totalSponsor;
+                    document.querySelector(`input[name="fee_details[${index}][fee_sponsorship_percent]"]`).value = sponsorPercentage;
+                    $('#sponsorModal').modal('hide'); // Close the modal
+                    // updateFeeTable(feeStructure); // Recalculate and update the fee table
+                } else {
+                    console.error('Invalid index or sponsorship amount.');
+                }
+            });
+            $(document).on('change', '.sponsorship-percent', function() {
+                let row = $(this).closest('tr');
+                let totalFee = parseFloat(row.find('.total-fee').val()) || 0;
+                let percent = parseFloat($(this).val()) || 0;
+                let value = (totalFee * percent / 100).toFixed(2);
+
+                row.find('.sponsorship-value').val(value);
+                recalculateRow(row);
+            });
+
+            // Recalculate when discount percent changes
+            $(document).on('change', '.discount-percent', function() {
+                let row = $(this).closest('tr');
+                let totalFee = parseFloat(row.find('.total-fee').val()) || 0;
+                let percent = parseFloat($(this).val()) || 0;
+                let value = (totalFee * percent / 100).toFixed(2);
+
+                row.find('.discount-value').val(value);
+                recalculateRow(row);
+            });
+
+            function recalculateRow(row) {
+                let totalFee = parseFloat(row.find('.total-fee').val()) || 0;
+                let sponsorshipValue = parseFloat(row.find('.sponsorship-value').val()) || 0;
+                let discountValue = parseFloat(row.find('.discount-value').val()) || 0;
+
+                let totalDiscountValue = sponsorshipValue + discountValue;
+                let totalDiscountPercent = (totalDiscountValue / totalFee * 100).toFixed(2);
+                let netValue = totalFee - totalDiscountValue;
+                let netPercent = 100 - totalDiscountPercent;
+
+                row.find('.total-discount-percent').val(totalDiscountPercent);
+                row.find('.total-discount-value').val(totalDiscountValue.toFixed(2));
+                row.find('.net-percent').val(netPercent);
+                row.find('.net-value').val(netValue.toFixed(2));
+
+                // Update the total row
+                updateTotalRow();
+            }
+
+            function updateTotalRow() {
+                let totalNetFee = 0;
+                $('tr:not(.total-row)').each(function() {
+                    let netValue = parseFloat($(this).find('.net-value').val()) || 0;
+                    totalNetFee += netValue;
+                });
+
+                $('.total-row .font-large-1').last().text(totalNetFee.toFixed(2));
+            }
+            // Initialize the dropdowns based on the selected section
+            {{--var sectionName = $('#section').val();--}}
+            {{--if (sectionName) {--}}
+            {{--    // Fetch batch years for the selected section--}}
+            {{--    $.ajax({--}}
+            {{--        url: "{{ route('get.batch.year') }}",--}}
+            {{--        type: "POST",--}}
+            {{--        data: {--}}
+            {{--            section_name: sectionName,--}}
+            {{--            _token: "{{ csrf_token() }}"--}}
+            {{--        },--}}
+            {{--        success: function(response) {--}}
+            {{--            if (response.length > 0) {--}}
+            {{--                var selectedYear = "{{ $selectedBatch ? $selectedBatch->batch_year : '' }}";--}}
+            {{--                $('#batch_year').html('<option value="">-----Select Year-----</option>');--}}
+
+            {{--                $.each(response, function(index, item) {--}}
+            {{--                    var selected = (item == selectedYear) ? 'selected' : '';--}}
+            {{--                    $('#batch_year').append('<option value="' + item + '" ' + selected + '>' + item + '</option>');--}}
+            {{--                });--}}
+
+            {{--                // If there's a selected year, trigger the change to load batch names--}}
+            {{--                if (selectedYear) {--}}
+            {{--                    $('#batch_year').trigger('change');--}}
+            {{--                }--}}
+            {{--            }--}}
+            {{--        }--}}
+            {{--    });--}}
+            {{--}--}}
+
+            // Section change event (same as create)
+            {{--$('#section').change(function() {--}}
+            {{--    var sectionId = $(this).val();--}}
+            {{--    var sectionName = $(this).find(':selected').data('name');--}}
+
+            {{--    $('#batch_year').html('<option value="">-----Select Year-----</option>');--}}
+            {{--    $('#batch_name').html('<option value="">-----Select Batch-----</option>');--}}
+
+            {{--    if (sectionId && sectionName) {--}}
+            {{--        $.ajax({--}}
+            {{--            url: "{{ route('get.batch.year.student') }}",--}}
+            {{--            type: "POST",--}}
+            {{--            data: {--}}
+            {{--                section_name: sectionName,--}}
+            {{--                _token: "{{ csrf_token() }}"--}}
+            {{--            },--}}
+            {{--            success: function(response) {--}}
+            {{--                if (response.length > 0) {--}}
+            {{--                    $.each(response, function(index, item) {--}}
+            {{--                        $('#batch_year').append('<option value="' + item + '">' + item + '</option>');--}}
+            {{--                    });--}}
+            {{--                    $('#batch_year').prop('disabled', false);--}}
+            {{--                }--}}
+            {{--            }--}}
+            {{--        });--}}
+            {{--    } else {--}}
+            {{--        $('#batch_year').prop('disabled', true);--}}
+            {{--        $('#batch_name').prop('disabled', true);--}}
+            {{--    }--}}
+            {{--    fetchFeeStructure();--}}
+            {{--});--}}
+
+            // Batch Year change event
+            {{--$('#batch_year').change(function() {--}}
+            {{--    var sectionId = $('#section').val();--}}
+            {{--    var sectionName = $('#section').find(':selected').data('name');--}}
+            {{--    var batchYear = $(this).val();--}}
+
+            {{--    $('#batch_name').html('<option value="">-----Select Batch-----</option>');--}}
+            {{--    if (sectionId && sectionName && batchYear) {--}}
+            {{--        $.ajax({--}}
+            {{--            url: "{{ route('get.batch.names.student') }}",--}}
+            {{--            type: "POST",--}}
+            {{--            data: {--}}
+            {{--                section_name: sectionName,--}}
+            {{--                batch_year: batchYear,--}}
+            {{--                _token: "{{ csrf_token() }}"--}}
+            {{--            },--}}
+            {{--            success: function(response) {--}}
+            {{--                console.log(response)--}}
+            {{--                --}}{{--console.log("{{ $selectedBatch ? $selectedBatch->id : '' }}")--}}
+            {{--                if (response.length > 0) {--}}
+            {{--                    var selectedBatchId = "{{ $selectedBatch ? $selectedBatch->id : '' }}";--}}
+
+            {{--                    $.each(response, function(index, item) {--}}
+            {{--                        console.log(index, item)--}}
+            {{--                        var selected = (item.id == selectedBatchId) ? 'selected' : '';--}}
+            {{--                        $('#batch_name').append('<option value="' + item.id + '" ' + selected + '>' + item.batch + '</option>');--}}
+            {{--                    });--}}
+            {{--                    $('#batch_name').prop('disabled', false);--}}
+            {{--                }--}}
+            {{--            }--}}
+            {{--        });--}}
+            {{--    } else {--}}
+            {{--        $('#batch_name').prop('disabled', true);--}}
+            {{--    }--}}
+            {{--    fetchFeeStructure();--}}
+            {{--});--}}
+        });
         $(document).ready(function () {
             let rowIndex = {{ count($sportTrainingDetails) }};
 
@@ -1881,329 +2328,6 @@
                 $('#country').prop('required', true);
             }
         });
-        $(document).ready(function() {
-            $('#batch_name').change(function() {
-                let batchId = $(this).val();
-                $('#section').html('<option value="" selected>-----Select Section-----</option>');
-
-                if (batchId) {
-                    $.ajax({
-                        url: "{{ route('get.sections.by.batch') }}",
-                        type: "POST",
-                        data: {
-                            batch_id: batchId,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            if (response.length > 0) {
-                                $.each(response, function(index, section) {
-                                    $('#section').append('<option value="' + section.id + '">' + section.section + '</option>');
-                                });
-                            }
-                        }
-                    });
-                }
-            });
-            $('#section').change(function() {
-                fetchFeeStructure();
-            });
-            $('#quota_id').change(function() {
-                fetchFeeStructure();
-            });
-
-            function fetchFeeStructure() {
-                // Get all required values
-                // alert('testing');
-                const sportId = $('#sport_id').val();
-                const sectionId = $('#section').val();
-                const batchYear = $('#batch_year').val();
-                const batchId = $('#batch_name').val();
-                const quotaId = $('#quota_id').val();
-
-                // Make sure all fields are selected
-                // if (!sportId || !sectionId || !batchYear || !batchId || !quotaId) {
-                //     return;
-                // }
-
-                $.ajax({
-                    url: '{{ route("fetch.fee.structure") }}',
-                    type: 'GET',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        sport_id: sportId,
-                        section_id: sectionId,
-                        batch_year: batchYear,
-                        batch_id: batchId,
-                        quota_id: quotaId
-                    },
-                    success: function (response) {
-                        console.log(response);
-                        if (response.status === 'success') {
-                            updateFeeTable(response.feeStructure);
-                        } else {
-                            alert('Failed to fetch fee structure.');
-                        }
-                    },
-                    error: function () {
-                        alert('An error occurred while fetching the fee structure.');
-                    }
-                });
-            }
-            let feeStructure = [];
-
-// Function to update the fee table
-            function updateFeeTable(feeData) {
-                feeStructure = feeData; // Update the global feeStructure
-                let feeTableBody = $('#feeTable tbody');
-                feeTableBody.empty(); // Clear existing rows
-
-                let totalNetFeePayableValue = 0;
-
-                feeData.forEach((fee, index) => {
-                    let totalFees = Number(fee.total_fees) || 0;
-                    let feeSponsorshipPercent = Number(fee.fee_sponsorship_percent) || 0;
-                    let feeSponsorshipValue = Number(fee.fee_sponsorship_value) || (totalFees * feeSponsorshipPercent / 100);
-                    let feeDiscountPercent = Number(fee.fee_discount_percent) || 0;
-                    let feeDiscountValue = Number(fee.fee_discount_value) || (totalFees * feeDiscountPercent / 100);
-                    let feeSponsorshipPlusDiscountPercent = feeSponsorshipPercent + feeDiscountPercent;
-                    let feeSponsorshipPlusDiscountValue = feeSponsorshipValue + feeDiscountValue;
-                    let netFeePayablePercent = 100 - feeSponsorshipPlusDiscountPercent;
-                    let netFeePayableValue = totalFees - feeSponsorshipPlusDiscountValue;
-
-                    // Add row to the table
-                    let row = `
-            <tr>
-                <td>${index + 1}</td>
-                <td><input type="text" class="form-control" name="fee_details[${index}][title]" value="${fee.title || ''}" readonly></td>
-                <td><input type="number" class="form-control total-fee" name="fee_details[${index}][total_fees]" value="${totalFees}" readonly></td>
-                <td><input type="number" class="form-control sponsorship-percent" name="fee_details[${index}][fee_sponsorship_percent]" value="${feeSponsorshipPercent}"></td>
-                <td><input type="number" class="form-control sponsorship-value" name="fee_details[${index}][fee_sponsorship_value]" value="${feeSponsorshipValue.toFixed(2)}" readonly></td>
-                <td><input type="number" class="form-control discount-percent" name="fee_details[${index}][fee_discount_percent]" value="${feeDiscountPercent}"></td>
-                <td><input type="number" class="form-control discount-value" name="fee_details[${index}][fee_discount_value]" value="${feeDiscountValue.toFixed(2)}" readonly></td>
-                <td><input type="number" class="form-control total-discount-percent" value="${feeSponsorshipPlusDiscountPercent}" readonly></td>
-                <td><input type="number" class="form-control total-discount-value" value="${feeSponsorshipPlusDiscountValue.toFixed(2)}" readonly></td>
-                <td><input type="number" class="form-control net-percent" value="${netFeePayablePercent}" readonly></td>
-                <td><input type="number" class="form-control net-value" value="${netFeePayableValue.toFixed(2)}" readonly></td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-primary add-sponsor-btn" data-index="${index}" data-bs-toggle="modal" data-bs-target="#sponsorModal">
-                        Add Sponsor
-                    </button>
-                    ${index !== 0 ? '<a href="#" class="text-danger ms-25 delete-fee-row"><i data-feather="trash-2" class="me-50"></i></a>' : ''}
-                </td>
-            </tr>
-        `;
-                    feeTableBody.append(row);
-
-                    // Add to total only if applicable
-                    if (fee.mandatory || fee.isChecked) {
-                        totalNetFeePayableValue += netFeePayableValue;
-                    }
-                });
-
-                // Add total row
-                feeTableBody.append(`
-        <tr class="total-row">
-            <td></td>
-            <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
-            <td class="fw-bolder text-dark font-large-1" id="totalNetFeePayableValue">${totalNetFeePayableValue.toFixed(2)}</td>
-            <td></td>
-        </tr>
-    `);
-
-                feather.replace();
-            }
-
-            $(document).on('click', '.add-sponsor-btn', function() {
-                let index = $(this).data('index');
-                $('#feeIndex').val(index);
-
-                // Pre-fill the modal with current sponsorship value if exists
-                if (feeStructure[index]) {
-                    let currentSponsorship = feeStructure[index].fee_sponsorship_value || 0;
-                    $('#sponsorAmount').val(currentSponsorship);
-                }
-            });
-
-            $('#sponsorModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget); // Button that triggered the modal
-                var index = button.data('index'); // Extract info from data-* attributes
-                $('#feeIndex').val(index);
-
-                // Pre-fill the modal with current sponsorship value if exists
-                var currentSponsorship = feeStructure[index]?.fee_sponsorship_value || 0;
-                $('#sponsorAmount').val(currentSponsorship);
-            });
-            $('#saveSponsor').on('click', function () {
-                let sponsorAmount = Number($('#sponsorAmount').val());
-                let index = $('#feeIndex').val();
-                let totalNetFeePayableValue = Number($('#totalNetFeePayableValue').text());
-                console.log(feeStructure);
-                console.log('Sponsor amount:', sponsorAmount); // Log sponsorAmount for debugging
-                console.log('Index from modal input:', index); // Log index from the hidden input for debugging
-                console.log('Net fee:', totalNetFeePayableValue); // Log index from the hidden input for debugging
-                // console.log('feeStructure array:', feeStructure); // Log the entire feeStructure array
-                // console.log(`feeStructure[${index}]:`, feeStructure[index]); // Log the specific feeStructure entry
-
-                // Check if the index is valid and the feeStructure entry exists
-                if (!isNaN(sponsorAmount) && sponsorAmount > 0) {
-                    // feeStructure[index].fee_sponsorship_value = sponsorAmount;
-                    // console.log('Sponsorship value updated:', feeStructure[index]); // Log the updated fee structure entry
-                    let totalFee = totalNetFeePayableValue - sponsorAmount;
-                    $('#totalNetFeePayableValue').text(totalFee);
-                    $('#sponsorModal').modal('hide'); // Close the modal
-                    // updateFeeTable(feeStructure); // Recalculate and update the fee table
-                } else {
-                    console.error('Invalid index or sponsorship amount.');
-                }
-            });
-            $(document).on('change', '.sponsorship-percent', function() {
-                let row = $(this).closest('tr');
-                let totalFee = parseFloat(row.find('.total-fee').val()) || 0;
-                let percent = parseFloat($(this).val()) || 0;
-                let value = (totalFee * percent / 100).toFixed(2);
-
-                row.find('.sponsorship-value').val(value);
-                recalculateRow(row);
-            });
-
-            // Recalculate when discount percent changes
-            $(document).on('change', '.discount-percent', function() {
-                let row = $(this).closest('tr');
-                let totalFee = parseFloat(row.find('.total-fee').val()) || 0;
-                let percent = parseFloat($(this).val()) || 0;
-                let value = (totalFee * percent / 100).toFixed(2);
-
-                row.find('.discount-value').val(value);
-                recalculateRow(row);
-            });
-
-            function recalculateRow(row) {
-                let totalFee = parseFloat(row.find('.total-fee').val()) || 0;
-                let sponsorshipValue = parseFloat(row.find('.sponsorship-value').val()) || 0;
-                let discountValue = parseFloat(row.find('.discount-value').val()) || 0;
-
-                let totalDiscountValue = sponsorshipValue + discountValue;
-                let totalDiscountPercent = (totalDiscountValue / totalFee * 100).toFixed(2);
-                let netValue = totalFee - totalDiscountValue;
-                let netPercent = 100 - totalDiscountPercent;
-
-                row.find('.total-discount-percent').val(totalDiscountPercent);
-                row.find('.total-discount-value').val(totalDiscountValue.toFixed(2));
-                row.find('.net-percent').val(netPercent);
-                row.find('.net-value').val(netValue.toFixed(2));
-
-                // Update the total row
-                updateTotalRow();
-            }
-
-            function updateTotalRow() {
-                let totalNetFee = 0;
-                $('tr:not(.total-row)').each(function() {
-                    let netValue = parseFloat($(this).find('.net-value').val()) || 0;
-                    totalNetFee += netValue;
-                });
-
-                $('.total-row .font-large-1').last().text(totalNetFee.toFixed(2));
-            }
-            // Initialize the dropdowns based on the selected section
-            {{--var sectionName = $('#section').val();--}}
-            {{--if (sectionName) {--}}
-            {{--    // Fetch batch years for the selected section--}}
-            {{--    $.ajax({--}}
-            {{--        url: "{{ route('get.batch.year') }}",--}}
-            {{--        type: "POST",--}}
-            {{--        data: {--}}
-            {{--            section_name: sectionName,--}}
-            {{--            _token: "{{ csrf_token() }}"--}}
-            {{--        },--}}
-            {{--        success: function(response) {--}}
-            {{--            if (response.length > 0) {--}}
-            {{--                var selectedYear = "{{ $selectedBatch ? $selectedBatch->batch_year : '' }}";--}}
-            {{--                $('#batch_year').html('<option value="">-----Select Year-----</option>');--}}
-
-            {{--                $.each(response, function(index, item) {--}}
-            {{--                    var selected = (item == selectedYear) ? 'selected' : '';--}}
-            {{--                    $('#batch_year').append('<option value="' + item + '" ' + selected + '>' + item + '</option>');--}}
-            {{--                });--}}
-
-            {{--                // If there's a selected year, trigger the change to load batch names--}}
-            {{--                if (selectedYear) {--}}
-            {{--                    $('#batch_year').trigger('change');--}}
-            {{--                }--}}
-            {{--            }--}}
-            {{--        }--}}
-            {{--    });--}}
-            {{--}--}}
-
-            // Section change event (same as create)
-            $('#section').change(function() {
-                var sectionId = $(this).val();
-                var sectionName = $(this).find(':selected').data('name');
-
-                $('#batch_year').html('<option value="">-----Select Year-----</option>');
-                $('#batch_name').html('<option value="">-----Select Batch-----</option>');
-
-                if (sectionId && sectionName) {
-                    $.ajax({
-                        url: "{{ route('get.batch.year.student') }}",
-                        type: "POST",
-                        data: {
-                            section_name: sectionName,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            if (response.length > 0) {
-                                $.each(response, function(index, item) {
-                                    $('#batch_year').append('<option value="' + item + '">' + item + '</option>');
-                                });
-                                $('#batch_year').prop('disabled', false);
-                            }
-                        }
-                    });
-                } else {
-                    $('#batch_year').prop('disabled', true);
-                    $('#batch_name').prop('disabled', true);
-                }
-                fetchFeeStructure();
-            });
-
-            // Batch Year change event
-            $('#batch_year').change(function() {
-                var sectionId = $('#section').val();
-                var sectionName = $('#section').find(':selected').data('name');
-                var batchYear = $(this).val();
-
-                $('#batch_name').html('<option value="">-----Select Batch-----</option>');
-                if (sectionId && sectionName && batchYear) {
-                    $.ajax({
-                        url: "{{ route('get.batch.names.student') }}",
-                        type: "POST",
-                        data: {
-                            section_name: sectionName,
-                            batch_year: batchYear,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            console.log(response)
-                            {{--console.log("{{ $selectedBatch ? $selectedBatch->id : '' }}")--}}
-                            if (response.length > 0) {
-                                var selectedBatchId = "{{ $selectedBatch ? $selectedBatch->id : '' }}";
-
-                                $.each(response, function(index, item) {
-                                    console.log(index, item)
-                                    var selected = (item.id == selectedBatchId) ? 'selected' : '';
-                                    $('#batch_name').append('<option value="' + item.id + '" ' + selected + '>' + item.batch + '</option>');
-                                });
-                                $('#batch_name').prop('disabled', false);
-                            }
-                        }
-                    });
-                } else {
-                    $('#batch_name').prop('disabled', true);
-                }
-                fetchFeeStructure();
-            });
-        });
         var initialCountry = $('#other_country').val();
         if (initialCountry) {
             loadStates(initialCountry, 'other');
@@ -2229,12 +2353,25 @@
                 $('#other_district').html('<option value="">Select City</option>');
             }
         });
-        function getDate(yearsAgo) {
-            let d = new Date();
-            d.setFullYear(d.getFullYear() + yearsAgo);
-            return d.toISOString().split('T')[0];
+        function calculateAge() {
+            const dobInput = document.getElementById('dobInput').value;
+            if (!dobInput) return;
+
+            const dob = new Date(dobInput);
+            const today = new Date();
+
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+
+            // Adjust age if birthday hasn't occurred yet this year
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            document.getElementById('ageInput').value = age + ' years';
         }
 
+        // Validate DOB and calculate age
         function validateDOB() {
             let dob = document.getElementById("dobInput").value;
             let minDate = getDate(-50);
@@ -2245,8 +2382,23 @@
                 errorField.textContent = "Age must be between 10 and 50 years.";
             } else {
                 errorField.textContent = "";
+                calculateAge();
             }
         }
+
+        // Calculate date X years ago
+        function getDate(yearsAgo) {
+            let d = new Date();
+            d.setFullYear(d.getFullYear() + yearsAgo);
+            return d.toISOString().split('T')[0];
+        }
+
+        // Calculate age on page load if DOB exists
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('dobInput').value) {
+                calculateAge();
+            }
+        });
 
         function validateDOJ() {
             let doj = document.getElementById("dojInput").value;

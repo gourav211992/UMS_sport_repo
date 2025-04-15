@@ -63,7 +63,21 @@
                                 {{ session('status') }}
                             </div>
                         @endif
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
 
+                            @if (session('success'))
+                                <div class="alert alert-success">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
                         <div class="tab-pane active">
                             <form class="auth-login-form mt-2" id="sports_forgot_form"
                                   action="{{ route('sports.password.email') }}" method="POST">

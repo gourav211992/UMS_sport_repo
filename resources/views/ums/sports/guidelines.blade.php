@@ -175,7 +175,7 @@
         </header>
 
         <section class="alert">
-            Your account verification depends on valid document submission.
+            Your registration confirmation will be depending upon the valid document submission and full fee submission.
         </section>
 
         <section class="guidelines">
