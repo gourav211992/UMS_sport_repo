@@ -214,27 +214,27 @@
 
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 class="card-title fw-bolder text-primary">My Profile</h5>
+                                    <h4 class="card-title">My Profile</h4>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-2 pb-50">
                                                 <!-- <h5>Registration No</h5> -->
-                                                <h5 class="fw-bolder">Permanent ID</h5>
+                                                <h5>Permanent ID</h5>
                                                 <span>{{ $student->registration->registration_number ?? 'N/A' }} </span>
                                             </div>
                                             <div class="mb-2 pb-50">
                                                 <!-- <h5>Registration No</h5> -->
-                                                <h5 class="fw-bolder">Temporary ID</h5>
+                                                <h5>Temporary ID</h5>
                                                 <span>{{ $student->registration->document_number ?? 'N/A' }} </span>
                                             </div>
                                             <div class="mb-2 pb-50">
-                                                <h5 class="fw-bolder">Date of Joining</h5>
+                                                <h5>Date of Joining</h5>
                                                 <span>{{ \Carbon\Carbon::parse($student->registration->doj)->format('d-m-Y') .' ' }} <i data-feather="check-circle" class="text-success"></i></span>
                                             </div>
                                             <div class="mb-2 mb-md-1">
-                                                <h5 class="fw-bolder">Address</h5>
+                                                <h5>Address</h5>
                                                 <span>{{ $familyDetails->permanent_street1 ?? 'N/A' }}<span class="badge badge-light-primary ms-50">Primary</span></span>
                                             </div>
                                         </div>
@@ -277,12 +277,6 @@
                                                 Profile Detail
                                             </a>
                                         </div>
-                                        @elseif($student->registration->status == 'submitted' ||$student->registration->status == 'approved')
-                                            <div class="col-12">
-                                                <a class="btn btn-primary me-1 mt-1" href="{{ route('profile-view-detail', ['id' => $student->registration->id, 'readonly' => true]) }}">
-                                                   View Detail
-                                                </a>
-                                            </div>
                                         @endif
                                     </div>
                                 </div>
@@ -327,7 +321,7 @@
                                                             <th width="108">Action</th>
                                                         </tr>
                                                     </thead>
-
+                                                   
                                                         <tr>
                                                             <td class="poprod-decpt">1</td>
                                                             <td class="poprod-decpt">{{$date}}</td>
@@ -380,13 +374,13 @@
                                                             <form id="">
                                                                 @csrf
                                                                 <div class="mb-3 text-center">
-
+                                                                  
                                                                     <p class="">Are you sure you're paying under the correct quota? If not, please contact the admin on ......... before proceeding with payment.</p>
-
+                                                                 
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                                    <button type="button" class="btn btn-success pay-now-btn" data-user-id="{{ $student->id }}" >Submit</button>
+                                                                    <button type="button" class="btn btn-success pay-now-btn" data-user-id="{{ $student->id }}" >Submit</button> 
                                                                 </div>
                                                                 <!-- <button type="button" class="btn btn-success pay-now-btn" data-user-id="{{ $student->id }}" >Submit</button> -->
                                                             </form>
@@ -585,12 +579,10 @@
                                     <th>Fee Discount %</th>
                                     <th>Fee Discount Value</th>
                                     <th>Net Fee Payable Value</th>
-                                    <th>Payment Schedule</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($feeDetails as $index => $fee)
-{{--                                    @dump($fee)--}}
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $fee['title'] }}</td>
@@ -598,18 +590,6 @@
                                     <td>{{ $fee['fee_discount_percent'] }}%</td>
                                     <td>{{ number_format($fee['fee_discount_value'], 2) }}</td>
                                     <td>{{ number_format($fee['net_fee_payable'], 2) }}</td>
-                                    <td>
-                                        @if(isset($fee['payment_mode']) && $fee['payment_mode'] == 'Monthly')
-                                        <button class="btn btn-sm btn-primary view-schedule-btn"
-                                                data-fee-id="{{ $index  }}"
-                                                data-total-amount="{{ $fee['net_fee_payable'] }}"
-                                                data-duration="{{ $fee['duration'] }}">
-                                            View Schedule
-                                        </button>
-                                        @else
-                                        One-time Payment
-                                        @endif
-                                    </td>
                                 </tr>
                                 @endforeach
 
@@ -721,38 +701,6 @@
             </div>
         </div>
     </div>
-{{--<<<<<<< HEAD--}}
-
-    <!-- Monthly Payment Schedule Modal -->
-    <div class="modal fade" id="monthlyScheduleModal" tabindex="-1" aria-labelledby="monthlyScheduleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="monthlyScheduleModalLabel">Monthly Payment Schedule</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Month</th>
-                                    <th>Due Date</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="scheduleTableBody">
-                                <!-- Schedule rows will be populated here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-{{--=======--}}
     <!-- Payment Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -801,7 +749,6 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="confirmPayment">Confirm Payment</button>
-{{-->>>>>>> 798b756dcee47b85dba55b98ac398261eac34584--}}
                 </div>
             </div>
         </div>
@@ -976,72 +923,20 @@
             {{--                    // location.reload()--}}
             {{--                }, 1500);--}}
 
-            //             } else {
-            //                 toastr.error(response.message, 'Error');
-            //                 $button.prop('disabled', false).html('Pay Now');
-            //             }
-            //         },
-            //         error: function(xhr, status, error) {
-            //             var errorMessage = xhr.responseJSON && xhr.responseJSON.message ?
-            //                 xhr.responseJSON.message :
-            //                 'An error occurred while processing your request.';
-            //             toastr.error(errorMessage, 'Error');
-            //             $button.prop('disabled', false).html('Pay Now');
-            //         }
-            //     });
-            // });
-
-            $('.view-schedule-btn').click(function() {
-                const totalAmount = $(this).data('total-amount');
-                const duration = $(this).data('duration');
-                const feeId = $(this).data('fee-id');
-
-                // Calculate monthly amount
-                const monthlyAmount = totalAmount / duration;
-
-                // Clear previous schedule
-                $('#scheduleTableBody').empty();
-
-                // Generate schedule rows
-                const today = new Date();
-                for (let i = 0; i < duration; i++) {
-                    const dueDate = new Date(today);
-                    dueDate.setMonth(today.getMonth() + i);
-
-                    const row = `
-                        <tr>
-                            <td>Month ${i + 1}</td>
-                            <td>${dueDate.toLocaleDateString()}</td>
-                            <td>₹${monthlyAmount.toFixed(2)}</td>
-                            <td><span class="badge bg-warning">Pending</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-success pay-monthly-btn"
-                                        data-fee-id="${feeId}"
-                                        data-month="${i + 1}"
-                                        data-amount="${monthlyAmount}">
-                                    Pay Now
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                    $('#scheduleTableBody').append(row);
-                }
-
-                // Show the modal
-                $('#monthlyScheduleModal').modal('show');
-            });
-
-            // Handle monthly payment button click
-            $('.pay-monthly-btn').click(function() {
-                const feeId = $(this).data('fee-id');
-                const month = $(this).data('month');
-                const amount = $(this).data('amount');
-
-                // Here you can implement the payment logic
-                // For example, redirect to payment gateway or show payment form
-                alert(`Processing payment for Month ${month} - Amount: ${amount.toFixed(2)}`);
-            });
-
+            {{--            } else {--}}
+            {{--                toastr.error(response.message, 'Error');--}}
+            {{--                $button.prop('disabled', false).html('Pay Now');--}}
+            {{--            }--}}
+            {{--        },--}}
+            {{--        error: function(xhr, status, error) {--}}
+            {{--            var errorMessage = xhr.responseJSON && xhr.responseJSON.message ?--}}
+            {{--                xhr.responseJSON.message :--}}
+            {{--                'An error occurred while processing your request.';--}}
+            {{--            toastr.error(errorMessage, 'Error');--}}
+            {{--            $button.prop('disabled', false).html('Pay Now');--}}
+            {{--        }--}}
+            {{--    });--}}
+            {{--});--}}
         });
     </script>
     @endsection

@@ -11,7 +11,7 @@
     data-menu="vertical-menu-modern" data-col="">
     @include('ums.sports.sports-meta.navbar')
 
-    @if(Request::path() !== 'sports-login' && Request::path() !== 'registration' && Request::path() !== 'sport-registration' && !Str::startsWith(Request::path(), 'sports/profile/' ) && !Str::startsWith(Request::path(), 'update/registration' ))
+    @if(Request::path() !== 'sports-login' && Request::path() !== 'registration' && Request::path() !== 'sport-registration' && !Str::startsWith(Request::path(), 'sports/profile/' ) && !Str::startsWith(Request::path(), 'update/registration' ) && !Str::startsWith(Request::path(), 'profile-view-detail/' ) )
     @include('ums.sports.sports-meta.sidebar')
     @endif
 

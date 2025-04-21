@@ -68,7 +68,9 @@ class SportRegister extends Model
         'gender',
         'remarks',
         'registration_number',
-        'payment_reason'
+        'payment_reason',
+        'fee_batch_id',
+        'fee_section_id'
     ];
 
     public function trainingDetails()

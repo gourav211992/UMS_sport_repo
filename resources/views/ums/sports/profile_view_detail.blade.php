@@ -11,12 +11,12 @@
                     <div class="content-header-left col-md-6 mb-2">
                         <div class="row breadcrumbs-top">
                             <div class="col-12">
-                                <h2 class="content-header-title float-start mb-0">Edit Registration</h2>
+                                <h2 class="content-header-title float-start mb-0">View Registration</h2>
                                 <div class="breadcrumb-wrapper">
                                     <ol class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href={{ url('') }}>Home</a>
+                                        <li class="breadcrumb-item"><a href="">Home</a>
                                         </li>
-                                        <li class="breadcrumb-item active">Edit Registration</li>
+                                        <li class="breadcrumb-item active">View Registration</li>
                                     </ol>
                                 </div>
                             </div>
@@ -26,16 +26,42 @@
                         <div class="form-group breadcrumb-right">
                             <button onClick="javascript: history.go(-1)" class="btn btn-secondary btn-sm mb-50 mb-sm-0"><i
                                         data-feather="arrow-left-circle"></i> Back</button>
-                            <button onClick="saveDraft()" class="btn btn-outline-primary btn-sm mb-50 mb-sm-0"><i
-                                        data-feather="save"></i> Save as Draft</button>
-                            <button onClick="proceed()"
-                                    {{--                                    data-bs-toggle="modal" data-bs-target="#disclaimer"--}}
-                                    class="btn btn-primary btn-sm mb-50 mb-sm-0"><i data-feather="check-circle"></i>
-                                Submit</button>
+{{--                            <button onClick="saveDraft()" class="btn btn-outline-primary btn-sm mb-50 mb-sm-0"><i--}}
+{{--                                        data-feather="save"></i> Save</button>--}}
+{{--                            <button onClick="openRejectModal()" class="btn btn-danger btn-sm mb-50 mb-sm-0">--}}
+{{--                                <i data-feather="x-circle"></i> Reject--}}
+{{--                            </button>--}}
+{{--                            <button onClick="proceed()"--}}
+{{--                                    --}}{{--                                    data-bs-toggle="modal" data-bs-target="#disclaimer"--}}
+{{--                                    class="btn btn-primary btn-sm mb-50 mb-sm-0"><i data-feather="check-circle"></i>--}}
+{{--                                Approve</button>--}}
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="rejectModalLabel">Reject Registration</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="rejectForm">
+                                <div class="mb-3">
+                                    <label for="remarks" class="form-label">Remarks</label>
+                                    <textarea class="form-control" id="remarks" name="remarks" rows="3" required></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-danger" onclick="submitRejectForm()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="content-body">
                 <!-- Success Message -->
                 @if (session('success'))
@@ -54,16 +80,15 @@
                 <!-- Validation Errors -->
                 @if ($errors->any())
                     <div class="alert alert-danger">
-{{--                        @dump($errors)--}}
                         <ul>
                             @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li> <!-- Display each individual error -->
+                                <li>{{ $error }}</li>
                             @endforeach
                         </ul>
                     </div>
                 @endif
 
-                <form action="{{ route('profile-registration-update', $registration->id) }}" method="post"
+                <form action="{{ route('sport-registration-update', $registration->id) }}" method="post"
                       id="postRegister" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
@@ -75,41 +100,51 @@
                                     <div class="card-body customernewsection-form">
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <div class="newheader border-bottom mb-2 pb-25">
+                                                <div class="newheader  border-bottom mb-2 pb-25">
                                                     <h4 class="card-title text-theme">Basic Information</h4>
                                                     <p class="card-text">Fill the details</p>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <!-- Series -->
+                                            <div class="col-md-8">
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Series <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Series <span
+                                                                    class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
                                                         <select class="form-select" name="book_id" id="series" required>
                                                             <option value="" disabled>Select</option>
                                                             @foreach ($series as $ser)
-                                                                <option value="{{ $ser->id }}" {{ old('book_id', $registration->book_id) == $ser->id ? 'selected' : '' }}>{{ $ser->book_name }}</option>
+                                                                <option value="{{ $ser->id }}" {{ $registration->book_id == $ser->id ? 'selected' : '' }}>{{ $ser->book_name }}</option>
                                                             @endforeach
                                                         </select>
-                                                        @error('book_id')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
                                                     </div>
                                                 </div>
 
-                                                <!-- Temporary ID -->
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Temporary ID <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Temporary ID <span
+                                                                    class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <input type="text" class="form-control" name="document_number" readonly id="requestno" value="{{ $registration->document_number }}">
-                                                        @error('document_number')
+                                                        <input type="text" class="form-control" name="document_number"
+                                                               readonly id="requestno" value="{{ $registration->document_number }}">
+                                                        <input type="hidden" name="status" id="status" value="">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Reg. Date <span
+                                                                    class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="date" onchange="getDocNumberByBookId()"
+                                                               class="form-control" name="document_date" id="document_date"
+                                                               value="{{ old('document_date', $registration->document_date) }}">
+                                                        @error('document_date')
                                                         <div class="text-danger">{{ $message }}</div>
                                                         @enderror
-                                                        <input type="hidden" name="status" id="status" value="">
                                                     </div>
                                                 </div>
                                                 @if($registration->status == 'approved')
@@ -124,211 +159,152 @@
                                                         </div>
                                                     </div>
                                                 @endif
-                                                <!-- Registration Date -->
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Reg. Date <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Sport Name <span
+                                                                    class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <input type="date" onchange="getDocNumberByBookId()" class="form-control" name="document_date" id="document_date"
-                                                               value="{{ old('document_date', $registration->document_date) }}">
-                                                        @error('document_date')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-
-                                                <!-- Sport Name -->
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Sport Name <span class="text-danger">*</span></label>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <select class="form-select" name="sport_id" id="sport_id">
-                                                            <option value="">Select</option>
+                                                        <select class="form-select" name="sport_id">
+                                                            <option>Select</option>
                                                             @foreach ($sport_types as $type)
-                                                                <option value="{{ $type->id }}" {{ old('sport_id', $registration->sport_id) == $type->id ? 'selected' : '' }}>{{ $type->sport_name }}</option>
+                                                                <option value="{{ $type->id }}" {{ $registration->sport_id == $type->id ? 'selected' : '' }}>{{ $type->sport_name }}</option>
                                                             @endforeach
                                                         </select>
-                                                        @error('sport_id')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
                                                     </div>
                                                 </div>
 
-                                                <!-- Name -->
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Name <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Name <span
+                                                                    class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-3">
-                                                        <input type="text" placeholder="First Name" class="form-control" name="name" value="{{ old('name', $registration->name) }}">
-                                                        @error('name')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
+                                                        <input type="text" placeholder="First Name" class="form-control"
+                                                               name="name" value="{{ $registration->name }}">
                                                     </div>
                                                     <div class="col-md-3">
-                                                        <input type="text" placeholder="Middle Name" class="form-control" name="middle_name" value="{{ old('middle_name', $registration->middle_name) }}">
-                                                        @error('middle_name')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
+                                                        <input type="text" placeholder="Middle Name"
+                                                               class="form-control" name="middle_name" value="{{ $registration->middle_name }}">
                                                     </div>
                                                     <div class="col-md-3">
-                                                        <input type="text" placeholder="Last Name" class="form-control" name="last_name" value="{{ old('last_name', $registration->last_name) }}">
-                                                        @error('last_name')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
+                                                        <input type="text" placeholder="Last Name"
+                                                               class="form-control" name="last_name" value="{{ $registration->last_name }}">
                                                     </div>
                                                 </div>
 
-                                                <!-- Gender -->
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Gender <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Gender <span
+                                                                    class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
                                                         <div class="demo-inline-spacing">
                                                             <div class="form-check form-check-primary mt-25">
-                                                                <input type="radio" id="customColorRadio1" name="gender" class="form-check-input"
-                                                                       value="male" {{ old('gender', $registration->gender) == 'male' ? 'checked' : '' }}>
-                                                                <label class="form-check-label fw-bolder" for="customColorRadio1">Male</label>
+                                                                <input type="radio" id="customColorRadio1"
+                                                                       name="gender" class="form-check-input"
+                                                                       value="male" {{ $registration->gender == 'male' ? 'checked' : '' }}>
+                                                                <label class="form-check-label fw-bolder"
+                                                                       for="customColorRadio1">Male</label>
                                                             </div>
                                                             <div class="form-check form-check-primary mt-25">
-                                                                <input type="radio" id="service" name="gender" class="form-check-input"
-                                                                       value="female" {{ old('gender', $registration->gender) == 'female' ? 'checked' : '' }}>
-                                                                <label class="form-check-label fw-bolder" for="service">Female</label>
+                                                                <input type="radio" id="service" name="gender"
+                                                                       class="form-check-input" value="female" {{ $registration->gender == 'female' ? 'checked' : '' }}>
+                                                                <label class="form-check-label fw-bolder"
+                                                                       for="service">Female</label>
                                                             </div>
                                                         </div>
-                                                        @error('gender')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Batch Name <span class="text-danger">*</span></label>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <select class="form-select" id="batch_name" name="fee_batch_id">
-                                                            <option value="">-----Select Batch-----</option>
-                                                            @foreach($batch as $ba)
-                                                                    <option value="{{ $ba->id }}" @if ($ba->id == $registration->fee_batch_id) selected @endif >{{ $ba->batch }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-{{--                                                <div class="row align-items-center mb-1">--}}
-{{--                                                    <div class="col-md-3">--}}
-{{--                                                        <label class="form-label">Batch Year <span class="text-danger">*</span></label>--}}
-{{--                                                    </div>--}}
-{{--                                                    <div class="col-md-5">--}}
-{{--                                                        <select class="form-select" id="batch_year" name="batch_year" disabled>--}}
-{{--                                                            <option value="">-----Select Year-----</option>--}}
-{{--                                                            @foreach($batch as $ba)--}}
-{{--                                                                <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif>{{ $ba->batch_year }}</option>--}}
-{{--                                                            @endforeach--}}
-{{--                                                        </select>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Section <span class="text-danger">*</span></label>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <select class="form-select" name="fee_section_id" id="section">
-                                                            <option value="">-----Select Section-----</option>
-                                                            @foreach($sections as $section)
-                                                                <option value="{{ $section->id }}" @if ($section->id == $registration->fee_section_id) selected @endif>{{ $section->section }}</option>
-                                                            @endforeach
-                                                        </select>
                                                     </div>
                                                 </div>
 
+                                                <div class="row align-items-center mb-1">
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Batch Name <span class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <select class="form-select" id="batch_name" name="batch_id">
+                                                                <option value="">-----Select Batch-----</option>
+                                                                @foreach($batch as $ba)
+                                                                    <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif >{{ $ba->batch }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                </div>
+
+                                                <div class="row align-items-center mb-1">
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Section <span class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <select class="form-select" name="section_id" id="section">
+                                                                <option value="">-----Select Section-----</option>
+                                                                @foreach($sections as $section)
+                                                                    <option value="{{ $section->id }}" @if ($section->id == $registration->section_id) selected @endif>{{ $section->section }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
 
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Quota <span class="text-danger">*</span></label>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <select class="form-select" name="quota_id" id="quota_id" disabled>
-                                                            <option value="">-----Select-----</option>
-                                                            @foreach ($quotas as $quota)
-                                                                <option value="{{ $quota->id }}" {{ old('quota_id', $registration->quota_id) == $quota->id ? 'selected' : '' }}>
-                                                                    {{ ucfirst($quota->quota_name) }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <input type="hidden" id="selected_batch_name" value="{{ $selectedBatch ? $selectedBatch->batch_name : '' }}">
-                                                <input type="hidden" value="{{ $registration->quota_id }}" name="quota_id" id="quota_id">
-
-                                                <!-- <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Group <span
+                                                        <label class="form-label">Quota <span
                                                                     class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <select class="form-select" name="group">
+                                                        <select class="form-select" name="quota_id" id="quota_id">
                                                             <option>Select</option>
-                                                            @foreach($groups as $group)
-                                                                <option value="{{$group->id}}" @if($registration->group == $group->id) selected @endif>{{$group->group_name}}</option>
+                                                            @foreach ($quotas as $quota)
+                                                                <option value="{{ $quota->id }}" {{ $registration->quota_id == $quota->id ? 'selected' : '' }}>
+                                                                    {{ $quota->quota_name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                </div> -->
-
-                                                <!-- Date of Birth Section -->
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <input type="date" class="form-control" name="dob" id="dobInput"
-                                                               onfocus="this.min=getDate(-50); this.max=getDate(-10);"
-                                                               onblur="validateDOB(); calculateAge();"
-                                                               value="{{ old('dob', $registration->dob) }}">
-                                                        <small id="dobError" class="text-danger"></small>
-                                                        @error('dob')
-                                                        <div class="text-danger">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                                <!-- Age Field -->
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Age</label>
-                                                    </div>
-                                                    <div class="col-md-5">
-                                                        <input type="text" class="form-control" id="ageInput" disabled>
-                                                    </div>
                                                 </div>
 
-                                                <!-- Date of Joining -->
+                                                <div class="row align-items-center mb-1">
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Group <span
+                                                                        class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <select class="form-select" name="group">
+                                                                <option>Select</option>
+                                                                @foreach($groups as $group)
+                                                                    <option value="{{$group->id}}" @if($registration->group == $group->id) selected @endif>{{$group->group_name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Date of Joining <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Date of Birth <span
+                                                                    class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <input type="date" class="form-control" name="doj" id="dojInput"
-                                                               onfocus="this.min=getDate(-1);"
-                                                               onblur="validateDOJ()" required
-                                                               value="{{ old('doj', $registration->doj) }}">
-                                                        <small id="dojError" class="text-danger"></small>
+                                                        <input type="date" class="form-control" name="dob" value="{{ $registration->dob }}">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Date of Joining <span
+                                                                    class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="date" class="form-control" name="doj" value="{{ $registration->doj }}">
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 border-start">
+
+                                            <div class="col-md-4 border-start">
                                                 @if($registration->image)
-                                                    <div class="appli-photobox">
-{{--                                                        <p id="photoSizeText">Photo Size<br />25mm X 35mm</p>--}}
-                                                        <img id="previewImg" src="{{ asset($registration->image) }}"
+                                                    <div class="mt-2 text-center">
+                                                        <img src="{{ asset($registration->image) }}"
                                                              alt="Profile Image"
                                                              class="img-fluid rounded mt-3 mb-2"
                                                              height="110"
                                                              width="110">
-                                                    </div>
-                                                    <div class="mt-2 text-center">
                                                         <div class="mt-2">
                                                             <label for="replace-image" class="btn btn-outline-primary btn-sm waves-effect">
                                                                 <i data-feather="upload"></i> Replace Profile Image
@@ -337,12 +313,15 @@
                                                         </div>
                                                     </div>
                                                 @else
+                                                    <div class="appli-photobox">
+                                                        <p>Photo Size<br />25mm X 35mm</p>
+                                                    </div>
                                                     <div class="mt-2 text-center">
                                                         <div class="image-uploadhide">
-                                                            <label for="imageUpload" class="btn btn-outline-primary btn-sm waves-effect">
+                                                            <a href="#" class="btn btn-outline-primary btn-sm waves-effect">
                                                                 <i data-feather="upload"></i> Upload Profile Image
-                                                            </label>
-                                                            <input type="file" id="imageUpload" name="image" class="d-none">
+                                                            </a>
+                                                            <input type="file" class="" name="image">
                                                         </div>
                                                     </div>
                                                 @endif
@@ -413,97 +392,127 @@
                                             </div>
                                             <div class="tab-content pb-1 px-1">
                                                 <div class="tab-pane active" id="other">
-                                                    <!-- Mobile Number -->
                                                     <div class="row mb-1 align-items-center">
                                                         <div class="col-md-2">
-                                                            <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                                                            <label class="form-label">Mobile Number <span
+                                                                        class="text-danger">*</span></label>
                                                         </div>
                                                         <div class="col-md-3">
                                                             <div class="input-group input-group-merge">
-                                                                <span class="input-group-text" id="basic-addon5"><i data-feather='phone'></i></span>
-                                                                <input type="text" class="form-control" name="mobile_number" value="{{ old('mobile_number', $registration->mobile_number ?? $user->mobile) }}">
+                                                                <span class="input-group-text" id="basic-addon5"><i
+                                                                            data-feather='phone'></i></span>
+                                                                <input type="text" class="form-control" name="mobile_number" value="{{ $registration->mobile_number }}">
                                                             </div>
-                                                            @error('mobile_number')
-                                                            <div class="text-danger">{{ $message }}</div>
-                                                            @enderror
                                                         </div>
                                                     </div>
 
-                                                    <!-- Email -->
                                                     <div class="row align-items-center mb-1">
                                                         <div class="col-md-2">
-                                                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                                                            <label class="form-label">Email <span
+                                                                        class="text-danger">*</span></label>
                                                         </div>
                                                         <div class="col-md-3">
                                                             <div class="input-group input-group-merge">
-                                                                <span class="input-group-text" id="basic-addon5"><i data-feather='mail'></i></span>
-                                                                <input type="text" class="form-control" placeholder="hello@student.com" name="email" value="{{ old('email', $registration->email ?? $user->email) }}">
+                                                                <span class="input-group-text" id="basic-addon5"><i
+                                                                            data-feather='mail'></i></span>
+                                                                <input type="text" class="form-control"
+                                                                       placeholder="hello@student.com" name="email" value="{{ $registration->email }}">
                                                             </div>
-                                                            @error('email')
-                                                            <div class="text-danger">{{ $message }}</div>
-                                                            @enderror
                                                         </div>
                                                     </div>
 
-                                                    <!-- BAI ID -->
-                                                    <div class="row mb-1 align-items-center">
-                                                        <div class="col-md-2">
-                                                            <label class="form-label">BAI ID <span class="text-danger">*</span></label>
-                                                        </div>
-                                                        <div class="col-md-3 mb-sm-0 mb-1">
-                                                            <input type="text" class="form-control" name="bai_id" value="{{ old('bai_id', $registration->bai_id) }}" id="bai_id">
-                                                            @error('bai_id')
-                                                            <div class="text-danger">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <label class="form-label">State</label>
-                                                        </div>
+                                                    <!-- <div class="row align-items-center mb-1">
                                                         <div class="col-md-3">
-                                                            <select id="other_state" class="form-select" name="bai_state">
-                                                                <option value="">Select State</option>
-                                                                @if(isset($otherStates) && count($otherStates) > 0)
-                                                                    @foreach($otherStates as $state)
-                                                                        <option value="{{ $state->id }}" {{ old('bai_state', $registration->bai_state) == $state->id ? 'selected' : '' }}>
-                                                                            {{ $state->name }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                @endif
-                                                            </select>
-                                                            @error('bai_state')
-                                                            <div class="text-danger">{{ $message }}</div>
-                                                            @enderror
+                                                            <label class="form-label">Batch Name <span class="text-danger">*</span></label>
                                                         </div>
-                                                    </div>
-                                                    <!-- BWF ID -->
-                                                    <div class="row align-items-center mb-1">
-                                                        <div class="col-md-2">
-                                                            <label class="form-label">BWF ID <span class="text-danger">*</span></label>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <input type="text" class="form-control" name="bwf_id" value="{{ old('bwf_id', $registration->bwf_id) }}" id="bwf_id">
-                                                            @error('bwf_id')
-                                                            <div class="text-danger">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <label class="form-label">Country</label>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <select id="other_country" class="form-select" name="country">
-                                                                <option value="">Select</option>
-                                                                @foreach($countries as $country)
-                                                                    <option value="{{ $country->id }}" {{ old('country', $registration->country) == $country->id ? 'selected' : '' }}>
-                                                                        {{ $country->name }}
-                                                                    </option>
+                                                        <div class="col-md-5">
+                                                            <select class="form-select" id="batch_name" name="batch_id">
+                                                                <option value="">-----Select Batch-----</option>
+                                                                @foreach($batch as $ba)
+                                                                    <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif >{{ $ba->batch }}</option>
                                                                 @endforeach
                                                             </select>
-                                                            @error('country')
-                                                            <div class="text-danger">{{ $message }}</div>
-                                                            @enderror
+                                                        </div>
+                                                    </div> -->
+{{--                                                    <div class="row align-items-center mb-1">--}}
+{{--                                                        <div class="col-md-3">--}}
+{{--                                                            <label class="form-label">Batch Year <span class="text-danger">*</span></label>--}}
+{{--                                                        </div>--}}
+{{--                                                        <div class="col-md-5">--}}
+{{--                                                            <select class="form-select" id="batch_year" name="batch_year" disabled>--}}
+{{--                                                                <option value="">-----Select Year-----</option>--}}
+{{--                                                                @foreach($batch as $ba)--}}
+{{--                                                                    <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif>{{ $ba->batch_year }}</option>--}}
+{{--                                                                @endforeach--}}
+{{--                                                            </select>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+                                                    <!-- <div class="row align-items-center mb-1">
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Section <span class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <select class="form-select" name="section_id" id="section">
+                                                                <option value="">-----Select Section-----</option>
+                                                                @foreach($sections as $section)
+                                                                    <option value="{{ $section->id }}" @if ($section->id == $registration->section_id) selected @endif>{{ $section->section }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div> -->
+
+                                                    <input type="hidden" id="selected_batch_name" value="{{ $selectedBatch ? $selectedBatch->batch_name : '' }}">
+
+                                                    <!-- <div class="row align-items-center mb-1">
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">Group <span
+                                                                        class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <select class="form-select" name="group">
+                                                                <option>Select</option>
+                                                                @foreach($groups as $group)
+                                                                    <option value="{{$group->id}}" @if($registration->group == $group->id) selected @endif>{{$group->group_name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div> -->
+
+                                                    <div class="row align-items-center mb-1">
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">BAI ID <span
+                                                                        class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-3 mb-sm-0 mb-1">
+                                                            <input type="text" class="form-control" name="bai_id" value="{{ $registration->bai_id }}"/>
+                                                        </div>
+                                                        <div class="col-md-1 mb-sm-0 mb-1">
+                                                            <label class="form-label">State <span
+                                                                        class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <input type="text" class="form-control" name="bai_state" value="{{ $registration->bai_state }}"/>
                                                         </div>
                                                     </div>
+
+                                                    <div class="row align-items-center mb-1">
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">BWF ID <span
+                                                                        class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <input type="text" class="form-control" name="bwf_id" value="{{ $registration->bwf_id }}"/>
+                                                        </div>
+                                                        <div class="col-md-1 mb-sm-0 mb-1">
+                                                            <label class="form-label">Country <span
+                                                                        class="text-danger">*</span></label>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <input type="text" name="country" placeholder="Country"
+                                                                   class="form-control" value="{{ $registration->country }}"/>
+                                                        </div>
                                                     </div>
+                                                </div>
                                                 <div class="tab-pane" id="Address">
                                                     <div class="row">
                                                         <!-- Permanent Address -->
@@ -705,7 +714,7 @@
                                                                 <th>Contact No</th>
                                                                 <th>Email</th>
                                                                 <th>Guardian</th>
-                                                                <th>Action</th>
+                                                                {{-- <th>Action</th> --}}
                                                             </tr>
                                                             </thead>
                                                             <tbody>
@@ -723,6 +732,7 @@
                                                                             <option {{ $family->relation == 'Sibling' ? 'selected' : '' }}>Sibling</option>
                                                                             <option {{ $family->relation == 'Local Guardian' ? 'selected' : '' }}>Local Guardian</option>
                                                                             <option {{ $family->relation == 'Other' ? 'selected' : '' }}>Other</option>
+                                                                            <!-- Add other options -->
                                                                         </select>
                                                                     </td>
                                                                     <td><input type="text" class="form-control mw-100 name" name="family_details[{{ $index }}][name]" value="{{ $family->name }}"></td>
@@ -731,16 +741,16 @@
                                                                     <td>
                                                                         <input type="radio" name="family_details[{{ $index }}][is_guardian]" class="guardian" {{ $family->is_guardian ? 'checked' : '' }}>
                                                                     </td>
-                                                                    <td>
+                                                                    {{-- <td>
                                                                         <a href="#" class="text-danger delete-row" data-id="{{ $family->id }}"><i data-feather="trash-2" class="me-50"></i></a>
-                                                                    </td>
+                                                                    </td> --}}
                                                                     <input type="hidden" name="family_details[{{ $index }}][id]" value="{{ $family->id }}">
                                                                 </tr>
                                                             @endforeach
                                                             </tbody>
                                                         </table>
                                                     </div>
-                                                    <a href="#" class="text-primary add-contactpeontxt"><i data-feather='plus'></i> Add New</a>
+                                                    {{-- <a href="#" class="text-primary add-contactpeontxt"><i data-feather='plus'></i> Add New</a> --}}
                                                 </div>
 
 
@@ -834,18 +844,18 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
 
-                                                            <h5 class="mt-1 mb-2 text-dark"><strong>Badminton Playing Exp.</strong>
+                                                            <h5 class="mt-1 mb-2 text-dark"><strong>Badminton Exp.</strong>
                                                             </h5>
 
 
                                                             <div class="row align-items-center mb-1">
                                                                 <div class="col-md-4">
-                                                                    <label class="form-label">Total Playing Experience (No of
+                                                                    <label class="form-label">Total Experience (No of
                                                                         Years)</label>
                                                                 </div>
 
                                                                 <div class="col-md-6">
-                                                                    <input type="number" class="form-control" name="badminton_experience" value="{{$sportRegistrationDetails->badminton_experience ?? ''}}"/>
+                                                                    <input type="text" class="form-control" name="badminton_experience" value="{{$sportRegistrationDetails->badminton_experience ?? ''}}"/>
                                                                 </div>
                                                             </div>
 
@@ -970,7 +980,7 @@
                                                                 </div>
 
                                                                 <div class="col-md-6">
-                                                                    <input type="text" class="form-control" name="blood_group" value="{{$sportRegistrationDetails->blood_group}}"/>
+                                                                    <input type="text" class="form-control" name="blood_group" value="{{$sportRegistrationDetails->blood_group ?? ''}}"/>
                                                                 </div>
                                                             </div>
 
@@ -988,35 +998,25 @@
                                                                     </tr>
                                                                     </thead>
                                                                     <tbody id="trainingBody">
-                                                                    @if($sportTrainingDetails->isEmpty())
+                                                                    @foreach($sportTrainingDetails as $index => $detail)
                                                                         <tr>
-                                                                            <td colspan="4">
+                                                                            <td>{{ $index + 1 }}</td>
+                                                                            <td>
+                                                                                <input type="text" class="form-control mw-100" name="previous_coach[]" value="{{ $detail->previous_coach }}" required />
+                                                                            </td>
+                                                                            <td>
+                                                                                <input type="text" class="form-control mw-100" name="training_academy[]" value="{{ $detail->training_academy }}" required />
+                                                                            </td>
+                                                                            <td>
                                                                                 <a href="javascript:void(0)" class="text-primary add-row">
-                                                                                    Add New <i class="fas fa-plus-square"></i>
+                                                                                    <i class="fas fa-plus-square"></i>
+                                                                                </a>
+                                                                                <a href="javascript:void(0)" class="text-danger remove-row">
+                                                                                    <i class="fas fa-trash"></i>
                                                                                 </a>
                                                                             </td>
                                                                         </tr>
-                                                                    @else
-                                                                        @foreach($sportTrainingDetails as $index => $detail)
-                                                                            <tr>
-                                                                                <td>{{ $index + 1 }}</td>
-                                                                                <td>
-                                                                                    <input type="text" class="form-control mw-100" name="previous_coach[]" value="{{ $detail->previous_coach }}" required />
-                                                                                </td>
-                                                                                <td>
-                                                                                    <input type="text" class="form-control mw-100" name="training_academy[]" value="{{ $detail->training_academy }}" required />
-                                                                                </td>
-                                                                                <td>
-                                                                                    <a href="javascript:void(0)" class="text-primary add-row">
-                                                                                        <i class="fas fa-plus-square"></i>
-                                                                                    </a>
-{{--                                                                                    <a href="javascript:void(0)" class="text-danger remove-row">--}}
-{{--                                                                                        <i class="fas fa-trash"></i>--}}
-{{--                                                                                    </a>--}}
-                                                                                </td>
-                                                                            </tr>
-                                                                        @endforeach
-                                                                    @endif
+                                                                    @endforeach
                                                                     </tbody>
                                                                 </table>
                                                             </div>
@@ -1103,7 +1103,7 @@
                                                                         <th>SPOC Phone No.</th>
                                                                         <th>SPOC Email Id</th>
                                                                         <th>SPOC Email Position</th>
-                                                                        <th width="150px">Action</th>
+                                                                        {{-- <th width="150px">Action</th> --}}
                                                                     </tr>
                                                                     </thead>
                                                                     <tbody>
@@ -1115,14 +1115,11 @@
                                                                             <td><input type="text" class="form-control mw-100" name="sponsor[{{ $index }}][phone]" value="{{ $sponsor->phone }}" required /></td>
                                                                             <td><input type="text" class="form-control mw-100" name="sponsor[{{ $index }}][email]" value="{{ $sponsor->email }}" /></td>
                                                                             <td><input type="text" class="form-control mw-100" name="sponsor[{{ $index }}][email_position]" value="{{ $sponsor->email_position }}" /></td>
-                                                                            <td>
+                                                                            {{-- <td>
                                                                                 <a href="#" class="text-primary add-sponsor-row">
                                                                                     <i data-feather="plus-square"></i>
                                                                                 </a>
-                                                                                <a href="#" class="text-danger delete-sponsor-row">
-                                                                                    <i data-feather="trash-2"></i>
-                                                                                </a>
-                                                                            </td>
+                                                                            </td> --}}
                                                                         </tr>
                                                                     @empty
                                                                         <tr id="fee_tr">
@@ -1163,11 +1160,11 @@
                                                                 <th>Fee Sponsorship<br /> + Discount Value</th>
                                                                 <th>Net Fee<br /> Payable %</th>
                                                                 <th>Net Fee<br /> Payable Value</th>
-{{--                                                                <th>Mandatory</th>--}}
                                                                 <th width="150px">Action</th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
+                                                            {{--                                                            @dump($feeDetails)--}}
                                                             @foreach ($feeDetails as $key => $fees)
                                                                 @php
                                                                     $totalFees = $fees['total_fees'] ?? 0;
@@ -1179,40 +1176,27 @@
                                                                     $feeSponsorshipPlusDiscountValue = $feeSponsorshipValue + $feeDiscountValue;
                                                                     $netFeePayablePercent = 100 - $feeSponsorshipPlusDiscountPercent;
                                                                     $netFeePayableValue = $totalFees - $feeSponsorshipPlusDiscountValue;
-                                                                     $isMandatory = $fees['mandatory'] ?? false;
                                                                 @endphp
                                                                 <tr>
                                                                     <td>{{ $key + 1 }}</td>
-                                                                    <td><input type="text" class="form-control" name="fee_details[{{$key}}][title]" value="{{ $fees['title'] ?? 'N/A' }}" readonly></td>
-                                                                    <td><input type="number" class="form-control" name="fee_details[{{$key}}][total_fees]" value="{{ $totalFees }}" readonly></td>
-                                                                    <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_sponsorship_percent]" value="{{ $feeSponsorshipPercent }}" readonly></td>
-                                                                    <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_sponsorship_value]" value="{{ $feeSponsorshipValue }}" readonly></td>
-                                                                    <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_discount_percent]" value="{{ $feeDiscountPercent }}" readonly></td>
-                                                                    <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_discount_value]" value="{{ $feeDiscountValue }}" readonly></td>
-                                                                    <td><input type="number" class="form-control" value="{{ $feeSponsorshipPlusDiscountPercent }}" readonly></td>
-                                                                    <td><input type="number" class="form-control" value="{{ $feeSponsorshipPlusDiscountValue }}" readonly></td>
-                                                                    <td><input type="number" class="form-control" value="{{ $netFeePayablePercent }}" readonly></td>
-                                                                    <td><input type="number" class="form-control" value="{{ $netFeePayableValue }}" readonly></td>
+                                                                    <td><input type="text" class="form-control" name="fee_details[{{$key}}][title]" value="{{ $fees['title'] ?? 'N/A' }}"></td>
+                                                                    <td><input type="number" class="form-control" name="fee_details[{{$key}}][total_fees]" value="{{ $totalFees }}"></td>
+                                                                    <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_sponsorship_percent]" value="{{ $feeSponsorshipPercent }}"></td>
+                                                                    <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_sponsorship_value]" value="{{ $feeSponsorshipValue }}"></td>
+                                                                    <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_discount_percent]" value="{{ $feeDiscountPercent }}"></td>
+                                                                    <td><input type="number" class="form-control" name="fee_details[{{$key}}][fee_discount_value]" value="{{ $feeDiscountValue }}"></td>
+                                                                    <td><input type="number" class="form-control" value="{{ $feeSponsorshipPlusDiscountPercent }}"></td>
+                                                                    <td><input type="number" class="form-control" value="{{ $feeSponsorshipPlusDiscountValue }}"></td>
+                                                                    <td><input type="number" class="form-control" value="{{ $netFeePayablePercent }}"></td>
+                                                                    <td><input type="number" class="form-control" value="{{ $netFeePayableValue }}"></td>
                                                                     <td>
-                                                                        <input type="hidden"
-                                                                               name="fee_details[{{$key}}][mandatory]"
-                                                                               value="{{$isMandatory ? 1: 0}}">
-                                                                        <input type="checkbox" class="form-check-input mandatory-checkbox"
-                                                                               name="fee_details[{{$key}}][mandatory]"
-                                                                               @if($isMandatory) checked @endif
-                                                                               @if($isMandatory) disabled @endif>
-{{--                                                                        <a href="#sponsor" data-bs-toggle="modal">--}}
-{{--                                                                            <span class="btn-outline-primary font-small-2 px25 btn btn-sm">Add Sponsor</span>--}}
-{{--                                                                        </a>--}}
 {{--                                                                        @if ($key != 0)--}}
-                                                                            <!-- <a href="#" class="text-danger ms-25">
+                                                                            <a href="#" class="text-danger ms-25" disabled="">
                                                                                 <i data-feather="trash-2" class="me-50"></i>
-                                                                            </a> -->
+                                                                            </a>
 {{--                                                                        @endif--}}
                                                                     </td>
                                                                 </tr>
-                                                                <input type="hidden" name="fee_details[{{$key}}][payment_mode]" value="{{$fees['payment_mode'] ?? null}}">
-                                                                <input type="hidden" name="fee_details[{{$key}}][duration]" value="{{$fees['duration'] ?? null}}">
                                                             @endforeach
 
                                                             <!-- Add New Row -->
@@ -1254,103 +1238,149 @@
 
                                                             <!-- Total Fees Row -->
                                                             @php
-                                                                $totalFeesSum = 0;
-$totalNetFeePayableValue = 0;
-
-foreach ($feeDetails as $fees) {
-    $isMandatory = $fees['mandatory'] ?? false;
-
-    if ($isMandatory) {
-        $totalFees = $fees['total_fees'] ?? 0;
-        $feeSponsorshipValue = $fees['fee_sponsorship_value'] ?? (($fees['total_fees'] ?? 0) * ($fees['fee_sponsorship_percent'] ?? 0) / 100);
-        $feeDiscountValue = $fees['fee_discount_value'] ?? (($fees['total_fees'] ?? 0) * ($fees['fee_discount_percent'] ?? 0) / 100);
-
-        $totalFeesSum += $totalFees;
-        $totalNetFeePayableValue += $totalFees - ($feeSponsorshipValue + $feeDiscountValue);
-    }
-}
+                                                                $totalFeesSum = array_sum(array_column($feeDetails, 'total_fees'));
+                                                                $totalNetFeePayableValue = array_sum(array_map(function ($fees) {
+                                                                    return ($fees['total_fees'] ?? 0) - (($fees['fee_sponsorship_value'] ?? 0) + ($fees['fee_discount_value'] ?? 0));
+                                                                }, $feeDetails));
                                                             @endphp
                                                             <tr>
                                                                 <td></td>
                                                                 <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
                                                                 <td class="fw-bolder text-dark font-large-1">{{ $totalNetFeePayableValue }}</td>
-                                                                <td>
-                                                                    @if($user->payment_status == 'paid')
-                                                                        <span class="badge bg-success">Paid</span>
-                                                                    @else
-                                                                        <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"
-                                                                                data-bs-toggle="modal"
-                                                                                data-bs-target="#paymentModal"
-                                                                                data-user-id="{{ $user->id }}"
-                                                                                data-total-amount="{{ $totalNetFeePayableValue }}">Pay Now</button>
-                                                                    @endif
-                                                                    <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>
-                                                                </td>
+                                                                <td></td>
                                                             </tr>
                                                             </tbody>
                                                         </table>
-                                                        {{-- <input type="hidden" name="fee_details" id="feeDetailsInput"> --}}
+                                                        {{--                                                        <input type="hidden" name="fee_details" id="feeDetailsInput">--}}
                                                     </div>
                                                 </div>
-
 
 
 
                                                 <div class="tab-pane" id="Hostel">
                                                     <div class="row">
                                                         <div class="col-md-6">
+
                                                             <div class="row align-items-center mb-1">
                                                                 <div class="col-md-4">
                                                                     <label class="form-label">Hostel Required</label>
                                                                 </div>
+                                                                {{-- <div class="row align-items-center mb-2 mt-4 justify-content-center text-center"> --}}
                                                                 <div class="col-md-3">
+                                                                    {{-- <label class="form-label text-primary"><strong>Hostel Required</strong></label> --}}
                                                                     <div class="demo-inline-spacing justify-content-center">
                                                                         <div class="form-check form-check-primary mt-25">
-                                                                            <input type="radio" id="hostel_required_yes" name="hostel_required"
-                                                                                   class="form-check-input" @if($registration->hostel_required == 'Yes') checked @endif value="yes" >
-                                                                            <label class="form-check-label fw-bolder" for="hostel_required_yes">Yes</label>
+                                                                            <input type="radio" id="hostel_required1"
+                                                                                   name="hostel_required"
+                                                                                   class="form-check-input" @if($registration->hostel_required == 'Yes') checked="" @endif value="yes">
+                                                                            <label class="form-check-label fw-bolder"
+                                                                                   for="hostel_required1">Yes</label>
                                                                         </div>
                                                                         <div class="form-check form-check-primary mt-25 me-0">
-                                                                            <input type="radio" id="hostel_required_no" name="hostel_required"
-                                                                                   class="form-check-input" @if($registration->hostel_required == 'No') checked @endif value="no">
-                                                                            <label class="form-check-label fw-bolder" for="hostel_required_no">No</label>
+                                                                            <input type="radio" id="hostel_required2"
+                                                                                   name="hostel_required"
+                                                                                   class="form-check-input" @if($registration->hostel_required == 'No') checked="" @endif value="no">
+                                                                            <label class="form-check-label fw-bolder"
+                                                                                   for="hostel_required2">No</label>
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                {{-- </div> --}}
+
+                                                                {{-- <div class="col-md-6">
+                                                                                    <div class="form-check form-check-primary mt-25 custom-checkbox">
+                                                                                        <input type="checkbox" class="form-check-input" id="colorCheck1" checked="">
+                                                                                        <label class="form-check-label" for="colorCheck1">Yes/No</label>
+                                                                                    </div>
+                                                                                </div> --}}
                                                             </div>
 
                                                             <div class="row align-items-center mb-1">
-                                                                <div class="col-md-4" id="check_in_date_label">
-                                                                    <label class="form-label">Check-In Date <span class="text-danger">*</span></label>
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Check-In Date <span
+                                                                                class="text-danger">*</span></label>
                                                                 </div>
+
                                                                 <div class="col-md-6">
-                                                                    <input type="date" class="form-control" name="check_in_date" id="check_in_date"
-                                                                           value="{{$registration->check_in_date}}" disabled/>
+                                                                    <input type="date" class="form-control" name="check_in_date" value="{{$registration->check_in_date}}"/>
                                                                 </div>
                                                             </div>
 
                                                             <div class="row align-items-center mb-1">
-                                                                <div class="col-md-4" id="check_out_date_label">
-                                                                    <label class="form-label">Check-Out Date <span class="text-danger">*</span></label>
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Check-Out Date <span
+                                                                                class="text-danger">*</span></label>
                                                                 </div>
+
                                                                 <div class="col-md-6">
-                                                                    <input type="date" class="form-control" name="check_out_date" id="check_out_date"
-                                                                           value="{{$registration->check_out_date}}" disabled/>
+                                                                    <input type="date" class="form-control" name="check_out_date" value="{{$registration->check_out_date}}"/>
                                                                 </div>
                                                             </div>
 
                                                             <div class="row align-items-center mb-1">
-                                                                <div class="col-md-4" id="room_preference_label">
-                                                                    <label class="form-label">Room Preference</label>
+                                                                <div class="col-md-4">
+                                                                    <label class="form-label">Room Preference <span
+                                                                                class="text-danger"></span></label>
                                                                 </div>
+
                                                                 <div class="col-md-6">
-                                                                    <select class="form-select" name="room_preference" id="room_preference" disabled>
+                                                                    <select class="form-select" name="room_preference">
                                                                         <option>Select</option>
                                                                     </select>
                                                                 </div>
                                                             </div>
+
+
+                                                            <!--
+                                                                                 <div class="row align-items-center mb-1">
+                                                                                    <div class="col-md-4">
+                                                                                        <label class="form-label">Hostel ID <span class="text-danger">*</span></label>
+                                                                                    </div>
+
+                                                                                    <div class="col-md-6">
+                                                                                        <input type="text" class="form-control"  />
+                                                                                    </div>
+                                                                                 </div>
+
+                                                                                 <div class="row align-items-center mb-1">
+                                                                                    <div class="col-md-4">
+                                                                                        <label class="form-label">Hostel Present <span class="text-danger">*</span></label>
+                                                                                    </div>
+
+                                                                                    <div class="col-md-6">
+                                                                                        <input type="text" class="form-control"  />
+                                                                                    </div>
+                                                                                 </div>
+
+                                                                                 <div class="row align-items-center mb-1">
+                                                                                    <div class="col-md-4">
+                                                                                        <label class="form-label">Hostel Absent <span class="text-danger">*</span></label>
+                                                                                    </div>
+
+                                                                                    <div class="col-md-6">
+                                                                                        <input type="text" class="form-control"  />
+                                                                                    </div>
+                                                                                 </div>
+
+
+                                                                                 <div class="row mb-1">
+                                                                                    <div class="col-md-4">
+                                                                                        <label class="form-label">Hostel Absence Reason <span class="text-danger">*</span></label>
+                                                                                    </div>
+
+                                                                                    <div class="col-md-6">
+                                                                                        <textarea class="form-control"></textarea>
+                                                                                    </div>
+                                                                                 </div>
+        -->
+
+
                                                         </div>
+
+
                                                     </div>
+
+
                                                 </div>
 
 
@@ -1459,10 +1489,6 @@ foreach ($feeDetails as $fees) {
                                                                     <th>Reference No.</th>
                                                                     <td>{{ $user->payments->ref_no ?? 'N/A' }}</td>
                                                                 </tr>
-                                                                  <tr>
-                                                                    <th>Paid Amount</th>
-                                                                    <td>{{ $user->payments->paid_amount ?? 'N/A' }}</td>
-                                                                </tr>
                                                                 <tr>
                                                                     <th>Payment Document</th>
                                                                     <td>
@@ -1477,6 +1503,10 @@ foreach ($feeDetails as $fees) {
                                                                     <th>Remarks</th>
                                                                     <td>{{ $user->payments->remarks ?? 'N/A' }}</td>
                                                                 </tr>
+                                                                <tr>
+                                                                    <th>Transaction Date</th>
+                                                                    <td>{{ $user->payments->created_at ?? 'N/A' }}</td>
+                                                                </tr>
                                                             @else
                                                                 <tr>
                                                                     <th colspan="2">No payment information available</th>
@@ -1489,7 +1519,6 @@ foreach ($feeDetails as $fees) {
 
 
                                                 </div>
-
                                                 <!-- Other tabs like Address, Family, Emergency, Medical, Sponsor, Fee, Hostel, Document -->
                                                 <!-- You can follow the same pattern as above to pre-fill the data in these tabs -->
                                             </div>
@@ -1503,672 +1532,23 @@ foreach ($feeDetails as $fees) {
             </div>
         </div>
     </div>
-    <div class="modal fade" id="sponsorModal" tabindex="-1" aria-labelledby="sponsorModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="sponsorModalLabel">Add Sponsor</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="sponsorForm">
-                        <div class="mb-3">
-                            <label for="sponsorAmount" class="form-label">Sponsorship Amount</label>
-                            <input type="number" class="form-control" id="sponsorAmount" placeholder="Enter sponsor amount">
-                        </div>
-                        <input type="hidden" id="feeIndex" value="">
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveSponsor">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Payment Modal -->
-    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="paymentModalLabel">Make Payment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="paymentForm">
-                        <div class="mb-3">
-                            <div class="alert alert-danger">
-                                Are you sure you're paying under the correct quota? If not, please contact the admin on ......... before proceeding with payment.
-                            </div>
-                            <label for="paymentMode" class="form-label">Payment Mode</label>
-                            <select class="form-select" id="paymentMode" required>
-                                <option value="">Select Payment Mode</option>
-                                <option value="UPI">UPI</option>
-                                <option value="IMPS">IMPS</option>
-                            </select>
-                        </div>
-
-                        <div id="upiSection" style="display:none;">
-                            <div class="text-center mb-3">
-                                <p>Scan the QR code to make payment</p>
-                                <img src="{{asset('sports/img/sampleqr.jpeg')}}"
-                                     alt="UPI QR Code" class="img-fluid">
-                                {{--                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=UPI_ID:your-upi-id@bank&amount={{ $totalNetFeePayableValue }}"--}}
-                                {{--                                     alt="UPI QR Code" class="img-fluid">--}}
-                                {{--                                <p class="mt-2">OR</p>--}}
-                                {{--                                <p>Send payment to: your-upi-id@bank</p>--}}
-                            </div>
-                        </div>
-
-                        <div id="impsSection" style="display:none;">
-                            <div class="mb-3">
-                                <label class="form-label">Bank Details for IMPS</label>
-                                <div class="card p-3">
-                                    <p><strong>Account Name:</strong> Your Academy Name</p>
-                                    <p><strong>Account Number:</strong> 1234567890</p>
-                                    <p><strong>IFSC Code:</strong> ABCD0123456</p>
-                                    <p><strong>Bank Name:</strong> Example Bank</p>
-                                </div>
-                                <p class="mt-2 text-muted">Please share the transaction reference after payment.</p>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="confirmPayment">Confirm Payment</button>
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- END: Content-->
 
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script>
-        $(document).ready(function() {
-            // Handle payment mode selection
-            $('#paymentMode').change(function() {
-                const mode = $(this).val();
-                $('#upiSection, #impsSection').hide();
-
-                if (mode === 'UPI') {
-                    $('#upiSection').show();
-                } else if (mode === 'IMPS') {
-                    $('#impsSection').show();
-                }
-            });
-            // Handle confirm payment button
-            $('#confirmPayment').click(function() {
-                const paymentMode = $('#paymentMode').val();
-
-                if (!paymentMode) {
-                    toastr.error('Please select a payment mode');
-                    return;
-                }
-
-                const userId = $('.pay-now-btn').data('user-id');
-                const amount = $('.pay-now-btn').data('total-amount');
-
-                // Disable confirm button to prevent multiple submissions
-                $('#confirmPayment').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
-
-                // Send AJAX request to update payment status
-                $.ajax({
-                    url: "{{ url('update-payment-status') }}",
-                    type: "POST",
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        user_id: userId,
-                        payment_mode: paymentMode
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            toastr.success(`Payment of ₹${amount} via ${paymentMode} was successful`, 'Success');
-
-                            // Close the modal
-                            $('#paymentModal').modal('hide');
-
-                            // Replace button with "Paid" badge
-                            $('.pay-now-btn').replaceWith('<span class="badge bg-success">Paid</span>');
-                        } else {
-                            toastr.error(response.message, 'Error');
-                            $('#confirmPayment').prop('disabled', false).html('Confirm Payment');
-                        }
-                    },
-                    error: function(xhr) {
-                        var errorMessage = xhr.responseJSON && xhr.responseJSON.message
-                            ? xhr.responseJSON.message
-                            : 'Something went wrong. Please try again.';
-                        toastr.error(errorMessage, 'Error');
-                        $('#confirmPayment').prop('disabled', false).html('Confirm Payment');
-                    }
-                });
-            });
-        });
-        $(document).ready(function() {
-            // When BAI ID field changes
-            $('#bai_id').on('input', function() {
-                if ($(this).val().trim() !== '') {
-                    // Set country to India (assuming India's ID is 101)
-                    $('#country').val(101).trigger('change');
-
-                    // Load Indian states
-                    loadStates(101, 'other');
-                }
-            });
-
-            // When BWF ID field changes
-            $('#bwf_id').on('input', function() {
-                if ($(this).val().trim() !== '') {
-                    // Country becomes required
-                    $('#country').prop('required', true);
-                } else {
-                    // Only make country required if BAI ID is also empty
-                    if ($('#bai_id').val().trim() === '') {
-                        $('#country').prop('required', false);
-                    }
-                }
-            });
-
-            // Ensure the script runs on page load as well
-            if ($('#bai_id').val().trim() !== '') {
-                $('#country').val(101).trigger('change');
-                loadStates(101, 'other');
-            }
-
-            if ($('#bwf_id').val().trim() !== '') {
-                $('#country').prop('required', true);
-            }
-        });
-        $(document).ready(function() {
-            $('#batch_name').change(function() {
-                let batchId = $(this).val();
-                $('#section').html('<option value="" selected>-----Select Section-----</option>');
-
-                if (batchId) {
-                    $.ajax({
-                        url: "{{ route('get.sections.by.batch') }}",
-                        type: "POST",
-                        data: {
-                            batch_id: batchId,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            if (response.length > 0) {
-                                $.each(response, function(index, section) {
-                                    $('#section').append('<option value="' + section.id + '">' + section.section + '</option>');
-                                });
-                            }
-                        }
-                    });
-                }
-            });
-            $('#section').change(function() {
-                fetchFeeStructure();
-            });
-            function fetchFeeStructure()
-            {
-                // Get all required values
-                // alert('testing');
-                const sportId = $('#sport_id').val();
-                const sectionId = $('#section').val();
-                const batchYear = $('#batch_year').val();
-                const batchId = $('#batch_name').val();
-                const quotaId = $('#quota').val();
-
-                // Make sure all fields are selected
-                // if (!sportId || !sectionId || !batchYear || !batchId || !quotaId) {
-                //     return;
-                // }
-
-                $.ajax({
-                    url: '{{ route("fetch.fee.structure") }}',
-                    type: 'GET',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        sport_id: sportId,
-                        section_id: sectionId,
-                        batch_year: batchYear,
-                        batch_id: batchId,
-                        quota_id: quotaId
-                    },
-                    success: function (response) {
-                        console.log(response);
-                        if (response.status === 'success') {
-                            updateFeeTable(response.feeStructure);
-                        } else {
-                            alert('Failed to fetch fee structure.');
-                        }
-                    },
-                    error: function () {
-                        alert('An error occurred while fetching the fee structure.');
-                    }
-                });
-            }
-            let feeStructure = [];
-
-            function updateFeeTable(feeData) {
-                feeStructure = feeData;
-                let feeTableBody = $('#feeTable tbody');
-                feeTableBody.empty(); // Clear existing rows
-
-                let totalNetFeePayableValue = 0;
-
-                feeData.forEach((fee, index) => {
-                    let totalFees = Number(fee.total_fees) || 0;
-                    let feeSponsorshipPercent = Number(fee.fee_sponsorship_percent) || 0;
-                    let feeSponsorshipValue = Number(fee.fee_sponsorship_value) || (totalFees * feeSponsorshipPercent / 100);
-                    let feeDiscountPercent = Number(fee.fee_discount_percent) || 0;
-                    let feeDiscountValue = Number(fee.fee_discount_value) || (totalFees * feeDiscountPercent / 100);
-                    let feeSponsorshipPlusDiscountPercent = feeSponsorshipPercent + feeDiscountPercent;
-                    let feeSponsorshipPlusDiscountValue = feeSponsorshipValue + feeDiscountValue;
-                    let netFeePayablePercent = 100 - feeSponsorshipPlusDiscountPercent;
-                    let netFeePayableValue = totalFees - feeSponsorshipPlusDiscountValue;
-
-                    // Create checkbox with proper state
-                    let mandatoryCheckbox = `
-            <input type="hidden" name="fee_details[${index}][mandatory]" value=" ${fee.mandatory ? 1 : 0}">
-            <input type="checkbox" class="form-check-input mandatory-checkbox"
-                data-index="${index}"
-                data-fee-id="${fee.id}"
-                data-title="${fee.title}"
-                ${fee.mandatory ? 'checked' : ''}
-                ${fee.mandatory ? 'disabled' : ''}
-                name="fee_details[${index}][mandatory]"
-                ${(fee.mandatory || fee.is_checked) ? 'checked' : ''}>
-        `;
-
-                    let row = `
-            <tr>
-                <td>${index + 1}</td>
-                <td><input type="text" class="form-control" name="fee_details[${index}][title]" value="${fee.title}" readonly></td>
-                <td><input type="number" class="form-control" name="fee_details[${index}][total_fees]" value="${totalFees}" readonly></td>
-                <td><input type="number" class="form-control" name="fee_details[${index}][fee_sponsorship_percent]" value="${feeSponsorshipPercent}" readonly></td>
-                <td><input type="number" class="form-control" name="fee_details[${index}][fee_sponsorship_value]" value="${feeSponsorshipValue.toFixed(2)}" readonly></td>
-                <td><input type="number" class="form-control" name="fee_details[${index}][fee_discount_percent]" value="${feeDiscountPercent}" readonly></td>
-                <td><input type="number" class="form-control" name="fee_details[${index}][fee_discount_value]" value="${feeDiscountValue.toFixed(2)}" readonly></td>
-                <td><input type="number" class="form-control" value="${feeSponsorshipPlusDiscountPercent}" readonly></td>
-                <td><input type="number" class="form-control" value="${feeSponsorshipPlusDiscountValue.toFixed(2)}" readonly></td>
-                <td><input type="number" class="form-control" value="${netFeePayablePercent}" readonly></td>
-                <td><input type="number" class="form-control net-fee-value" value="${netFeePayableValue.toFixed(2)}" readonly></td>
-                <td>${mandatoryCheckbox}</td>
-                <td>
-                    ${index !== 0 ? '' : ''}
-                </td>
-            </tr>
-               <input type="hidden" name="fee_details[${index}][payment_mode]" value="${fee.payment_mode || ''}">
-               <input type="hidden" name="fee_details[${index}][duration]" value="${fee.duration || ''}">
-        `;
-
-                    feeTableBody.append(row);
-
-                    // Add to total if mandatory or checked
-                    if (fee.mandatory) {
-                        totalNetFeePayableValue += netFeePayableValue;
-                    }
-                });
-
-                // Add total row
-                feeTableBody.append(`
-        <tr>
-            <td></td>
-            <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
-            <td class="fw-bolder text-dark font-large-1 total-net-fee">${totalNetFeePayableValue.toFixed(2)}</td>
-            <td>
-                @if($user->payment_status == 'paid')
-                <span class="badge bg-success">Paid</span>
-@else
-                <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"
-                        data-bs-toggle="modal"
-                        data-bs-target="#paymentModal"
-                        data-user-id="{{ $user->id }}"
-                            data-total-amount="${totalNetFeePayableValue.toFixed(2)}">Pay Now</button>
-                @endif
-                <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>
-            </td>
-        </tr>
-`);
-
-                feather.replace();
-            }
-            $(document).on('change', '.mandatory-checkbox', function() {
-                updateTotalFee();
-            });
-            // Function to update the total fee
-            function updateTotalFee() {
-                let totalNetFeePayableValue = 0;
-
-                // Loop through all rows in the table (excluding the total row)
-                $('#feeTable tbody tr').not(':last').each(function() {
-                    let checkbox = $(this).find('.mandatory-checkbox');
-                    let netFeeValue = parseFloat($(this).find('.net-fee-value').val()) || 0;
-
-                    // If checkbox is checked or mandatory (disabled), add to total
-                    if (checkbox.is(':checked') || checkbox.prop('disabled')) {
-                        totalNetFeePayableValue += netFeeValue;
-                    }
-                });
-
-                // Update the total display
-                $('.total-net-fee').text(totalNetFeePayableValue.toFixed(2));
-
-                // Update the Pay Now button with the new total amount
-                $('.pay-now-btn').data('total-amount', totalNetFeePayableValue.toFixed(2));
-            }
-
-
-            function updateMandatoryStatus(feeId,feeTitle, isChecked) {
-                console.log("Updating Mandatory Status for Fee ID:", feeId, "Checked:", isChecked);
-
-                let feeItem = feeStructure.find(f => f.id == feeId);
-                if (!feeItem) {
-                    alert("Error: Fee ID not found in feeStructure!");
-                    return;
-                }
-
-                // let feeTitle = feeItem.title;
-                // console.log(feeTitle)
-                // feeItem.isChecked = isChecked;
-                //
-                // let totalNetFeePayableValue = feeStructure.reduce((total, fee) => {
-                //     let totalFees = Number(fee.total_fees) || 0;
-                //     let feeSponsorshipValue = Number(fee.fee_sponsorship_value) || (totalFees * Number(fee.fee_sponsorship_percent) / 100);
-                //     let feeDiscountValue = Number(fee.fee_discount_value) || (totalFees * Number(fee.fee_discount_percent) / 100);
-                //     let netFeePayableValue = totalFees - (feeSponsorshipValue + feeDiscountValue);
-                //
-                //     if (fee.mandatory || fee.isChecked) {
-                //         return total + netFeePayableValue;
-                //     }
-                //     return total;
-                // }, 0);
-                //
-                // // Update the frontend immediately
-                // $('#totalNetFeePayableValue').text(totalNetFeePayableValue.toFixed(2));
-
-                // Send AJAX request to update the database
-                $.ajax({
-                    url: '{{ route("update.fee.mandatory.status") }}',
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        registration_id: '{{ $registration->id ?? 0 }}',
-                        fee_id: feeId,
-                        fee_title: feeTitle,
-                        is_checked: isChecked ? 1 : 0
-                    },
-                    success: function (response) {
-                        console.log("Update Success:", response);
-                        alert('Mandatory status updated successfully!');
-                        // updateTotalFee()
-                    },
-                    error: function (xhr, status, error) {
-                        console.log("Update Error:", error);
-                        alert('An error occurred while updating mandatory status.');
-                    }
-                });
-            }
-
-            $(document).on('click', '.add-sponsor-btn', function () {
-                let index = $(this).data('index');
-                console.log('Index being set:', index); // Log index for debugging
-                console.log('feeStructure before modal opens:', feeStructure);
-                $('#feeIndex').val(index); // Store the index in the hidden input
-            });
-
-// Handle the Save Sponsor button in the modal
-            $('#saveSponsor').on('click', function () {
-                let sponsorAmount = Number($('#sponsorAmount').val());
-                let index = $('#feeIndex').val();
-
-                console.log('Sponsor amount:', sponsorAmount); // Log sponsorAmount for debugging
-                console.log('Index from modal input:', index); // Log index from the hidden input for debugging
-                console.log('feeStructure array:', feeStructure); // Log the entire feeStructure array
-                console.log(`feeStructure[${index}]:`, feeStructure[index]); // Log the specific feeStructure entry
-
-                // Check if the index is valid and the feeStructure entry exists
-                if (!isNaN(sponsorAmount) && sponsorAmount > 0 && feeStructure[index]) {
-                    feeStructure[index].fee_sponsorship_value = sponsorAmount;
-                    console.log('Sponsorship value updated:', feeStructure[index]); // Log the updated fee structure entry
-                    $('#sponsorModal').modal('hide'); // Close the modal
-                    updateFeeTable(feeStructure); // Recalculate and update the fee table
-                } else {
-                    console.error('Invalid index or sponsorship amount.');
-                }
-            });
-
-           
-    var sectionId = $('#section').val();
-    var sectionName = $('#section').find(':selected').data('name');
-
-    var selectedBatchYear = "{{ $selectedBatch ? $selectedBatch->year : '' }}";
-    var selectedBatchId = "{{ $selectedBatch ? $selectedBatch->id : '' }}";
-
-    if (sectionId && sectionName) {
-        // Fetch batch years for the selected section
-        $.ajax({
-            url: "{{ route('get.batch.year.student') }}",
-            type: "POST",
-            data: {
-                section_name: sectionName,
-                _token: "{{ csrf_token() }}"
-            },
-            success: function (response) {
-                if (response.length > 0) {
-                    $('#batch_year').html('<option value="">-----Select Year-----</option>');
-
-                    $.each(response, function (index, item) {
-                        var selected = (item == selectedBatchYear) ? 'selected' : '';
-                        $('#batch_year').append('<option value="' + item + '" ' + selected + '>' + item + '</option>');
-                    });
-
-                    // If a batch year was selected from DB, trigger change event to fetch batch names
-                    if (selectedBatchYear) {
-                        $('#batch_year').trigger('change');
-                    }
-                }
-            }
-        });
-    }
-
-    // If batch year is preselected, trigger change event to fetch batch names
-    if (selectedBatchYear) {
-        $('#batch_year').trigger('change');
-    }
-     
-        });
-        var initialCountry = $('#other_country').val();
-        if (initialCountry) {
-            loadStates(initialCountry, 'other');
-        }
-
-        // Your existing change handler
-        // $('#other_country').change(function() {
-        //     let countryId = $(this).val();
-        //     if (countryId) {
-        //         loadStates(countryId, 'other');
-        //     } else {
-        //         $('#other_state').html('<option value="">Select State</option>');
-        //         $('#other_district').html('<option value="">Select City</option>');
-        //     }
-        // });
-
-        // Load cities when state changes in Other Details section
-        $('#other_state').change(function() {
-            let stateId = $(this).val();
-            if (stateId) {
-                loadCities(stateId, 'other');
-            } else {
-                $('#other_district').html('<option value="">Select City</option>');
-            }
-        });
-
-
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const hostelRequiredYes = document.getElementById('hostel_required_yes');
-            const hostelRequiredNo = document.getElementById('hostel_required_no');
-            const checkInDate = document.getElementById('check_in_date');
-            const checkInDateLabel = document.getElementById('check_in_date_label');
-            const checkOutDate = document.getElementById('check_out_date');
-            const checkOutDateLabel = document.getElementById('check_out_date_label');
-            const roomPreference = document.getElementById('room_preference');
-            const roomPreferenceLabel = document.getElementById('room_preference_label');
-
-            // Function to toggle hostel fields
-            function toggleHostelFields() {
-                if (hostelRequiredYes.checked) {
-                    // Enable fields when "Yes" is selected
-                    checkInDate.disabled = false;
-                    checkOutDate.disabled = false;
-                    roomPreference.disabled = false;
-                    checkInDate.style.display = 'block';
-                    checkOutDate.style.display = 'block';
-                    roomPreference.style.display = 'block';
-                    checkInDateLabel.style.display = 'block';
-                    checkOutDateLabel.style.display = 'block';
-                    roomPreferenceLabel.style.display = 'block';
-
-                    // Make fields required
-                    checkInDate.required = true;
-                    checkOutDate.required = true;
-                    roomPreference.required = true;
-                } else {
-                    // Disable fields when "No" is selected or initially
-                    checkInDate.disabled = true;
-                    checkOutDate.disabled = true;
-                    roomPreference.disabled = true;
-
-                    // Remove required attribute
-                    checkInDate.required = false;
-                    checkOutDate.required = false;
-                    roomPreference.required = false;
-
-                    // Clear values
-                    checkInDate.value = '';
-                    checkOutDate.value = '';
-                    roomPreference.value = '';
-
-                    checkInDate.style.display = 'none';
-                    checkOutDate.style.display = 'none';
-                    roomPreference.style.display = 'none';
-                    checkInDateLabel.style.display = 'none';
-                    checkOutDateLabel.style.display = 'none';
-                    roomPreferenceLabel.style.display = 'none';
-                }
-            }
-
-            // Add event listeners to both radio buttons
-            hostelRequiredYes.addEventListener('change', toggleHostelFields);
-            hostelRequiredNo.addEventListener('change', toggleHostelFields);
-
-            // Initial call to set the correct state on page load
-            toggleHostelFields();
-        });
-        function calculateAge() {
-            const dobInput = document.getElementById('dobInput').value;
-            if (!dobInput) return;
-
-            const dob = new Date(dobInput);
-            const today = new Date();
-
-            let age = today.getFullYear() - dob.getFullYear();
-            const monthDiff = today.getMonth() - dob.getMonth();
-
-            // Adjust age if birthday hasn't occurred yet this year
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-                age--;
-            }
-
-            document.getElementById('ageInput').value = age + ' years';
-        }
-
-        // Validate DOB and calculate age
-        function validateDOB() {
-            let dob = document.getElementById("dobInput").value;
-            let minDate = getDate(-50);
-            let maxDate = getDate(-10);
-            let errorField = document.getElementById("dobError");
-
-            if (dob < minDate || dob > maxDate) {
-                errorField.textContent = "Age must be between 10 and 50 years.";
-            } else {
-                errorField.textContent = "";
-                calculateAge();
-            }
-        }
-
-        // Calculate date X years ago
-        function getDate(yearsAgo) {
-            let d = new Date();
-            d.setFullYear(d.getFullYear() + yearsAgo);
-            return d.toISOString().split('T')[0];
-        }
-
-        // Calculate age on page load if DOB exists
-        document.addEventListener('DOMContentLoaded', function() {
-            if (document.getElementById('dobInput').value) {
-                calculateAge();
-            }
-        });
-
-
-        function validateDOJ() {
-            let dojInput = document.getElementById("dojInput");
-            let errorField = document.getElementById("dojError");
-
-            // Calculate date 1 year ago from today
-            let today = new Date();
-            let oneYearAgo = new Date();
-            oneYearAgo.setFullYear(today.getFullYear() - 1);
-
-            // Convert to YYYY-MM-DD format
-            let minDate = oneYearAgo.toISOString().split('T')[0];
-
-            // Set the min attribute on the input field
-            dojInput.min = minDate;
-
-            // Validate the selected date
-            if (dojInput.value && new Date(dojInput.value) < oneYearAgo) {
-                // errorField.textContent = "Date of joining cannot be more than 1 year in the past.";
-                return false;
-            } else {
-                errorField.textContent = "";
-                return true;
-            }
-        }
-        const futureDateInputs = document.querySelectorAll('.dobInput');
-
-        function disableDates() {
-            const today = new Date().toISOString().split('T')[0];
-            futureDateInputs.forEach(input => {
-                input.setAttribute('min', today);
-            });
-        }
-        disableDates();
         function loadStates(countryId, type) {
             $.ajax({
                 url: '/get-states/' + countryId,
                 method: 'GET',
                 success: function(data) {
                     var stateDropdown = $('#' + type + '_state');
-                    var selectedState = "{{ $registration->bai_state }}"; // Get the selected state from PHP
-
                     stateDropdown.empty();
-                    stateDropdown.append('<option value="">Select State</option>');
-
+                    stateDropdown.append('<option>Select State</option>');
                     $.each(data, function(key, state) {
-                        var isSelected = (state.id == selectedState) ? 'selected' : '';
-                        stateDropdown.append('<option value="' + state.id + '" ' + isSelected + '>' + state.name + '</option>');
+                        stateDropdown.append('<option value="' + state.id + '">' + state.name + '</option>');
                     });
-
-                    // If there's a selected state but it's not in the list, add it
-                    if (selectedState && !data.some(state => state.id == selectedState)) {
-                        // You might need an additional AJAX call here to get the state name
-                        stateDropdown.append('<option value="' + selectedState + '" selected>Previously Selected State</option>');
-                    }
                 }
             });
         }
@@ -2187,47 +1567,35 @@ foreach ($feeDetails as $fees) {
                 }
             });
         }
-        {{--document.getElementById('batch_year').addEventListener('change', function () {--}}
-        {{--    var selectedYear = this.value;--}}
-        {{--    var batchNameDropdown = document.getElementById('batch_name');--}}
-
-        {{--    // Clear previous options--}}
-        {{--    batchNameDropdown.innerHTML = '<option value="">Select Name</option>';--}}
-        {{--    // Filter batches based on the selected year--}}
-        {{--    @json($batch).forEach(function(batch) {--}}
-        {{--        if (batch.batch_year == selectedYear) {--}}
-        {{--            var option = document.createElement('option');--}}
-        {{--            option.value = batch.id;--}}
-        {{--            option.text = batch.batch_name;--}}
-        {{--            batchNameDropdown.appendChild(option);--}}
-        {{--        }--}}
-        {{--    });--}}
-        {{--});--}}
-        document.addEventListener("DOMContentLoaded", function() {
-            const imageInput = document.getElementById('{{ $registration->image ? "replace-image" : "imageUpload" }}');
-            const previewImg = document.getElementById("previewImg");
-            const photoSizeText = document.getElementById("photoSizeText");
-
-            imageInput.addEventListener("change", function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImg.src = e.target.result;
-                        previewImg.style.display = "block";
-                        if (photoSizeText) photoSizeText.style.display = "none";
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        });
         function saveDraft() {
-            document.getElementById('status').value = 'draft';
+            document.getElementById('status').value = 'on-hold';
             document.getElementById('postRegister').submit();
         }
 
         function proceed() {
-            document.getElementById('status').value = 'submitted';
+            document.getElementById('status').value = 'approved';
+            document.getElementById('postRegister').submit();
+        }
+        function openRejectModal() {
+            $('#rejectModal').modal('show');
+        }
+
+        // Function to submit the reject form
+        function submitRejectForm() {
+            // Get the remarks from the modal
+            let remarks = $('#remarks').val();
+
+            // Set the status to 'rejected'
+            document.getElementById('status').value = 'rejected';
+
+            // Add the remarks to the form
+            let remarksInput = document.createElement('input');
+            remarksInput.type = 'hidden';
+            remarksInput.name = 'remarks';
+            remarksInput.value = remarks;
+            document.getElementById('postRegister').appendChild(remarksInput);
+
+            // Submit the form
             document.getElementById('postRegister').submit();
         }
         $('#series').on('change', function() {
@@ -2329,14 +1697,6 @@ foreach ($feeDetails as $fees) {
             $(document).on("click", ".add-row", function () {
                 rowIndex++;
 
-                // Remove the "add" icon from the previous row and add the "delete" icon
-                $(".add-row").replaceWith(`
-            <a href="javascript:void(0)" class="text-danger remove-row">
-                <i class="fas fa-trash"></i>
-            </a>
-        `);
-
-                // Add the new row with the "add" icon
                 let newRow = `
             <tr>
                 <td>${rowIndex}</td>
@@ -2345,6 +1705,9 @@ foreach ($feeDetails as $fees) {
                 <td>
                     <a href="javascript:void(0)" class="text-primary add-row">
                         <i class="fas fa-plus-square"></i>
+                    </a>
+                    <a href="javascript:void(0)" class="text-danger remove-row">
+                        <i class="fas fa-trash"></i>
                     </a>
                 </td>
             </tr>`;
@@ -2368,60 +1731,49 @@ foreach ($feeDetails as $fees) {
         });
 
 
-        $(document).ready(function() {
-            let familyRowIndex = {{ count($familyDetails) }};
-
+        $(document).ready(function () {
             // Add new row
-            $(".add-contactpeontxt, .add-contact-row").on("click", function(e) {
+            $(".add-contactpeontxt, .add-contact-row").on("click", function (e) {
                 e.preventDefault();
 
-                familyRowIndex++;
-
                 let newRow = `
-        <tr class="family-row">
-            <td>${familyRowIndex}</td>
-            <td>
-                <select class="form-select mw-100 relation" name="family_details[${familyRowIndex}][relation]">
-                    <option>Select</option>
-                    <option>Father</option>
-                    <option>Mother</option>
-                    <option>Grandfather</option>
-                    <option>Grandmother</option>
-                    <option>Uncle</option>
-                    <option>Aunt</option>
-                    <option>Sibling</option>
-                    <option>Local Guardian</option>
-                    <option>Other</option>
-                </select>
-            </td>
-            <td><input type="text" class="form-control mw-100 name" name="family_details[${familyRowIndex}][name]"></td>
-            <td><input type="text" class="form-control mw-100 contact" name="family_details[${familyRowIndex}][contact_no]"></td>
-            <td><input type="text" class="form-control mw-100 email" name="family_details[${familyRowIndex}][email]"></td>
-            <td>
-                <input type="radio" name="family_details[${familyRowIndex}][is_guardian]" class="guardian">
-            </td>
-            <td>
-                <a href="#" class="text-danger delete-row"><i data-feather="trash-2" class="me-50"></i></a>
-            </td>
-        </tr>
+            <tr class="family-row">
+                <td>#</td>
+                <td>
+                    <select class="form-select mw-100 relation">
+                        <option>Select</option>
+                        <option>Father</option>
+                        <option>Mother</option>
+                        <option>Grandfather</option>
+                        <option>Grandmother</option>
+                        <option>Uncle</option>
+                        <option>Aunt</option>
+                        <option>Sibling</option>
+                        <option>Local Guardian</option>
+                        <option>Other</option>
+                    </select>
+                </td>
+                <td><input type="text" class="form-control mw-100 name"></td>
+                <td><input type="text" class="form-control mw-100 contact"></td>
+                <td><input type="text" class="form-control mw-100 email"></td>
+                <td>
+                    <input type="radio" name="guardian" class="guardian">
+                </td>
+                <td>
+                    <a href="#" class="text-danger delete-row"><i data-feather="trash-2" class="me-50"></i></a>
+                </td>
+            </tr>
         `;
 
                 $("#familyTable tbody").append(newRow);
-                feather.replace();
+                feather.replace(); // Refresh icons
             });
 
             // Delete row
-            $(document).on("click", ".delete-row", function(e) {
+            $(document).on("click", ".delete-row", function (e) {
                 e.preventDefault();
                 $(this).closest("tr").remove();
-                updateRowNumbers();
             });
-
-            function updateRowNumbers() {
-                $("#familyTable tbody tr").each(function(index) {
-                    $(this).find("td:first").text(index + 1);
-                });
-            }
         });
 
     </script>
@@ -2514,9 +1866,9 @@ foreach ($feeDetails as $fees) {
             <td><input type="number" class="form-control" value="${netFeePayablePercent}" readonly></td>
             <td><input type="number" class="form-control" value="${netFeePayableValue.toFixed(2)}" readonly></td>
             <td>
-<!--                <a href="#sponsor" data-bs-toggle="modal">-->
-<!--                    <span class="btn-outline-primary font-small-2 px25 btn btn-sm">Add Sponsor</span>-->
-<!--                </a>-->
+                <a href="#sponsor" data-bs-toggle="modal">
+                    <span class="btn-outline-primary font-small-2 px25 btn btn-sm">Add Sponsor</span>
+                </a>
                 ${index !== 0 ? '<a href="#" class="text-danger ms-25"><i data-feather="trash-2" class="me-50"></i></a>' : ''}
             </td>
         </tr>
@@ -2567,5 +1919,54 @@ foreach ($feeDetails as $fees) {
         });
 
     </script>
+    <script>
+        $(document).ready(function () {
+            // Disable all form elements
+            $('#postRegister :input').prop('disabled', true);
+
+            // Disable all buttons
+            $('#postRegister button').prop('disabled', true);
+
+            // Prevent form submission
+            $('#postRegister').on('submit', function (e) {
+                e.preventDefault();
+                return false;
+            });
+
+            // Disable all file inputs
+            $('#postRegister input[type="file"]').prop('disabled', true);
+
+            // Disable all checkboxes and radio buttons
+            $('#postRegister input[type="checkbox"], #postRegister input[type="radio"]').prop('disabled', true);
+
+            // Disable all select elements
+            $('#postRegister select').prop('disabled', true);
+
+            // Disable all textareas
+            $('#postRegister textarea').prop('disabled', true);
+
+            // Disable all links that add new rows
+            $('.add-contactpeontxt, .add-contact-row, .add-sponsor-row, .add-row').on('click', function (e) {
+                e.preventDefault();
+                return false;
+            });
+
+            // Disable all delete row links
+            $('.delete-row, .delete-sponsor-row, .remove-row').on('click', function (e) {
+                e.preventDefault();
+                return false;
+            });
+
+            // Disable the "Same As Permanent Address" checkbox
+            $('#colorCheck2').prop('disabled', true);
+
+            // Disable the "Hostel Required" radio buttons
+            $('input[name="hostel_required"]').prop('disabled', true);
+
+            // Disable the "Guardian" radio buttons
+            $('input[name^="family_details"]').prop('disabled', true);
+        });
+    </script>
+
     <!-- Modals and scripts can be reused from the registration.blade.php -->
 @endsection

@@ -138,13 +138,13 @@
                                             <div class="col-md-3">
                                                 <label class="form-label">Batch Name <span class="text-danger">*</span></label>
                                             </div>
-                                        
+
                                             <div class="col-md-5">
                                                 <select class="form-select" name="batch_name" id="batch_name">
 
                                                     <option value="" selected>-----Select Batch-----</option>
                                                     @foreach ($batchs as $batch)
-                                                    <option value="{{ $batch->batch_name }}" 
+                                                    <option value="{{ $batch->batch_name }}"
                                                         @if (isset($sportFeeMaster) && $sportFeeMaster->batch == $batch->batch_name) selected @endif>
                                                         {{ ucfirst($batch->batch_name) }}
                                                     </option>
@@ -153,7 +153,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="row align-items-center mb-1">
                                             <div class="col-md-3">
                                                 <label class="form-label">Section</label><span
@@ -213,7 +213,7 @@
                                                             class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                   
+
                                                     <div class="demo-inline-spacing">
                                                         <div class="form-check form-check-primary mt-25">
                                                             <input type="radio" id="customColorRadio3" name="display"
@@ -305,11 +305,12 @@
                                                             <th>Net Fee<br /> Payable Value</th>
                                                             <th>Mandatory</th>
                                                             <th>Payment Frequency</th>
+                                                            <th>Duration</th>
                                                             <th width="150px">Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                       
+
                                                         @foreach ($feeDetails as $key => $fees)
                                                         <tr id="fee_tr" class="fee_tr">
                                                             <td>{{ $key + 1 }}</td>
@@ -317,7 +318,7 @@
                                                                 <select class="form-control mw-100" name="title" required style="width: 300px">
                                                                     <option value="" disabled>Select Title</option>
                                                                     @foreach ($fee_head as $head)
-                                                                        <option value="{{ $head->fee_head }}" 
+                                                                        <option value="{{ $head->fee_head }}"
                                                                             @if (isset($fees) && $fees['title']== $head->fee_head) selected @endif>
                                                                             {{ $head->fee_head }}
                                                                         </option>
@@ -337,11 +338,11 @@
                                                             <td><input type="text" class="form-control mw-100 fee_discount_value"
                                                                     name="fee_discount_value[]"
                                                                     id="fee_discount_value"
-                                                                   
+
                                                                     value="{{ old('fee_discount_value.' . $key, $fees['fee_discount_value'] ?? '') }}" />
 
                                                             </td>
-                                                            <td><input type="text" class="form-control mw-100 net_fee" 
+                                                            <td><input type="text" class="form-control mw-100 net_fee"
                                                                     name="net_fee[]"
                                                                     id="net_fee"
                                                                     readonly
@@ -359,7 +360,7 @@
                                                                 </div>
                                                             </td>
                                                             <td>
-                                                                <select class="form-select mw-100" name="payment_mode[]" required>
+                                                                <select class="form-select mw-100 payment-frequency" name="payment_mode[]" required>
                                                                     <option>Select</option>
                                                                     @php
                                                                     $paymentMode = old('payment_mode.' . $key, $fees['payment_mode'] ?? ''); // Handle undefined key safely
@@ -372,7 +373,17 @@
                                                                     <option value="One Time" {{ $paymentMode == 'One Time' ? 'selected' : '' }}>One Time</option>
                                                                 </select>
                                                             </td>
-
+                                                            <td>
+                                                                <select class="form-select mw-100 duration-select" name="duration[]" style="{{ $paymentMode == 'Monthly' ? '' : 'display: none;' }}">
+                                                                    <option value="">Select Duration</option>
+                                                                    @php
+                                                                    $duration = old('duration.' . $key, $fees['duration'] ?? '');
+                                                                    @endphp
+                                                                    @for($i = 1; $i <= 12; $i++)
+                                                                        <option value="{{ $i }}" {{ $duration == $i ? 'selected' : '' }}>{{ $i }} Month{{ $i > 1 ? 's' : '' }}</option>
+                                                                    @endfor
+                                                                </select>
+                                                            </td>
                                                             <td>
 
                                                                 <a href="#"
@@ -389,19 +400,19 @@
                                                      <tfoot>
                                                         <tr>
                                                             <td colspan="2"></td>
-                                                           
-                                                            
+
+
                                                             <td  colspan="1" class="fw-bold mw-100" style="color: black" >Total Fee:<span class="fw-bold" id="total_fee1"></span></td>
-                                                           
-                                                           
+
+
                                                             <td colspan="2" class="fw-bold " style="color: black" >Total Discount Value  :    <span class="fw-bold" id="fee_discount1"></span></td>
-                                                           
-                                                        
+
+
                                                             <td class="fw-bold " style="color: black">Total Payable:<span class="fw-bold" id="total_payable"></span></td>
                                                             <td colspan="3"></td>
                                                         </tr>
                                                     </tfoot>
-                                                   
+
 
 
 
@@ -422,7 +433,7 @@
                         </div>
                     </div>
                 </div>
-           
+
                 </form>
             </section>
 
@@ -431,7 +442,7 @@
     </div>
 </div>
 <!-- END: Content-->
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(window).on('load', function() {
         if (feather) {
@@ -475,7 +486,24 @@
     let tableData = [];
     let rows = document.querySelectorAll('.table tbody tr');
 
-   
+// <<<<<<< HEAD
+//         rows.forEach(row => {
+//             let rowData = {
+//                 title: row.querySelector('td:nth-child(2) select').value,
+//                 total_fees: row.querySelector('td:nth-child(3) input').value,
+//                 fee_discount_percent: row.querySelector('td:nth-child(4) input').value,
+//                 fee_discount_value: row.querySelector('td:nth-child(5) input').value,
+//                 net_fee_payable_value: row.querySelector('td:nth-child(6) input').value,
+//                 mandatory: row.querySelector('td:nth-child(7) input').checked,
+//                 payment_mode: row.querySelector('td:nth-child(8) select').value,
+//                 duration: row.querySelector('td:nth-child(9) select').value
+//
+//             };
+//             tableData.push(rowData);
+//             console.log(rowData);
+//             document.getElementById('form_details').value = JSON.stringify(tableData);
+// =======
+
     let grand_total_fees = document.getElementById('total_fee1')?.textContent.trim() || "0";
     let grand_total_discount = document.getElementById('fee_discount1')?.textContent.trim() || "0";
     let grand_total_payable = document.getElementById('total_payable')?.textContent.trim() || "0";
@@ -489,9 +517,9 @@
             net_fee_payable_value: row.querySelector('td:nth-child(6) input').value,
             mandatory: row.querySelector('td:nth-child(7) input').checked,
             payment_mode: row.querySelector('td:nth-child(8) select').value,
-           
-            
-        
+            duration: row.querySelector('td:nth-child(9) select').value,
+
+
             grand_total_fees: grand_total_fees,
             grand_total_discount: grand_total_discount,
             grand_total_payable: grand_total_payable
@@ -499,16 +527,16 @@
         tableData.push(rowData);
     });
 
-  
+
     document.getElementById('form_details').value = JSON.stringify(tableData);
 
-    
+
     console.log(tableData);
 }
+// >>>>>>> 798b756dcee47b85dba55b98ac398261eac34584
 
 
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
         var today = new Date().toISOString().split('T')[0];
@@ -525,7 +553,24 @@
         var discountPercent = parseFloat($row.find('#fee_discount').val()) || 0;
         var discountValue = parseFloat($row.find('#fee_discount_value').val()) || 0;
 
+// <<<<<<< HEAD
+//     // Condition 1: If user updates discount percentage, calculate discount value
+//     if(discount>0){
+//     if ($(this).attr('id') === 'fee_discount') {
+//         discountValue = (totalFee * discount) / 100;
+//         $row.find('#fee_discount_value').val(discountValue.toFixed(2));
+//     }}
+//     var rowTitle = $row.find('.title').text().trim() || "This Row";
+//     if(totalFee<discount){
+//
+//         $row.find('#fee_discount').val(0);
+//         discount = 0;
+//         $row.find('#fee_discount_value').val(0);
+//         discountValue = 0;
+//     }
+// =======
         var inputId = $(this).attr('id');
+// >>>>>>> 798b756dcee47b85dba55b98ac398261eac34584
 
         // If percent is changed
         if (inputId === 'fee_discount') {
@@ -605,7 +650,7 @@ $(document).on('change', 'input[name="guardian[]"]', function () {
 });
 $(document).ready(function() {
     setTimeout(function() {
-        $('#fee_tr input').trigger('input'); 
+        $('#fee_tr input').trigger('input');
     }, 500);
 });
 
@@ -616,20 +661,20 @@ function updateRows(table) {
     var rows = table.find('tbody tr');
 
     rows.each(function (index) {
-       
+
         $(this).find('td:first').text(index + 1);
 
-      
+
         var actionTd = $(this).find('td:last');
         if (index === 0) {
-            
+
             actionTd.html(`
                 <a href="#" class="text-primary add-contact-row">
                     <i data-feather="plus-square"></i>
                 </a>
             `);
         } else {
-           
+
             actionTd.html(`
                 <a href="#" class="text-danger delete-item">
                     <i data-feather="trash-2"></i>
@@ -638,6 +683,58 @@ function updateRows(table) {
         }
     });
 
+{{--<<<<<<< HEAD--}}
+{{--            // Generate a new row--}}
+{{--            var newRow = `--}}
+{{--                <tr>--}}
+{{--                    <td></td> <!-- Serial number will be added dynamically -->--}}
+{{--                    <td>--}}
+{{--                                                                <select class="form-control mw-100" name="title" required style="width: 300px">--}}
+{{--                                                                    <option value="" disabled>Select Title</option>--}}
+{{--                                                                    @foreach ($fee_head as $head)--}}
+{{--                                                                        <option value="{{ $head->fee_head }}"--}}
+{{--                                                                            @if (isset($fees) && $fees['title']== $head->fee_head) selected @endif>--}}
+{{--                                                                            {{ $head->fee_head }}--}}
+{{--                                                                        </option>--}}
+{{--                                                                    @endforeach--}}
+{{--                                                                </select>--}}
+{{--                                                            </td>--}}
+{{--                    <td><input type="number" class="form-control mw-100" value="" id="total_fee" /></td>--}}
+{{--                    <td><input type="number" class="form-control mw-100" value="" id="fee_discount" /></td>--}}
+{{--                    <td><input type="text" class="form-control mw-100" value="" id="fee_discount_value"  /></td>--}}
+{{--                    <td><input type="text" class="form-control mw-100" value="" id="net_fee" readonly /></td>--}}
+{{--                    <td><input type="checkbox" class="form-check-input" /></td>--}}
+{{--                    <td><select class="form-select mw-100">--}}
+{{--                        <option>Select</option>--}}
+{{--                        <option>Weekly</option>--}}
+{{--                        <option>Monthly</option>--}}
+{{--                        <option>Quarterly</option>--}}
+{{--                        <option>Semi-Yearly</option>--}}
+{{--                        <option>Yearly</option>--}}
+{{--                        <option>One Time</option>--}}
+{{--                    </select></td>--}}
+{{--                                                <td>--}}
+{{--                                                                    <select class="form-select mw-100 duration-select" name="duration" style="display: none;">--}}
+{{--                                                                        <option value="">Select Duration</option>--}}
+{{--                                                                        <option value="1">1 Month</option>--}}
+{{--                                                                        <option value="2">2 Months</option>--}}
+{{--                                                                        <option value="3">3 Months</option>--}}
+{{--                                                                        <option value="4">4 Months</option>--}}
+{{--                                                                        <option value="5">5 Months</option>--}}
+{{--                                                                        <option value="6">6 Months</option>--}}
+{{--                                                                        <option value="7">7 Months</option>--}}
+{{--                                                                        <option value="8">8 Months</option>--}}
+{{--                                                                        <option value="9">9 Months</option>--}}
+{{--                                                                        <option value="10">10 Months</option>--}}
+{{--                                                                        <option value="11">11 Months</option>--}}
+{{--                                                                        <option value="12">12 Months</option>--}}
+{{--                                                                    </select>--}}
+{{--                                                                </td>--}}
+{{--                    <td><a href="#" class="text-primary add-contact-row">--}}
+{{--                        <i data-feather="plus-square"></i>--}}
+{{--                    </a></td>--}}
+{{--                </tr>--}}
+// =======
     feather.replace();
 }
 
@@ -645,7 +742,7 @@ function updateRows(table) {
 $('body').on('click', '.add-contact-row', function (e) {
     e.preventDefault();
 
-    
+
     var table = $(this).closest('table');
 
     const $lastRow = table.find('tbody tr:last');
@@ -656,9 +753,9 @@ $lastRow.find('input[required], select[required]').each(function () {
     const val = $(this).val();
     if (val === null || val === '' || val === 'Select') {
         isValid = false;
-       
+
     } else {
-      
+
     }
 });
 
@@ -676,7 +773,7 @@ if (!isValid) {
                                                                                     <option value="{{ $head->fee_head }}">{{ $head->fee_head }}</option>
                                                                                   @endforeach
                                                                                 </select>
-                                                                    </td> 
+                                                                    </td>
                             <td><input type="number" class="form-control mw-100 total_fee" value="" id="total_fee" required /></td>
                             <td><input type="number" class="form-control mw-100" value="" id="fee_discount" /></td>
                             <td><input type="text" class="form-control mw-100 fee_discount_value" value="" id="fee_discount_value"  /></td>
@@ -694,16 +791,32 @@ if (!isValid) {
                                 </select>
                             </td>
                             <td>
+                                                                    <select class="form-select mw-100 duration-select" name="duration" style="display: none;">
+                                                                        <option value="">Select Duration</option>
+                                                                        <option value="1">1 Month</option>
+                                                                        <option value="2">2 Months</option>
+                                                                        <option value="3">3 Months</option>
+                                                                        <option value="4">4 Months</option>
+                                                                        <option value="5">5 Months</option>
+                                                                        <option value="6">6 Months</option>
+                                                                        <option value="7">7 Months</option>
+                                                                        <option value="8">8 Months</option>
+                                                                        <option value="9">9 Months</option>
+                                                                        <option value="10">10 Months</option>
+                                                                        <option value="11">11 Months</option>
+                                                                        <option value="12">12 Months</option>
+                                                                    </select>
+                                                                </td>
+                            <td>
                                 <a href="#" class="text-primary add-contact-row">
                                     <i data-feather="plus-square"></i>
                                 </a>
                             </td>
                         </tr>
-            
             `;
 
     table.find('tbody').append(newRow);
-    updateRows(table); 
+    updateRows(table);
 });
 
 
@@ -713,16 +826,16 @@ $('body').on('click', '.delete-item', function (e) {
     var row = $(this).closest('tr');
     var table = $(this).closest('table');
 
-    row.remove(); 
+    row.remove();
     calculateTotalPayable();
-    updateRows(table); 
+    updateRows(table);
 });
 
     });
 </script>
 <script>
      $(document).ready(function () {
-    
+
         $('#batch_year').change(function () {
         var batchYear = $(this).val();
         $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
@@ -751,13 +864,13 @@ $('body').on('click', '.delete-item', function (e) {
         }
     });
     // Fetch Sections on Batch Select
-    $('#batch_name').on('change', function () { 
+    $('#batch_name').on('change', function () {
     var batchName = $(this).val();
     $('#section').html('<option value="" selected>-----Select Section-----</option>');
 
     if (batchName) {
         $.ajax({
-            url: "{{ route('section.fetch') }}", 
+            url: "{{ route('section.fetch') }}",
             type: "POST",
             data: {
                 batch_name: batchName,
@@ -768,7 +881,7 @@ $('body').on('click', '.delete-item', function (e) {
                     $.each(response, function (index, item) {
                         $('#section').append('<option value="' + item.name + '">' + item.name + '</option>');
                     });
-                    $('#section').prop('disabled', false); 
+                    $('#section').prop('disabled', false);
                 } else {
                     $('#section').prop('disabled', true);
                 }
@@ -784,7 +897,43 @@ $('body').on('click', '.delete-item', function (e) {
     });
 </script>
 
+<script>
+    $(document).ready(function() {
+        // Handle payment frequency change
+        $(document).on('change', '.payment-frequency', function() {
+            var durationSelect = $(this).closest('tr').find('.duration-select');
+            var title = $(this).closest('tr').find('td:eq(1)').text().trim();
 
+            if ($(this).val() === 'Monthly') {
+                durationSelect.show();
+                durationSelect.prop('required', true);
+
+                // Show the modal with duration information
+                $('#paymentTitle').text(title);
+                $('#paymentDuration').text(durationSelect.find('option:selected').text());
+                $('#monthlyPaymentModal').modal('show');
+            } else {
+                durationSelect.hide();
+                durationSelect.prop('required', false);
+            }
+        });
+
+        // Handle duration change
+        $(document).on('change', '.duration-select', function() {
+            var title = $(this).closest('tr').find('td:eq(1)').text().trim();
+            $('#paymentTitle').text(title);
+            $('#paymentDuration').text($(this).find('option:selected').text());
+            $('#monthlyPaymentModal').modal('show');
+        });
+
+        // Initialize duration fields based on existing payment modes
+        $('.payment-frequency').each(function() {
+            if ($(this).val() === 'Monthly') {
+                $(this).closest('tr').find('.duration-select').show();
+            }
+        });
+    });
+</script>
 
 
 @endsection

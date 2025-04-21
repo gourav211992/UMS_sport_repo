@@ -212,7 +212,7 @@ use App\Http\Controllers\Auth\SportsResetPasswordController;
 
 use App\Http\Controllers\ums\sports\Activity\ScreeningMasterController;
 use App\Http\Controllers\ums\sports\Activity\ActivityMasterController;
-
+use App\Http\Controllers\ums\sports\Activity\ActivitySchedulerController;
 
 
 // Password Reset Routes
@@ -246,6 +246,10 @@ Route::group(['middleware' => ['sports']], function()
     Route::post('/get-batch-years-student', [SportRegisterController::class, 'get_batch_year'])->name('get.batch.year.student');
     Route::post('/get-batch-names-student', [SportRegisterController::class, 'get_batch_names'])->name('get.batch.names.student');
     Route::get('/get-quotas/{batchId}', [SportRegisterController::class, 'getQuotas']);
+
+    Route::get('/profile-view-detail/{id}', [SportRegisterController::class, 'profileViewDetail'])->name('profile-view-detail');
+    
+
 });
 Route::get('/fetch-fee-structure', [SportRegisterController::class, 'fetchFeeStructure'])->name('fetch.fee.structure');
 Route::put('/sport-registration-update/{id}', [SportRegisterController::class, 'postRegistrationUpdate'])->name('sport-registration-update');
@@ -283,8 +287,8 @@ Route::get('sports-register',function ()
 // Route::view('activity-master-add','ums.sports.activity.activity_master_add');
 
 //blades
-Route::view('activity-scheduler','ums.sports.activity.activity_scheduler');
-Route::view('activity-scheduler-add','ums.sports.activity.activity_scheduler_add');
+// Route::view('activity-scheduler','ums.sports.activity.activity_scheduler');
+// Route::view('activity-scheduler-add','ums.sports.activity.activity_scheduler_add');
 Route::view('activity-attendance','ums.sports.activity.activity_attendance');
 Route::view('activity-assessment','ums.sports.activity.activity_assessment');
 Route::view('mark-attendance','ums.sports.activity.mark_attendance');
@@ -314,6 +318,20 @@ Route::post('activity-master-edit/{id}', [ActivityMasterController::class, 'Acti
 Route::post('activity-master-add', [ActivityMasterController::class, 'activityMasterAdd'])->name('activity-master-add');
 Route::get('activity-master-delete/{id}', [ActivityMasterController::class, 'ActivityDelete'])->name('activity-master-delete');
 
+
+//scheduler
+Route::get('activity-scheduler', [ActivitySchedulerController::class, 'index'])->name('activity-scheduler');
+Route::get('activity-scheduler-add', [ActivitySchedulerController::class, 'activityScheduler'])->name('activity-scheduler-add');
+Route::post('activity-scheduler-add', [ActivitySchedulerController::class, 'activitySchedulerAdd'])->name('activity-scheduler-add');
+Route::get('activity-scheduler-edit/{id}', [ActivitySchedulerController::class, 'ActivityEdit'])->name('activity-scheduler-edit');
+Route::post('activity-scheduler-edit/{id}', [ActivitySchedulerController::class, 'ActivityUpdate'])->name('activity-scheduler-edit');
+Route::get('activity-scheduler-view/{id}', [ActivitySchedulerController::class, 'ActivityView'])->name('activity-scheduler-view');
+Route::get('activity-scheduler-delete/{id}', [ActivitySchedulerController::class, 'ActivityDelete'])->name('activity-scheduler-delete');
+Route::post('/get-batch-names-activity', [ActivitySchedulerController::class, 'get_batch_names'])->name('get.batch.names.activity');
+Route::post('/get-batch-section-activity', [ActivitySchedulerController::class, 'get_batch_section'])->name('get.batch.section.activity');
+Route::post('/get-section-group-activity', [ActivitySchedulerController::class, 'get_section_group'])->name('get.section.group.activity');
+Route::post('/get-activity-subactivity', [ActivitySchedulerController::class, 'get_activity_subactivity'])->name('get.activity.subactivities.activity');
+Route::post('/get_batch_student', [ActivitySchedulerController::class, 'get_batch_student'])->name('get_batch_student');
 
 
 //Screening Master 

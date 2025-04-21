@@ -163,8 +163,8 @@ class SportRegisterController extends Controller
     $optionalFields = [
         'mobile_number',
         'email',
-        'fee_batch_id',
-        'fee_section_id',
+        'batch_id',
+        'section_id',
         'group',
         'bai_id',
         'bai_state',
@@ -185,10 +185,6 @@ class SportRegisterController extends Controller
             $validated[$field] = $request->input($field);
         }
     }
-    $batch = sport_fee_master::find($request->fee_batch_id);
-    $batch_id = batch::where('batch_name',$batch->batch)->first();
-    $section = sport_fee_master::find($request->fee_section_id);
-    $section_id = Section::where('name',$section->section)->first();
     // Add system-generated fields
     $validated = array_merge($validated, [
         'organization_id' => $organization->id,
@@ -196,8 +192,6 @@ class SportRegisterController extends Controller
         'company_id'      => $organization->company_id,
         'userable_id'     => $user->id,
         'created_by'      => $user->auth_user_id,
-        'batch_id'        => $batch_id->id,
-        'section_id'      => $section_id->id
     ]);
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -208,7 +202,6 @@ class SportRegisterController extends Controller
     // Begin transaction
     DB::beginTransaction();
     try {
-
         // Insert into sport_register (Master Table)
         $sports = SportRegister::create($validated);
 
@@ -359,7 +352,7 @@ class SportRegisterController extends Controller
         }
         SportDocument::create($documentsData);
 
-        // Insert
+        // Insert 
         // if ($request->hasFile('documents')) {
         //     $documentsData = [];
         //     foreach ($request->file('documents') as $key => $files) {
@@ -439,7 +432,7 @@ class SportRegisterController extends Controller
 //         ->leftJoin('users', 'sport_registers.userable_id', '=', 'users.id')
 //         ->select('sport_registers.*', 'users.payment_status as user_payment_status');
 
-
+   
 //     if ($request->filled('date_range')) {
 //         $dates = explode(" to ", $request->date_range);
 //         if (count($dates) == 2) {
@@ -447,7 +440,7 @@ class SportRegisterController extends Controller
 //         }
 //     }
 
-
+    
 //     if ($request->filled('batch_id')) {
 //         $query->where('sport_registers.batch_id', $request->batch_id);
 //     }
@@ -460,11 +453,11 @@ class SportRegisterController extends Controller
 //         $query->where('users.payment_status', $request->payment_Status);
 //     }
 
-
+   
 //     $filtersApplied = $request->hasAny(['date_range', 'batch_id', 'profile_status', 'payment_Status']);
 
 //     if (!$filtersApplied) {
-
+        
 //         $students = SportRegister::with('batch')->latest()->get();
 //         $totalRegisteredStudents = SportRegister::count();
 //         $totalPaidStudents = SportRegister::join('users', 'sport_registers.userable_id', '=', 'users.id')
@@ -475,7 +468,7 @@ class SportRegisterController extends Controller
 //         $totalRejectedStudents = SportRegister::where('sport_registers.status', 'rejected')->count();
 
 //     } else {
-
+       
 //         $students = $query->get();
 //         $totalRegisteredStudents = $query->count();
 //         $totalPaidStudents = (clone $query)->where('users.payment_status', 'paid')->count();
@@ -486,9 +479,9 @@ class SportRegisterController extends Controller
 //     $batchs = Batch::all();
 
 //     return view('ums.sports.students', compact(
-//         'students',
-//         'batchs',
-//         'totalRegisteredStudents',
+//         'students', 
+//         'batchs', 
+//         'totalRegisteredStudents', 
 //         'totalPaidStudents',
 //         'totalApprovedStudents',
 //         'totalRejectedStudents'
@@ -502,7 +495,7 @@ public function fetch(Request $request)
         ->leftJoin('users', 'sport_registers.userable_id', '=', 'users.id')
         ->select('sport_registers.*', 'users.payment_status as user_payment_status');
 
-
+   
     if ($request->filled('date_range')) {
         $dates = explode(" to ", $request->date_range);
         if (count($dates) == 2) {
@@ -510,7 +503,7 @@ public function fetch(Request $request)
         }
     }
 
-
+    
     if ($request->filled('batch_id')) {
         $query->where('sport_registers.batch_id', $request->batch_id);
     }
@@ -524,17 +517,17 @@ public function fetch(Request $request)
             $q->whereNotIn('users.payment_status', ['paid', 'confirm'])
               ->orWhereNull('users.payment_status');
         });
-    }
+    } 
     elseif ($request->filled('payment_Status')) {
         $query->where('users.payment_status', $request->payment_Status);
     }
+   
 
-
-
+   
     $filtersApplied = $request->hasAny(['date_range', 'batch_id', 'profile_status', 'payment_Status']);
 
     if (!$filtersApplied) {
-
+        
         $students = SportRegister::with('batch')->latest()->get();
         $totalRegisteredStudents = SportRegister::count();
         $totalPaidStudents = SportRegister::join('users', 'sport_registers.userable_id', '=', 'users.id')
@@ -547,7 +540,7 @@ public function fetch(Request $request)
         $totaldraftStudents = SportRegister::where('sport_registers.status', 'draft')->count();
 
     } else {
-
+       
         $students = $query->latest()->get();
 
         $totalRegisteredStudents = $query->count();
@@ -567,9 +560,9 @@ public function fetch(Request $request)
     $selectpaymentstatus=$request->filled('payment_Status')? $request->payment_Status : ''  ;
 
     return view('ums.sports.students', compact(
-        'students',
-        'batchs',
-        'totalRegisteredStudents',
+        'students', 
+        'batchs', 
+        'totalRegisteredStudents', 
         'totalPaidStudents',
         'totalApprovedStudents',
         'totalRejectedStudents',
@@ -596,8 +589,8 @@ public function confirm(  Request $request, $id){
         return  back()->with('error', 'User not found');
     }
     $user->payment_status='confirm';
-    $user->save();
-
+    $user->save(); 
+ 
     return back()->with('success','payment status confirmed successfully');
  }
 
@@ -696,100 +689,6 @@ public function confirm(  Request $request, $id){
             'selectedCorrespondenceCountry',
             'user',
             'otherStates'
-        ));
-    }
-
-    public function profileViewDetail($id)
-    {
-        $registration = SportRegister::findOrFail($id);
-
-        $user = Helper::getAuthenticatedUser();
-        $parentURL = request()->segments()[0];
-        $parentURL = 'sport-registration';
-        $servicesBooks = Helper::getAccessibleServicesFromMenuAlias($parentURL);
-
-        if (empty($servicesBooks['services'])) {
-            return redirect()->route('/');
-        }
-        $sportSponsor = SportSponsor::where('registration_id', $registration->id)->get();
-        $familyDetails = SportFamilyDetail::where('registration_id', $registration->id)->get();
-        $sportEmergencyContact = SportEmergencyContact::where('registration_id', $registration->id)->get();
-        $sportRegistrationDetails = SportRegistrationDetail::where('registration_id',$registration->id)->first();
-        $sportTrainingDetails = SportTrainingDetail::where('registration_id',$registration->id)->get();
-        $sportDocuments = SportDocument::where('registration_id',$registration->id)->first();
-        $firstService = $servicesBooks['services'][0];
-        $series = Helper::getBookSeriesNew($firstService->alias, $parentURL)->get();
-        $sport_types = Sport_master::all();
-        $quotas = Quota::all();
-        $batchYears = sport_fee_master::select('batch_year')->distinct()->get();
-        $batch = sport_fee_master::all()->unique('batch');
-        $selectedBatch = sport_fee_master::where('batch_id', $registration->batch_id)->first();
-        $sections = sport_fee_master::all();
-        $quota = Quota::find($registration->quota_id);
-        $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
-        if ($registration->fee_details){
-            $feeDetails = json_decode($registration->fee_details, true);
-        }else{
-            $feeDetails = json_decode($sportFeeMaster->fee_details, true);
-        }
-        $groups = GroupMaster::where('status', 'active')->get();
-//        $selectedCountry = Country::where('id', $familyDetails[0]->permanent_country)->first();
-//        $selectedState = State::where('id', $familyDetails[0]->permanent_state)->first();
-//        $selectedCity = City::where('id', $familyDetails[0]->permanent_district)->first();
-        if ($familyDetails->isNotEmpty()) {
-            $selectedCountry = Country::where('id', $familyDetails[0]->permanent_country)->first();
-            $selectedState = State::where('id', $familyDetails[0]->permanent_state)->first();
-            $selectedCity = City::where('id', $familyDetails[0]->permanent_district)->first();
-            $selectedCorrespondenceCountry = Country::where('id', $familyDetails[0]->correspondence_country)->first();
-            $selectedCorrespondenceState = State::where('id', $familyDetails[0]->correspondence_state)->first();
-            $selectedCorrespondenceCity = City::where('id', $familyDetails[0]->correspondence_district)->first();
-        } else {
-            // Set default values if no family details are available
-            $selectedCountry = $selectedState = $selectedCity = null;
-            $selectedCorrespondenceCountry = $selectedCorrespondenceState = $selectedCorrespondenceCity = null;
-        }
-
-        // Load all countries to populate the country dropdown
-        $countries = Country::all();
-
-        // Only load the states and cities for the pre-selected country and state
-        if ($selectedCountry){
-            $states = State::where('country_id', $selectedCountry->id)->get();
-            $cities = City::where('state_id', $selectedState->id)->get();
-        }else{
-            $states = [];
-            $cities = [];
-        }
-//        dd($feeDetails);
-        $user = User::with('payments')->findOrFail($registration->userable_id);
-        return view('ums.sports.profile_view_detail', compact(
-            'registration',
-            'series',
-            'sport_types',
-            'quotas',
-            'batch',
-            'sections',
-            'sportFeeMaster',
-            'feeDetails',
-            'sportTrainingDetails',
-            'sportRegistrationDetails',
-            'familyDetails',
-            'sportEmergencyContact',
-            'sportSponsor',
-            'sportDocuments',
-            'groups',
-            'batchYears',
-            'selectedBatch',
-            'countries',
-            'states',
-            'cities',
-            'selectedCountry',
-            'selectedState',
-            'selectedCity',
-            'selectedCorrespondenceCity',
-            'selectedCorrespondenceState',
-            'selectedCorrespondenceCountry',
-            'user'
         ));
     }
 
@@ -979,8 +878,8 @@ public function confirm(  Request $request, $id){
         $optionalFields = [
             'mobile_number',
             'email',
-            'fee_batch_id',
-            'fee_section_id',
+            'batch_id',
+            'section_id',
             'group',
             'bai_id',
             'bai_state',
@@ -1007,14 +906,7 @@ public function confirm(  Request $request, $id){
             $image->move(public_path('images'), $imageName);
             $validated['image'] = 'images/' . $imageName;
         }
-        $batch = sport_fee_master::find($request->fee_batch_id);
-        $batch_id = batch::where('batch_name',$batch->batch)->first();
-        $section = sport_fee_master::find($request->fee_section_id);
-        $section_id = Section::where('name',$section->section)->first();
-        $validated = array_merge($validated, [
-            'batch_id'        => $batch_id->id,
-            'section_id'      => $section_id->id
-        ]);
+        // Begin transaction
         DB::beginTransaction();
         try {
             // Update the registration record
@@ -1182,35 +1074,10 @@ public function confirm(  Request $request, $id){
             }
             DB::commit();
             if ($request->status == 'on-hold') {
-                $sendOnHoldEmail = false;
-
-                // Check if quota_id changed
-                if ($registration->quota_id != $request->input('quota_id')) {
-                    $sendOnHoldEmail = true;
-                }
-
-                // Check if batch_id or section_id changed
-                if ($registration->batch_id != $batch_id->id || $registration->section_id != $section_id->id) {
-                    $sendOnHoldEmail = true;
-                }
-
-                // Check if fee_details changed
-                $oldFeeDetails = json_decode($registration->getOriginal('fee_details'), true);
-                $newFeeDetails = $request->input('fee_details');
-                if ($newFeeDetails && $oldFeeDetails !== $newFeeDetails) {
-                    $sendOnHoldEmail = true;
-                }
-
-                if ($sendOnHoldEmail) {
-                    Mail::send('ums.sports.on_hold_email', [
-                        'user' => $user,
-                        'remarks' => $request->remarks,
-                        'name' => $request->name
-                    ], function ($message) use ($user) {
-                        $message->to($user->email);
-                        $message->subject('Application On Hold');
-                    });
-                }
+                Mail::send('ums.sports.on_hold_email', ['user' => $user,'remarks'=>$request->remarks,'name'=>$request->name], function($message) use ($user) {
+                    $message->to($user->email);
+                    $message->subject('Application On Hold');
+                });
             }
             if ($request->status == 'approved') {
                 $sendApprovedEmail = false;
@@ -1293,13 +1160,13 @@ public function confirm(  Request $request, $id){
             $sportFeeMaster = sport_fee_master::where('quota',$quota->quota_name)->where('section',$sportFeeMaster->section)->first();
         }
         if ($sportFeeMaster) {
-            $feeStructure = json_decode($sportFeeMaster->fee_details, true);
+            $feeStructure = json_decode($sportFeeMaster->fee_details, true); 
         foreach ($feeStructure as $index => $fee) {
-            $feeStructure[$index]['id'] = $sportFeeMaster->id;
+            $feeStructure[$index]['id'] = $sportFeeMaster->id; 
         }
 
         foreach ($feeStructure as $index => $fee) {
-            $feeStructure[$index]['id'] = $sportFeeMaster->id;
+            $feeStructure[$index]['id'] = $sportFeeMaster->id; 
         }
             return response()->json([
                 'status' => 'success',
@@ -1312,25 +1179,20 @@ public function confirm(  Request $request, $id){
             'message' => 'No fee structure found for the selected criteria'
         ]);
     }
-
+    
     public function showProfile($id)
     {
         $student = User::findOrFail($id);
         $quota = Quota::find($student->registration->quota_id);
         $familyDetails = SportFamilyDetail::where('registration_id', $student->registration->id)->first();
 //        dd($student->registration);
+       
+       
 
 
-
-
-
+        
         $sportFeeMaster = SportRegister::where('userable_id', $id)->first();
-        // $feeDetails = $sportFeeMaster && !empty($sportFeeMaster->fee_details) ? json_decode($sportFeeMaster->fee_details, true) : [];
-        if ($student->registration->fee_details){
-            $feeDetails = json_decode($student->registration->fee_details, true);
-        }else{
-            $feeDetails = json_decode($sportFeeMaster->fee_details, true);
-        }
+        $feeDetails = $sportFeeMaster && !empty($sportFeeMaster->fee_details) ? json_decode($sportFeeMaster->fee_details, true) : [];
 
         // Ensure it's an array
         if (!is_array($feeDetails)) {
@@ -1526,8 +1388,8 @@ public function confirm(  Request $request, $id){
         $optionalFields = [
             'mobile_number',
             'email',
-            'fee_batch_id',
-            'fee_section_id',
+            'batch_id',
+            'section_id',
             'group',
             'bai_id',
             'bai_state',
@@ -1550,18 +1412,11 @@ public function confirm(  Request $request, $id){
         }
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
+            $imageName = time() . '_' . $image->getClientOriginalName(); 
             $image->move(public_path('images'), $imageName);
-            $validated['image'] = 'images/' . $imageName;
+            $validated['image'] = 'images/' . $imageName; 
         }
-        $batch = sport_fee_master::find($request->fee_batch_id);
-        $batch_id = batch::where('batch_name',$batch->batch)->first();
-        $section = sport_fee_master::find($request->fee_section_id);
-        $section_id = Section::where('name',$section->section)->first();
-        $validated = array_merge($validated, [
-            'batch_id'        => $batch_id->id,
-            'section_id'      => $section_id->id
-        ]);
+
         DB::beginTransaction();
         try {
             // Update the registration record
@@ -1769,8 +1624,8 @@ public function confirm(  Request $request, $id){
         $cities = City::where('state_id', $stateId)->get();
         return response()->json($cities);
     }
-
-    public function update_payment(Request $request)
+    
+    public function update_payment(Request $request) 
     {
         try {
             $validated = $request->validate([

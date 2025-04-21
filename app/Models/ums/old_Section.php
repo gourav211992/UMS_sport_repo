@@ -9,7 +9,7 @@ class Section extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name' , 'batch' ,'year', 'batch_id','status'];
+    protected $fillable = ['name' , 'batch' ,'year', 'status'];
 
     protected $guarded=[];
 

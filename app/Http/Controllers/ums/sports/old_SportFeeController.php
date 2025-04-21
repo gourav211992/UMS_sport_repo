@@ -84,7 +84,7 @@ class SportFeeController extends Controller
 
     public function store(Request $request)
     {
-    //    dd($request->all());
+       
         $validator = Validator::make($request->all(), [
             'series' => 'required|string|max:255',
             'schedule_no' => 'required|string|max:255',
@@ -210,7 +210,6 @@ class SportFeeController extends Controller
     
     //update function for admin
     public function update(Request $request, $id){
-        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'series' => 'required|string|max:255',
             'schedule_no' => 'required|string|max:255',

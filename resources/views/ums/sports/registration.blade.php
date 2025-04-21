@@ -218,15 +218,15 @@
                                                         <label class="form-label">Batch Name <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <select class="form-select" name="batch_id" id="batch_name" required>
+                                                        <select class="form-select" name="fee_batch_id" id="batch_name" required>
                                                             <option value="" selected>-----Select Batch-----</option>
                                                             @foreach ($batches as $batch)
-                                                            <option value="{{ $batch->id }}" {{ old('batch_id') == $batch->id ? 'selected' : '' }}>
+                                                            <option value="{{ $batch->id }}" {{ old('fee_batch_id') == $batch->id ? 'selected' : '' }}>
                                                                 {{ $batch->batch }}
                                                             </option>
                                                             @endforeach
                                                         </select>
-                                                        @error('batch_id')
+                                                        @error('fee_batch_id')
                                                         <div class="text-danger">{{ $message }}</div>
                                                         @enderror
                                                     </div>
@@ -237,11 +237,11 @@
                                                         <label class="form-label">Section <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <select class="form-select" name="section_id" id="section" required>
+                                                        <select class="form-select" name="fee_section_id" id="section" required>
                                                             <option value="" selected>-----Select Section-----</option>
                                                             <!-- Sections will be loaded dynamically based on batch selection -->
                                                         </select>
-                                                        @error('section_id')
+                                                        @error('fee_section_id')
                                                         <div class="text-danger">{{ $message }}</div>
                                                         @enderror
                                                     </div>
@@ -2164,6 +2164,8 @@
                     ${index !== 0 ? '' : ''}
                 </td>
             </tr>
+               <input type="hidden" name="fee_details[${index}][payment_mode]" value="${fee.payment_mode || ''}">
+               <input type="hidden" name="fee_details[${index}][duration]" value="${fee.duration || ''}">
         `;
 
                 feeTableBody.append(row);
@@ -2403,7 +2405,7 @@
             let errorField = document.getElementById("dojError");
 
             if (doj < minDate || doj > maxDate) {
-                errorField.textContent = "You can only select a date within the last 1 year.";
+                // errorField.textContent = "You can only select a date within the last 1 year.";
             } else {
                 errorField.textContent = "";
             }

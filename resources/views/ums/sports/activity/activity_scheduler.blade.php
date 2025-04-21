@@ -1,39 +1,5 @@
 @extends('ums.sports.sports-meta.admin-sports-meta')
 @section('content');
-    {{-- <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow erpnewsidemenu" data-scroll-to-active="true">
-        
-        <div class="shadow-bottom"></div>
-        <div class="main-menu-content newmodulleftmenu">
-            <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
-<!--
-                <li class="nav-ite"><a class="d-flex align-items-center" href="#"><i data-feather="home"></i><span class="menu-title text-truncate">Dashboard</span></a> 
-                </li>  
--->
-                <li class="nav-item"><a class="d-flex align-items-center" href="sport-master.html"><i data-feather="grid"></i><span class="menu-title text-truncate">Sports Master</span></a>
-                </li>
-                
-                <li class="nav-item"><a class="d-flex align-items-center" href="fee-schedule.html"><i data-feather="file-text"></i><span class="menu-title text-truncate">Fee Master</span></a>
-                </li>
-                
-                <li class="nav-item"><a class="d-flex align-items-center" href="students.html"><i data-feather="users"></i><span class="menu-title text-truncate">Student</span></a>
-                </li> 
-                
-                <li class="nav-item"><a class="d-flex align-items-center" href="index.html"><i data-feather="activity"></i><span class="menu-title text-truncate" data-i18n="Dashboards">Activity</span></a>
-                    <ul class="menu-content"> 
-                        <li><a class="d-flex align-items-center" href="activity-master.html"><i data-feather="circle"></i><span class="menu-item text-truncate">Master</span></a></li>
-                        <li><a class="d-flex align-items-center" href="activity-scheduler.html"><i data-feather="circle"></i><span class="menu-item text-truncate">Scheduler</span></a></li>
-                        <li><a class="d-flex align-items-center" href="activity-attendance.html"><i data-feather="circle"></i><span class="menu-item text-truncate">Player Review</span></a></li>
-						<li><a class="d-flex align-items-center" href="activity-assessment.html"><i data-feather="circle"></i><span class="menu-item text-truncate">Assessment</span></a></li>
-                    </ul>
-                </li> 
-                
-                 
-            </ul>
-        </div>
-		
-    </div> --}}
-    <!-- END: Main Menu-->
-
     <!-- BEGIN: Content-->
     <div class="app-content content ">
         <div class="content-overlay"></div>
@@ -46,7 +12,7 @@
                             <h2 class="content-header-title float-start mb-0">Activity Scheduler</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>  
+                                    <li class="breadcrumb-item"><a href="">Home</a></li>  
                                     <li class="breadcrumb-item active">Scheduler List</li>
                                 </ol>
                             </div>
@@ -55,33 +21,36 @@
                 </div>
                 <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">
-                        <button class="btn btn-warning btn-sm mb-50 mb-sm-0" data-bs-target="#filter" data-bs-toggle="modal"><i data-feather="filter"></i> Filter</button> 
+                        {{-- <button class="btn btn-warning btn-sm mb-50 mb-sm-0" data-bs-target="#filter" data-bs-toggle="modal"><i data-feather="filter"></i> Filter</button>  --}}
 						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('activity-scheduler-add')}}"><i data-feather="plus-circle"></i> Add New</a> 
                     </div>
                 </div>
             </div>
             <div class="content-body">
-                 
-                
-				
+			 @if(session('success'))
+				<div class="alert alert-success p-2 alert-dismissible fade show" role="alert">
+					<span>{{ session('success') }}</span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			 @endif
+
+	        <div id="ajax-success-container"></div>
+
+
 				<section id="basic-datatable">
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-								
-								   
                                 <div class="table-responsive candidates-tables">
 									<table class="datatables-basic table table-striped myrequesttablecbox loanapplicationlist tasklist "> 
                                         <thead>
-                                             <tr>
+                                             <tr class="text-center">
 												<th>#</th>
 												<th>Activity</th>
 												<th>Scheduler No.</th>
 												<th>Trainer</th>
 												<th>Start Date</th>
-												<th>Start Time</th>
 												<th>End Date</th>
-												<th>End Time</th>
 												<th>Section</th>
 												<th>Group</th>
 												<th>Students</th>
@@ -90,202 +59,91 @@
 											  </tr>
 											</thead>
 											<tbody>
-												 <tr>
-													<td>1</td>
-													<td class="fw-bolder text-dark">GYM</td>
-													<td>1</td>
-													<td>Aniket Singh</td>
-													<td>27-02-2025</td>
-													<td> 10:00 AM</td>
-													<td>27-02-2025</td>
-													<td> 10:00 AM</td>
-													<td>AB</td>
-													<td>10</td>
-													<td><span class="badge rounded-pill badge-light-secondary badgeborder-radius">10</span></td>
-													<td><span class="badge rounded-pill badge-light-success badgeborder-radius">Active</span></td> 
-													<td class="tableactionnew">
+												@foreach ($activityScheduler as $index=>$item)
+												 <tr class="text-center">
+													<td>{{$index+1}}</td>
+													<td class="fw-bolder text-dark">{{$item->activity}}</td>
+													<td>{{$item->scheduler_no}}</td>
+													<td>{{$item->trainer}}</td>
+													<td>{{$item->start_date}}</td>
+													<td>{{$item->end_date}}</td>
+													<td>{{ $item->sectionRelation->name ?? 'N/A' }}</td>
+													<td>{{ $item->groupRelation->name ?? 'N/A' }}</td>												
+													@php
+													$student = json_decode($item->batch_student , true);
+													$count = is_array($student) ? count($student) : 0;
+												    @endphp
+												
+												<td>
+													<span class="badge rounded-pill badge-light-secondary badgeborder-radius">{{$count}}</span>
+												</td>
+											    <td>
+											    	@if($item->status == 'inactive')
+											    	<span class="badge rounded-pill badge-light-danger">Inactive</span>
+										        	@else
+											     	<span class="badge rounded-pill badge-light-success">Active</span>
+											       @endif
+										        </td>	
+											  			<td class="tableactionnew">
 														<div class="dropdown">
 															<button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
 																<i data-feather="more-vertical"></i>
 															</button>
 															<div class="dropdown-menu dropdown-menu-end">
-																<a class="dropdown-item" href="{{url('activity-scheduler-view')}}">
+																<a class="dropdown-item" href="{{url('activity-scheduler-view/'.$item->id)}}">
 																	<i data-feather="eye" class="me-50"></i>
 																	<span>View Detail</span>
 																</a>
-																<a class="dropdown-item" href="{{url('activity-scheduler-edit')}}">
+																<a class="dropdown-item" href="{{url('activity-scheduler-edit/'.$item->id)}}">
 																	<i data-feather="edit-3" class="me-50"></i>
 																	<span>Edit</span>
 																</a>
-																<a class="dropdown-item" href="#">
-																	<i data-feather="trash-2" class="me-50"></i>
-																	<span>Delete</span>
-																</a> 
-															</div>
-														</div>
-													</td>
-												  </tr>
-												  <tr>
-													<td>2</td>
-													<td class="fw-bolder text-dark">Yoga</td>
-													<td>2</td>
-													<td>Aniket Singh</td>
-													<td>27-02-2025</td>
-													<td> 10:00 AM</td>
-													<td>27-02-2025</td>
-													<td> 10:00 AM</td>
-													<td>AB</td>
-													<td>10</td>
-													<td><span class="badge rounded-pill badge-light-secondary badgeborder-radius">10</span></td>
-													<td><span class="badge rounded-pill badge-light-danger badgeborder-radius">Inactive</span></td>
-													<td class="tableactionnew">
-														<div class="dropdown">
-															<button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
-																<i data-feather="more-vertical"></i>
-															</button>
-															<div class="dropdown-menu dropdown-menu-end">
-																<a class="dropdown-item" href="{{url('activity-scheduler-view')}}">
-																	<i data-feather="eye" class="me-50"></i>
-																	<span>View Detail</span>
-																</a>
-																<a class="dropdown-item" href="">
-																	<i data-feather="edit-3" class="me-50"></i>
-																	<span>Edit</span>
-																</a>
-																<a class="dropdown-item" href="#">
-																	<i data-feather="trash-2" class="me-50"></i>
-																	<span>Delete</span>
-																</a> 
-															</div>
-														</div>
-													</td>
-												  </tr>
-												  <tr>
-													<td>3</td>
-													<td class="fw-bolder text-dark">Zumba</td>
-													<td>3</td>
-													<td>Aniket Singh</td>
-													<td>27-02-2025</td>
-													<td>10:00 AM</td>
-													<td>27-02-2025</td>
-													<td>10:00 AM</td>
-													<td>AB</td>
-													<td>10</td>
-													<td><span class="badge rounded-pill badge-light-secondary badgeborder-radius">10</span></td>
-													<td><span class="badge rounded-pill badge-light-danger badgeborder-radius">Inactive</span></td>
-													<td class="tableactionnew">
-														<div class="dropdown">
-															<button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
-																<i data-feather="more-vertical"></i>
-															</button>
-															<div class="dropdown-menu dropdown-menu-end">
-																<a class="dropdown-item" href="{{url('activity-scheduler-view')}}">
-																	<i data-feather="eye" class="me-50"></i>
-																	<span>View Detail</span>
-																</a>
-																<a class="dropdown-item" href="{{url('activity-scheduler-edit')}}">
-																	<i data-feather="edit-3" class="me-50"></i>
-																	<span>Edit</span>
-																</a>
-																<a class="dropdown-item" href="#">
-																	<i data-feather="trash-2" class="me-50"></i>
-																	<span>Delete</span>
-																</a> 
-															</div>
-														</div>
-													</td>
-												  </tr>
-												  <tr>
-													<td>4</td>
-													<td class="fw-bolder text-dark">Dance</td>
-													<td>4</td>
-													<td>Aniket Singh</td>
-													<td>27-02-2025</td>
-													<td> 10:00 AM</td>
-													<td>27-02-2025</td>
-													<td> 10:00 AM</td>
-													<td>AB</td>
-													<td>10</td>
-													<td><span class="badge rounded-pill badge-light-secondary badgeborder-radius">10</span></td>
-													<td><span class="badge rounded-pill badge-light-success badgeborder-radius">Active</span></td>
-													<td class="tableactionnew">
-														<div class="dropdown">
-															<button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
-																<i data-feather="more-vertical"></i>
-															</button>
-															<div class="dropdown-menu dropdown-menu-end">
-																<a class="dropdown-item" href="{{url('activity-scheduler-view')}}">
-																	<i data-feather="eye" class="me-50"></i>
-																	<span>View Detail</span>
-																</a>
-																<a class="dropdown-item" href="{{url('activity-scheduler-edit')}}">
-																	<i data-feather="edit-3" class="me-50"></i>
-																	<span>Edit</span>
-																</a>
-																<a class="dropdown-item" href="#">
-																	<i data-feather="trash-2" class="me-50"></i>
-																	<span>Delete</span>
-																</a> 
-															</div>
-														</div>
-													</td>
-												  </tr>
-												  <tr>
-													<td>5</td>
-													<td class="fw-bolder text-dark">High Intensity</td>
-													<td>5</td>
-													<td>Aniket Singh</td>
-													<td>27-02-2025</td>
-													<td>10:00 AM</td>
-													<td>27-02-2025</td>
-													<td>10:00 AM</td>
-													<td>AB</td>
-													<td>10</td>
-													<td><span class="badge rounded-pill badge-light-secondary badgeborder-radius">10</span></td>
-													<td><span class="badge rounded-pill badge-light-success badgeborder-radius">Active</span></td>
-													<td class="tableactionnew">
-														<div class="dropdown">
-															<button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
-																<i data-feather="more-vertical"></i>
-															</button>
-															<div class="dropdown-menu dropdown-menu-end">
-																<a class="dropdown-item" href="{{url('activity-scheduler-view')}}">
-																	<i data-feather="eye" class="me-50"></i>
-																	<span>View Detail</span>
-																</a>
-																<a class="dropdown-item" href="{{url('activity-scheduler-edit')}}">
-																	<i data-feather="edit-3" class="me-50"></i>
-																	<span>Edit</span>
-																</a>
-																<a class="dropdown-item" href="#">
-																	<i data-feather="trash-2" class="me-50"></i>
-																	<span>Delete</span>
-																</a> 
-															</div>
-														</div>
-													</td>
-												  </tr>
-											   </tbody>
+																{{-- <a class="dropdown-item" href="{{ url('activity-scheduler-delete/'.$item->id) }}" onclick="return confirm('Are you sure you want to delete this data?')">
+																 <i data-feather="trash-2" class="me-50"></i>
+																 <span>Delete</span>
+															 </a> --}}
+															 <a href="#" 
+															 class="dropdown-item open-confirm-modal" 
+															 data-href="{{ url('activity-scheduler-delete/'.$item->id) }}">
+															  <i data-feather="trash-2" class="me-50"></i>
+															  <span>Delete</span>
+														     </a>
 
-
+															 
+															</div>
+														</div>
+													</td>
+												  </tr>
+												@endforeach
+										</tbody>
 									</table>
 								</div>
-								
-								
-								
-								
-								
                             </div>
                         </div>
                     </div>
-                     
                 </section>
-                 
-
             </div>
         </div>
     </div>
     <!-- END: Content-->
+
+	<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Confirm Deletion</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+			  Are you sure you want to delete this fee record?
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+			  <a href="#" class="btn btn-danger" id="confirmDeleteBtn">Delete</a>
+			</div>
+		  </div>
+		</div>
+	  </div>
 
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
@@ -299,7 +157,6 @@
 				<div class="modal-body flex-grow-1">
 					<div class="mb-1">
 						  <label class="form-label" for="fp-range">Select Date</label>
-<!--                        <input type="text" id="fp-default" class="form-control flatpickr-basic" placeholder="YYYY-MM-DD" />-->
 						  <input type="text" id="fp-range" class="form-control flatpickr-range bg-white" placeholder="YYYY-MM-DD to YYYY-MM-DD" />
 					</div>
                     
@@ -332,9 +189,7 @@
 							<option>Inactive</option> 
 						</select>
 					</div> 
-                    
-                    
-					 
+ 
 				</div>
 				<div class="modal-footer justify-content-start">
 					<button type="button" class="btn btn-primary data-submit mr-1">Apply</button>
@@ -343,6 +198,50 @@
 			</form>
 		</div>
 	</div>
+	
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const msg = sessionStorage.getItem('successMessage');
+			if (msg) {
+				const alertBox = `
+					<div class="alert alert-success p-2 alert-dismissible fade show" role="alert">
+						<span>${msg}</span>
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				`;
+				document.getElementById('ajax-success-container').innerHTML = alertBox;
+				sessionStorage.removeItem('successMessage');
+			}
+		});
+	</script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const msg = sessionStorage.getItem('successMessage');
+        if (msg) {
+            const alertBox = `
+                <div class="alert alert-success p-2 alert-dismissible fade show" role="alert">
+                    <span>${msg}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            document.getElementById('ajax-success-container').innerHTML = alertBox;
+            sessionStorage.removeItem('successMessage');
+        }
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+	$(document).on('click', '.open-confirm-modal', function (e) {
+e.preventDefault(); 
+
+let deleteUrl = $(this).data('href');
+$('#confirmDeleteBtn').attr('href', deleteUrl); 
+
+$('#confirmDeleteModal').modal('show'); 
+});
+
+</script>
 
 @endsection

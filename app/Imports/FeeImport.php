@@ -14,6 +14,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Collection;
 use App\Models\Book;
 use App\Helpers\Helper;
+use DateTime;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
@@ -29,10 +30,8 @@ class FeeImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            // Validate required fields
-            if (collect($row)->filter()->isEmpty()) {
-                return null;
-            }
+            if (collect($row)->filter()->isEmpty()) return null;
+
             if (!isset($row['batch_year'], $row['batch_name'], $row['section'])) {
                 Log::error('Row skipped due to missing required fields: ' . json_encode($row));
                 return null;
@@ -40,20 +39,16 @@ class FeeImport implements ToCollection, WithHeadingRow
 
             $batchName = trim((string) $row['batch_name']);
             $batch = batch::where('batch_name', $batchName)->first();
-
             if (!$batch) {
                 Log::error("Batch not found: $batchName");
                 return null;
             }
 
-
-            // Find Book
             $book = Book::find($this->bookId);
             if (!$book) {
                 Log::error('Book not found for ID: ' . $this->bookId);
                 continue;
             }
-
 
             $docNumberData = Helper::generateDocumentNumberNew($book->id, Carbon::now()->toDateString());
             if (!$docNumberData) {
@@ -61,19 +56,16 @@ class FeeImport implements ToCollection, WithHeadingRow
                 continue;
             }
 
-
             $feeDetailsArray = [];
+
             if (isset($row['fee_head'], $row['fee_amount'])) {
-                // $feeHeads = explode(",", (string) $row['fee_head']);
-                // $feeAmounts = explode(",", (string) $row['fee_amount']);
-                // $feeDiscounts = explode(",", (string) ($row['fee_discount'] ?? ''));
-                // $feeDiscountValues = explode(",", (string) ($row['fee_discount_value'] ?? ''));
-                // $netFees = explode(",", (string) ($row['net_fee'] ?? ''));
-                // $frequencies = explode(",", (string) ($row['frequency'] ?? ''));
-                // $mandatory = explode(",", (string) ($row['mandatory'] ?? ''));
                 $clean = function ($str) {
+                    
                     $str = preg_replace('/\s*[,]\s*/', ',', $str);
-                    $str = preg_replace('/[^\w\s,]/', '', $str);
+                
+                  
+                    $str = preg_replace('/[^\w\s,-]/', '', $str);
+                
                     return $str;
                 };
 
@@ -81,61 +73,41 @@ class FeeImport implements ToCollection, WithHeadingRow
                 $feeAmounts = explode(",", $clean((string) $row['fee_amount']));
                 $feeDiscounts = explode(",", $clean((string) ($row['fee_discount'] ?? '')));
                 $feeDiscountValues = explode(",", $clean((string) ($row['fee_discount_value'] ?? '')));
-                $netFees = explode(",", $clean((string) ($row['net_fee'] ?? '')));
                 $frequencies = explode(",", $clean((string) ($row['frequency'] ?? '')));
                 $mandatory = explode(",", $clean((string) ($row['mandatory'] ?? '')));
 
+               
+                $totals = $this->calculateFeeTotals($feeHeads, $feeAmounts, $feeDiscounts, $feeDiscountValues, $mandatory);
 
                 foreach ($feeHeads as $index => $feeHead) {
-                    if (trim($feeHead) === '') {
-                        continue; // Skip empty fee heads
+                    if (trim($feeHead) === '') continue;
+
+                    $amount = floatval($feeAmounts[$index] ?? 0);
+                    $discountValue = 0;
+
+                    if (!empty($feeDiscountValues[$index])) {
+                        $discountValue = floatval($feeDiscountValues[$index]);
+                    } elseif (!empty($feeDiscounts[$index])) {
+                        $discountPercent = floatval($feeDiscounts[$index]);
+                        $discountValue = ($amount * $discountPercent) / 100;
                     }
+
+                    $netFee = $amount - $discountValue;
 
                     $feeDetailsArray[] = [
                         'title' => trim($feeHead),
-                        'total_fees' => $feeAmounts[$index] ?? null,
+                        'total_fees' => $amount,
                         'fee_discount_percent' => $feeDiscounts[$index] ?? null,
-                        'fee_discount_value' => $feeDiscountValues[$index] ?? null,
-                        'net_fee_payable_value' => $netFees[$index] ?? null,
+                        'fee_discount_value' => $discountValue,
+                        'net_fee_payable_value' => $netFee,
                         'payment_mode' => $frequencies[$index] ?? null,
                         'mandatory' => $mandatory[$index] ?? null,
+                        'grand_total_fees' => $totals['grand_total_fees'],
+                        'grand_total_discount' => $totals['grand_total_discount'],
+                        'grand_total_payable' => $totals['grand_total_payable'],
                     ];
                 }
             }
-
-
-            // function excelToDateSmart($value, $format = 'Y-m-d')
-            // {
-            //     $value = trim((string) $value);
-
-            //     // Handle Excel serial number
-            //     if (is_numeric($value)) {
-            //         return date($format, strtotime("1899-12-30 +$value days"));
-            //     }
-
-            //     // Try to parse a date in m/d/Y format (like 4/14/2025)
-            //     $date = DateTime::createFromFormat('n/j/Y', $value);
-            //     if ($date !== false) {
-            //         return $date->format($format);
-            //     }
-
-            //     // Fallback to general strtotime
-            //     return date($format, strtotime($value));
-            // }
-
-
-
-
-
-            function excelToDateSmart($value, $format = 'Y-m-d')
-            {
-                $value = trim((string) $value);
-                if (is_numeric($value)) {
-                    return date($format, strtotime("1899-12-30 +$value days"));
-                }
-                return date($format, strtotime($value));
-            }
-
 
             sport_fee_master::create([
                 'series' => null,
@@ -154,14 +126,92 @@ class FeeImport implements ToCollection, WithHeadingRow
                 'batch' => trim((string) $row['batch_name']),
                 'section' => trim((string) $row['section']),
                 'quota' => trim((string) ($row['quota'] ?? '')),
-                'start_date' => excelToDateSmart($row['from_date']),
-                'end_date'   => excelToDateSmart($row['to_date']),
-                'status' => 'active',
+                'start_date' => $this->excelToDateSmart($row['from_date']),
+                'end_date' => $this->excelToDateSmart($row['to_date']),
+                'status' => 'Active',
                 'sport_name' => 'Badminton',
                 'fee_details' => json_encode($feeDetailsArray),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+        }
+    }
+
+
+
+    
+        private function calculateFeeTotals(
+        array $feeHeads,
+        array $feeAmounts,
+        array $feeDiscountPercents,
+        array $feeDiscountValues,
+        array $mandatory
+    ): array {
+        $totalFees = 0;
+        $totalDiscount = 0;
+        $totalPayable = 0;
+    
+        foreach ($feeHeads as $index => $head) {
+            if (trim($head) === '') continue;
+    
+            $isMandatory = strtolower(trim($mandatory[$index] ?? '')) === 'yes';
+            if (!$isMandatory) continue;
+    
+            $amount = floatval($feeAmounts[$index] ?? 0);
+    
+            $discountValue = floatval($feeDiscountValues[$index] ?? 0);
+            $discountPercent = floatval($feeDiscountPercents[$index] ?? 0);
+    
+            $finalDiscount = 0;
+    
+            if ($discountValue > 0) {
+               
+                $finalDiscount = $discountValue;
+            } elseif ($discountPercent > 0) {
+               
+                $finalDiscount = ($amount * $discountPercent) / 100;
+            }
+    
+            $netFee = $amount - $finalDiscount;
+    
+            $totalFees += $amount;
+            $totalDiscount += $finalDiscount;
+            $totalPayable += $netFee;
+        }
+    
+        return [
+            'grand_total_fees' => round($totalFees, 2),
+            'grand_total_discount' => round($totalDiscount, 2),
+            'grand_total_payable' => round($totalPayable, 2),
+        ];
+    }
+    
+
+    private function excelToDateSmart($value, $format = 'Y-m-d')
+    {
+        $value = trim((string) $value);
+
+        if (is_numeric($value)) {
+            return date($format, strtotime("1899-12-30 +$value days"));
+        }
+
+        $possibleFormats = [
+            'Y-m-d', 'd-m-Y', 'm-d-Y', 'd/m/Y', 'm/d/Y', 'd.m.Y', 'm.d.Y',
+            'Y/m/d', 'Y.m.d', 'd M Y', 'M d, Y'
+        ];
+
+        foreach ($possibleFormats as $f) {
+            $date = DateTime::createFromFormat($f, $value);
+            if ($date && $date->format($f) === $value) {
+                return $date->format($format);
+            }
+        }
+
+        try {
+            return date($format, strtotime($value));
+        } catch (\Exception $e) {
+            Log::error("Invalid date format: {$value}");
+            return null;
         }
     }
 }
