@@ -350,15 +350,26 @@
                                                         </div>
                                                     </div>
                                                 @else
+                                                    <div class="appli-photobox">
+                                                        <p id="photoSizeText">Photo Size<br />25mm X 35mm</p>
+                                                        <img id="previewImg" src="{{ old('image') ? asset('storage/' . old('image')) : '' }}" alt="Profile Image" style="max-width: 150px; border-radius: 5px; display: {{ old('image') ? 'block' : 'none' }};">
+                                                    </div>
                                                     <div class="mt-2 text-center">
                                                         <div class="image-uploadhide">
                                                             <label for="imageUpload" class="btn btn-outline-primary btn-sm waves-effect">
                                                                 <i data-feather="upload"></i> Upload Profile Image
                                                             </label>
-                                                            <input type="file" id="imageUpload" name="image" class="d-none">
+                                                            <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;">
                                                         </div>
+                                                        @error('image')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
                                                     </div>
                                                 @endif
+
+                                                <div class="my-1 text-center">
+                                                    <small class="form-text text-danger ">Upload JPG, JPEG, or PNG<br>(10KB–5MB).</small>
+                                                </div>
 
                                                 <div class="row align-items-center mb-2 mt-4 justify-content-center text-center">
                                                     <div class="col-md-12">
@@ -1416,12 +1427,12 @@
                                                                         </div>
 
                                                                         <div class="col-md-12 mb-1">
-                                                                            <label class="form-label">Payment Document <span class="text-danger"></span></label>
+                                                                            <label class="form-label">Payment Document <span class="text-danger">*</span></label>
                                                                             <input type="file" class="form-control" name="pay_doc" />
                                                                         </div>
 
                                                                          <div class="col-md-12 mb-1">
-                                                                            <label class="form-label">Paid Amount <span class="text-danger"></span></label>
+                                                                            <label class="form-label">Paid Amount <span class="text-danger">*</span></label>
                                                                             <input type="text" class="form-control" name="paid_amount" />
                                                                         </div>
 
@@ -1589,6 +1600,10 @@
                                                     <div class="row">
 
                                                         <div class="col-md-6">
+
+                                                            <div class="mb-2">
+                                                                <small class="form-text text-danger ">Supported formats: JPG, JPEG, PNG, PDF. file size between: 10KB and 5MB</small>
+                                                            </div>
 
                                                             <!-- Identity Proof -->
                                                             <div class="row mb-1">
@@ -1787,6 +1802,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const imageInput = document.getElementById('{{ $registration->image ? "replace-image" : "imageUpload" }}');
+            const previewImg = document.getElementById("previewImg");
+            const photoSizeText = document.getElementById("photoSizeText");
+
+            imageInput.addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewImg.style.display = "block";
+                        if (photoSizeText) photoSizeText.style.display = "none";
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
         $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
@@ -2779,24 +2812,6 @@
             });
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const imageInput = document.getElementById('{{ $registration->image ? "replace-image" : "imageUpload" }}');
-            const previewImg = document.getElementById("previewImg");
-            const photoSizeText = document.getElementById("photoSizeText");
-
-            imageInput.addEventListener("change", function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImg.src = e.target.result;
-                        previewImg.style.display = "block";
-                        if (photoSizeText) photoSizeText.style.display = "none";
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        });
         function saveDraft() {
             document.getElementById('status').value = 'on-hold';
             document.getElementById('postRegister').submit();

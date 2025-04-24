@@ -57,7 +57,7 @@
                                             <th>#</th>
                                             <th>Quota</th>
                                             <th>Display Name</th>
-                                            <th>Discount%</th>
+                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -67,7 +67,12 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td class="fw-bolder text-dark">{{ $quota->quota_name }}</td>
                                             <td class="fw-bolder text-dark">{{ $quota->display_name }}</td>
-                                            <td class="fw-bolder text-dark">{{ $quota->discount }}</td>
+                                            {{-- <td class="fw-bolder text-dark">{{ $quota-> }}</td> --}}
+                                            <td>
+                                                <span class="badge rounded-pill {{ $quota->status == 'active' ? 'badge-light-success' : 'badge-light-danger' }}">
+                                                    {{ ucfirst($quota->status) }}
+                                                </span>
+                                            </td>
                                             <!-- <td class="tableactionnew">
                                                 <div class="dropdown">
                                                     <button type="button"

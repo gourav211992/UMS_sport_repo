@@ -66,15 +66,31 @@
                                                     </div>
                                                 </div>
                                             
-                                                <div class="row align-items-center mb-1">
+                                                {{-- <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Discount% <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
                                                         <input type="text" class="form-control" name="discount" value="{{ old('discount', $quota->discount ?? '') }}" required />
                                                     </div>
+                                                </div> --}}
+                                                <div class="row align-items-center mb-2">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Status</label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <div class="demo-inline-spacing">
+                                                            <div class="form-check form-check-primary mt-25">
+                                                                <input type="radio" id="inactive" name="status" value="inactive" class="form-check-input">
+                                                                <label class="form-check-label fw-bolder" for="inactive">Inactive</label>
+                                                            </div>
+                                                            <div class="form-check form-check-primary mt-25">
+                                                                <input type="radio" id="active" name="status" value="active" class="form-check-input" checked>
+                                                                <label class="form-check-label fw-bolder" for="active">Active</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            
                                                 <div class="mt-3">
                                                     <button type="button" onClick="javascript: history.go(-1)" class="btn btn-secondary btn-sm">
                                                         <i data-feather="arrow-left-circle"></i> Back

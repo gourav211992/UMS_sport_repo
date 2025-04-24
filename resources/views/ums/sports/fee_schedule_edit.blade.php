@@ -373,7 +373,7 @@
                                                                     <option value="One Time" {{ $paymentMode == 'One Time' ? 'selected' : '' }}>One Time</option>
                                                                 </select>
                                                             </td>
-                                                            <td>
+                                                            <!-- <td>
                                                                 <select class="form-select mw-100 duration-select" name="duration[]" style="{{ $paymentMode == 'Monthly' ? '' : 'display: none;' }}">
                                                                     <option value="">Select Duration</option>
                                                                     @php
@@ -383,7 +383,20 @@
                                                                         <option value="{{ $i }}" {{ $duration == $i ? 'selected' : '' }}>{{ $i }} Month{{ $i > 1 ? 's' : '' }}</option>
                                                                     @endfor
                                                                 </select>
-                                                            </td>
+                                                            </td> -->
+                                                            <td>
+    <select class="form-select mw-100 duration-select" name="duration[]" style="{{ $paymentMode == 'Monthly' ? '' : 'display: none;' }}">
+        <option value="">Select Duration</option>
+        @php
+            //dd($fees['monthly_duration']);
+            $duration = old('duration.' . $key, $fees['duration'] ?? ''); 
+        @endphp
+        @for($i = 1; $i <= 12; $i++)
+            <option value="{{ $i }}" {{  $fees['duration'] == $i ? 'selected' : '' }}>{{ $i }} Month{{ $i > 1 ? 's' : '' }}</option>
+        @endfor
+    </select>
+</td>
+
                                                             <td>
 
                                                                 <a href="#"
@@ -540,8 +553,7 @@
 <script>
     $(document).ready(function () {
         var today = new Date().toISOString().split('T')[0];
-        $('#start_date').attr('min', today);
-        $('#end_date').attr('min', today);
+        
     });
 </script>
 

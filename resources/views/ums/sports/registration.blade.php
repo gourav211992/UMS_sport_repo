@@ -314,6 +314,9 @@
                                             </div>
 
                                             <div class="col-md-4 border-start">
+                                                <!-- <div class="mb-2">
+                                                    <small class="form-text text-danger ">Upload JPG, JPEG, or PNG<br>(10KB–5MB).</small>
+                                                </div> -->
                                                 <div class="appli-photobox">
                                                     <p id="photoSizeText">Photo Size<br />25mm X 35mm</p>
                                                     <img id="previewImg" src="{{ old('image') ? asset('storage/' . old('image')) : '' }}" alt="Profile Image" style="max-width: 150px; border-radius: 5px; display: {{ old('image') ? 'block' : 'none' }};">
@@ -329,6 +332,10 @@
                                                     @error('image')
                                                     <div class="text-danger">{{ $message }}</div>
                                                     @enderror
+                                                </div>
+
+                                                <div class="my-1 text-center">
+                                                    <small class="form-text text-danger ">Upload JPG, JPEG, or PNG<br>(10KB–5MB).</small>
                                                 </div>
 
                                                 <div class="row align-items-center mb-2 mt-4 justify-content-center text-center">
@@ -1277,6 +1284,10 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
 
+                                                            <div class="mb-2">
+                                                                <small class="form-text text-danger ">Supported formats: JPG, JPEG, PNG, PDF. file size between: 10KB and 5MB</small>
+                                                            </div>
+
                                                             <div class="row mb-1">
                                                                 <div class="col-md-4">
                                                                     <label class="form-label">Identity Proof <span class="text-danger"></span></label>
@@ -1498,12 +1509,12 @@
                             </div>
 
                             <div class="col-md-12 mb-1">
-                                <label class="form-label">Paid Amount <span class="text-danger"></span></label>
+                                <label class="form-label">Paid Amount <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="paid_amount" />
                             </div>
 
                             <div class="col-md-12 mb-1">
-                                <label class="form-label">Payment Document <span class="text-danger"></span></label>
+                                <label class="form-label">Payment Document <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="pay_doc" />
                             </div>
 

@@ -31,6 +31,7 @@ class sport_fee_master extends Model
         'part_name',
         'doc_no',
         'section',
+        'section_id',
         'batch_year',
         'batch',
         'batch_id',

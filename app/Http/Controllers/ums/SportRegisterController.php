@@ -34,6 +34,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use App\Models\ums\Activity\SportActivityScheduler;
+use App\Models\ums\Activity\SportActivityDetail;
+use Carbon\CarbonPeriod;
+use Illuminate\Support\Carbon;
 
 class SportRegisterController extends Controller
 {
@@ -1321,6 +1325,174 @@ public function confirm(  Request $request, $id){
 //        dd($student->registration);
 
 
+// activity code
+$sportRegister = SportRegister::where('userable_id', $student->id)->first();
+$studentActivities = [];
+$previousStudentActivities = [];
+
+if ($sportRegister) {
+    $sportRegisterId = $sportRegister->id;
+    $activitySchedulers = SportActivityScheduler::all();
+
+    $fromDate = request()->input('fromDate') ? Carbon::parse(request('fromDate')) : null;
+    $toDate = request()->input('toDate') ? Carbon::parse(request('toDate')) : null;
+
+    foreach ($activitySchedulers as $scheduler) {
+        $batchStudents = json_decode($scheduler->batch_student, true);
+        if (!is_array($batchStudents)) continue;
+
+        foreach ($batchStudents as $bs) {
+            if ((int)$bs['id'] === $sportRegisterId && $bs['isChecked'] == true) {
+
+                $startDate = Carbon::parse($scheduler->start_date);
+                $endDate = Carbon::parse($scheduler->end_date);
+
+                $filterStart = $fromDate ?? $startDate;
+                $filterEnd = $toDate ?? $endDate;
+
+                $effectiveStart = $filterStart->greaterThan($startDate) ? $filterStart : $startDate;
+                $effectiveEnd = $filterEnd->lessThan($endDate) ? $filterEnd : $endDate;
+
+                $daysJson = $scheduler->day;
+                $days = json_decode($daysJson, true);
+
+                $dayMap = [
+                    'Sunday' => 0,
+                    'Monday' => 1,
+                    'Tuesday' => 2,
+                    'Wednesday' => 3,
+                    'Thursday' => 4,
+                    'Friday' => 5,
+                    'Saturday' => 6,
+                ];
+
+                $period = CarbonPeriod::create($effectiveStart, $effectiveEnd);
+                $activities = [];
+
+                $attendanceRecords = SportActivityDetail::where('scheduler_id', $scheduler->id)->get();
+                $allAttendanceData = [];
+
+                foreach ($attendanceRecords as $attendanceRecord) {
+                    $attendanceData = json_decode($attendanceRecord->students, true);
+                    $attendanceDate = Carbon::parse($attendanceRecord->date)->format('d-M-Y');
+
+                    $allAttendanceData[] = [
+                        'date' => $attendanceDate,
+                        'attendance_data' => $attendanceData,
+                    ];
+                }
+
+                foreach ($period as $date) {
+                    foreach ($days as $dayName => $timeRange) {
+                        $targetDay = $dayMap[$dayName];
+
+                        if ($date->dayOfWeek === $targetDay) {
+                            $dateStr = $date->format('Y-m-d');
+                            $activities[] = [
+                                'date' => $dateStr,
+                                'day' => $dayName,
+                                'start_time' => $timeRange['start_time'],
+                                'end_time' => $timeRange['end_time'],
+                            ];
+                        }
+                    }
+                }
+
+                $scheduler->activity_occurrences = count($activities);
+                $scheduler->activities = $activities;
+
+                $studentActivities[] = $scheduler;
+
+                $fullPeriod = CarbonPeriod::create($startDate, $endDate);
+                $allActivities = [];
+                $attendedClasses = 0;
+                $absentClasses = 0;
+
+                foreach ($fullPeriod as $date) {
+                    foreach ($days as $dayName => $timeRange) {
+                        $targetDay = $dayMap[$dayName];
+
+                        if ($date->dayOfWeek === $targetDay) {
+                            $dateStr = $date->format('Y-m-d');
+                            $dateFormatted = $date->format('d-M-Y');
+                            $attendanceStatus = '';
+                            $today = Carbon::today();
+
+                            foreach ($allAttendanceData as $attendanceData) {
+                                if ($attendanceData['date'] === $dateFormatted) {
+                                    if (isset($attendanceData['attendance_data'][$sportRegisterId])) {
+                                        $attendanceStatus = $attendanceData['attendance_data'][$sportRegisterId]['attendance'];
+                                    } else {
+                                        $attendanceStatus = 'data_exists';
+                                    }
+                                    break;
+                                }
+                            }
+
+                            if ($attendanceStatus == 'present') {
+                                $attendedClasses++;
+                            } elseif ($attendanceStatus == 'absent') {
+                                $absentClasses++;
+                            }
+
+                            $allActivities[] = [
+                                'date' => $dateStr,
+                                'day' => $dayName,
+                                'start_time' => $timeRange['start_time'],
+                                'end_time' => $timeRange['end_time'],
+                                'attendance' => $attendanceStatus,
+                            ];
+                        }
+                    }
+                }
+
+                $groupedByDate = [];
+                foreach ($allActivities as $activity) {
+                    $groupedByDate[$activity['date']][] = $activity;
+                }
+
+                ksort($groupedByDate);
+
+                $sortedGroupedActivities = [];
+                foreach ($groupedByDate as $dateGroup) {
+                    foreach ($dateGroup as $activity) {
+                        $sortedGroupedActivities[] = $activity;
+                    }
+                }
+
+                $remainingClasses = 0;
+                $today = Carbon::today();
+                $hasPastActivity = false;
+
+                foreach ($sortedGroupedActivities as $activity) {
+                    $activityDate = Carbon::parse($activity['date']);
+                    if ($activityDate->greaterThan($today) && $activity['attendance'] === '') {
+                        $remainingClasses++;
+                    }
+
+                    if ($activityDate->lessThan($today)) {
+                        $hasPastActivity = true;
+                    }
+                }
+
+                if (!empty($sortedGroupedActivities) && $hasPastActivity) {
+                    $previousScheduler = clone $scheduler;
+                    $previousScheduler->activities = $sortedGroupedActivities;
+                    $previousScheduler->activity_occurrences = count($sortedGroupedActivities);
+                    $previousScheduler->attended_count = $attendedClasses;
+                    $previousScheduler->absent_count = $absentClasses;
+                    $previousScheduler->remaining_count = $remainingClasses;
+                    $previousStudentActivities[] = $previousScheduler;
+                }
+
+                break;
+            }
+        }
+    }
+}
+  //activity end
+
+
 
 
 
@@ -1354,7 +1526,8 @@ public function confirm(  Request $request, $id){
         }
 
         $user = User::with('payments')->findOrFail($id);
-        return view('ums.sports.profile', compact('student', 'sportFeeMaster', 'feeDetails', 'totalFees','familyDetails','user','paid_amount','date'))
+        return view('ums.sports.profile', compact('student', 'sportFeeMaster', 'feeDetails', 'totalFees','familyDetails', 'previousStudentActivities',
+            'studentActivities','user','paid_amount','date'))
             ->with('success', 'Registration successful');
     }
     public function profileRegistration($id)

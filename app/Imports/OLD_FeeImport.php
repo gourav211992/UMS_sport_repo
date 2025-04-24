@@ -14,7 +14,6 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Collection;
 use App\Models\Book;
 use App\Helpers\Helper;
-use App\Models\ums\Section;
 use DateTime;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -39,14 +38,7 @@ class FeeImport implements ToCollection, WithHeadingRow
             }
 
             $batchName = trim((string) $row['batch_name']);
-            $batchYear = trim((string) $row['batch_year']);
-            $section=  trim((string) $row['section']);
-
-
-            $batch = batch::where('batch_name', $batchName)->where('batch_year',$batchYear)->first();
-            $section= Section::where('name',$section)->where('batch',$batchName)->first();
-
-
+            $batch = batch::where('batch_name', $batchName)->first();
             if (!$batch) {
                 Log::error("Batch not found: $batchName");
                 return null;
@@ -102,18 +94,6 @@ class FeeImport implements ToCollection, WithHeadingRow
 
                     $netFee = $amount - $discountValue;
 
-                    // $feeDetailsArray[] = [
-                    //     'title' => trim($feeHead),
-                    //     'total_fees' => $amount,
-                    //     'fee_discount_percent' => $feeDiscounts[$index] ?? null,
-                    //     'fee_discount_value' => $discountValue,
-                    //     'net_fee_payable_value' => $netFee,
-                    //     'payment_mode' => $frequencies[$index] ?? null,
-                    //     'mandatory' => $mandatory[$index] ?? null,
-                    //     'grand_total_fees' => $totals['grand_total_fees'],
-                    //     'grand_total_discount' => $totals['grand_total_discount'],
-                    //     'grand_total_payable' => $totals['grand_total_payable'],
-                    // ];
                     $feeDetailsArray[] = [
                         'title' => trim($feeHead),
                         'total_fees' => $amount,
@@ -125,9 +105,7 @@ class FeeImport implements ToCollection, WithHeadingRow
                         'grand_total_fees' => $totals['grand_total_fees'],
                         'grand_total_discount' => $totals['grand_total_discount'],
                         'grand_total_payable' => $totals['grand_total_payable'],
-                        'duration' => ($frequencies[$index] === 'Monthly') ? 6 : null,
                     ];
-                    
                 }
             }
 
@@ -147,7 +125,6 @@ class FeeImport implements ToCollection, WithHeadingRow
                 'batch_id' => $batch->id,
                 'batch' => trim((string) $row['batch_name']),
                 'section' => trim((string) $row['section']),
-                'section_id'=>$section->id,
                 'quota' => trim((string) ($row['quota'] ?? '')),
                 'start_date' => $this->excelToDateSmart($row['from_date']),
                 'end_date' => $this->excelToDateSmart($row['to_date']),

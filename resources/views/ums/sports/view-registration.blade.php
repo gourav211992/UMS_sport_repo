@@ -225,7 +225,7 @@
                                                             <select class="form-select" id="batch_name" name="batch_id">
                                                                 <option value="">-----Select Batch-----</option>
                                                                 @foreach($batch as $ba)
-                                                                    <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif >{{ $ba->batch }}</option>
+                                                                    <option value="{{ $ba->id }}" @if ($ba->id == $registration->fee_batch_id) selected @endif >{{ $ba->batch }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
@@ -239,7 +239,7 @@
                                                             <select class="form-select" name="section_id" id="section">
                                                                 <option value="">-----Select Section-----</option>
                                                                 @foreach($sections as $section)
-                                                                    <option value="{{ $section->id }}" @if ($section->id == $registration->section_id) selected @endif>{{ $section->section }}</option>
+                                                                    <option value="{{ $section->id }}" @if ($section->id == $registration->fee_section_id) selected @endif>{{ $section->section }}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>

@@ -213,7 +213,7 @@ use App\Http\Controllers\Auth\SportsResetPasswordController;
 use App\Http\Controllers\ums\sports\Activity\ScreeningMasterController;
 use App\Http\Controllers\ums\sports\Activity\ActivityMasterController;
 use App\Http\Controllers\ums\sports\Activity\ActivitySchedulerController;
-
+use App\Http\Controllers\ums\sports\Activity\MyActivityController;
 
 // Password Reset Routes
 Route::get('sports/password/reset', [SportsForgotPasswordController::class, 'showForgotForm'])->name('sports.password.request');
@@ -229,7 +229,29 @@ Route::put('sport-type-edit/{id}', [SportsMasterController::class, 'SportTypeUpd
 Route::get('sport-type-delete/{id}', [SportsMasterController::class, 'sportTypeDelete'])->name('sport-type-delete');
 Route::post('/get-sections-by-batch', [SportRegisterController::class, 'getSectionsByBatch'])->name('get.sections.by.batch');
 
+ //my activity
 
+ 
+ Route::get('download-template', function () {
+    $filePath = public_path('templates/bulk_upload_template.xlsx');
+    if (file_exists($filePath)) {
+        // dd('File exists at: ' . $filePath); 
+        return response()->download($filePath, 'Bulk_Upload_Template.xlsx');
+    } else {
+        // dd('File not found');
+        return abort(404, 'Template file not found.');
+    }
+});
+
+Route::get('my-activity', [MyActivityController::class, 'index'])->name('my-activity');
+Route::get('my-activity-view/{id}/{date}', [MyActivityController::class, 'ActivityView'])->name('activity-view');
+Route::post('save-activity-details', [MyActivityController::class, 'saveActivityDetails'])->name('save-activity-details');
+
+//player Review
+Route::get('player-review', [MyActivityController::class, 'review'])->name('player-review');
+Route::get('player-review-view/{id}/{date}', [MyActivityController::class, 'playerView'])->name('player-review-view');
+Route::get('player-review-edit/{id}/{date}', [MyActivityController::class, 'playerEdit'])->name('player-review-edit');
+Route::post('save-player-details', [MyActivityController::class, 'savePlayerDetails'])->name('save-player-details');
 // Sports Routes
 Route::group(['middleware' => ['sports']], function()
 {
@@ -266,6 +288,8 @@ Route::post('/update-fee-mandatory-status',[SportRegisterController::class,'upda
 // Route::get('sports-registration',function(){
 //     return view('ums.sports.registration');
 // });
+
+
 Route::get('sports-register/confirm-email',function(){
     return view('ums.sports.confirm_email');
 });

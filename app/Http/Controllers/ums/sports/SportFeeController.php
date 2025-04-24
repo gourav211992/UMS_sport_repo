@@ -82,71 +82,140 @@ class SportFeeController extends Controller
     }
     
 
-    public function store(Request $request)
-    {
-    //    dd($request->all());
-        $validator = Validator::make($request->all(), [
-            'series' => 'required|string|max:255',
-            'schedule_no' => 'required|string|max:255',
-            'admission_year' => 'required|integer',
-            'sport_name' => 'required|string|max:255',
-            'batch' => 'required|string|max:255',
-            'section' => 'required|string|max:255',
-            'quota' => 'required|string|max:255',
-            'start_date'=>'required',
-            'end_date'=>'required',
-            'fee_details' => 'required|',
-            'document_number'  => 'required|string|max:255',
-            'document_date'    => 'required|date',
-            'doc_no' => 'required|string|max:255',
-//            'book_code' => 'required|string|max:255',
-            'doc_number_type' => 'required|string|max:255',
-            'doc_reset_pattern' => 'required|string|max:255',
-            'doc_prefix' => 'nullable|string|max:255',
-            'doc_suffix' => 'nullable|string|max:255',
-        ]);
+//     public function store(Request $request)
+//     {
+//     //    dd($request->all());
+//         $validator = Validator::make($request->all(), [
+//             'series' => 'required|string|max:255',
+//             'schedule_no' => 'required|string|max:255',
+//             'admission_year' => 'required|integer',
+//             'sport_name' => 'required|string|max:255',
+//             'batch' => 'required|string|max:255',
+//             'section' => 'required|string|max:255',
+//             'quota' => 'required|string|max:255',
+//             'start_date'=>'required',
+//             'end_date'=>'required',
+//             'fee_details' => 'required|',
+//             'document_number'  => 'required|string|max:255',
+//             'document_date'    => 'required|date',
+//             'doc_no' => 'required|string|max:255',
+// //            'book_code' => 'required|string|max:255',
+//             'doc_number_type' => 'required|string|max:255',
+//             'doc_reset_pattern' => 'required|string|max:255',
+//             'doc_prefix' => 'nullable|string|max:255',
+//             'doc_suffix' => 'nullable|string|max:255',
+//         ]);
 
-        // dd($validator);
-        if ($validator->fails()) {
-          alert('Failed to validate');
-        }
-        $user = Helper::getAuthenticatedUser();
+//         // dd($validator);
+//         if ($validator->fails()) {
+//           alert('Failed to validate');
+//         }
+//         $user = Helper::getAuthenticatedUser();
+// //        dd($user);
+//         $organization = $user->organization;
+//             $sportFeeMaster = new sport_fee_master();
+//             $sportFeeMaster->book_id = $request->book_id;
+//             $sportFeeMaster->organization_id = $user->organization_id;
+//             $sportFeeMaster->group_id = $user->group_id ?? 1;
+//             $sportFeeMaster->company_id = $user->company_id ?? 1;
+// //            $sportFeeMaster->created_by = $user->auth_user_id;
+// //            $sportFeeMaster->organization_id = $organization->id;
+//             $sportFeeMaster->document_number = $request->document_number;
+//             $sportFeeMaster->document_date = $request->document_date;
+//             $sportFeeMaster->sport_name = $request->sport_name;
+//             $sportFeeMaster->batch = $request->batch_name;
+
+//             $batch_id = batch::where('batch_name', '=', $request->batch_name)->first()->id;
+//             $sportFeeMaster->batch_id = $batch_id;
+//             $sportFeeMaster->batch_year= $request->batch_year;
+//             $sportFeeMaster->section = $request->section;
+//             $sportFeeMaster->quota = $request->quota;
+//             $sportFeeMaster->start_date= $request->start_date;
+//             $sportFeeMaster->end_date= $request->end_date;
+
+//             $sportFeeMaster->status = $request->status;
+
+//             $sportFeeMaster->fee_details = $request->fee_details;
+
+//         $sportFeeMaster->doc_no = $request->doc_no;
+// //        $sportFeeMaster->book_code = $request->book_code;
+//         $sportFeeMaster->doc_number_type = $request->doc_number_type;
+//         $sportFeeMaster->doc_reset_pattern = $request->doc_reset_pattern;
+//         $sportFeeMaster->doc_prefix = $request->doc_prefix;
+//         $sportFeeMaster->doc_suffix = $request->doc_suffix;
+//             $sportFeeMaster->save();  
+//             return redirect('sports-fee-schedule')->with('success','Fee Schedule Successfully Added');
+
+//     }
+
+
+public function store(Request $request)
+{
+   
+    $validator = Validator::make($request->all(), [
+        'series' => 'required|string|max:255',
+        'schedule_no' => 'required|string|max:255',
+        'admission_year' => 'required|integer',
+        'sport_name' => 'required|string|max:255',
+        'batch' => 'required|string|max:255',
+        'section' => 'required|string|max:255',
+        'quota' => 'required|string|max:255',
+        'start_date'=>'required',
+        'end_date'=>'required',
+        'fee_details' => 'required|',
+        'document_number'  => 'required|string|max:255',
+        'document_date'    => 'required|date',
+        'doc_no' => 'required|string|max:255',
+//            'book_code' => 'required|string|max:255',
+        'doc_number_type' => 'required|string|max:255',
+        'doc_reset_pattern' => 'required|string|max:255',
+        'doc_prefix' => 'nullable|string|max:255',
+        'doc_suffix' => 'nullable|string|max:255',
+    ]);
+
+    // dd($validator);
+    if ($validator->fails()) {
+      alert('Failed to validate');
+    }
+    $user = Helper::getAuthenticatedUser();
 //        dd($user);
-        $organization = $user->organization;
-            $sportFeeMaster = new sport_fee_master();
-            $sportFeeMaster->book_id = $request->book_id;
-            $sportFeeMaster->organization_id = $user->organization_id;
-            $sportFeeMaster->group_id = $user->group_id ?? 1;
-            $sportFeeMaster->company_id = $user->company_id ?? 1;
+    $organization = $user->organization;
+        $sportFeeMaster = new sport_fee_master();
+        $sportFeeMaster->book_id = $request->book_id;
+        $sportFeeMaster->organization_id = $user->organization_id;
+        $sportFeeMaster->group_id = $user->group_id ?? 1;
+        $sportFeeMaster->company_id = $user->company_id ?? 1;
 //            $sportFeeMaster->created_by = $user->auth_user_id;
 //            $sportFeeMaster->organization_id = $organization->id;
-            $sportFeeMaster->document_number = $request->document_number;
-            $sportFeeMaster->document_date = $request->document_date;
-            $sportFeeMaster->sport_name = $request->sport_name;
-            $sportFeeMaster->batch = $request->batch_name;
+        $sportFeeMaster->document_number = $request->document_number;
+        $sportFeeMaster->document_date = $request->document_date;
+        $sportFeeMaster->sport_name = $request->sport_name;
+        $sportFeeMaster->batch = $request->batch_name;
 
-            $batch_id = batch::where('batch_name', '=', $request->batch_name)->first()->id;
-            $sportFeeMaster->batch_id = $batch_id;
-            $sportFeeMaster->batch_year= $request->batch_year;
-            $sportFeeMaster->section = $request->section;
-            $sportFeeMaster->quota = $request->quota;
-            $sportFeeMaster->start_date= $request->start_date;
-            $sportFeeMaster->end_date= $request->end_date;
+        $batch_id = batch::where('batch_name', '=', $request->batch_name)->where('batch_year','=', $request->batch_year)->first()->id;
+        $sportFeeMaster->batch_id = $batch_id;
+        $sportFeeMaster->batch_year= $request->batch_year;
+        $sportFeeMaster->section = $request->section;
+        $section_id = Section::where('name', $request->section)->where('batch','=', $request->batch_name)->first()->id;
+        $sportFeeMaster->section_id= $section_id;
+        $sportFeeMaster->quota = $request->quota;
+        $sportFeeMaster->start_date= $request->start_date;
+        $sportFeeMaster->end_date= $request->end_date;
 
-            $sportFeeMaster->status = $request->status;
+        $sportFeeMaster->status = $request->status;
 
-            $sportFeeMaster->fee_details = $request->fee_details;
+        $sportFeeMaster->fee_details = $request->fee_details;
 
-        $sportFeeMaster->doc_no = $request->doc_no;
+    $sportFeeMaster->doc_no = $request->doc_no;
 //        $sportFeeMaster->book_code = $request->book_code;
-        $sportFeeMaster->doc_number_type = $request->doc_number_type;
-        $sportFeeMaster->doc_reset_pattern = $request->doc_reset_pattern;
-        $sportFeeMaster->doc_prefix = $request->doc_prefix;
-        $sportFeeMaster->doc_suffix = $request->doc_suffix;
-            $sportFeeMaster->save();  
-            return redirect('sports-fee-schedule')->with('success','Fee Schedule Successfully Added');
+    $sportFeeMaster->doc_number_type = $request->doc_number_type;
+    $sportFeeMaster->doc_reset_pattern = $request->doc_reset_pattern;
+    $sportFeeMaster->doc_prefix = $request->doc_prefix;
+    $sportFeeMaster->doc_suffix = $request->doc_suffix;
+        $sportFeeMaster->save();  
+        return redirect('sports-fee-schedule')->with('success','Fee Schedule Successfully Added');
 
-    }
+}
 
     //listing page for admin 
     public function listing(){
@@ -209,8 +278,48 @@ class SportFeeController extends Controller
     }
     
     //update function for admin
+    // public function update(Request $request, $id){
+    //     // dd($request->all());
+    //     $validator = Validator::make($request->all(), [
+    //         'series' => 'required|string|max:255',
+    //         'schedule_no' => 'required|string|max:255',
+    //         'admission_year' => 'required|integer',
+    //        'sport_name' => 'required|string|max:255',
+    //         'batch' => 'required|string|max:255',
+    //        'section' => 'required|string|max:255',
+    //         'quota' => 'required|string|max:255',
+    //         'start_date'=>'required',
+    //         'end_date'=>'required',
+    //         'fee_details' => 'required|', 
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //       alert('Failed to validate');
+    //     }
+
+    //         $sportFeeMaster = sport_fee_master::find($id);
+    //         $sportFeeMaster->series = $request->series;
+    //         $sportFeeMaster->schedule_no = $request->schedule_no;
+    //         $sportFeeMaster->admission_year = $request->admission_year;
+    //         $sportFeeMaster->sport_name = $request->sport_name;
+    //         $sportFeeMaster->batch = $request->batch_name;
+    //         $batch_id = batch::where('batch_name', '=', $request->batch_name)->first()->id;
+    //         $sportFeeMaster->batch_id = $batch_id;
+    //         $sportFeeMaster->batch_year= $request->batch_year;
+            
+    //         $sportFeeMaster->section = $request->section;
+    //         $sportFeeMaster->quota = $request->quota;
+    //         $sportFeeMaster->start_date= $request->start_date;
+    //         $sportFeeMaster->end_date= $request->end_date;
+    //         $sportFeeMaster->status = $request->status;
+    //         $sportFeeMaster->fee_details = $request->fee_details;
+    //         $sportFeeMaster->save();
+            
+
+    //         return redirect('sports-fee-schedule')->with('success','Fee Schedule Successfully Updated');
+
+    // }
     public function update(Request $request, $id){
-        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'series' => 'required|string|max:255',
             'schedule_no' => 'required|string|max:255',
@@ -234,11 +343,12 @@ class SportFeeController extends Controller
             $sportFeeMaster->admission_year = $request->admission_year;
             $sportFeeMaster->sport_name = $request->sport_name;
             $sportFeeMaster->batch = $request->batch_name;
-            $batch_id = batch::where('batch_name', '=', $request->batch_name)->first()->id;
+            $batch_id = batch::where('batch_name', '=', $request->batch_name)->where('batch_year','=', $request->batch_year)->first()->id;
             $sportFeeMaster->batch_id = $batch_id;
             $sportFeeMaster->batch_year= $request->batch_year;
-            
             $sportFeeMaster->section = $request->section;
+            $section_id = Section::where('name', $request->section)->where('batch','=', $request->batch_name)->first()->id;
+            $sportFeeMaster->section_id = $section_id;
             $sportFeeMaster->quota = $request->quota;
             $sportFeeMaster->start_date= $request->start_date;
             $sportFeeMaster->end_date= $request->end_date;

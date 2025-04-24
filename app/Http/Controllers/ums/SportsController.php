@@ -123,44 +123,92 @@ class SportsController extends Controller
 
 
 
-    public function login(Request $request){
+    // public function login(Request $request){
+    //     $validator = Validator::make($request->all(), [
+    //         'email' => ['required', 'string', 'email'],
+    //         'password' => 'required',
+    //     ], [
+    //         'password.required' => 'Password field is required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         if ($request->expectsJson()) {
+    //             return response()->json($validator->messages(), 200);
+    //         } else {
+    //             return redirect()->back()->withErrors($validator)->withInput();
+    //         }
+    //     }
+
+    //     $credentials = $request->only('email', 'password');
+    //     $remember = $request->has('remember') ? true : false;
+
+    //     if (Auth::guard('sports')->attempt($credentials, $remember)) {
+    //         $user = Auth::user(); 
+    //         if ($user && $user->status == 'pending') {
+    //             $data['status'] = false;
+    //             $data['message'] = 'Your account is not activated. To activate your account, please click on <a class="btn btn-success" href="activate-your-account/' . $credentials['email'] . '">Activate</a> button';
+    //             Auth::logout();
+    //             return response()->json($data);
+    //         }
+
+    //         $data['status'] = true;
+    //         $data['message'] = 'Logged in Successfully';
+    //         return response()->json($data);
+
+    //     } else {
+    //         $data['status'] = false;
+    //         $data['message'] = 'Email ID or Password is wrong';
+    //         return response()->json($data);
+    //     }
+    // }
+
+    public function login(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'email' => ['required', 'string', 'email'],
             'password' => 'required',
         ], [
+            'email.required' => 'Email field is required',
             'password.required' => 'Password field is required',
         ]);
-
+    
         if ($validator->fails()) {
-            if ($request->expectsJson()) {
-                return response()->json($validator->messages(), 200);
-            } else {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
         }
-
+    
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember') ? true : false;
-
+    
         if (Auth::guard('sports')->attempt($credentials, $remember)) {
-            $user = Auth::user(); // Get the authenticated user
-            if ($user && $user->status == 'pending') {
-                $data['status'] = false;
-                $data['message'] = 'Your account is not activated. To activate your account, please click on <a class="btn btn-success" href="activate-your-account/' . $credentials['email'] . '">Activate</a> button';
-                Auth::logout();
-                return response()->json($data);
+            $user = Auth::guard('sports')->user(); 
+    
+            if ($user && $user->status === 'pending') {
+                Auth::guard('sports')->logout();
+    
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Your account is not activated. Please click the link sent to your email to activate your account'
+                ]);
             }
-
-            $data['status'] = true;
-            $data['message'] = 'Logged in Successfully';
-            return response()->json($data);
-
-        } else {
-            $data['status'] = false;
-            $data['message'] = 'Email ID or Password is wrong';
-            return response()->json($data);
+    
+            return response()->json([
+                'status' => true,
+                'message' => 'Logged in Successfully'
+            ]);
+        }
+         else {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email ID or Password is wrong'
+            ]);
         }
     }
+    
+
+
     public function logout(Request $request) {
         Auth::logout();
         $request->session()->invalidate();

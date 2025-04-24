@@ -19,12 +19,14 @@ class SportMasterController extends Controller
         $request->validate([
             'quota_name' => 'required|string|max:255',
             'display_name' => 'required|string|max:255',
-            'discount' => 'required|numeric|min:0|max:100',
+          
+            'status'=> 'required'
         ]);
 
         $quota = Quota::create([
             'quota_name' => $request->quota_name,
             'display_name' => $request->display_name,
+            'status'=>$request->status,
             'discount' => $request->discount,
         ]);
         if ($quota) {
@@ -46,7 +48,8 @@ class SportMasterController extends Controller
         $request->validate([
             'quota_name' => 'required|string|max:255',
             'display_name' => 'required|string|max:255',
-            'discount' => 'required|numeric|min:0|max:100',
+              'status'=> 'required',
+     
         ]);
 
         $quota = Quota::find($id);
@@ -54,6 +57,7 @@ class SportMasterController extends Controller
             $quota->quota_name = $request->quota_name;
             $quota->discount = $request->discount;
             $quota->display_name = $request->display_name;
+            $quota->status= $request->status;
             if ($quota->save()) {
                 return response()->json(['success' => true, 'message' => 'Quota updated successfully!']);
             } else {

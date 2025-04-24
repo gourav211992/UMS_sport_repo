@@ -417,6 +417,450 @@
 
                         <!--/ User Content -->
                     </div>
+                    
+                    @if (isset($studentActivities) && count($studentActivities) > 0 && ($student->registration->status == 'approved')  )
+                        
+                   
+                        <div class="col-md-12">
+                            <div class="card">
+                                 <div class="card-body customernewsection-form"> 
+    
+    
+                                            <div class="border-bottom mb-2 pb-25">
+                                                     <div class="row">
+                                                        <div class="col-md-8">
+                                                            <div class="newheader "> 
+                                                                <h4 class="card-title text-theme">My Activity</h4> 
+                                                            </div>
+                                                        </div>
+                                                        
+                                                     </div>
+                                           
+    
+    
+    
+    
+    
+                                            <div class="row"> 
+    
+                                                 <div class="col-md-12">
+                                                     
+                                                     <div class="">
+                                                        <div class="step-custhomapp bg-light"> 
+                                                            <ul class="nav nav-tabs my-25 custapploannav" role="tablist">
+                                                                <li class="nav-item">
+                                                                    <a class="nav-link active" data-bs-toggle="tab" href="#Today">Schedule</a>
+                                                                </li>
+                                                                <li class="nav-item">
+                                                                    <a class="nav-link" data-bs-toggle="tab" href="#Schedule">Previous Activity</a>
+                                                                </li> 
+                                                            </ul>
+                                                        </div>
+                                                         <div class="tab-content pb-1">
+                                                                 <div class="tab-pane active" id="Today">
+                                                                    <div class="d-flex justify-content-end align-items-center mb-75">
+                                                                        <div class="form-label text-nowrap me-1">
+                                                                            <strong>Activity Date</strong>
+                                                                        </div>
+                                                                    
+                                                                        <form method="GET" action="{{ url('/sports/profile/' . $student->id) }}" id="filterForm" class="d-flex align-items-center">
+                                                                            <input type="text" id="fp-range" class="form-control flatpickr-range bg-white mw-100" placeholder="DD-MM-YYYY to DD-MM-YYYY" />
+                                                                            <input type="hidden" name="fromDate" id="fromDate" />
+                                                                            <input type="hidden" name="toDate" id="toDate" />
+                                                                        </form>
+                                                                    
+                                                                        <div class="ms-1">
+                                                                            <a href="{{ url()->current() }}" class="btn btn-sm btn-secondary">Reset</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                     <div class="table-responsive pomrnheadtffotsticky">
+                                                                         <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad"> 
+                                                                              <thead>
+                                                                                 <tr>
+                                                                                    <th>#</th>
+                                                                                    <th>Date</th>
+                                                                                    <th>Activity</th>
+                                                                                    <th>Trainer</th>
+                                                                                    <th>Time</th>
+                                                                                    <th>Students</th>
+                                                                                    <th>Status</th>
+                                                                                  </tr>
+                                                                                </thead>
+                                                                                {{-- <tbody>
+                                                               
+                                                                                  @php
+        $hasFilter = request()->has('fromDate') && request()->has('toDate');
+        $counter = 1;
+    @endphp
+    
+    @foreach($studentActivities as $index => $activity)
+        @php
+            $subActivities = json_decode($activity->sub_activities, true);
+            $tooltip = is_array($subActivities) ? implode(', ', $subActivities) : '';
+            $batchCount = is_array(json_decode($activity->batch_student, true)) ? count(json_decode($activity->batch_student, true)) : 0;
+        @endphp
+    
+        @foreach($activity->activities as $scheduled)
+            @php
+                $activityDate = \Carbon\Carbon::parse($scheduled['date']);
+            @endphp
+    
+    @if(($hasFilter && $activityDate->between(\Carbon\Carbon::parse(request('fromDate')), \Carbon\Carbon::parse(request('toDate')))) || (!$hasFilter && $activityDate->isToday()))
+                <tr>
+                    <td>{{ $counter++}}</td>
+                    <td>{{ $activityDate->format('d-m-Y') }}</td>
+    
+                    <td>
+                        <div 
+                            data-bs-toggle="tooltip"
+                            data-popup="tooltip-custom"
+                            data-bs-placement="top"
+                            title="{{ $tooltip }}">
+                            {{ strtoupper($activity->activity) }}
+                        </div>
+                    </td>
+    
+                    <td>{{ ucwords($activity->trainer) }}</td>
+    
+                    <td>
+                        {{ \Carbon\Carbon::createFromFormat('H:i', $scheduled['start_time'])->format('h:i A') }}
+                        -
+                        {{ \Carbon\Carbon::createFromFormat('H:i', $scheduled['end_time'])->format('h:i A') }}
+                    </td>
+    
+                    <td>
+                        <span class="badge rounded-pill badge-light-secondary badgeborder-radius">
+                            {{ $batchCount }}
+                        </span>
+                    </td>
+    
+                    <td>
+                        @php
+                            $dayData = json_decode($activity->day, true);
+                            $firstDay = array_key_first($dayData);
+                    
+                            $startTimeStr = $scheduled['start_time'] ?? '00:00';  
+                            $endTimeStr = $scheduled['end_time'] ?? '00:00';      
+                            // dd(  $startTimeStr,  $endTimeStr);
+                    
+                            $activityDateStr = $scheduled['date'];
+                    
+                            $startDateTime = \Carbon\Carbon::parse($activityDateStr . ' ' . $startTimeStr);
+                            $endDateTime = \Carbon\Carbon::parse($activityDateStr . ' ' . $endTimeStr);
+                    
+                            $currentTime = \Carbon\Carbon::now('Asia/Kolkata');
+                        @endphp
+                    
+                        @if($currentTime->between($startDateTime, $endDateTime))
+                            <span class="badge rounded-pill badge-light-info badgeborder-radius">Ongoing</span>
+                        @elseif($currentTime->greaterThan($endDateTime))
+                            <span class="badge rounded-pill badge-light-success badgeborder-radius">Closed</span>
+                        @else
+                            <span class="badge rounded-pill badge-light-warning badgeborder-radius">Upcoming</span>
+                        @endif
+                    </td>
+                        
+                </tr>
+            @endif
+        @endforeach
+    @endforeach
+    
+                                                                                  
+    
+    
+    
+    
+    
+    
+    
+                                                                                     
+                                                                                   </tbody> --}}
+    
+    
+                                                                                   <tbody>
+                                                                                   @php
+    $hasFilter = request()->has('fromDate') && request()->has('toDate');
+    $counter = 1;
+    $hasActivityToday = false;
+@endphp
+
+@foreach($studentActivities as $index => $activity)
+    @php
+        $subActivities = json_decode($activity->sub_activities, true);
+        $tooltip = is_array($subActivities) ? implode(', ', $subActivities) : '';
+        $batchCount = is_array(json_decode($activity->batch_student, true)) ? count(json_decode($activity->batch_student, true)) : 0;
+    @endphp
+
+    @foreach($activity->activities as $scheduled)
+        @php
+            $activityDate = \Carbon\Carbon::parse($scheduled['date']);
+        @endphp
+
+        @if(($hasFilter && $activityDate->between(\Carbon\Carbon::parse(request('fromDate')), \Carbon\Carbon::parse(request('toDate')))) || (!$hasFilter && $activityDate->isToday()))
+            @php $hasActivityToday = true; @endphp
+
+            <tr>
+                <td>{{ $counter++ }}</td>
+                <td>{{ $activityDate->format('d-m-Y') }}</td>
+                <td>
+                    <div 
+                        data-bs-toggle="tooltip"
+                        data-popup="tooltip-custom"
+                        data-bs-placement="top"
+                        title="{{ $tooltip }}">
+                        {{ strtoupper($activity->activity) }}
+                    </div>
+                </td>
+                <td>{{ ucwords($activity->trainer) }}</td>
+                <td>
+                    {{ \Carbon\Carbon::createFromFormat('H:i', $scheduled['start_time'])->format('h:i A') }}
+                    -
+                    {{ \Carbon\Carbon::createFromFormat('H:i', $scheduled['end_time'])->format('h:i A') }}
+                </td>
+                <td>
+                    <span class="badge rounded-pill badge-light-secondary badgeborder-radius">
+                        {{ $batchCount }}
+                    </span>
+                </td>
+                <td>
+                    @php
+                        $startTimeStr = $scheduled['start_time'] ?? '00:00';
+                        $endTimeStr = $scheduled['end_time'] ?? '00:00';
+                        $activityDateStr = $scheduled['date'];
+                
+                        $startDateTime = \Carbon\Carbon::parse($activityDateStr . ' ' . $startTimeStr);
+                        $endDateTime = \Carbon\Carbon::parse($activityDateStr . ' ' . $endTimeStr);
+                        $currentDateTime = \Carbon\Carbon::now('Asia/Kolkata');
+                        $currentTimeFormatted = $currentDateTime->format('h:i A');
+                    @endphp
+                
+                  
+                
+                    @if(($currentTimeFormatted >=$startDateTime) || ( $currentTimeFormatted<=$endDateTime))
+                        <span class="badge rounded-pill badge-light-info badgeborder-radius">Ongoing</span>
+                    @elseif($currentDateTime->greaterThan($endDateTime))
+                        <span class="badge rounded-pill badge-light-success badgeborder-radius">Closed</span>
+                    @else
+                        <span class="badge rounded-pill badge-light-warning badgeborder-radius">Upcoming</span>
+                    @endif
+                </td>
+            </tr>
+        @endif
+    @endforeach
+@endforeach
+
+@if(!$hasActivityToday)
+    <tr>
+        <td colspan="12" class="text-center text-muted">No activity today</td>
+    </tr>
+@endif
+
+                                                                                    </tbody>
+                                                                                    
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="tab-pane" id="Schedule">
+                                                                    <div class="table-responsive pomrnheadtffotsticky">
+                                                                         <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad"> 
+                                                                              <thead>
+                                                                                 <tr>
+                                                                                    <th>#</th>
+                                                                                    <th>Activity</th>
+                                                                                    <th>Trainer</th>
+                                                                                    <th>Date</th>
+                                                                                    <th>Time</th>
+                                                                                    <th>Total Classes</th>
+                                                                                    <th>Remaining</th>
+                                                                                    <th>Attended</th>
+                                                                                    <th>Absent</th>
+                                                                                    <th>Status</th>
+                                                                                  </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                           
+                                                                                        @php
+                                                                                          $hasPrevActivity=false;
+                                                                                        @endphp
+          
+                                                                                       @foreach($previousStudentActivities as $index => $activity)
+                                                                                       @php $hasPrevActivity = true; @endphp
+                                                                                       <tr>
+                                                                                           <td>{{ $loop->iteration }}</td>
+                                                                                   
+                                                                                           <td>
+                                                                                               <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top"
+                                                                                                   title="{{ implode(', ', json_decode($activity->sub_activities, true) ?? []) }}">
+                                                                                                   {{ $activity->activity ?? 'N/A' }}
+                                                                                               </div>
+                                                                                           </td>
+                                                                                   
+                                                                                           <td>{{ $activity->trainer ?? 'N/A' }}</td>
+                                                                                   
+                                                                                           <td>{{ \Carbon\Carbon::parse($activity->start_date)->format('d-m-Y') }} to {{ \Carbon\Carbon::parse($activity->end_date)->format('d-m-Y') }}</td>
+                                                                                   
+                                                                                           <td>
+                                                                                               @php
+                                                                                                   $firstActivity = $activity->activities[0] ?? null;
+                                                                                   
+                                                                                                   if ($firstActivity) {
+                                                                                                       $startTime = \Carbon\Carbon::createFromFormat('H:i', $firstActivity['start_time'])->format('h:i A');
+                                                                                                       $endTime = \Carbon\Carbon::createFromFormat('H:i', $firstActivity['end_time'])->format('h:i A');
+                                                                                                       echo $startTime . ' - ' . $endTime;
+                                                                                                   } else {
+                                                                                                       echo 'N/A';
+                                                                                                   }
+                                                                                               @endphp
+                                                                                           </td>
+                                                                                   
+                                                                                           <td>{{ $activity->activity_occurrences }}</td>
+                                                                                   
+                                                                                           <td>{{ $activity->remaining_count ?? 0 }}</td>
+                                                                                   
+                                                                                           <td>{{ $activity->attended_count ?? 0 }}</td>
+                                                                                   
+                                                                                           <td>{{ $activity->absent_count ?? 0 }}</td>
+                                                                                   
+                                                                                        <td>
+                                                                                            @php
+                                                                                                $now = \Carbon\Carbon::now('Asia/Kolkata');
+                                                                                                $isOngoing = false;
+                                                                                        
+                                                                                                foreach ($activity->activities ?? [] as $act) {
+                                                                                                    $start = \Carbon\Carbon::parse($act['date'] . ' ' . $act['start_time']);
+                                                                                                    $end = \Carbon\Carbon::parse($act['date'] . ' ' . $act['end_time']);
+                                                                                                    
+                                                                                                    if ($now->between($start, $end)) {
+                                                                                                        $isOngoing = true;
+                                                                                                        break; 
+                                                                                                    }
+                                                                                                }
+                                                                                        
+                                                                                                $startDate = \Carbon\Carbon::parse($activity->start_date);
+                                                                                                $endDate = \Carbon\Carbon::parse($activity->end_date);
+                                                                                                // $isOngoingInRange = $now->between($startDate, $endDate);
+                                                                                                $currentDateTime = \Carbon\Carbon::now('Asia/Kolkata');
+                                                                                                $currentTimeFormatted = $currentDateTime->format('h:i A');
+                                                                                                @endphp
+                                                                                        
+                                                                                        @if ($isOngoing || ($currentTimeFormatted>=$startDate||$currentTimeFormatted <= $end ))
+                                                                                        <span class="badge rounded-pill badge-light-info badgeborder-radius">Ongoing</span>
+                                                                                        
+                                                                                            @else
+                                                                                                <span class="badge rounded-pill badge-light-secondary badgeborder-radius">Completed</span>
+                                                                                            @endif
+                                                                                        </td>
+    
+                                                                                        {{-- <td>
+                                                                                            @php
+                                                                                              
+                                                                                        
+                                                                                                $now = \Carbon\Carbon::now('Asia/Kolkata');
+                                                                                                $isOngoing = false;
+                                                                                        
+                                                                                              
+                                                                                                foreach ($activity->activities ?? [] as $act) {
+                                                                                                    $start =  \Carbon\Carbon::parse($act['date'] . ' ' . $act['start_time']);
+                                                                                                    $end = \Carbon\Carbon::parse($act['date'] . ' ' . $act['end_time']);
+                                                                                        
+                                                                                                    if ($now->between($start, $end)) {
+                                                                                                        $isOngoing = true;
+                                                                                                        break;
+                                                                                                    }
+                                                                                                }
+                                                                                        
+                                                                                                $startDate =  \Carbon\Carbon::parse($activity->start_date);
+                                                                                                $endDate = \Carbon\Carbon::parse($activity->end_date);
+                                                                                                $dayMap = [
+                                                                                                    'Sunday' => 0,
+                                                                                                    'Monday' => 1,
+                                                                                                    'Tuesday' => 2,
+                                                                                                    'Wednesday' => 3,
+                                                                                                    'Thursday' => 4,
+                                                                                                    'Friday' => 5,
+                                                                                                    'Saturday' => 6,
+                                                                                                ];
+                                                                                        
+                                                                                                $days = json_decode($activity->day, true); 
+                                                                                        
+                                                                                                $lastSessionDate = null;
+                                                                                        
+                                                                                                $period =  \Carbon\CarbonPeriod::create($startDate, $endDate);
+                                                                                        
+                                                                                                foreach ($period as $date) {
+                                                                                                    $dayOfWeek = $date->dayOfWeek;
+                                                                                        
+                                                                                                    foreach ($days as $dayName => $timeRange) {
+                                                                                                        if ($dayOfWeek === $dayMap[$dayName]) {
+                                                                                                            $lastSessionDate = $date->copy();
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                        
+                                                                                                $lastSessionEnd = null;
+                                                                                        
+                                                                                                if ($lastSessionDate) {
+                                                                                                    $lastDayName = $lastSessionDate->format('l');
+                                                                                                    $lastEndTime = $days[$lastDayName]['end_time'] ?? '23:59';
+                                                                                                    $lastSessionEnd =  \Carbon\Carbon::parse($lastSessionDate->format('Y-m-d') . ' ' . $lastEndTime);
+                                                                                                }
+                                                                                        
+                                                                                                $isCompleted = !$isOngoing && ($lastSessionEnd && $now->greaterThan($lastSessionEnd));
+                                                                                            @endphp
+                                                                                        
+                                                                                            @if ($isOngoing)
+                                                                                                <span class="badge rounded-pill badge-light-info badgeborder-radius">Ongoing</span>
+                                                                                            @elseif($isCompleted)
+                                                                                                <span class="badge rounded-pill badge-light-secondary badgeborder-radius">Completed</span>
+                                                                                            @else
+                                                                                                <span class="badge rounded-pill badge-light-warning badgeborder-radius">Upcoming</span>
+                                                                                            @endif
+                                                                                        </td> --}}
+                                                                                        
+                                                                                        
+                                                                                       
+                                                                                        
+                                                                                        
+                                                                                       </tr>
+                                                                                   @endforeach
+                                                                                   @if(!$hasPrevActivity)
+    <tr>
+        <td colspan="12" class="text-center text-muted">No  Previous Activity </td>
+    </tr>
+@endif
+
+                                                                                   
+
+                                                                                   
+                                                                                   
+                                                                                   </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                                 
+                                                         </div>
+                                                     
+    
+    
+    
+    
+    
+    
+    
+                                                </div> 
+    
+                                             </div> 
+                                </div>
+                            </div>
+    
+                        </div>
+                        
+                         
+                        
+                    </div>
+                            </div>
+                    @endif
                 </section>
 
 
@@ -810,6 +1254,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr("#fp-range", {
+            mode: "range",
+            dateFormat: "d-m-Y",
+            onClose: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    document.getElementById("fromDate").value = instance.formatDate(selectedDates[0], "d-m-Y");
+                    document.getElementById("toDate").value = instance.formatDate(selectedDates[1], "d-m-Y");
+
+                    document.getElementById("filterForm").submit();
+                }
+            }
+        });
+    });
+</script>
+<script>
+       
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+
+  
+    </script>
     <script>
 
         $(document).ready(function() {

@@ -104,6 +104,16 @@ data-scroll-to-active="true">
                     <li><a class="d-flex align-items-center" href="{{url('activity-scheduler')}}"><i
                                 data-feather="circle"></i><span
                                 class="menu-item text-truncate">Scheduler</span></a></li>
+                                <li><a class="d-flex align-items-center" href="{{ url('my-activity') }}"><i
+                                    data-feather="circle"></i><span class="menu-item text-truncate">My Activity</span></a> </li>
+            
+                                <li><a class="d-flex align-items-center" href="{{ url('player-review') }}"><i
+                                    data-feather="circle"></i><span class="menu-item text-truncate">Player Review</span></a> </li>
+
+
+
+
+
                     <li><a class="d-flex align-items-center" href="{{url('activity-attendance')}}"><i
                                 data-feather="circle"></i><span
                                 class="menu-item text-truncate">Attendance</span></a></li>

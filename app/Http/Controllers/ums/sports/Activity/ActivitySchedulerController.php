@@ -5,8 +5,8 @@ namespace App\Http\Controllers\ums\sports\Activity;
 use App\Http\Controllers\Controller;
 use App\Models\MasterGroup;
 use App\Models\SportRegister as ModelsSportRegister;
-use App\Models\ums\Activity\ActivityScheduler;
-use App\Models\ums\ActivityMaster;
+use App\Models\ums\Activity\SportActivityScheduler;
+use App\Models\ums\Activity\SportActivityMaster;
 use App\Models\ums\batch;
 use App\Models\ums\GroupMaster;
 use App\Models\ums\Section;
@@ -20,13 +20,13 @@ class ActivitySchedulerController extends Controller
 
     function activityScheduler()
     {
-        $sportName = ActivityScheduler::all();
+        $sportName =SportActivityScheduler::all();
         $sport = Sport_master::all();
         $batch = batch::all();
         $section = Section::all();
         $group = GroupMaster::all();
-        $activity = ActivityMaster::all();
-        $sub_activity = ActivityMaster::get();
+        $activity =SportActivityMaster::all();
+        $sub_activity =SportActivityMaster::get();
 
 
         return view('ums.sports.activity.activity_scheduler_add', compact('sportName', 'sport', 'batch', 'section', 'group', 'activity', 'sub_activity'));
@@ -66,7 +66,7 @@ class ActivitySchedulerController extends Controller
             }
         }
 
-        $existing = ActivityScheduler::where('group', $validatedData['group'])
+        $existing =SportActivityScheduler::where('group', $validatedData['group'])
     ->where('activity', $validatedData['activity'])
     ->where(function ($query) use ($validatedData) {
         $query->whereBetween('start_date', [$validatedData['start_date'], $validatedData['end_date']])
@@ -97,7 +97,7 @@ if ($existing) {
             return back()->withErrors($dayErrors)->withInput();
         }
     
-        $latest = ActivityScheduler::orderBy('scheduler_no', 'desc')->first();
+        $latest =SportActivityScheduler::orderBy('scheduler_no', 'desc')->first();
         $schedulerNo = $latest ? $latest->scheduler_no + 1 : 1;
     
         $filteredDays = [];
@@ -110,7 +110,7 @@ if ($existing) {
             }
         }
     
-        ActivityScheduler::create([
+        SportActivityScheduler::create([
             'sport' => $validatedData['sport'],
             'batch_year' => $validatedData['batch'],
             'batch_name' => $validatedData['batch_name'],
@@ -145,13 +145,13 @@ if ($existing) {
     
     public function index(Request $request)
     {
-        $activityScheduler = ActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation','sportRelation'])->orderBy('id', 'DESC')->get();
+        $activityScheduler =SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation','sportRelation'])->orderBy('id', 'DESC')->get();
         return view('ums.sports.activity.activity_scheduler', compact('activityScheduler'));
     }
 
     public function ActivityEdit($id)
 {
-    $data = ActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation'])->find($id);
+    $data =SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation'])->find($id);
 
     $selectedSubActivities = is_array($data->sub_activities)
         ? $data->sub_activities
@@ -163,13 +163,13 @@ if ($existing) {
 
     $scheduledDays = json_decode($data->day, true) ?? [];
 
-    $sportName = ActivityScheduler::all();
+    $sportName =SportActivityScheduler::all();
     $sport = Sport_master::all();
     $batch = Batch::all();
     $section = Section::all();
     $group = GroupMaster::all();
-    $activity = ActivityMaster::all();
-    $sub_activity = ActivityMaster::get();
+    $activity =SportActivityMaster::all();
+    $sub_activity =SportActivityMaster::get();
     $selectedStudentIds = [];
     $students=json_decode($data->batch_student);
     foreach ($students as $key => $value) {
@@ -226,7 +226,7 @@ if ($existing) {
         return back()->withErrors($dayErrors)->withInput();
     }
 
-    $latest = ActivityScheduler::orderBy('scheduler_no', 'desc')->first();
+    $latest =SportActivityScheduler::orderBy('scheduler_no', 'desc')->first();
     $schedulerNo = $latest ? $latest->scheduler_no + 1 : 1;
 
     $filteredDays = [];
@@ -238,7 +238,7 @@ if ($existing) {
             ];
         }
     }
-    $activity = ActivityScheduler::find($id);
+    $activity =SportActivityScheduler::find($id);
 
     if (!$activity) {
         return redirect()->back()->with('error', 'Activity not found.');
@@ -278,7 +278,7 @@ if ($existing) {
 
     public function ActivityView($id)
     {
-        $data = ActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation','sportRelation'])->find($id);
+        $data =SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation','sportRelation'])->find($id);
         $selectedSubActivities = is_array($data->sub_activities)
             ? $data->sub_activities
             : (is_string($data->sub_activities)
@@ -287,13 +287,13 @@ if ($existing) {
 
         $scheduledDays = json_decode($data->day, true) ?? [];
 
-        $sportName = ActivityScheduler::all();
+        $sportName =SportActivityScheduler::all();
         $sport = Sport_master::all();
         $batch = batch::all();
         $section = Section::all();
         $group = GroupMaster::all();
-        $activity = ActivityMaster::all();
-        $sub_activity = ActivityMaster::get();
+        $activity =SportActivityMaster::all();
+        $sub_activity =SportActivityMaster::get();
         $selectedStudentIds = json_decode($data->batch_student, true) ?? [];
 
         return view('ums.sports.activity.activity_scheduler_view', compact(
@@ -317,7 +317,7 @@ if ($existing) {
 
     public function ActivityDelete(Request $request,$slug) {
         
-        activityScheduler::where('id', $slug)->delete();
+        SportActivityScheduler::where('id', $slug)->delete();
     
         session()->flash('success', 'Activity Scheduler has been deleted successfully!');
     
@@ -328,7 +328,7 @@ if ($existing) {
 
     public function get_activity_subactivity(Request $request)
 {
-    $activity = ActivityMaster::where('activity_name', $request->sub_activities)->first();
+    $activity =SportActivityMaster::where('activity_name', $request->sub_activities)->first();
 
     if ($activity) {
         $sub_activities = json_decode($activity->sub_activities, true);
@@ -380,7 +380,7 @@ public function get_batch_student(Request $request) {
         return response()->json([]);
     }
 
-    $students = SportRegister::where('section_id', $section->id)->get();
+    $students = SportRegister::where('section_id', $section->id)->where('status','approved')->get();
 
     return response()->json($students);
 }

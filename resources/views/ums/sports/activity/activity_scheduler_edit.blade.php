@@ -424,8 +424,7 @@
                                                                                     <strong>{{ $day }}</strong>
                                                                                 </td>
 
-                                                                                {{-- Start Time --}}
-                                                                                <td class="poprod-decpt">
+                                                                                {{-- <td class="poprod-decpt">
                                                                                     <input type="time"
                                                                                         class="form-control mw-100 @error('day.' . $day . '.start_time') is-invalid @enderror"
                                                                                         name="day[{{ $day }}][start_time]"
@@ -436,7 +435,6 @@
                                                                                     @enderror
                                                                                 </td>
 
-                                                                                {{-- End Time --}}
                                                                                 <td class="poprod-decpt">
                                                                                     <input type="time"
                                                                                         class="form-control mw-100 @error('day.' . $day . '.end_time') is-invalid @enderror"
@@ -446,6 +444,36 @@
                                                                                         <div class="invalid-feedback">
                                                                                             {{ $message }}</div>
                                                                                     @enderror
+                                                                                </td> --}}
+
+                                                                                <td class="poprod-decpt">
+                                                                                    <input type="time"
+                                                                                        class="form-control mw-100 @error('day.' . $day . '.start_time') is-invalid @enderror"
+                                                                                        name="day[{{ $day }}][start_time]"
+                                                                                        value="{{ old('day.' . $day . '.start_time', $scheduledDays[$day]['start_time'] ?? '') }}">
+                                                                                    @error('day.' . $day . '.start_time')
+                                                                                        <div class="invalid-feedback">
+                                                                                            {{ $message }}</div>
+                                                                                    @enderror
+                                                                                    <button type="button"
+                                                                                        class="btn btn-link clear-time"
+                                                                                        data-day="{{ $day }}"
+                                                                                        data-field="start_time">Clear</button>
+                                                                                </td>
+
+                                                                                <td class="poprod-decpt">
+                                                                                    <input type="time"
+                                                                                        class="form-control mw-100 @error('day.' . $day . '.end_time') is-invalid @enderror"
+                                                                                        name="day[{{ $day }}][end_time]"
+                                                                                        value="{{ old('day.' . $day . '.end_time', $scheduledDays[$day]['end_time'] ?? '') }}">
+                                                                                    @error('day.' . $day . '.end_time')
+                                                                                        <div class="invalid-feedback">
+                                                                                            {{ $message }}</div>
+                                                                                    @enderror
+                                                                                    <button type="button"
+                                                                                        class="btn btn-link clear-time"
+                                                                                        data-day="{{ $day }}"
+                                                                                        data-field="end_time">Clear</button>
                                                                                 </td>
 
                                                                                 <td class="poprod-decpt"></td>
@@ -500,6 +528,18 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <script>
+        $(document).ready(function() {
+            $('.clear-time').on('click', function() {
+                var day = $(this).data('day');
+                var field = $(this).data('field');
+
+                var inputName = 'day[' + day + '][' + field + ']';
+
+                $("input[name='" + inputName + "']").val('');
+            });
+        });
+    </script>
     <script>
         $(document).ready(function() {
 
