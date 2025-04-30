@@ -9,5 +9,10 @@ class Sport_type extends Model
 {
     use HasFactory;
     protected $table = 'sports_type';
-    protected $fillable = ['type'];
+    protected $fillable = [
+        'type',
+        'organization_id',
+        'group_id',
+        'company_id'
+    ];
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>DSMNRU | Admin Login</title>
+    <title>Admin Login</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{asset('assets/admin/css/bootstrap.min.css')}}">
@@ -74,12 +74,12 @@
                                                     <div class="tab-content" id="myTabContent">
                                                         <div class="tab-pane fade show active" id="organization" role="tabpanel" aria-labelledby="org-tab">
 
-                                                            <h5 class="mb-3 text-success">Welcome to
-                                                            @if(Request::segment(1)=='hod')
+                                                            <h5 class="mb-3 text-success">Welcome to Sports Quest
+                                                            <!-- @if(Request::segment(1)=='hod')
                                                              HOD
                                                              @else
                                                              University
-                                                             @endif
+                                                             @endif -->
                                                               Portal</h5>
 
                                                             <h5 class="mb-5 "><i class="fa fa-sign-in"></i> Enter your Credentials</h5>
@@ -134,7 +134,11 @@
 
                                                     </div>
                                                     <div class="mt-5">
-                                                        <p class="f-12 mb-0">For any query/issue, please write to <a href="mailto:dsmnru.help@gmail.com" class="text-orange">dsmnru.help@gmail.com</a></p>
+                                                        <p class="f-12 mb-0">For any query/issue, please write to 
+                                                            <!-- <a href="mailto:dsmnru.help@gmail.com" class="text-orange">dsmnru.help@gmail.com</a> -->
+                                                            <a href="mailto:dsmnru.help@gmail.com" class="text-orange">sportsquest.help@gmail.com</a>
+
+                                                        </p>
                                                         <p class="f-12 text-muted mb-0">This site is best viewed with latest version of all browsers.</p>
                                                     </div>
                                                 </div>

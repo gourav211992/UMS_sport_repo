@@ -467,55 +467,25 @@
     })
 </script>
 <script>
-    // function captureTableData() {
-    //     let tableData = [];
-    //     let rows = document.querySelectorAll('.table tbody tr');
+  
+$(document).on('change', '.form-select', function() {
+    var frequency = $(this).val(); 
+    var row = $(this).closest('tr'); 
+    var durationSelect = row.find('.duration-select'); 
 
-    //     rows.forEach(row => {
-    //         let rowData = {
-    //             title: row.querySelector('td:nth-child(2) select').value,
-    //             total_fees: row.querySelector('td:nth-child(3) input').value,
-    //             fee_discount_percent: row.querySelector('td:nth-child(4) input').value,
-    //             fee_discount_value: row.querySelector('td:nth-child(5) input').value,
-    //             net_fee_payable_value: row.querySelector('td:nth-child(6) input').value,
-    //             mandatory: row.querySelector('td:nth-child(7) input').checked,
-    //             payment_mode: row.querySelector('td:nth-child(8) select').value
-    //         };
-    //         tableData.push(rowData);
-    //         console.log(rowData);
-    //         document.getElementById('form_details').value = JSON.stringify(tableData);
-
-
-    //     });
-    //     var fees_total = document.getElementById('#total_fee1').text;
-    //     var fees_discount_value = document.getElementById('#fee_discount1').text;
-    //     var fees_net = document.getElementById('#total_payable').text;
-
-
-
-    // }
+    if (frequency === 'Monthly') {
+        durationSelect.show(); 
+    } else {
+        durationSelect.hide(); 
+    }
+});
+</script>
+<script>
 
     function captureTableData() {
     let tableData = [];
     let rows = document.querySelectorAll('.table tbody tr');
 
-// <<<<<<< HEAD
-//         rows.forEach(row => {
-//             let rowData = {
-//                 title: row.querySelector('td:nth-child(2) select').value,
-//                 total_fees: row.querySelector('td:nth-child(3) input').value,
-//                 fee_discount_percent: row.querySelector('td:nth-child(4) input').value,
-//                 fee_discount_value: row.querySelector('td:nth-child(5) input').value,
-//                 net_fee_payable_value: row.querySelector('td:nth-child(6) input').value,
-//                 mandatory: row.querySelector('td:nth-child(7) input').checked,
-//                 payment_mode: row.querySelector('td:nth-child(8) select').value,
-//                 duration: row.querySelector('td:nth-child(9) select').value
-//
-//             };
-//             tableData.push(rowData);
-//             console.log(rowData);
-//             document.getElementById('form_details').value = JSON.stringify(tableData);
-// =======
 
     let grand_total_fees = document.getElementById('total_fee1')?.textContent.trim() || "0";
     let grand_total_discount = document.getElementById('fee_discount1')?.textContent.trim() || "0";
@@ -546,7 +516,7 @@
 
     console.log(tableData);
 }
-// >>>>>>> 798b756dcee47b85dba55b98ac398261eac34584
+
 
 
 </script>
@@ -557,6 +527,7 @@
     });
 </script>
 
+
 <script>
    $(document).ready(function () {
     $(document).on('input', '#total_fee, #fee_discount, #fee_discount_value', function () {
@@ -565,26 +536,9 @@
         var discountPercent = parseFloat($row.find('#fee_discount').val()) || 0;
         var discountValue = parseFloat($row.find('#fee_discount_value').val()) || 0;
 
-// <<<<<<< HEAD
-//     // Condition 1: If user updates discount percentage, calculate discount value
-//     if(discount>0){
-//     if ($(this).attr('id') === 'fee_discount') {
-//         discountValue = (totalFee * discount) / 100;
-//         $row.find('#fee_discount_value').val(discountValue.toFixed(2));
-//     }}
-//     var rowTitle = $row.find('.title').text().trim() || "This Row";
-//     if(totalFee<discount){
-//
-//         $row.find('#fee_discount').val(0);
-//         discount = 0;
-//         $row.find('#fee_discount_value').val(0);
-//         discountValue = 0;
-//     }
-// =======
-        var inputId = $(this).attr('id');
-// >>>>>>> 798b756dcee47b85dba55b98ac398261eac34584
 
-        // If percent is changed
+        var inputId = $(this).attr('id');
+
         if (inputId === 'fee_discount') {
             if (discountPercent > 100) {
                 alert("Discount % cannot be greater than 100!");
@@ -601,7 +555,6 @@
             }
         }
 
-        // If discount value is changed
         if (inputId === 'fee_discount_value') {
             if (discountValue > totalFee) {
                 alert("Discount value cannot be greater than Total Fee!");
@@ -695,58 +648,6 @@ function updateRows(table) {
         }
     });
 
-{{--<<<<<<< HEAD--}}
-{{--            // Generate a new row--}}
-{{--            var newRow = `--}}
-{{--                <tr>--}}
-{{--                    <td></td> <!-- Serial number will be added dynamically -->--}}
-{{--                    <td>--}}
-{{--                                                                <select class="form-control mw-100" name="title" required style="width: 300px">--}}
-{{--                                                                    <option value="" disabled>Select Title</option>--}}
-{{--                                                                    @foreach ($fee_head as $head)--}}
-{{--                                                                        <option value="{{ $head->fee_head }}"--}}
-{{--                                                                            @if (isset($fees) && $fees['title']== $head->fee_head) selected @endif>--}}
-{{--                                                                            {{ $head->fee_head }}--}}
-{{--                                                                        </option>--}}
-{{--                                                                    @endforeach--}}
-{{--                                                                </select>--}}
-{{--                                                            </td>--}}
-{{--                    <td><input type="number" class="form-control mw-100" value="" id="total_fee" /></td>--}}
-{{--                    <td><input type="number" class="form-control mw-100" value="" id="fee_discount" /></td>--}}
-{{--                    <td><input type="text" class="form-control mw-100" value="" id="fee_discount_value"  /></td>--}}
-{{--                    <td><input type="text" class="form-control mw-100" value="" id="net_fee" readonly /></td>--}}
-{{--                    <td><input type="checkbox" class="form-check-input" /></td>--}}
-{{--                    <td><select class="form-select mw-100">--}}
-{{--                        <option>Select</option>--}}
-{{--                        <option>Weekly</option>--}}
-{{--                        <option>Monthly</option>--}}
-{{--                        <option>Quarterly</option>--}}
-{{--                        <option>Semi-Yearly</option>--}}
-{{--                        <option>Yearly</option>--}}
-{{--                        <option>One Time</option>--}}
-{{--                    </select></td>--}}
-{{--                                                <td>--}}
-{{--                                                                    <select class="form-select mw-100 duration-select" name="duration" style="display: none;">--}}
-{{--                                                                        <option value="">Select Duration</option>--}}
-{{--                                                                        <option value="1">1 Month</option>--}}
-{{--                                                                        <option value="2">2 Months</option>--}}
-{{--                                                                        <option value="3">3 Months</option>--}}
-{{--                                                                        <option value="4">4 Months</option>--}}
-{{--                                                                        <option value="5">5 Months</option>--}}
-{{--                                                                        <option value="6">6 Months</option>--}}
-{{--                                                                        <option value="7">7 Months</option>--}}
-{{--                                                                        <option value="8">8 Months</option>--}}
-{{--                                                                        <option value="9">9 Months</option>--}}
-{{--                                                                        <option value="10">10 Months</option>--}}
-{{--                                                                        <option value="11">11 Months</option>--}}
-{{--                                                                        <option value="12">12 Months</option>--}}
-{{--                                                                    </select>--}}
-{{--                                                                </td>--}}
-{{--                    <td><a href="#" class="text-primary add-contact-row">--}}
-{{--                        <i data-feather="plus-square"></i>--}}
-{{--                    </a></td>--}}
-{{--                </tr>--}}
-// =======
     feather.replace();
 }
 
@@ -776,23 +677,23 @@ if (!isValid) {
     return;
 }
     var newRow = `
-                 <tr>
+                 <tr class='add-row'>
                             <td></td> <!-- Serial number will be added dynamically -->
                             <td>
                                                                                 <select class="form-control mw-100" name="title" required style="width: 300px">
                                                                                     <option value="" disabled selected>Select Title</option>
                                                                                     @foreach ($fee_head as $head)
                                                                                     <option value="{{ $head->fee_head }}">{{ $head->fee_head }}</option>
-                                                                                  @endforeach
+                                                                                    @endforeach
                                                                                 </select>
                                                                     </td>
                             <td><input type="number" class="form-control mw-100 total_fee" value="" id="total_fee" required /></td>
                             <td><input type="number" class="form-control mw-100" value="" id="fee_discount" /></td>
                             <td><input type="text" class="form-control mw-100 fee_discount_value" value="" id="fee_discount_value"  /></td>
-                            <td><input type="text" class="form-control mw-100 net_fee" value="" id="net_fee" readonly /></td>
-                            <td><input type="checkbox" class="form-check-input" /></td>
+                            <td><input type="text" class="form-control mw-100 net_fee" value="" id="net_fee"  readonly /></td>
+                            <td><input type="checkbox" class="form-check-input " name="guardian" /></td>
                             <td>
-                                <select class="form-select mw-100">
+                                <select class="form-select mw-100 payment-frequency">
                                     <option>Select</option>
                                     <option>Weekly</option>
                                     <option>Monthly</option>
@@ -875,7 +776,6 @@ $('body').on('click', '.delete-item', function (e) {
             $('#batch_name').prop('disabled', true);
         }
     });
-    // Fetch Sections on Batch Select
     $('#batch_name').on('change', function () {
     var batchName = $(this).val();
     $('#section').html('<option value="" selected>-----Select Section-----</option>');
@@ -911,41 +811,45 @@ $('body').on('click', '.delete-item', function (e) {
 
 <script>
     $(document).ready(function() {
-        // Handle payment frequency change
         $(document).on('change', '.payment-frequency', function() {
-            var durationSelect = $(this).closest('tr').find('.duration-select');
-            var title = $(this).closest('tr').find('td:eq(1)').text().trim();
-
+            var $row = $(this).closest('tr');
+            var durationSelect = $row.find('.duration-select');
+            var title = $row.find('select[name="title"] option:selected').text().trim();
+    
             if ($(this).val() === 'Monthly') {
-                durationSelect.show();
-                durationSelect.prop('required', true);
-
-                // Show the modal with duration information
+                durationSelect.show().prop('required', true);
+    
                 $('#paymentTitle').text(title);
                 $('#paymentDuration').text(durationSelect.find('option:selected').text());
                 $('#monthlyPaymentModal').modal('show');
             } else {
-                durationSelect.hide();
-                durationSelect.prop('required', false);
+                durationSelect.hide().prop('required', false);
             }
         });
-
-        // Handle duration change
+    
         $(document).on('change', '.duration-select', function() {
-            var title = $(this).closest('tr').find('td:eq(1)').text().trim();
+            var $row = $(this).closest('tr');
+            var title = $row.find('select[name="title"] option:selected').text().trim();
+            var durationText = $(this).find('option:selected').text();
+    
             $('#paymentTitle').text(title);
-            $('#paymentDuration').text($(this).find('option:selected').text());
+            $('#paymentDuration').text(durationText);
             $('#monthlyPaymentModal').modal('show');
+    
+            $(this).show(); 
         });
-
-        // Initialize duration fields based on existing payment modes
+    
         $('.payment-frequency').each(function() {
+            var $row = $(this).closest('tr');
             if ($(this).val() === 'Monthly') {
-                $(this).closest('tr').find('.duration-select').show();
+                $row.find('.duration-select').show().prop('required', true);
+            } else {
+                $row.find('.duration-select').hide().prop('required', false);
             }
         });
     });
-</script>
+    </script>
+    
 
 
 @endsection

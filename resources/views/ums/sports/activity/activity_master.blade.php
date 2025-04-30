@@ -93,7 +93,7 @@
                                                             <span>No Sub Activities Duration</span>
                                                         @endif
                                                     </td> --}}
-                                                    <td>{{ $item->activity_duration_min }}</td>
+                                                    <td>{{ $item->duration_min }}</td>
                                                     <td>
                                                         @if ($item->status == 'inactive')
                                                             <span

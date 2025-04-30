@@ -29,7 +29,6 @@
 
             <form id="cat_form" method="POST" action="{{ route('activity-master-add') }}">
                 @csrf
-                @include('ums.admin.notifications')
                 <div class="content-body">
                     <section id="basic-datatable">
                         <div class="row">
@@ -45,7 +44,7 @@
                                                                 class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <select class="form-select" name="sport_id">
+                                                        <select class="form-select" name="sport_id" id="sport_id">
                                                             <option value="">--Select Sport</option>
                                                             @foreach ($sportName as $name)
                                                                 <option value="{{ $name->id }}">
@@ -84,7 +83,8 @@
                                                         @enderror
                                                     </div>
                                                 </div>
-                                     <input type="hidden" id="sub_activity">
+                                                <input type="hidden" id="sub_activity">
+                                                
                                                 <!-- Description Field -->
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
@@ -120,7 +120,7 @@
                                                 </div>
 
                                                 <!-- Sub Activity Table -->
-                                                <div class="col-md-9">
+                                                <div class="col-md-12">
                                                     <div class="table-responsive-md">
                                                         <table
                                                             class="mt-1 table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable">
@@ -130,38 +130,40 @@
                                                                     <th>Sub Activity Name<span class="text-danger">*</span>
                                                                     </th>
                                                                     <th>Duration(min)<span class="text-danger">*</span></th>
+                                                                    <th>Shuttle<span class="text-danger"></span></th>
                                                                     <th>Action</th>
                                                                 </tr>
                                                             </thead>
-                                                         
-                                                            {{-- <tbody id="parameter-table-body">
-                                                                <!-- Always first row with + icon -->
-                                                                <tr class="parameter-row add-template">
-                                                                    <td class="sno">1</td>
-                                                                    <td>
-                                                                        <input type="text"
-                                                                            class="form-control parameter-input mw-100"
-                                                                            placeholder="Enter Parameter Name" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="text"
-                                                                            class="form-control parameter-duration mw-100"
-                                                                            placeholder="Enter Parameter duration" />
-                                                                    </td>
-    
-                                                                    <td>
-                                                                        <a href="#" class="text-primary add-row"><i
-                                                                                data-feather="plus-square"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody> --}}
                                                             <tbody id="sub-category-box">
                                                                 <tr class="sub-category-template">
                                                                     <td class="row-number">1</td>
-                                                                    <td><input type="text" name="subcategories[0][name]" class="form-control mw-100" placeholder="Enter Sub Activity Name" /></td>
-                                                                    <td><input type="number" name="subcategories[0][duration]" class="form-control mw-100" placeholder="Enter Sub Activity Duration" /></td>
+                                                                    <td><input type="text"
+                                                                            name="subcategories[0][name]"
+                                                                            class="form-control mw-100"
+                                                                            placeholder="Enter Sub Activity Name" /></td>
+                                                                    <td><input type="number"
+                                                                            name="subcategories[0][duration]"
+                                                                            class="form-control mw-100"
+                                                                            placeholder="Enter Sub Activity Duration" />
+                                                                    </td>
                                                                     <td>
-                                                                        <a href="#" class="text-primary add-address"><i data-feather="plus-square"></i></a>
+                                                                        <div class="d-flex justify-content-around">
+                                                                            <div class="form-check">
+                                                                                <input type="hidden" name="subcategories[0][checkbox_status]" class="form-check-input" value="0">
+                                                                                <input type="checkbox" name="subcategories[0][checkbox_status]" class="form-check-input" id="toggleCheckbox0" value="1">
+                                                                            </div>
+                                                                            <div>
+                                                                                <select id="dropdown0" class="form-control text-dark mw-100" name="subcategories[0][condition_status]" style="display: none;">
+                                                                                    <option value="">---Select---</option>
+                                                                                    <option value="fresh">Fresh</option>
+                                                                                    <option value="used">Used</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#" class="text-primary add-address"><i
+                                                                                data-feather="plus-square"></i></a>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -184,143 +186,127 @@
     <script src="https://cdn.jsdelivr.net/npm/feather-icons"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
+     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             feather.replace();
 
             let subCategoryIndex = 1;
 
-            document.getElementById('cat_form').addEventListener('submit', function(e) {
-                let activityName = document.querySelector('input[name="activity_name"]');
-                let durationMin = document.querySelector('input[name="duration_min"]');
-                let subActivity = document.querySelector('input[name="sub_activities"]');
+            // Add new row
+            $('#sub-category-box').on('click', '.add-address', function (e) {
+                e.preventDefault();
+
+                let $templateRow = $('.sub-category-template').first().clone();
+
+                $templateRow.find('input[type="text"], input[type="number"]').val('');
+                $templateRow.find('input[type="checkbox"]').prop('checked', false);
+                $templateRow.find('select').val('').hide();
+                $templateRow.find('.text-danger.validation-error').remove();
+
+                $templateRow.find('input, select').each(function () {
+                    const attrName = $(this).attr('name');
+                    if (attrName) {
+                        $(this).attr('name', attrName.replace(/\[\d+]/, `[${subCategoryIndex}]`));
+                    }
+
+                    const attrId = $(this).attr('id');
+                    if (attrId?.includes('toggleCheckbox')) {
+                        $(this).attr('id', `toggleCheckbox${subCategoryIndex}`);
+                    }
+
+                    if ($(this).is('select')) {
+                        $(this).attr('id', `dropdown${subCategoryIndex}`);
+                    }
+                });
+
+                const newDropdownId = `dropdown${subCategoryIndex}`;
+                $templateRow.find('input[type="checkbox"]').off('click').on('click', function () {
+                    const isChecked = $(this).is(':checked');
+                    $(`#${newDropdownId}`).toggle(isChecked);
+                });
+
+                $templateRow.find('td:last').html(`
+                    <a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>
+                `);
+
+                $('#sub-category-box').append($templateRow);
+                updateRowNumbers();
+                feather.replace();
+                subCategoryIndex++;
+            });
+
+            // Delete row
+            $('#sub-category-box').on('click', '.delete-row', function (e) {
+                e.preventDefault();
+                $(this).closest('tr').remove();
+                updateRowNumbers();
+                subCategoryIndex = $('#sub-category-box tr').length;
+            });
+
+            $('#toggleCheckbox0').on('click', function () {
+                $('#dropdown0').toggle(this.checked);
+            });
+
+            function updateRowNumbers() {
+                $('#sub-category-box tr').each(function (i) {
+                    $(this).find('.row-number').text(i + 1);
+                });
+            }
+
+            // Form validation
+            $('#cat_form').on('submit', function (e) {
                 let isValid = true;
+                $('.text-danger.validation-error').remove();
+                $('.is-invalid').removeClass('is-invalid');
 
-                if (activityName.value.trim() === '') {
+                const activityName = $('input[name="activity_name"]');
+                if (activityName.val().trim() === '') {
                     isValid = false;
-                    activityName.classList.add('is-invalid');
-                    if (!document.querySelector('#activity-name-error')) {
-                        let errorMsg = document.createElement('div');
-                        errorMsg.id = 'activity-name-error';
-                        errorMsg.classList.add('text-danger');
-                        errorMsg.textContent = 'required.';
-                        activityName.parentElement.appendChild(errorMsg);
-                    }
+                    activityName.addClass('is-invalid');
+                    activityName.after('<div class="text-danger validation-error">Required.</div>');
                 }
 
-                if (durationMin.value.trim() === '' || isNaN(durationMin.value.trim())) {
+                const durationMin = $('input[name="duration_min"]');
+                if (durationMin.val().trim() === '' || isNaN(durationMin.val())) {
                     isValid = false;
-                    durationMin.classList.add('is-invalid');
-                    if (!document.querySelector('#duration-error')) {
-                        let errorMsg = document.createElement('div');
-                        errorMsg.id = 'duration-error';
-                        errorMsg.classList.add('text-danger');
-                        errorMsg.textContent = 'required.';
-                        durationMin.parentElement.appendChild(errorMsg);
-                    }
+                    durationMin.addClass('is-invalid');
+                    durationMin.after('<div class="text-danger validation-error">Required.</div>');
                 }
 
-                if (subActivity.value.trim() === '') {
+                const sportSelect = $('select[name="sport_id"]');
+                if (sportSelect.val().trim() === '') {
                     isValid = false;
-                    subActivity.classList.add('is-invalid');
-                    if (!document.querySelector('#subactivity-name-error')) {
-                        let errorMsg = document.createElement('div');
-                        errorMsg.id = 'activity-name-error';
-                        errorMsg.classList.add('text-danger');
-                        errorMsg.textContent = 'required.';
-                        subActivity.parentElement.appendChild(errorMsg);
-                    }
+                    sportSelect.addClass('is-invalid');
+                    sportSelect.after('<div class="text-danger validation-error">Required.</div>');
                 }
+
+                $('#sub-category-box tr').each(function () {
+                    const nameInput = $(this).find('input[name^="subcategories"][name$="[name]"]');
+                    const durationInput = $(this).find('input[name^="subcategories"][name$="[duration]"]');
+
+                    if (nameInput.val().trim() === '') {
+                        isValid = false;
+                        nameInput.addClass('is-invalid');
+                        nameInput.after('<div class="text-danger validation-error">Required.</div>');
+                    }
+
+                    if (durationInput.val().trim() === '') {
+                        isValid = false;
+                        durationInput.addClass('is-invalid');
+                        durationInput.after('<div class="text-danger validation-error">Required.</div>');
+                    }
+                });
 
                 if (!isValid) {
                     e.preventDefault();
                 }
             });
 
-            document.querySelector('input[name="activity_name"]').addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-                document.querySelector('#activity-name-error')?.remove();
-            });
-
-            document.querySelector('input[name="duration_min"]').addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-                document.querySelector('#duration-error')?.remove();
-            });
-            document.querySelector('input[name="sub_activities"]').addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-                document.querySelector('#duration-error')?.remove();
+            $(document).on('input change', 'input, select', function () {
+                $(this).removeClass('is-invalid');
+                $(this).next('.validation-error').remove();
             });
         });
     </script>
-    		 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // Initialize Feather icons
-                feather.replace();
-        
-                let subCategoryIndex = 1;
-        
-                // Add new subcategory row when the plus icon is clicked
-                document.querySelector('#sub-category-box').addEventListener('click', function (e) {
-                    if (e.target.closest('.add-address')) {
-                        e.preventDefault();
-        
-                        // Get the input values from the current row
-                        let subCategoryNameField = document.querySelector('.sub-category-template input[name="subcategories[0][name]"]');
-                        let subCategoryDurationField = document.querySelector('.sub-category-template input[name="subcategories[0][duration]"]');
-        
-                        let subCategoryName = subCategoryNameField.value.trim();
-                        let subCategoryDuration = subCategoryDurationField.value.trim();
-        
-                        if (subCategoryName === "" || subCategoryDuration === "") {
-                            alert("Please enter both subcategory name and duration.");
-                            return;
-                        }
-        
-                        // Create a new row to display the filled subcategory and duration
-                        let newRow = document.createElement('tr');
-                        newRow.innerHTML = `
-                            <td>${subCategoryIndex + 1}</td>
-                            <td><input type="text" name="subcategories[${subCategoryIndex}][name]" class="form-control mw-100" value="${subCategoryName}" /></td>
-                            <td><input type="number" name="subcategories[${subCategoryIndex}][duration]" class="form-control mw-100" value="${subCategoryDuration}" /></td>
-                            <td><a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a></td>
-                        `;
-        
-                        // Append the new row to the table body
-                        document.querySelector('#sub-category-box').appendChild(newRow);
-        
-                        // Reinitialize Feather icons for the new row
-                        feather.replace();
-        
-                        // Clear the input fields and focus on the name field for the next entry
-                        subCategoryNameField.value = '';
-                        subCategoryDurationField.value = '';
-                        subCategoryNameField.focus();
-        
-                        // Increment the index for the next subcategory
-                        subCategoryIndex++;
-                    }
-                });
-        
-                // Delete a subcategory row when the delete button is clicked
-                document.querySelector('#sub-category-box').addEventListener('click', function (e) {
-                    if (e.target.closest('.delete-row')) {
-                        e.preventDefault();
-        
-                        // Remove the row
-                        let row = e.target.closest('tr');
-                        row.remove();
-        
-                        // Re-index the rows
-                        let rows = document.querySelectorAll('#sub-category-box tr');
-                        rows.forEach((row, index) => {
-                            row.querySelector('td:first-child').textContent = index + 1; // Update the row number
-                        });
-        
-                        // Update subCategoryIndex based on the remaining rows
-                        subCategoryIndex = rows.length;
-                    }
-                });
-            });
-        </script>
 @endsection

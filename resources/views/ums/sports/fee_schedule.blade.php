@@ -42,8 +42,8 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="table-responsive candidates-tables">
-                                <table
-                                    class=" table-responsive datatables-basic table table-striped myrequesttablecbox tasklist ">
+                                <table class="datatables-basic table table-striped myrequesttablecbox ">
+                                    
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -62,123 +62,6 @@
                                     </thead>
 
 
-
-                                    <!-- <tbody>
-                                        @foreach ($sportFeeMaster ?? [] as $fee)
-                                        @php
-                                        $feeDetails = json_decode($fee->fee_details, true);
-                                        $totalFees = $feeDetails[0]['grand_total_fees'] ?? 0;
-                                        $discount = $feeDetails[0]['grand_total_discount'] ?? 0;
-                                        $netFees = $feeDetails[0]['grand_total_payable'] ?? 0;
-
-                                       
-                                        $section = \App\Models\ums\Section::where('name', $fee->section)->first();
-                                        $sectionId = $section ? $section->id : null;
-
-                                        
-                                        $quota = \App\Models\ums\Quota::where('quota_name', $fee->quota)->first();
-                                        $quotaId = $quota ? $quota->id : null;
-
-                                      
-                                        $exists = false;
-                                        if ($sectionId && $quotaId) {
-                                        $exists = \App\Models\SportRegister::where('batch_id', $fee->batch_id)
-                                        ->where('section_id', $sectionId)
-                                        ->where('quota_id', $quotaId)
-                                        ->exists();
-                                        }
-
-                                        $fee->is_editable = !$exists;
-                                        @endphp
-
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $fee->sport_name }}</td>
-                                            <td>{{ $fee->batch_year }}</td>
-                                            <td>{{ $fee->batch }}</td>
-                                            <td>{{ $fee->section }}</td>
-                                            <td>{{ $fee->quota }}</td>
-                                            <td>{{ $totalFees }}</td>
-                                            <td>{{ $discount }}</td>
-                                            <td>{{ $netFees }}</td>
-                                            <td>
-                                                <span class="badge rounded-pill badge-light-{{ $fee->status == 'Active' ? 'success' : 'danger' }} badgeborder-radius">
-                                                    {{ $fee->status }}
-                                                </span>
-                                            </td>
-                                            <td class="tableactionnew">
-                                                <div class="dropdown">
-                                                    <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
-                                                        <i data-feather="more-vertical"></i>
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <a class="dropdown-item" href="{{ url('sports-fee-schedule/view/'.$fee->id) }}">
-                                                            <i data-feather="edit" class="me-50"></i>
-                                                            <span>View Detail</span>
-                                                        </a>
-
-                                                        @if (strtotime($fee->end_date) >= strtotime(now()) && $fee->is_editable)
-                                                        <a class="dropdown-item" href="{{ url('sports-fee-schedule/edit/'.$fee->id) }}">
-                                                            <i data-feather="edit-3" class="me-50"></i>
-                                                            <span>Edit</span>
-                                                        </a>
-                                                        @else
-                                                        <span class="dropdown-item text-muted" title="Edit disabled: already registered">
-                                                            <i data-feather="x-circle" class="me-50"></i>
-                                                            <span>Edit Disabled</span>
-                                                        </span>
-                                                        @endif
-
-                                                        <a href="#"
-                                                            class="dropdown-item open-confirm-modal"
-                                                            data-href="{{ url('sports-fee-schedule/delete/'.$fee->id) }}">
-                                                            <i data-feather="trash-2" class="me-50"></i>
-                                                            <span>Delete</span>
-                                                        </a>
-                                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#confirmModal{{ $fee->id }}" href="javascript:void(0)">
-                                                            <i data-feather="copy" class="me-50"></i>
-                                                            <span>Clone</span>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-
-                                        <div class="modal fade" id="confirmModal{{ $fee->id }}" tabindex="-1" aria-labelledby="confirmModalLabel{{ $fee->id }}" aria-hidden="true">
-                                            <div class="modal-dialog d-flex align-items-center" style="min-height: 100vh;">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="confirmModalLabel{{ $fee->id }}">Fee Schedule Clone</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form action="{{ route('sports-fee-schedule-clone', $fee->id) }}" method="POST">
-                                                            @csrf
-                                                            <div class="mt-1 d-flex align-items-center">
-                                                                <label for="quota" class="mr-2 me-2">Select Quota</label>
-                                                                <select id="quota" name="quota" class="form-select w-50 b-0 ">
-                                                                    @foreach ($quotas as $item)
-                                                                    @if ($item->quota_name != $fee->quota)
-                                                                    <option value="{{ $item->quota_name }}">{{ $item->quota_name }}</option>
-                                                                    @endif
-                                                                    @endforeach
-                                                                </select>
-                                                            </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-success">Confirm Clone</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-
-                                        @endforeach
-                                    </tbody> -->
 
 
 

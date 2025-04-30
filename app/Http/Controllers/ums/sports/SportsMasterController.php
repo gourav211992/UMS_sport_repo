@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\ums\sports;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\ums\Sport_type;
 use App\Models\ums\Sport_master;
@@ -25,10 +26,10 @@ class SportsMasterController extends Controller
 
     public function SportMasterAdd(Request $request)
     {
-        
+        $user = Helper::getAuthenticatedUser();
         $validatedData = $request->validate([
             'sport_type' => 'required|exists:sports_type,id',  
-            'sport_name' => 'required|string|max:255',  
+            'sport_name' => 'required|string|max:255',
             'status' => 'required|in:active,inactive',  
         ]);
     
@@ -37,6 +38,9 @@ class SportsMasterController extends Controller
             'sport_type' => $validatedData['sport_type'],  
             'sport_name' => $validatedData['sport_name'],
             'status' => $validatedData['status'],
+            'organization_id' => $user->organization_id,
+            'group_id' => $user->group_id,
+            'company_id' => $user->company_id,
         ]);
     
         
@@ -62,7 +66,7 @@ class SportsMasterController extends Controller
 
 public function SportMasterUpdate(Request $request, $id)
 {
-    
+    $user = Helper::getAuthenticatedUser();
     $validatedData = $request->validate([
         'sport_type' => 'required|exists:sports_type,id',  
         'sport_name' => 'required|string|max:255', 
@@ -77,6 +81,9 @@ public function SportMasterUpdate(Request $request, $id)
         'sport_type' => $validatedData['sport_type'],
         'sport_name' => $validatedData['sport_name'],
         'status' => $validatedData['status'],
+        'organization_id' => $user->organization_id,
+        'group_id' => $user->group_id,
+        'company_id' => $user->company_id
     ]);
 
     
@@ -126,14 +133,20 @@ public function showSportTypeAddForm()
 }
 
 public function SportTypeAdd(Request $request)
+
 {
+    $user = Helper::getAuthenticatedUser();
+    // dd($request->all());
     $validatedData = $request->validate([
-        'type' => 'required|string|max:255',  
+        'type' => 'required|string|max:255', 
     ]);
 
     
     Sport_Type::create([
-        'type' => $validatedData['type'],  
+        'type' => $validatedData['type'],
+        'organization_id' => $user->organization_id,
+        'group_id' => $user->group_id,
+        'company_id' => $user->company_id  
     ]);
 
     

@@ -637,7 +637,7 @@
                 
                   
                 
-                    @if(($currentTimeFormatted >=$startDateTime) || ( $currentTimeFormatted<=$endDateTime))
+                    @if(($currentTimeFormatted >=$startDateTime) && ( $currentTimeFormatted<=$endDateTime))
                         <span class="badge rounded-pill badge-light-info badgeborder-radius">Ongoing</span>
                     @elseif($currentDateTime->greaterThan($endDateTime))
                         <span class="badge rounded-pill badge-light-success badgeborder-radius">Closed</span>

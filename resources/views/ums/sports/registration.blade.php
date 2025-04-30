@@ -1686,7 +1686,7 @@
                     <form id="paymentForm">
                         <div class="mb-3">
                             <div class="alert alert-danger">
-                                Are you sure you're paying under the correct quota? If not, please contact the admin on ......... before proceeding with payment.
+                                Are you sure you're paying under the correct quota? If not, "please make save as draft" and contact the admin on ......... before proceeding with payment.
                             </div>
                             <label for="paymentMode" class="form-label">Payment Mode</label>
                             <select class="form-select" id="paymentMode" required>

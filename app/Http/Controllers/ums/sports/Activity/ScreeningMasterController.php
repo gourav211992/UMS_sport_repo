@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ums\sports\Activity;
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\ums\Activity\SportScreeningMaster;
 use App\Models\ums\Sport_master;
@@ -16,6 +17,8 @@ class ScreeningMasterController extends Controller
 
     public function store(Request $request)
     {
+        $user = Helper::getAuthenticatedUser();
+
         $validatedData = $request->validate([
             'screening_name' => 'required|string|max:255', 
             'description' => 'nullable|string',
@@ -40,6 +43,9 @@ class ScreeningMasterController extends Controller
             $sport_screening->sport_id = $validatedData['sport_id'];
             $sport_screening->status = $validatedData['status'];
             $sport_screening->parameter_details = $validatedData['parameter_details'];
+            $sport_screening->organization_id = $user->organization_id;
+            $sport_screening->group_id = $user->group_id;
+            $sport_screening->company_id = $user->company_id;
             $sport_screening->save();
 
             return response()->json([

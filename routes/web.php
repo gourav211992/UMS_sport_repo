@@ -221,12 +221,7 @@ Route::post('sports/password/email', [SportsForgotPasswordController::class, 'se
 Route::get('sports/password/reset/{token}', [SportsForgotPasswordController::class, 'showResetForm'])->name('sports.password.reset');
 Route::post('sports/password/reset', [SportsForgotPasswordController::class, 'resetPassword'])->name('sports.password.update');
 
-Route::post('sport-type-add', [SportsMasterController::class, 'SportTypeAdd'])->name('sport-type-add');
-Route::get('sport-type', [SportsMasterController::class, 'indexSportType'])->name('sport-type');
-Route::get('sport-type-add', [SportsMasterController::class, 'showSportTypeAddForm'])->name('sport-type-add.form');
-Route::get('sport-type-edit/{id}', [SportsMasterController::class, 'SportTypeEdit'])->name('sport-type-edit');
-Route::put('sport-type-edit/{id}', [SportsMasterController::class, 'SportTypeUpdate'])->name('sport-type-update');
-Route::get('sport-type-delete/{id}', [SportsMasterController::class, 'sportTypeDelete'])->name('sport-type-delete');
+
 Route::post('/get-sections-by-batch', [SportRegisterController::class, 'getSectionsByBatch'])->name('get.sections.by.batch');
 
  //my activity
@@ -243,15 +238,7 @@ Route::post('/get-sections-by-batch', [SportRegisterController::class, 'getSecti
     }
 });
 
-Route::get('my-activity', [MyActivityController::class, 'index'])->name('my-activity');
-Route::get('my-activity-view/{id}/{date}', [MyActivityController::class, 'ActivityView'])->name('activity-view');
-Route::post('save-activity-details', [MyActivityController::class, 'saveActivityDetails'])->name('save-activity-details');
 
-//player Review
-Route::get('player-review', [MyActivityController::class, 'review'])->name('player-review');
-Route::get('player-review-view/{id}/{date}', [MyActivityController::class, 'playerView'])->name('player-review-view');
-Route::get('player-review-edit/{id}/{date}', [MyActivityController::class, 'playerEdit'])->name('player-review-edit');
-Route::post('save-player-details', [MyActivityController::class, 'savePlayerDetails'])->name('save-player-details');
 // Sports Routes
 Route::group(['middleware' => ['sports']], function()
 {
@@ -331,6 +318,67 @@ Route::get('/sports-logout', [SportsController::class, 'logout'])->name('sport.l
 Route::post('/verify-otp', [SportsController::class, 'verifyOTP'])->name('verify.otp');
 Route::get('/verify-email', [SportsController::class, 'verifyEmail'])->name('verify.email');
 
+
+Route::get('/master-batches-add', function () {
+    return view('ums.sports.master.master_batches_add');
+});
+
+
+
+//ums 
+Route::get('/', [UmsHomeController::class, 'index'])->name('index');
+Route::get('/ums-login', [UmsHomeController::class, 'umsLogin'])->name('ums.login');
+Route::post('/post-ums-login', [UmsHomeController::class, 'postUmsLogin'])->name('post.ums.login');
+Route::get('/admission-portal', [UmsHomeController::class, 'admissionPortal'])->name('admission-portal');
+Route::post('/enquery-register', [UmsHomeController::class, 'enquery_register'])->name('enquery-register');
+Route::post('/enquery-login', [UmsHomeController::class, 'enquery_login'])->name('enquery-login');
+Route::post('forgot-password', [UmsHomeController::class, 'forgotPassword'])->name('user-forgot-password');
+Route::get('forgot-password-change', [UmsHomeController::class, '@forgotPasswordChange'])->name('user-forgot-password-change');
+Route::post('forgot-password-change', [UmsHomeController::class, '@forgotPasswordChangeSave']);
+
+Route::get('user-dashboard', [UserHomeController::class, 'userDashboardAndProfile'])->name('user.dashboard');
+Route::get('user-application-form', [UserHomeController::class, 'application_form'])->name('user-application-form');
+Route ::post('/application-course-list',[UserHomeController::class,'applicationCourseList']);
+Route ::post('/get-state',[UserHomeController::class,'get_state']);
+Route ::post('/get-district',[UserHomeController::class,'get_district']);
+Route::get('/education-single-row', [UserHomeController::class,'education_single_row'])->name('education-single-row');
+Route::get('entrance-admit-card/{id}', [UserHomeController::class,'entranceAdmitCard']);
+Route::post('application-form', [UserHomeController::class, 'applicationSave'])->middleware('auth');
+Route::group(['middleware' => ['admin']], function () {
+    Route::get('/sports-fee-schedule',[SportFeeController::class,'listing']);
+    Route::get('/sports-fee-schedule/add',[SportFeeController::class,'index']);
+    Route::post('fee-master/add',[SportFeeController::class,'store']);
+    Route::get('/sports-fee-schedule/edit/{id}',[SportFeeController::class,'edit']);
+    Route::get('/sports-fee-schedule/view/{id}',[SportFeeController::class,'ViewPage']);
+    Route::post('sports-fee-schedule/update/{id}',[SportFeeController::class,'update']);
+    Route::get('sports-fee-schedule/delete/{id}',[SportFeeController::class,'fee_delete']);
+
+    //clone 
+    Route::post('/sports-fee-schedule/clone/{id}',[SportFeeController::class,'clone'])->name('sports-fee-schedule-clone');
+
+
+    // MY ACTIVITY
+    Route::get('my-activity', [MyActivityController::class, 'index'])->name('my-activity');
+Route::get('my-activity-view/{id}/{date}', [MyActivityController::class, 'ActivityView'])->name('activity-view');
+Route::post('save-activity-details', [MyActivityController::class, 'saveActivityDetails'])->name('save-activity-details');
+
+//player Review
+Route::get('player-review', [MyActivityController::class, 'review'])->name('player-review');
+Route::get('player-review-view/{id}/{date}', [MyActivityController::class, 'playerView'])->name('player-review-view');
+Route::get('player-review-edit/{id}/{date}', [MyActivityController::class, 'playerEdit'])->name('player-review-edit');
+Route::post('save-player-details', [MyActivityController::class, 'savePlayerDetails'])->name('save-player-details');
+
+
+// Sport TYPE
+Route::post('sport-type-add', [SportsMasterController::class, 'SportTypeAdd'])->name('sport-type-add');
+Route::get('sport-type', [SportsMasterController::class, 'indexSportType'])->name('sport-type');
+Route::get('sport-type-add', [SportsMasterController::class, 'showSportTypeAddForm'])->name('sport-type-add.form');
+Route::get('sport-type-edit/{id}', [SportsMasterController::class, 'SportTypeEdit'])->name('sport-type-edit');
+Route::put('sport-type-edit/{id}', [SportsMasterController::class, 'SportTypeUpdate'])->name('sport-type-update');
+Route::get('sport-type-delete/{id}', [SportsMasterController::class, 'sportTypeDelete'])->name('sport-type-delete');
+
+
+//
 
 // Activity Marter 
 
@@ -415,9 +463,7 @@ Route::get('section-delete/{id}', [SportMasterController::class, 'sec_delete'])-
 
 Route::get('/master-batches', [SportMasterController::class, 'batch']);
 
-Route::get('/master-batches-add', function () {
-    return view('ums.sports.master.master_batches_add');
-});
+
 
 Route::post('/master-batches-add', [SportMasterController::class, 'store'])->name('batches-store');
 
@@ -455,36 +501,26 @@ Route::get('group-master-delete/{id}', [GroupMasterController::class, 'GroupMast
 
 
 
-//ums 
-Route::get('/', [UmsHomeController::class, 'index'])->name('index');
-Route::get('/ums-login', [UmsHomeController::class, 'umsLogin'])->name('ums.login');
-Route::post('/post-ums-login', [UmsHomeController::class, 'postUmsLogin'])->name('post.ums.login');
-Route::get('/admission-portal', [UmsHomeController::class, 'admissionPortal'])->name('admission-portal');
-Route::post('/enquery-register', [UmsHomeController::class, 'enquery_register'])->name('enquery-register');
-Route::post('/enquery-login', [UmsHomeController::class, 'enquery_login'])->name('enquery-login');
-Route::post('forgot-password', [UmsHomeController::class, 'forgotPassword'])->name('user-forgot-password');
-Route::get('forgot-password-change', [UmsHomeController::class, '@forgotPasswordChange'])->name('user-forgot-password-change');
-Route::post('forgot-password-change', [UmsHomeController::class, '@forgotPasswordChangeSave']);
 
-Route::get('user-dashboard', [UserHomeController::class, 'userDashboardAndProfile'])->name('user.dashboard');
-Route::get('user-application-form', [UserHomeController::class, 'application_form'])->name('user-application-form');
-Route ::post('/application-course-list',[UserHomeController::class,'applicationCourseList']);
-Route ::post('/get-state',[UserHomeController::class,'get_state']);
-Route ::post('/get-district',[UserHomeController::class,'get_district']);
-Route::get('/education-single-row', [UserHomeController::class,'education_single_row'])->name('education-single-row');
-Route::get('entrance-admit-card/{id}', [UserHomeController::class,'entranceAdmitCard']);
-Route::post('application-form', [UserHomeController::class, 'applicationSave'])->middleware('auth');
-Route::group(['middleware' => ['admin']], function () {
-    Route::get('/sports-fee-schedule',[SportFeeController::class,'listing']);
-    Route::get('/sports-fee-schedule/add',[SportFeeController::class,'index']);
-    Route::post('fee-master/add',[SportFeeController::class,'store']);
-    Route::get('/sports-fee-schedule/edit/{id}',[SportFeeController::class,'edit']);
-    Route::get('/sports-fee-schedule/view/{id}',[SportFeeController::class,'ViewPage']);
-    Route::post('sports-fee-schedule/update/{id}',[SportFeeController::class,'update']);
-    Route::get('sports-fee-schedule/delete/{id}',[SportFeeController::class,'fee_delete']);
 
-    //clone 
-    Route::post('/sports-fee-schedule/clone/{id}',[SportFeeController::class,'clone'])->name('sports-fee-schedule-clone');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//----------------------------------------------------- UMS ROUTE --------------------------------------------------------------
+
 
 //    Route::post('application-form', [UserHomeController::class, 'applicationSave']);
 Route::get('/ums-dashboard', [UmsHomeController::class, 'dashboard'])->name('ums.dashboard');

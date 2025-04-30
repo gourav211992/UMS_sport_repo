@@ -9,9 +9,13 @@ use App\Models\City;
 use App\Models\Country;
 use App\Models\SportRegister;
 use App\Models\State;
-use App\Models\ums\Quota;
-use App\Models\ums\batch;
-use App\Models\ums\Section;
+// use App\Models\ums\Quota;
+// use App\Models\ums\batch;
+// use App\Models\ums\Section;
+
+use App\Models\ums\SportBatch;
+use App\Models\ums\SportQuota;
+use App\Models\ums\SportSection;
 
 use App\Models\ums\sport_fee_master;
 use App\Models\ums\Sport_type;
@@ -28,7 +32,7 @@ use App\Models\ums\SportRegistrationDetail;
 use App\Models\ums\SportFamilyDetail;
 use App\Models\ums\SportEmergencyContact;
 use App\Models\ums\SportDocument;
-use App\Models\ums\GroupMaster;
+use App\Models\ums\SportGroupMaster;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -71,17 +75,18 @@ class SportRegisterController extends Controller
             return redirect()->route('sports.profile', ['id' => $student->id]);
         }
     $sport_types = Sport_master::all();
-    $quotas = Quota::all();
+    $quotas = SportQuota::all();
+    // $quotas = SportQuota::where('status', 'active')->get();
 //    dd($quotas);
     $batches = sport_fee_master::all()->unique('batch');
-    $sections = Section::all()->unique('name');
+    $sections = SportSection::all()->unique('name');
     $sportFeeMaster = sport_fee_master::where('quota','General')->first();
     $feeDetails = json_decode($sportFeeMaster->fee_details, true);
         $countries  = Country::all();
         $user = User::with('payments')->findOrFail($user->id);
-        $batchYears = Batch::select('batch_year')->distinct()->get();
-        $groups = GroupMaster::where('status', 'active')->get();
-        $qouta_id =  Quota::where('quota_name','General')->first();
+        $batchYears = SportBatch::select('batch_year')->distinct()->get();
+        $groups = SportGroupMaster::where('status', 'active')->get();
+        $qouta_id =  SportQuota::where('quota_name','General')->first();
 //        dd($qouta_id);
 //        $cities  = City::all();
 //        $states  = State::all();
@@ -110,7 +115,7 @@ class SportRegisterController extends Controller
             'gender'           => 'required',
             'dob'              => 'required|date|before:today',
             'doj'              => 'nullable|date|after:dob',
-            'quota_id'         => 'required|integer|exists:quotas,id',
+            'quota_id'         => 'required|integer|exists:sport_quotas,id',
             'previous_coach.*' => 'nullable|string|max:255',
             'training_academy.*' => 'nullable|string|max:255',
             'badminton_experience'  => 'nullable|string|max:255',
@@ -190,9 +195,9 @@ class SportRegisterController extends Controller
         }
     }
     $batch = sport_fee_master::find($request->fee_batch_id);
-    $batch_id = batch::where('batch_name',$batch->batch)->first();
+    $batch_id = SportBatch::where('batch_name',$batch->batch)->first();
     $section = sport_fee_master::find($request->fee_section_id);
-    $section_id = Section::where('name',$section->section)->first();
+    $section_id = SportSection::where('name',$section->section)->first();
     // Add system-generated fields
     $validated = array_merge($validated, [
         'organization_id' => $organization->id,
@@ -562,7 +567,8 @@ public function fetch(Request $request)
         $totaldraftStudents = (clone $query)->where('sport_registers.status', 'draft')->count();
     }
 
-    $batchs = Batch::all();
+    // $batchs = SportBatch::all();
+    $batchs = SportBatch::where('status', 'active')->get();
 
 
     $selectedate=$request->filled('date_range')? $request->date_range : '';
@@ -629,20 +635,21 @@ public function confirm(  Request $request, $id){
         $firstService = $servicesBooks['services'][0];
         $series = Helper::getBookSeriesNew($firstService->alias, $parentURL)->get();
         $sport_types = Sport_master::all();
-        $quotas = Quota::all();
+        // $quotas = SportQuota::all();
+        $quotas = SportQuota::where('status', 'active')->get();
 
         $batchYears = sport_fee_master::select('batch_year')->distinct()->get();
         $batch = sport_fee_master::all()->unique('batch');
         $selectedBatch = sport_fee_master::where('batch_id', $registration->batch_id)->first();
         $sections = sport_fee_master::all()->unique('section');
-        $quota = Quota::find($registration->quota_id);
+        $quota = SportQuota::find($registration->quota_id);
         $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
         if ($registration->fee_details){
             $feeDetails = json_decode($registration->fee_details, true);
         }else{
             $feeDetails = json_decode($sportFeeMaster->fee_details, true);
         }
-        $groups = GroupMaster::where('status', 'active')->get();
+        $groups = SportGroupMaster::where('status', 'active')->get();
 
         // Handle missing family details
         if ($familyDetails->isNotEmpty()) {
@@ -724,19 +731,20 @@ public function confirm(  Request $request, $id){
         $firstService = $servicesBooks['services'][0];
         $series = Helper::getBookSeriesNew($firstService->alias, $parentURL)->get();
         $sport_types = Sport_master::all();
-        $quotas = Quota::all();
+        // $quotas = SportQuota::all();
+        $quotas = SportQuota::where('status', 'active')->get();
         $batchYears = sport_fee_master::select('batch_year')->distinct()->get();
         $batch = sport_fee_master::all()->unique('batch');
         $selectedBatch = sport_fee_master::where('batch_id', $registration->batch_id)->first();
         $sections = sport_fee_master::all();
-        $quota = Quota::find($registration->quota_id);
+        $quota = SportQuota::find($registration->quota_id);
         $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
         if ($registration->fee_details){
             $feeDetails = json_decode($registration->fee_details, true);
         }else{
             $feeDetails = json_decode($sportFeeMaster->fee_details, true);
         }
-        $groups = GroupMaster::where('status', 'active')->get();
+        $groups = SportGroupMaster::where('status', 'active')->get();
 //        $selectedCountry = Country::where('id', $familyDetails[0]->permanent_country)->first();
 //        $selectedState = State::where('id', $familyDetails[0]->permanent_state)->first();
 //        $selectedCity = City::where('id', $familyDetails[0]->permanent_district)->first();
@@ -818,19 +826,20 @@ public function confirm(  Request $request, $id){
         $firstService = $servicesBooks['services'][0];
         $series = Helper::getBookSeriesNew($firstService->alias, $parentURL)->get();
         $sport_types = Sport_master::all();
-        $quotas = Quota::all();
+        // $quotas = SportQuota::all();
+        $quotas = SportQuota::where('status', 'active')->get();
         $batchYears = sport_fee_master::select('batch_year')->distinct()->get();
         $batch = sport_fee_master::all()->unique('batch');
         $selectedBatch = sport_fee_master::where('batch_id', $registration->batch_id)->first();
         $sections = sport_fee_master::all();
-        $quota = Quota::find($registration->quota_id);
+        $quota = SportQuota::find($registration->quota_id);
         $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
         if ($registration->fee_details){
             $feeDetails = json_decode($registration->fee_details, true);
         }else{
             $feeDetails = json_decode($sportFeeMaster->fee_details, true);
         }
-        $groups = GroupMaster::where('status', 'active')->get();
+        $groups = SportGroupMaster::where('status', 'active')->get();
 //        $selectedCountry = Country::where('id', $familyDetails[0]->permanent_country)->first();
 //        $selectedState = State::where('id', $familyDetails[0]->permanent_state)->first();
 //        $selectedCity = City::where('id', $familyDetails[0]->permanent_district)->first();
@@ -918,7 +927,7 @@ public function confirm(  Request $request, $id){
             'gender'           => 'required',
             'dob'              => 'required|date|before:today',
             'doj'              => 'nullable|date|after:dob',
-            'quota_id'         => 'required|integer|exists:quotas,id',
+            'quota_id'         => 'required|integer|exists:sport_quotas,id',
             'previous_coach.*' => 'nullable|string|max:255',
             'training_academy.*' => 'nullable|string|max:255',
             'badminton_experience'  => 'nullable|string|max:255',
@@ -1012,9 +1021,9 @@ public function confirm(  Request $request, $id){
             $validated['image'] = 'images/' . $imageName;
         }
         $batch = sport_fee_master::find($request->fee_batch_id);
-        $batch_id = batch::where('batch_name',$batch->batch)->first();
+        $batch_id = SportBatch::where('batch_name',$batch->batch)->first();
         $section = sport_fee_master::find($request->fee_section_id);
-        $section_id = Section::where('name',$section->section)->first();
+        $section_id = SportSection::where('name',$section->section)->first();
         $validated = array_merge($validated, [
             'batch_id'        => $batch_id->id,
             'section_id'      => $section_id->id
@@ -1293,7 +1302,7 @@ public function confirm(  Request $request, $id){
         $sportFeeMaster = sport_fee_master::find($sectionId);
 //        dd($request->all(),$sportFeeMaster);
         if($request->input('quota_id')){
-            $quota = Quota::find($request->input('quota_id'));
+            $quota = SportQuota::find($request->input('quota_id'));
             $sportFeeMaster = sport_fee_master::where('quota',$quota->quota_name)->where('section',$sportFeeMaster->section)->first();
         }
         if ($sportFeeMaster) {
@@ -1320,7 +1329,7 @@ public function confirm(  Request $request, $id){
     public function showProfile($id)
     {
         $student = User::findOrFail($id);
-        $quota = Quota::find($student->registration->quota_id);
+        $quota = SportQuota::find($student->registration->quota_id);
         $familyDetails = SportFamilyDetail::where('registration_id', $student->registration->id)->first();
 //        dd($student->registration);
 
@@ -1551,19 +1560,20 @@ if ($sportRegister) {
         $firstService = $servicesBooks['services'][0];
         $series = Helper::getBookSeriesNew($firstService->alias, $parentURL)->get();
         $sport_types = Sport_master::all();
-        $quotas = Quota::all();
+        // $quotas = SportQuota::all();
+        $quotas = SportQuota::where('status', 'active')->get();
         $batchYears = sport_fee_master::select('batch_year')->distinct()->get();
         $batch = sport_fee_master::all()->unique('batch');
         $selectedBatch = sport_fee_master::where('batch_id', $registration->batch_id)->first();
         $sections = sport_fee_master::all()->unique('section');
-        $quota = Quota::find($registration->quota_id);
+        $quota = SportQuota::find($registration->quota_id);
         $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
         if ($registration->fee_details){
             $feeDetails = json_decode($registration->fee_details, true);
         }else{
             $feeDetails = json_decode($sportFeeMaster->fee_details, true);
         }
-        $groups = GroupMaster::where('status', 'active')->get();
+        $groups = SportGroupMaster::where('status', 'active')->get();
         if ($familyDetails->isNotEmpty()) {
             $selectedCountry = Country::where('id', $familyDetails[0]->permanent_country)->first();
             $selectedState = State::where('id', $familyDetails[0]->permanent_state)->first();
@@ -1728,9 +1738,9 @@ if ($sportRegister) {
             $validated['image'] = 'images/' . $imageName;
         }
         $batch = sport_fee_master::find($request->fee_batch_id);
-        $batch_id = batch::where('batch_name',$batch->batch)->first();
+        $batch_id = SportBatch::where('batch_name',$batch->batch)->first();
         $section = sport_fee_master::find($request->fee_section_id);
-        $section_id = Section::where('name',$section->section)->first();
+        $section_id = SportSection::where('name',$section->section)->first();
         $validated = array_merge($validated, [
             'batch_id'        => $batch_id->id,
             'section_id'      => $section_id->id
@@ -2032,7 +2042,7 @@ if ($sportRegister) {
     // Section.php
     public function get_batch_year(Request $request)
     {
-        $sections_year = Section::where('name', $request->section_name)
+        $sections_year = SportSection::where('name', $request->section_name)
             ->distinct()
             ->pluck('year');
 
@@ -2041,7 +2051,7 @@ if ($sportRegister) {
 
     public function get_batch_names(Request $request)
     {
-        $batch_names = Section::where('name', $request->section_name)
+        $batch_names = SportSection::where('name', $request->section_name)
             ->where('year', $request->batch_year)
             ->select('id', 'batch')
             ->get();

@@ -5,11 +5,13 @@ namespace App\Models\ums;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Section extends Model
+class SportSection extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['name' , 'batch' ,'year', 'status'];
+    protected $table = "sport_sections";
+    protected $fillable = ['name' , 'batch' ,'year', 'batch_id','status','organization_id',
+        'group_id',
+        'company_id'];
 
     protected $guarded=[];
 
@@ -20,7 +22,7 @@ class Section extends Model
 
     public function batch()
     {
-        return $this->belongsTo(Batch::class);
+        return $this->belongsTo(sportBatch::class);
     }
 
 }

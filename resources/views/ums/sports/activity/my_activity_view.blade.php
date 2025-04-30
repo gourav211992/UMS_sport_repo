@@ -26,9 +26,18 @@
                         <div class="form-group breadcrumb-right">
                             <button onClick="javascript: history.go(-1)" class="btn btn-secondary btn-sm mb-50 mb-sm-0"><i
                                     data-feather="arrow-left-circle"></i> Back</button>
-                            <button type="submit" id="submit" form="form"
-                                class="btn btn-primary btn-sm mb-50 mb-sm-0"><i data-feather="check-circle"></i>
-                                Submit</button>
+                                    @php
+                                    use Carbon\Carbon;
+                                    $activityDateObj = Carbon::parse($activityDate['date'] ?? null);
+                                    $today = Carbon::today();
+                                @endphp
+                                
+                                @if ($activityDateObj->lessThanOrEqualTo($today))
+                                    <button type="submit" id="submit" form="form"
+                                        class="btn btn-primary btn-sm mb-50 mb-sm-0">
+                                        <i data-feather="check-circle"></i> Submit
+                                    </button> 
+                                @endif
                         </div>
                     </div>
                 </div>
@@ -214,16 +223,25 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        <select
-                                                                            name="students[{{ $stu->id }}][activity_comment]"
+                                                                        <select name="students[{{ $stu->id }}][activity_comment]" 
                                                                             class="form-select attendance-related attendance-{{ $stu->id }}">
-                                                                            <option value="">Select</option>
-                                                                            @foreach (['Tournament', 'Rest', 'Injury', 'Sickness', 'Weekly Holiday', 'Sanctioned Leave', 'Unauthorised Leave'] as $comment)
-                                                                                <option value="{{ $comment }}"
-                                                                                    @if (($data['activity_comment'] ?? '') === $comment) selected @endif>
-                                                                                    {{ $comment }}</option>
-                                                                            @endforeach
-                                                                        </select>
+                                                                        <option value="">--Select--</option>
+                                                                        <option value="Shows consistent participation and enthusiasm." @if(($data['activity_comment'] ?? '') === 'Shows consistent participation and enthusiasm.') selected @endif>Shows consistent participation and enthusiasm.</option>
+                                                                        <option value="Demonstrates improvement in physical fitness and stamina." @if(($data['activity_comment'] ?? '') === 'Demonstrates improvement in physical fitness and stamina.') selected @endif>Demonstrates improvement in physical fitness and stamina.</option>
+                                                                        <option value="Exhibits strong coordination and skill development." @if(($data['activity_comment'] ?? '') === 'Exhibits strong coordination and skill development.') selected @endif>Exhibits strong coordination and skill development.</option>
+                                                                        <option value="Participates actively and promotes team spirit." @if(($data['activity_comment'] ?? '') === 'Participates actively and promotes team spirit.') selected @endif>Participates actively and promotes team spirit.</option>
+                                                                        <option value="Shows understanding of game rules and strategies." @if(($data['activity_comment'] ?? '') === 'Shows understanding of game rules and strategies.') selected @endif>Shows understanding of game rules and strategies.</option>
+                                                                        <option value="Displays positive attitude and good sportsmanship." @if(($data['activity_comment'] ?? '') === 'Displays positive attitude and good sportsmanship.') selected @endif>Displays positive attitude and good sportsmanship.</option>
+                                                                        <option value="Needs improvement in focus and consistency." @if(($data['activity_comment'] ?? '') === 'Needs improvement in focus and consistency.') selected @endif>Needs improvement in focus and consistency.</option>
+                                                                        <option value="Shows potential; continued practice recommended." @if(($data['activity_comment'] ?? '') === 'Shows potential; continued practice recommended.') selected @endif>Shows potential; continued practice recommended.</option>
+                                                                        <option value="Follows instructions and responds well to feedback." @if(($data['activity_comment'] ?? '') === 'Follows instructions and responds well to feedback.') selected @endif>Follows instructions and responds well to feedback.</option>
+                                                                        <option value="Encouraged to build confidence in competitive settings." @if(($data['activity_comment'] ?? '') === 'Encouraged to build confidence in competitive settings.') selected @endif>Encouraged to build confidence in competitive settings.</option>
+                                                                        <option value="Represents the team with discipline and dedication." @if(($data['activity_comment'] ?? '') === 'Represents the team with discipline and dedication.') selected @endif>Represents the team with discipline and dedication.</option>
+                                                                        <option value="Maintains respect for teammates, opponents, and officials." @if(($data['activity_comment'] ?? '') === 'Maintains respect for teammates, opponents, and officials.') selected @endif>Maintains respect for teammates, opponents, and officials.</option>
+                                                                        <option value="Demonstrates leadership and supports peers." @if(($data['activity_comment'] ?? '') === 'Demonstrates leadership and supports peers.') selected @endif>Demonstrates leadership and supports peers.</option>
+                                                                        <option value="Achieved notable progress in skill execution." @if(($data['activity_comment'] ?? '') === 'Achieved notable progress in skill execution.') selected @endif>Achieved notable progress in skill execution.</option>
+                                                                        <option value="Regularly attends and contributes to training sessions." @if(($data['activity_comment'] ?? '') === 'Regularly attends and contributes to training sessions.') selected @endif>Regularly attends and contributes to training sessions.</option>
+                                                                    </select>
                                                                     </td>
                                                                     <td>
                                                                         <select

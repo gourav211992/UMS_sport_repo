@@ -23,6 +23,7 @@
                         <i data-feather="arrow-left-circle"></i> Back
                     </button>
                     <button type="submit" class="btn btn-primary btn-sm mb-50 mb-sm-0">
+                        {{-- <a href="{{url('activity_master')}}"></a> --}}
                         <i data-feather="check-circle"></i> Submit
                     </button>
                 </div>
@@ -49,7 +50,7 @@
                                                 <div class="col-md-5">
                                                     <select class="form-select" name="sport_id">
                                                         @foreach ($sportName as $name)
-                                                            <option value="{{$name->id}}">{{ ucfirst($name->sport_name) }}</option>
+                                                            <option value="{{$name->id}}"{{($activity->sport_id==$name->id)?'selected':''}}>{{ ucfirst($name->sport_name) }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -71,7 +72,7 @@
                                                     <label class="form-label"> Activity Duration (In Mins) <span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-5">
-                                                    <input type="number" name="duration_min" class="form-control"  value="{{ $activity->activity_duration_min }}"/>    
+                                                    <input type="number" name="duration_min" class="form-control"  value="{{ $activity->duration_min }}"/>    
                                                 </div>
                                             </div>
 
@@ -117,6 +118,7 @@
                                                                 <th>S.NO</th>
                                                                 <th>Sub Activity Name<span class="text-danger">*</span></th>
                                                                 <th>Duration(min)<span class="text-danger">*</span></th>
+                                                                <th>Shuddle<span class="text-danger">*</span></th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
@@ -146,7 +148,32 @@
                                                                         class="form-control parameter-duration mw-100"
                                                                         placeholder="Enter Parameter duration" />
                                                                 </td>
-
+                                                                <td>
+                                                                    <div class="d-flex justify-content-around"> 
+                                                                    <div class="form-check">
+                                                                        <input type="hidden" name="subcategories[0][checkbox_status]" value="0"> <!-- hidden input to send 0 if unchecked -->
+                                                                
+                                                                        <input type="checkbox" 
+                                                                               name="subcategories[0][checkbox_status]" 
+                                                                               class="form-check-input parameter-check" 
+                                                                               id="toggleCheckbox" 
+                                                                               onclick="toggleDropdown(0)" 
+                                                                               value="1" 
+                                                                               {{ old("subcategories.0.checkbox_status", $subcategory['checkbox_status'] ?? false) ? 'checked' : '' }}>
+                                                                    </div>
+                                                                <div> 
+                                                                    <select id="dropdown" 
+                                                                            class="form-control text-dark parameter-condition mw-100" 
+                                                                            name="subcategories[0][condition_status]" 
+                                                                            style="{{ old("subcategories.0.checkbox_status", $subcategory['checkbox_status'] ?? false) ? '' : 'display: none;' }}">
+                                                                        <option value="">---Select---</option>
+                                                                        <option value="fresh" {{ old("subcategories.0.condition_status", $subcategory['condition_status'] ?? '') == 'fresh' ? 'selected' : '' }}>Fresh</option>
+                                                                        <option value="used" {{ old("subcategories.0.condition_status", $subcategory['condition_status'] ?? '') == 'used' ? 'selected' : '' }}>Used</option>
+                                                                    </select>
+                                                                </div>
+                                                                </div>
+                                                                </td>
+                                                                
                                                                 <td>
                                                                     <a href="#" class="text-primary add-row"><i
                                                                             data-feather="plus-square"></i></a>
@@ -174,158 +201,254 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="https://unpkg.com/feather-icons"></script>
-		<script>
-			$(document).ready(function () {
-				let parameterData = @json($sub_activity ?? []);
-				let $tableBody = $('#parameter-table-body');
+ 
+        <script>
+            $(document).ready(function () {
+    // Load existing parameter data
+    let parameterData = @json($sub_activity ?? []);
+    let $tableBody = $('#parameter-table-body');
 
-				if (parameterData.length > 0) {
-					$tableBody.find('.add-template .parameter-input').val(parameterData[0].name ?? '');
-					$tableBody.find('.add-template .parameter-duration').val(parameterData[0].duration ?? '');
-				}
+    // Populate first row with existing data if available
+    if (parameterData.length > 0) {
+        $tableBody.find('.add-template .parameter-input').val(parameterData[0].name ?? '');
+        $tableBody.find('.add-template .parameter-duration').val(parameterData[0].duration ?? '');
+        
+        // Set checkbox status
+        if (parameterData[0].checkbox_status == 1) {
+            $tableBody.find('.add-template .parameter-check').prop('checked', true);
+            $tableBody.find('.add-template .parameter-condition').show();
+        } else {
+            $tableBody.find('.add-template .parameter-check').prop('checked', false);
+            $tableBody.find('.add-template .parameter-condition').hide();
+        }
+        
+        $tableBody.find('.add-template .parameter-condition').val(parameterData[0].condition_status ?? '');
+    }
 
-				for (let i = 1; i < parameterData.length; i++) {
-					let row = $('.add-template').clone().removeClass('add-template');
-					row.find('.parameter-input').val(parameterData[i].name ?? '');
-					row.find('.parameter-duration').val(parameterData[i].duration ?? '');
-					row.find('a')
-						.removeClass('add-row text-primary')
-						.addClass('delete-row text-danger')
-						.html('<i data-feather="trash-2"></i>');
-					$tableBody.append(row);
-				}
+    // Add any additional rows from existing data
+    for (let i = 1; i < parameterData.length; i++) {
+        let row = $('.add-template').clone().removeClass('add-template');
+        row.find('.parameter-input').val(parameterData[i].name ?? '');
+        row.find('.parameter-duration').val(parameterData[i].duration ?? '');
+        
+        // Set checkbox and dropdown for existing rows
+        if (parameterData[i].checkbox_status == 1) {
+            row.find('.parameter-check').prop('checked', true);
+            row.find('.parameter-condition').show();
+        } else {
+            row.find('.parameter-check').prop('checked', false);
+            row.find('.parameter-condition').hide();
+        }
+        
+        row.find('.parameter-condition').val(parameterData[i].condition_status ?? '');
+        row.find('a')
+            .removeClass('add-row text-primary')
+            .addClass('delete-row text-danger')
+            .html('<i data-feather="trash-2"></i>');
+        $tableBody.append(row);
+    }
 
-				updateSerialsAndNames();
-				collectJsonData();
-				feather.replace(); 
-			});
-		</script>
+    updateSerialsAndNames();
+    collectJsonData();
+    setupCheckboxHandlers();
+    feather.replace();
+    
+    // Add new row event handler
+    $(document).on('click', '.add-row', function (e) {
+        e.preventDefault();
 
-		<script>
+        let addRow = $('.add-template');
+        let inputVal = addRow.find('.parameter-input').val().trim();
+        let durationVal = addRow.find('.parameter-duration').val().trim();
 
+        if (inputVal === '' || durationVal === '') {
+            return;
+        }
+        
+        collectJsonData();
+        let clone = addRow.clone(false, false).removeClass('add-template');
 
+        // Clear inputs in new row
+        clone.find('.parameter-input').val('');
+        clone.find('.parameter-duration').val('');
+        clone.find('.parameter-check').prop('checked', false);
+        clone.find('.parameter-condition').val('').hide();
 
+        clone.find('td:last').html(
+            '<a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>'
+        );
 
-			function updateSerialsAndNames() {
-				$('#parameter-table-body .parameter-row').each(function (index) {
-					$(this).find('.sno').text(index + 1); 
+        $('#parameter-table-body').append(clone);
+        feather.replace();
+        updateSerialsAndNames();
+        setupCheckboxHandlers();
+        collectJsonData();
+    });
 
-					if (!$(this).hasClass('add-template')) {
-						$(this).find('.parameter-input').attr('name', `parameters[${index}][name]`); // Start with index = 0
-					}
-				});
-			}
+    // Delete row event handler
+    $(document).on('click', '.delete-row', function (e) {
+        e.preventDefault();
+        $(this).closest('tr').remove();
+        updateSerialsAndNames();
+        setupCheckboxHandlers();
+        collectJsonData();
+    });
 
-			function collectJsonData() {
-				let data = [];
-				$('#parameter-table-body .parameter-row').each(function () {
-					let value = $(this).find('.parameter-input').val(); 
-					let value1 = $(this).find('.parameter-duration').val(); 
-					data.push({ name: value, duration:value1 });
-				});
-				$('#sub_activity').val(JSON.stringify(data));
-			}
+    // Input event handlers
+    $(document).on('input', '.parameter-input, .parameter-duration', function () {
+        collectJsonData();
+    });
+    
+    $(document).on('change', '.parameter-check, .parameter-condition', function () {
+        collectJsonData();
+    });
 
-			$(document).on('click', '.add-row', function (e) {
-				e.preventDefault();
+    // Form submission handler
+    $('#myForm').submit(function (e) {
+        e.preventDefault();
+        
+        // Basic validation
+        let isValid = true;
+        let activityName = $('input[name="activity_name"]').val().trim();
+        let durationMin = $('input[name="duration_min"]').val().trim();
+        
+        if (activityName === '') {
+            isValid = false;
+            // Add validation error
+        }
+        
+        if (durationMin === '' || isNaN(durationMin)) {
+            isValid = false;
+            // Add validation error
+        }
+        
+        // Validate first row sub-activity
+        let firstRowInput = $('.add-template .parameter-input').val().trim();
+        let firstRowDuration = $('.add-template .parameter-duration').val().trim();
+        
+        if (firstRowInput === '' || firstRowDuration === '') {
+            isValid = false;
+            // Add validation error
+            return false;
+        }
 
-				let addRow = $('.add-template');
-				let inputVal = addRow.find('input').val().trim();
+        if (!isValid) {
+            return false;
+        }
+        
+        $('#alertContainer').html('');
+        let formData = new FormData(this);
 
-				if (inputVal === '') {
-					alert('Please enter a parameter name before adding a new row.');
-					return;
-				}
-				collectJsonData();
-				let clone = addRow.clone(false, false).removeClass('add-template');
+        $.ajax({
+            url: "{{ url('activity-master-edit/' . $activity->id) }}",
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                let alertClass = response.success ? 'alert-success' : 'alert-danger';
+                let alertHTML = `
+                    <div class="alert p-2 ${alertClass} alert-dismissible fade show" role="alert">
+                        <strong>${response.success ? 'Success' : 'Error'}:</strong> ${response.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                $('#alertContainer').html(alertHTML);
 
-				clone.find('input').val('');
+                if (response.success) {
+                    setTimeout(() => {
+                        window.location.href = "{{ url('activity-master') }}";
+                    }, 500);
+                }
+            },
+            error: function (xhr) {
+                $('#alertContainer').html(`
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> Something went wrong.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            }
+        });
+    });
+});
 
-				clone.find('td:last').html(
-					'<a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>'
-				);
+// Function to update row numbers and input names
+function updateSerialsAndNames() {
+    $('#parameter-table-body .parameter-row').each(function (index) {
+        // Update row number
+        $(this).find('.sno').text(index + 1);
 
-				$('#parameter-table-body').append(clone);
+        // Update input names with correct index
+        $(this).find('.parameter-input').attr('name', `subcategories[${index}][name]`);
+        $(this).find('.parameter-duration').attr('name', `subcategories[${index}][duration]`);
+        $(this).find('.parameter-check').attr('name', `subcategories[${index}][checkbox_status]`);
+        $(this).find('.parameter-condition').attr('name', `subcategories[${index}][condition_status]`);
+        
+        // Add hidden field for checkbox if not exists
+        let hiddenCheckbox = $(this).find('input[type="hidden"][name="subcategories[' + index + '][checkbox_status]"]');
+        if (hiddenCheckbox.length === 0) {
+            $(this).find('.parameter-check').before('<input type="hidden" name="subcategories[' + index + '][checkbox_status]" value="0">');
+        }
+    });
+}
 
-				feather.replace();
+// Function to collect form data into JSON
+function collectJsonData() {
+    let data = [];
+    $('#parameter-table-body .parameter-row').each(function () {
+        let name = $(this).find('.parameter-input').val();
+        let duration = $(this).find('.parameter-duration').val();
+        let checkboxStatus = $(this).find('.parameter-check').is(':checked') ? 1 : 0;
+        let conditionStatus = $(this).find('.parameter-condition').val();
+        
+        data.push({ 
+            name: name, 
+            duration: duration,
+            checkbox_status: checkboxStatus,
+            condition_status: conditionStatus
+        });
+    });
+    $('#sub_activity').val(JSON.stringify(data));
+}
 
-				updateSerialsAndNames();
-				collectJsonData();
-			});
+// Function to handle checkbox-dropdown visibility
+function toggleDropdown(index) {
+    // Find the checkbox by name with the given index
+    const checkbox = document.querySelector(`input[name="subcategories[${index}][checkbox_status]"][type="checkbox"]`);
+    
+    // Find the corresponding dropdown in the same row
+    const dropdown = document.querySelector(`select[name="subcategories[${index}][condition_status]"]`);
+    
+    if (checkbox && dropdown) {
+        // Show/hide dropdown based on checkbox state
+        if (checkbox.checked) {
+            dropdown.style.display = "inline-block";
+        } else {
+            dropdown.style.display = "none";
+        }
+    }
+}
 
-			$(document).on('click', '.delete-row', function (e) {
-				e.preventDefault();
-				$(this).closest('tr').remove();
-				updateSerialsAndNames();
-				collectJsonData();
-			});
-
-			$(document).on('input', '.parameter-input', function () {
-				collectJsonData();
-			});
-			$(document).on('input', '.parameter-duration', function () {
-				collectJsonData();
-			});
-
-			$(document).ready(function () {
-				updateSerialsAndNames();
-				collectJsonData();
-			});
-
-			
-			feather.replace();
-
-		</script>
-
-		<script>
-			$(document).ready(function () {
-				$('#myForm').submit(function (e) {
-					e.preventDefault();
-					var input=  $('.parameter-input').val().trim();
-	   if(input == ''){
-           alert('Please enter a parameter name');
-           return false;
-       }
-					$('#alertContainer').html('');
-
-					let formData = new FormData(this);
-
-					$.ajax({
-						url: "{{ url('activity-master-edit/' . $activity->id) }}",
-						method: 'POST',
-						data: formData,
-						processData: false,
-						contentType: false,
-						success: function (response) {
-							let alertClass = response.success ? 'alert-success' : 'alert-danger';
-							let alertHTML = `
-							<div class="alert p-2 ${alertClass} alert-dismissible fade show" role="alert">
-								<strong>${response.success ? 'Success' : 'Error'}:</strong> ${response.message}
-								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-							</div>
-						`;
-							$('#alertContainer').html(alertHTML);
-
-							if (response.success) {
-							
-								$('#myForm')[0].reset();
-								setTimeout(() => {
-									window.location.href = "{{ url('activity-master') }}";
-								},500);
-								
-							}
-						},
-						error: function (xhr) {
-							$('#alertContainer').html(`
-							<div class="alert alert-danger alert-dismissible fade show" role="alert">
-								<strong>Error!</strong> Something went wrong.
-								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-							</div>
-						`);
-						}
-					});
-				});
-			});
-		</script>
-
+// Function to set up checkbox event handlers for all rows
+function setupCheckboxHandlers() {
+    // For each parameter row
+    document.querySelectorAll('.parameter-row').forEach((row, index) => {
+        // Find the checkbox in this row
+        const checkbox = row.querySelector('.parameter-check');
+        if (checkbox) {
+            // Update the onclick attribute with the correct index
+            checkbox.setAttribute('onclick', `toggleDropdown(${index})`);
+            
+            // Get the corresponding dropdown
+            const dropdown = row.querySelector('.parameter-condition');
+            if (dropdown) {
+                // Set initial visibility based on checkbox state
+                dropdown.style.display = checkbox.checked ? "inline-block" : "none";
+            }
+        }
+    });
+}
+        </script>
+    
 @endsection

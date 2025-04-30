@@ -13,8 +13,17 @@ return new class extends Migration
     {
         Schema::create('sports_type', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
+
+            // Optional foreign-like references
+            $table->unsignedBigInteger('organization_id')->nullable();
+            $table->unsignedBigInteger('group_id')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->string('type', 50)->index();
+
             $table->timestamps();
+
+          
+            $table->index(['organization_id', 'type']);
         });
     }
 

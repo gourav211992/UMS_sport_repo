@@ -3,9 +3,9 @@
 namespace App\Models\ums\activity;
 
 use App\Models\MasterGroup;
-use App\Models\ums\batch;
-use App\Models\ums\GroupMaster;
-use App\Models\ums\Section;
+use App\Models\ums\SportBatch;
+use App\Models\ums\SportGroupMaster;
+use App\Models\ums\SportSection;
 use App\Models\ums\Sport_master;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -42,16 +42,16 @@ class SportActivityScheduler extends Model
 
     public function sectionRelation()
 {
-    return $this->belongsTo(Section::class, 'section'); // foreign key column ka naam 'section' hai
+    return $this->belongsTo(SportSection::class, 'section'); // foreign key column ka naam 'section' hai
 }
 
 public function groupRelation()
 {
-    return $this->belongsTo(GroupMaster::class, 'group'); // foreign key column ka naam 'group' hai
+    return $this->belongsTo(SportGroupMaster::class, 'group'); // foreign key column ka naam 'group' hai
 }
 public function batchRelation()
 {
-    return $this->belongsTo(batch::class, 'batch_name'); // Assuming batch_name = batch_id
+    return $this->belongsTo(SportBatch::class, 'batch_name'); // Assuming batch_name = batch_id
 }
 
 public function sportRelation()

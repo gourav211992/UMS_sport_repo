@@ -701,7 +701,7 @@ $(document).on('change', '.bulk-upload', function() {
 
         const $lastRow = table.find('tbody tr:last');
 
-        // ✅ Validate required fields in the last row
+        
         let isValid = true;
         $lastRow.find('input[required], select[required]').each(function () {
             const val = $(this).val();

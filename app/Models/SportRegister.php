@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Traits\DefaultGroupCompanyOrg;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\ums\batch;
+use App\Models\ums\SportBatch;
 
 class SportRegister extends Model
 {
@@ -91,6 +91,6 @@ class SportRegister extends Model
     }
     public function batch()
     {
-        return $this->belongsTo(Batch::class, 'batch_id');
+        return $this->belongsTo(SportBatch::class, 'batch_id');
     }
 }
