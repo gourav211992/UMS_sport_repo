@@ -12,10 +12,18 @@ use App\Models\ums\SportGroupMaster;
 use App\Models\ums\SportSection;
 use App\Models\ums\Sport_master;
 use App\Models\SportRegister;
+use App\Models\ums\Country;
 use Illuminate\Http\Request;
+use App\Models\ums\Activity\Employee;
 
 class ActivitySchedulerController extends Controller
 {
+
+    public function getCountry()
+    {
+        $countries = Country::all();
+        return response()->json($countries);
+    }
 
 
     function activityScheduler()
@@ -27,9 +35,10 @@ class ActivitySchedulerController extends Controller
         $group = SportGroupMaster::where('status','active')->get();
         $activity =SportActivityMaster::where('status','active')->get();
         $sub_activity =SportActivityMaster::get();
+        $trainers = Employee::where('designation_id', '=', 344)->get();
 
 
-        return view('ums.sports.activity.activity_scheduler_add', compact('sportName', 'sport', 'batch', 'section', 'group', 'activity', 'sub_activity'));
+        return view('ums.sports.activity.activity_scheduler_add', compact('sportName', 'sport', 'batch', 'section', 'group', 'activity', 'sub_activity','trainers'));
     }
 
     public function activitySchedulerAdd(Request $request)
@@ -151,7 +160,7 @@ if ($existing) {
     
     public function index(Request $request)
     {
-        $activityScheduler =SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation','sportRelation'])->orderBy('id', 'DESC')->get();
+        $activityScheduler =SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation','sportRelation','trainerRelation'])->orderBy('id', 'DESC')->get();
         return view('ums.sports.activity.activity_scheduler', compact('activityScheduler'));
     }
 
@@ -181,9 +190,10 @@ if ($existing) {
     foreach ($students as $key => $value) {
         $selectedStudentIds[$key] = $value;  
     }
- 
+    $trainers = Employee::where('designation_id', '=', 344)->get(); 
+
      return view('ums.sports.activity.activity_scheduler_edit', compact(
-        'data', 'sportName', 'sport', 'batch', 'section', 'group', 'activity', 'sub_activity', 'selectedSubActivities', 'selectedStudentIds', 'scheduledDays'
+        'data', 'sportName', 'sport', 'batch', 'section', 'group', 'activity', 'sub_activity', 'selectedSubActivities', 'selectedStudentIds', 'scheduledDays', 'trainers'
     ));
 }
 
@@ -301,6 +311,8 @@ if ($existing) {
         $activity =SportActivityMaster::where('status','active')->get();
         $sub_activity =SportActivityMaster::get();
         $selectedStudentIds = json_decode($data->batch_student, true) ?? [];
+        $trainers = Employee::where('designation_id', '=', 344)->get(); 
+
 
         return view('ums.sports.activity.activity_scheduler_view', compact(
             'data',
@@ -313,7 +325,8 @@ if ($existing) {
             'sub_activity',
             'selectedSubActivities',
             'scheduledDays',
-            'selectedStudentIds'
+            'selectedStudentIds',
+            'trainers'
         ));
     }
 
@@ -363,6 +376,20 @@ public function get_batch_section(Request $request)
     return response()->json($section);
 }
 
+// public function get_section_group(Request $request)
+// {
+//     $sectionValue = $request->section;
+
+//     if (is_numeric($sectionValue)) {
+//         $group = SportGroupMaster::where('section_id', $sectionValue)->get();
+//     } else {
+//         $group = SportGroupMaster::where('section_name', $sectionValue)->get();
+//     }
+
+//     return response()->json($group);
+// }
+
+
 public function get_section_group(Request $request)
 {
     $sectionValue = $request->section;
@@ -376,20 +403,32 @@ public function get_section_group(Request $request)
     return response()->json($group);
 }
 
-
 public function get_batch_student(Request $request) {
-    $section = SportSection::where('id', $request->section_id)
-                      ->orWhere('name', $request->section_id)
-                      ->first();
+    $group = SportGroupMaster::where('id', $request->group_id)
+                       ->orWhere('name', $request->group_id)->first();
 
-    if (!$section) {
+    if (!$group) {
         return response()->json([]);
     }
 
-    $students = SportRegister::where('section_id', $section->id)->where('status','approved')->get();
+    $students = SportRegister::where('group', $group->id)->where('status','approved')->get();
 
     return response()->json($students);
 }
+
+// public function get_batch_student(Request $request) {
+//     $group = SportGroupMaster::where('id', $request->group_id)
+//                        ->orWhere('name', $request->group_id)->first();
+
+//     if (!$group) {
+//         return response()->json([]);
+//     }
+
+//     $students = SportRegister::where('group_id', $group->id)->where('status','approved')->get();
+
+//     return response()->json($students);
+// }
+
 
 
  

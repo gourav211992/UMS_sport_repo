@@ -43,7 +43,7 @@
                         <div class="card">
                             <div class="table-responsive candidates-tables">
                                 <table class="datatables-basic table table-striped myrequesttablecbox ">
-                                    
+
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -73,14 +73,14 @@
 
                                         $feeDetails = json_decode($fee->fee_details, true);
 
-                                        $totalFees = $feeDetails[0]['grand_total_fees'] ?? 0; 
+                                        $totalFees = $feeDetails[0]['grand_total_fees'] ?? 0;
                                         $discount = $feeDetails[0]['grand_total_discount'] ?? 0;
                                         $netFees = $feeDetails[0]['grand_total_payable'] ?? 0;
                                         @endphp
-                                       
+
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                           
+
                                             <td>{{ $fee->sport_name }}</td>
                                             <td>{{ $fee->batch_year}}</td>
                                             <td>{{ $fee->batch }}</td>
@@ -113,16 +113,16 @@
                                                             <i data-feather="trash-2" class="me-50"></i>
                                                             <span>Delete</span>
                                                         </a>
-                                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#confirmModal{{ $fee->id }}" href="javascript:void(0)">
+                                                        <!-- <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#confirmModal{{ $fee->id }}" href="javascript:void(0)">
                                                             <i data-feather="copy" class="me-50"></i>
                                                             <span>Clone</span>
-                                                        </a>
+                                                        </a> -->
                                                     </div>
                                                 </div>
                                             </td>
                                         </tr>
 
-                                       
+
                                         <div class="modal fade" id="confirmModal{{ $fee->id }}" tabindex="-1" aria-labelledby="confirmModalLabel{{ $fee->id }}" aria-hidden="true">
                                             <div class="modal-dialog d-flex align-items-center" style="min-height: 100vh;">
                                                 <div class="modal-content">
@@ -130,32 +130,14 @@
                                                         <h5 class="modal-title" id="confirmModalLabel{{ $fee->id }}">Fee Schedule Clone</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
-                                                    <div class="modal-body">
-                                                        <form action="{{ route('sports-fee-schedule-clone', $fee->id) }}" method="POST">
-                                                            @csrf
-                                                            <div class="mt-1 d-flex align-items-center">
-                                                                <label for="quota" class="mr-2 me-2">Select Quota</label>
-                                                                <select id="quota" name="quota" class="form-select w-50 b-0 ">
-                                                                    @foreach ($quotas as $item)
-                                                                    @if ($item->quota_name != $fee->quota)
-                                                                    <option value="{{ $item->quota_name }}">{{ $item->quota_name }}</option>
-                                                                    @endif
-                                                                    @endforeach
-                                                                </select>
-                                                            </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-success">Confirm Clone</button>
-                                                        </form>
-                                                    </div>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
 
                                         @endforeach
                                     </tbody>
-                               
+
                                 </table>
                             </div>
                         </div>

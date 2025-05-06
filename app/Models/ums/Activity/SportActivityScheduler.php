@@ -3,6 +3,7 @@
 namespace App\Models\ums\activity;
 
 use App\Models\MasterGroup;
+use App\Models\ums\Activity\Employee;
 use App\Models\ums\SportBatch;
 use App\Models\ums\SportGroupMaster;
 use App\Models\ums\SportSection;
@@ -59,6 +60,10 @@ public function sportRelation()
     return $this->belongsTo(Sport_master::class, 'sport');
 }
 
+public function trainerRelation()
+{
+    return $this->belongsTo(Employee::class, 'trainer');
+}
 
 
 }

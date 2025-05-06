@@ -237,7 +237,7 @@ Route::post('/get-sections-by-batch', [SportRegisterController::class, 'getSecti
         return abort(404, 'Template file not found.');
     }
 });
-
+Route::post('/admin/confirm-fee-schedule', [SportRegisterController::class, 'ConfirmfeeStatus'])->name('admin.confirmFeeSchedule');
 
 // Sports Routes
 Route::group(['middleware' => ['sports']], function()
@@ -324,7 +324,7 @@ Route::get('/master-batches-add', function () {
 });
 
 
-
+Route::get('/get-country', [SportRegisterController::class, 'getCountry'])->name('get.country');
 //ums 
 Route::get('/', [UmsHomeController::class, 'index'])->name('index');
 Route::get('/ums-login', [UmsHomeController::class, 'umsLogin'])->name('ums.login');
@@ -404,6 +404,7 @@ Route::post('/get-batch-section-activity', [ActivitySchedulerController::class, 
 Route::post('/get-section-group-activity', [ActivitySchedulerController::class, 'get_section_group'])->name('get.section.group.activity');
 Route::post('/get-activity-subactivity', [ActivitySchedulerController::class, 'get_activity_subactivity'])->name('get.activity.subactivities.activity');
 Route::post('/get_batch_student', [ActivitySchedulerController::class, 'get_batch_student'])->name('get_batch_student');
+Route::post('/get-feesection',[SportRegisterController::class,'get_Feesection_group']);
 
 
 //Screening Master 

@@ -616,7 +616,10 @@ public function confirm(  Request $request, $id){
     public function edit($id)
     {
         $registration = SportRegister::findOrFail($id);
+        $userId=User::find($registration->userable_id);
 
+    
+        $RecivedPayment=Payment::where('user_id',$userId->id)->first();
         $user = Helper::getAuthenticatedUser();
         $parentURL = request()->segments()[0];
         $parentURL = 'sport-registration';
@@ -706,7 +709,9 @@ public function confirm(  Request $request, $id){
             'selectedCorrespondenceState',
             'selectedCorrespondenceCountry',
             'user',
-            'otherStates'
+            'otherStates',
+              'RecivedPayment'
+
         ));
     }
 
@@ -856,9 +861,8 @@ public function confirm(  Request $request, $id){
             $selectedCorrespondenceCountry = $selectedCorrespondenceState = $selectedCorrespondenceCity = null;
         }
 
-        // Load all countries to populate the country dropdown
-        $countries = Country::all();
 
+        $countries = Country::all();
         // Only load the states and cities for the pre-selected country and state
         if ($selectedCountry){
             $states = State::where('country_id', $selectedCountry->id)->get();
@@ -867,8 +871,12 @@ public function confirm(  Request $request, $id){
             $states = [];
             $cities = [];
         }
+        $otherStates = State::where('country_id', $registration->bai_state)->get();
+
 //        dd($feeDetails);
         $user = User::with('payments')->findOrFail($registration->userable_id);
+        
+        // dd($otherStates);
         return view('ums.sports.view-registration', compact(
             'registration',
             'series',
@@ -896,7 +904,8 @@ public function confirm(  Request $request, $id){
             'selectedCorrespondenceCity',
             'selectedCorrespondenceState',
             'selectedCorrespondenceCountry',
-            'user'
+            'user',
+            'otherStates'
         ));
     }
     public function postRegistrationUpdate(Request $request, $id)
@@ -976,9 +985,10 @@ public function confirm(  Request $request, $id){
             $validated['remarks'] = $request->input('remarks');
         }
         $feeDependentChanged = false;
+    
         $feeDependentFields = [
             'quota_id' => $registration->quota_id,
-            'batch_id' => $registration->batch_id,
+            'fee_batch_id' => $registration->fee_batch_id,
             'group' => $registration->group,
         ];
 
@@ -988,6 +998,8 @@ public function confirm(  Request $request, $id){
                 break;
             }
         }
+
+
         // Optional fields
         $optionalFields = [
             'mobile_number',
@@ -1030,7 +1042,7 @@ public function confirm(  Request $request, $id){
         ]);
         DB::beginTransaction();
         try {
-            // Update the registration record
+          
             $registration->update($validated);
 
             // Update or Insert into sport_training_details (Child Table 1)
@@ -1173,16 +1185,8 @@ public function confirm(  Request $request, $id){
                     SportSponsor::insert($sponsorData);
                 }
             }
-//            if ($request->has('fee_details')) {
-//                $feeDetails = $request->input('fee_details');
-//                $quota = Quota::find($request->input('quota_id'));
-//                $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
-//
-//                if ($sportFeeMaster) {
-//                    $sportFeeMaster->fee_details = json_encode($feeDetails);
-//                    $sportFeeMaster->save();
-//                }
-//            }
+
+
             if ($request->has('fee_details')) {
                 $feeDetails = $request->input('fee_details');
 //                $quota = Quota::find($request->input('quota_id'));
@@ -1193,7 +1197,9 @@ public function confirm(  Request $request, $id){
                     $registration->save();
                 }
             }
+
             DB::commit();
+            $sendOnHoldEmail = false;
             if ($request->status == 'on-hold') {
                 $sendOnHoldEmail = false;
 
@@ -1224,14 +1230,33 @@ public function confirm(  Request $request, $id){
                         $message->subject('Application On Hold');
                     });
                 }
-            }
-            if ($request->status == 'approved') {
-                $sendApprovedEmail = false;
-
-                // Only send email if there were fee-dependent changes or this is a new approval
-                if ($registration->status != 'approved' || $feeDependentChanged) {
-                    $sendApprovedEmail = true;
+                if( $feeDependentChanged){
+                    Mail::send('ums.sports.on_hold_email', [
+                        'user' => $user,
+                        'remarks' => $request->remarks,
+                        'name' => $request->name,
+                       
+                    ], function ($message) use ($user) {
+                        $message->to($user->email);
+                        $message->subject('Application On Hold');
+                    });
                 }
+            }
+
+            // if ($registration->status != 'approved' || $feeDependentChanged) {
+            //     $sendApprovedEmail = true;
+               
+            // }
+            $sendApprovedEmail = false;
+            if ($request->status == 'approved') {
+                $sendApprovedEmail = true;
+
+                
+                if ($registration->status != 'approved') {
+                    $sendApprovedEmail =false ;
+                   
+                }
+
 
                 if (!$registration->registration_number) {
                     $levelCode = '';
@@ -1263,23 +1288,25 @@ public function confirm(  Request $request, $id){
                     $registration->registration_number = $newRegistrationNumber;
                     $registration->save();
 
-                    // If this is a new registration number, we should send the email
                     $sendApprovedEmail = true;
                 }
 
-                if ($sendApprovedEmail) {
+                if( $sendApprovedEmail){
+                try {
                     Mail::send('ums.sports.approved_email', [
                         'user' => $user,
                         'remarks' => $request->remarks,
                         'name' => $request->name,
-                        'fee_changes' => $feeDependentChanged,
                         'registration_number' => $registration->registration_number
                     ], function($message) use ($user) {
                         $message->to($user->email);
                         $message->subject('Application Approved');
                     });
+                } catch (\Exception $e) {
+                    \Log::error('Mail not sent: ' . $e->getMessage());
                 }
             }
+        }
             return redirect()->route('sports-students')->with('success', 'Registration updated successfully');
 
         } catch (\Exception $e) {
@@ -1330,6 +1357,8 @@ public function confirm(  Request $request, $id){
     {
         $student = User::findOrFail($id);
         $quota = SportQuota::find($student->registration->quota_id);
+        $payment = Payment::where(['user_id' => $student->id])->first();
+        $existingData = json_decode($payment->fee_heads_durations ?? '{}', true);
         $familyDetails = SportFamilyDetail::where('registration_id', $student->registration->id)->first();
 //        dd($student->registration);
 
@@ -1499,11 +1528,6 @@ if ($sportRegister) {
         }
     }
 }
-  //activity end
-
-
-
-
 
         $sportFeeMaster = SportRegister::where('userable_id', $id)->first();
         // $feeDetails = $sportFeeMaster && !empty($sportFeeMaster->fee_details) ? json_decode($sportFeeMaster->fee_details, true) : [];
@@ -1535,10 +1559,227 @@ if ($sportRegister) {
         }
 
         $user = User::with('payments')->findOrFail($id);
-        return view('ums.sports.profile', compact('student', 'sportFeeMaster', 'feeDetails', 'totalFees','familyDetails', 'previousStudentActivities',
+        return view('ums.sports.profile', compact('student', 'sportFeeMaster',  'existingData','feeDetails', 'totalFees','familyDetails', 'previousStudentActivities',
             'studentActivities','user','paid_amount','date'))
             ->with('success', 'Registration successful');
     }
+
+//     public function showProfile($id)
+//     {
+//         $student = User::findOrFail($id);
+//         $quota = SportQuota::find($student->registration->quota_id);
+//         $familyDetails = SportFamilyDetail::where('registration_id', $student->registration->id)->first();
+// //        dd($student->registration);
+
+
+// // activity code
+// $sportRegister = SportRegister::where('userable_id', $student->id)->first();
+// $studentActivities = [];
+// $previousStudentActivities = [];
+
+// if ($sportRegister) {
+//     $sportRegisterId = $sportRegister->id;
+//     $activitySchedulers = SportActivityScheduler::all();
+
+//     $fromDate = request()->input('fromDate') ? Carbon::parse(request('fromDate')) : null;
+//     $toDate = request()->input('toDate') ? Carbon::parse(request('toDate')) : null;
+
+//     foreach ($activitySchedulers as $scheduler) {
+//         $batchStudents = json_decode($scheduler->batch_student, true);
+//         if (!is_array($batchStudents)) continue;
+
+//         foreach ($batchStudents as $bs) {
+//             if ((int)$bs['id'] === $sportRegisterId && $bs['isChecked'] == true) {
+
+//                 $startDate = Carbon::parse($scheduler->start_date);
+//                 $endDate = Carbon::parse($scheduler->end_date);
+
+//                 $filterStart = $fromDate ?? $startDate;
+//                 $filterEnd = $toDate ?? $endDate;
+
+//                 $effectiveStart = $filterStart->greaterThan($startDate) ? $filterStart : $startDate;
+//                 $effectiveEnd = $filterEnd->lessThan($endDate) ? $filterEnd : $endDate;
+
+//                 $daysJson = $scheduler->day;
+//                 $days = json_decode($daysJson, true);
+
+//                 $dayMap = [
+//                     'Sunday' => 0,
+//                     'Monday' => 1,
+//                     'Tuesday' => 2,
+//                     'Wednesday' => 3,
+//                     'Thursday' => 4,
+//                     'Friday' => 5,
+//                     'Saturday' => 6,
+//                 ];
+
+//                 $period = CarbonPeriod::create($effectiveStart, $effectiveEnd);
+//                 $activities = [];
+
+//                 $attendanceRecords = SportActivityDetail::where('scheduler_id', $scheduler->id)->get();
+//                 $allAttendanceData = [];
+
+//                 foreach ($attendanceRecords as $attendanceRecord) {
+//                     $attendanceData = json_decode($attendanceRecord->students, true);
+//                     $attendanceDate = Carbon::parse($attendanceRecord->date)->format('d-M-Y');
+
+//                     $allAttendanceData[] = [
+//                         'date' => $attendanceDate,
+//                         'attendance_data' => $attendanceData,
+//                     ];
+//                 }
+
+//                 foreach ($period as $date) {
+//                     foreach ($days as $dayName => $timeRange) {
+//                         $targetDay = $dayMap[$dayName];
+
+//                         if ($date->dayOfWeek === $targetDay) {
+//                             $dateStr = $date->format('Y-m-d');
+//                             $activities[] = [
+//                                 'date' => $dateStr,
+//                                 'day' => $dayName,
+//                                 'start_time' => $timeRange['start_time'],
+//                                 'end_time' => $timeRange['end_time'],
+//                             ];
+//                         }
+//                     }
+//                 }
+
+//                 $scheduler->activity_occurrences = count($activities);
+//                 $scheduler->activities = $activities;
+
+//                 $studentActivities[] = $scheduler;
+
+//                 $fullPeriod = CarbonPeriod::create($startDate, $endDate);
+//                 $allActivities = [];
+//                 $attendedClasses = 0;
+//                 $absentClasses = 0;
+
+//                 foreach ($fullPeriod as $date) {
+//                     foreach ($days as $dayName => $timeRange) {
+//                         $targetDay = $dayMap[$dayName];
+
+//                         if ($date->dayOfWeek === $targetDay) {
+//                             $dateStr = $date->format('Y-m-d');
+//                             $dateFormatted = $date->format('d-M-Y');
+//                             $attendanceStatus = '';
+//                             $today = Carbon::today();
+
+//                             foreach ($allAttendanceData as $attendanceData) {
+//                                 if ($attendanceData['date'] === $dateFormatted) {
+//                                     if (isset($attendanceData['attendance_data'][$sportRegisterId])) {
+//                                         $attendanceStatus = $attendanceData['attendance_data'][$sportRegisterId]['attendance'];
+//                                     } else {
+//                                         $attendanceStatus = 'data_exists';
+//                                     }
+//                                     break;
+//                                 }
+//                             }
+
+//                             if ($attendanceStatus == 'present') {
+//                                 $attendedClasses++;
+//                             } elseif ($attendanceStatus == 'absent') {
+//                                 $absentClasses++;
+//                             }
+
+//                             $allActivities[] = [
+//                                 'date' => $dateStr,
+//                                 'day' => $dayName,
+//                                 'start_time' => $timeRange['start_time'],
+//                                 'end_time' => $timeRange['end_time'],
+//                                 'attendance' => $attendanceStatus,
+//                             ];
+//                         }
+//                     }
+//                 }
+
+//                 $groupedByDate = [];
+//                 foreach ($allActivities as $activity) {
+//                     $groupedByDate[$activity['date']][] = $activity;
+//                 }
+
+//                 ksort($groupedByDate);
+
+//                 $sortedGroupedActivities = [];
+//                 foreach ($groupedByDate as $dateGroup) {
+//                     foreach ($dateGroup as $activity) {
+//                         $sortedGroupedActivities[] = $activity;
+//                     }
+//                 }
+
+//                 $remainingClasses = 0;
+//                 $today = Carbon::today();
+//                 $hasPastActivity = false;
+
+//                 foreach ($sortedGroupedActivities as $activity) {
+//                     $activityDate = Carbon::parse($activity['date']);
+//                     if ($activityDate->greaterThan($today) && $activity['attendance'] === '') {
+//                         $remainingClasses++;
+//                     }
+
+//                     if ($activityDate->lessThan($today)) {
+//                         $hasPastActivity = true;
+//                     }
+//                 }
+
+//                 if (!empty($sortedGroupedActivities) && $hasPastActivity) {
+//                     $previousScheduler = clone $scheduler;
+//                     $previousScheduler->activities = $sortedGroupedActivities;
+//                     $previousScheduler->activity_occurrences = count($sortedGroupedActivities);
+//                     $previousScheduler->attended_count = $attendedClasses;
+//                     $previousScheduler->absent_count = $absentClasses;
+//                     $previousScheduler->remaining_count = $remainingClasses;
+//                     $previousStudentActivities[] = $previousScheduler;
+//                 }
+
+//                 break;
+//             }
+//         }
+//     }
+// }
+//   //activity end
+
+
+
+
+
+//         $sportFeeMaster = SportRegister::where('userable_id', $id)->first();
+//         // $feeDetails = $sportFeeMaster && !empty($sportFeeMaster->fee_details) ? json_decode($sportFeeMaster->fee_details, true) : [];
+//         if ($student->registration->fee_details){
+//             $feeDetails = json_decode($student->registration->fee_details, true);
+//         }else{
+//             $feeDetails = json_decode($sportFeeMaster->fee_details, true);
+//         }
+
+//         // Ensure it's an array
+//         if (!is_array($feeDetails)) {
+//             $feeDetails = [];
+//         }
+
+//         $totalFees = 0;
+
+//          $payment=Payment::where('user_id',$id)->first();
+
+//         $paid_amount = $payment ? $payment->paid_amount : 0;
+
+//                 $date=$sportFeeMaster->document_date;
+
+
+//         // Calculate the total fee payable by applying discounts
+//         foreach ($feeDetails as $key => $fee) {
+//             $netFeePayable = $fee['total_fees'] - ($fee['fee_discount_value'] ?? 0);
+//             $feeDetails[$key]['net_fee_payable'] = $netFeePayable;
+//             $totalFees += $netFeePayable;
+//         }
+
+//         $user = User::with('payments')->findOrFail($id);
+//         return view('ums.sports.profile', compact('student', 'sportFeeMaster', 'feeDetails', 'totalFees','familyDetails', 'previousStudentActivities',
+//             'studentActivities','user','paid_amount','date'))
+//             ->with('success', 'Registration successful');
+//     }
+
+
+
     public function profileRegistration($id)
     {
         $registration = SportRegister::findOrFail($id);
@@ -1647,7 +1888,7 @@ if ($sportRegister) {
             'gender'           => 'required',
             'dob'              => 'required|date|before:today',
             'doj'              => 'nullable|date|after:dob',
-            'quota_id'         => 'required|integer|exists:quotas,id',
+            'quota_id'         => 'required|integer|exists:sport_quotas,id',
             'previous_coach.*' => 'nullable|string|max:255',
             'training_academy.*' => 'nullable|string|max:255',
             'badminton_experience'  => 'nullable|string|max:255',
@@ -1941,6 +2182,14 @@ if ($sportRegister) {
                 ->withInput();
         }
     }
+
+    public function getCountry()
+    {
+        $countries = Country::all();
+      
+        return response()->json($countries);
+    }
+
     public function getStates($countryId)
     {
         $states = State::where('country_id', $countryId)->get();
@@ -1953,93 +2202,150 @@ if ($sportRegister) {
         return response()->json($cities);
     }
 
-    public function update_payment(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'user_id' => 'required|exists:users,id',
-                'bank_name' => 'required_unless:pay_mode,Cash|string|nullable',
-                'pay_mode' => 'required|string',
-                'ref_no' => 'required_unless:pay_mode,Cash|string|nullable',
-                'pay_doc' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-                'paid_amount' => 'nullable|string',
-                'pay_remark' => 'nullable|string',
-                'confirm_payment' => 'nullable|string',
-                'pay_confirmation_date' => 'nullable|date',
-                'pay_confirmation_time' => 'nullable|string',
-                'pay_collector' => 'nullable|string',
-            ]);
 
-            // Find the payment for the user or create a new one
-            $payment = Payment::updateOrCreate(
-                ['user_id' => $request->user_id], // Condition to check if payment exists
-                [   // Attributes to update or create
-                    'bank_name' => $request->bank_name,
-                    'pay_mode' => $request->pay_mode,
-                    'paid_amount' => $request->paid_amount,
-                    'ref_no' => $request->ref_no,
-                    'remarks' => $request->pay_remark,
-                ]
-            );
 
-            // Handle file upload if present
-            if ($request->hasFile('pay_doc')) {
-                $file = $request->file('pay_doc');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $path = $file->move(public_path('payment_docs'), $filename);
-                $payment->pay_doc = asset('payment_docs/' . $filename);
+
+
+public function update_payment(Request $request)
+{
+    // dd($request->all()); // Debugging line - remove in production
+    
+    try {
+        // Validate the request
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'bank_name' => 'required_unless:pay_mode,Cash|string|nullable',
+            'pay_mode' => 'required|string',
+            'ref_no' => 'required_unless:pay_mode,Cash|string|nullable',
+            'pay_doc' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'paid_amount' => 'nullable|numeric',
+            'pay_remark' => 'nullable|string',
+            'confirm_payment' => 'nullable|string',
+            'pay_confirmation_date' => 'nullable|date',
+            'pay_confirmation_time' => 'nullable|string',
+            'pay_collector' => 'nullable|string',
+            'final_schedule_json' => 'nullable|json', 
+        ]);
+
+
+        $payment = Payment::firstOrNew(['user_id' => $validated['user_id']]);
+        
+
+        $existingData = json_decode($payment->fee_heads_durations ?? '{}', true);
+        
+        $newScheduleData = $request->has('final_schedule_json') ? json_decode($request->final_schedule_json, true) : [];
+
+        foreach ($newScheduleData as $feeHead => $newSchedule) {
+            if (isset($existingData[$feeHead])) {
+                $existingData[$feeHead]['duration'] = 
+                    ($existingData[$feeHead]['duration'] ?? 0) + ($newSchedule['duration'] ?? 0);
+        
+                $existingSchedule = $existingData[$feeHead]['schedule'] ?? [];
+                $newScheduleItems = $newSchedule['schedule'] ?? [];
+        
+                $existingData[$feeHead]['schedule'] = array_merge($existingSchedule, $newScheduleItems);
+            } else {
+                $existingData[$feeHead] = $newSchedule;
             }
+        }
+        
 
-            if ($request->input('confirm_payment') == 'yes') {
-                $payment->pay_confirmation_date = $request->pay_confirmation_date ?? null;
-                $payment->pay_confirmation_time = $request->pay_confirmation_time ?? null;
-                $payment->pay_collector = $request->pay_collector ?? null;
-            }
+        $payment->fee_heads_durations = json_encode($existingData);
 
-            $payment->save();
+        $payment->bank_name = $validated['bank_name'] ?? null;
+        $payment->pay_mode = $validated['pay_mode'];
+        $payment->ref_no = $validated['ref_no'] ?? null;
+        $payment->remarks = $validated['pay_remark'] ?? null;
+        $payment->paid_amount +=  intval($validated['paid_amount'] ?? 0);
+        $payment->payment_status = $validated['confirm_payment'] ?? null;
+        $payment->pay_confirmation_date = $validated['pay_confirmation_date'] ?? null;
+        $payment->pay_confirmation_time = $validated['pay_confirmation_time'] ?? null;
+        $payment->pay_collector = $validated['pay_collector'] ?? null;
 
-            // Update user's payment status
-//            $user = \App\Models\User::find($payment->user_id);
-//            $user->payment_status = 'paid';
-//            $user->save();
+        if ($request->hasFile('pay_doc')) {
+            $file = $request->file('pay_doc');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->move(public_path('payment_docs'), $filename);
+            $payment->pay_doc = asset('payment_docs/' . $filename);
+        }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Payment updated successfully!'
-            ]);
+        $payment->save();
 
-        } catch (\Exception $e) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment updated successfully!',
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred: ' . $e->getMessage(),
+        ]);
+    }
+}
+
+
+
+   
+ public function update_payment_status(Request $request)
+{
+    try {
+        $payment = Payment::firstOrNew(['user_id' => $request->user_id]);
+        $existingData = json_decode($payment->user_side_data ?? '{}', true);
+
+        $feeHeads = is_string($request->fee_heads) ? json_decode($request->fee_heads, true) : $request->fee_heads;
+
+        if (!is_array($feeHeads)) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+                'message' => 'Invalid or missing fee_heads data.'
+            ], 400);
         }
-    }
-    public function update_payment_status(Request $request)
-    {
-        try {
-            // Validate the request
-            $validated = $request->validate([
-                'user_id' => 'required|exists:users,id',
-            ]);
 
-            // Find the user and update payment status
-            $user = \App\Models\User::find($request->user_id);
-            $user->payment_status = 'paid';
-            $user->save();
+        foreach ($feeHeads as $feeHead => $selectedSchedules) {
+            $selectedDuration = count($selectedSchedules);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Payment status updated to paid!'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            if (!isset($existingData[$feeHead])) {
+                $existingData[$feeHead] = [
+                    'duration' => 0,
+                    'schedule' => []
+                ];
+            }
+
+            foreach ($selectedSchedules as $entry) {
+                $existingData[$feeHead]['schedule'][] = [
+                    'month' => $entry['month'],
+                    'due_date' => $entry['due_date'],
+                    'amount' => floatval($entry['amount']),
+                    'payment_date' => $entry['payment_date'],
+                    'payment_time' => $entry['payment_time'],
+                    'status' => $entry['status'],
+                    'index' => intval($entry['index']),
+                    'Total_amount'=> floatval($request->paid_amount ?? 0)
+                ];
+            }
+
+            $existingData[$feeHead]['duration'] += $selectedDuration;
+            
         }
+
+        $payment->user_side_data = json_encode($existingData);
+
+        $payment->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment status updated successfully!'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
     }
-    // Section.php
+}
+
+    
+    
     public function get_batch_year(Request $request)
     {
         $sections_year = SportSection::where('name', $request->section_name)
@@ -2072,6 +2378,53 @@ if ($sportRegister) {
 
         return response()->json($sections);
     }
+
+
+
+    public function ConfirmfeeStatus(Request $request)
+    {
+        $payment = Payment::firstOrNew(['user_id' => $request->user_id]);
+    
+        // Decode existing data
+        $existingData = json_decode($payment->fee_heads_durations, true) ?? [];
+    
+        // Decode new confirmed data
+        $newData = json_decode($request->confirmfees, true) ?? [];
+    
+        // Merge logic
+        foreach ($newData as $feeHeadId => $newFeeData) {
+            if (!isset($existingData[$feeHeadId])) {
+                // New Fee Head — directly add
+                $existingData[$feeHeadId] = $newFeeData;
+            } else {
+                // Existing Fee Head — merge duration and schedule
+                $existingSchedule = $existingData[$feeHeadId]['schedule'] ?? [];
+                $newSchedule = $newFeeData['schedule'] ?? [];
+    
+                // Merge schedules based on 'index'
+                $scheduleMap = [];
+                foreach ($existingSchedule as $entry) {
+                    $scheduleMap[$entry['index']] = $entry;
+                }
+    
+                foreach ($newSchedule as $entry) {
+                    $scheduleMap[$entry['index']] = $entry; // Add or overwrite
+                }
+    
+                // Update duration by counting unique months
+                $mergedSchedule = array_values($scheduleMap);
+                $existingData[$feeHeadId]['schedule'] = $mergedSchedule;
+                $existingData[$feeHeadId]['duration'] = count($mergedSchedule); // Updated duration
+            }
+        }
+    
+        $payment->fee_heads_durations = json_encode($existingData);
+        $payment->paid_amount += intval( $request->paid_amount);
+        $payment->save();
+    }
+    
+
+
     public function updateMandatoryStatus(Request $request)
     {
         \Log::info('Update Mandatory Status Request:', $request->all());
@@ -2131,7 +2484,21 @@ if ($sportRegister) {
     }
 
 
-
+    public function get_Feesection_group(Request $request)
+    {
+        $sectionValue = $request->section;
+       $sportfee= sport_fee_master::find($sectionValue );
+    
+    
+        if (is_numeric($sectionValue)) {
+            $group = SportGroupMaster::where('section_id',     $sportfee->section_id)->get();
+        } else {
+            $group = SportGroupMaster::where('section_name', $sportfee->section_id)->get();
+        }
+    
+        return response()->json($group);
+    }
+    
 }
 
 

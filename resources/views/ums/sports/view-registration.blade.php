@@ -491,7 +491,19 @@
                                                                         class="text-danger">*</span></label>
                                                         </div>
                                                         <div class="col-md-2">
-                                                            <input type="text" class="form-control" name="bai_state" value="{{ $registration->bai_state }}"/>
+                                                          
+                                                            <!-- <input type="text" class="form-control" name="bai_state" value="{{ $registration->bai_state }}"/> -->
+                                                             <select id="other_state" class="form-select" name="bai_state">
+                                                                <option value="">Select State</option>
+                                                                @if(isset($otherStates) && count($otherStates) > 0)
+                                                                    @foreach($otherStates as $state)
+                                                                        <option value="{{ $state->id }}"
+                                                                                @if($registration->bai_state == $state->id) selected @endif>
+                                                                            {{ $state->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                @endif
+                                                            </select>
                                                         </div>
                                                     </div>
 
@@ -508,8 +520,30 @@
                                                                         class="text-danger">*</span></label>
                                                         </div>
                                                         <div class="col-md-2">
-                                                            <input type="text" name="country" placeholder="Country"
-                                                                   class="form-control" value="{{ $registration->country }}"/>
+                                                        
+                                                        
+                                                        <select id="other_country" class="form-select" name="country">
+                                                            <option value="">Select</option>
+                                                            @foreach($countries as $country)
+                                                                <option value="{{ $country->id }}"
+                                                                    @if(isset($selectedCountry) && $selectedCountry->id == $country->id) selected @endif>
+                                                                    {{ $country->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+
+                                                        
+                                                        
+                                                        <!-- <select id="other_country" class="form-select" name="country">
+                                                                <option value="">Select</option>
+                                                                @foreach($countries as $country)
+                                                                    <option value="{{ $country->id }}"
+                                                                            @if($registration->country == $country->id) selected @endif>
+                                                                            
+                                                                        {{ $country->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select> -->
                                                         </div>
                                                     </div>
                                                 </div>

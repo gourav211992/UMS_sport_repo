@@ -131,23 +131,10 @@
 
                                                 <div class="col-md-5">
                                                     <select class="form-select select2" disabled>
-                                                        <option value="" disabled selected>-- Select Trainer
-                                                            --</option>
-                                                        @foreach ($trainers as $item)
-                                                            <option value={{ $item['id'] }}
-                                                                {{ $item['id'] == $data->trainer ? 'selected' : '' }}>
-                                                                {{ ucfirst($item['name']) }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                
-                                                <!-- <div class="col-md-5">
-                                                    <select class="form-select select2" disabled>
                                                         <option value="{{ $data->trainer }}">{{ ucfirst($data->trainer) }}
                                                         </option>
                                                     </select>
-                                                </div> -->
+                                                </div>
                                             </div>
 
                                             <div class="row align-items-center mb-1">
@@ -476,8 +463,6 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
-
     <script>
         $(document).ready(function() {
 
@@ -602,7 +587,7 @@
         })
     </script>
 
-    <script>
+<script>
     $(document).ready(function() {
         const selectedGroup = "{{ $data->group }}";
 
@@ -631,7 +616,7 @@
                             $('#group').prop('disabled', false);
 
                             if (selectedGroup) {
-                                $('#group').val(selectedGroup).trigger('change').attr('disabled');
+                                $('#group').val(selectedGroup).trigger('change');
                             }
 
                         } else {
@@ -649,14 +634,14 @@
             $('#section').trigger('change');
         }
     });
-    </script>
-    
-    <script>
+</script>
+
+<script>
     let preselectedStudents = @json($selectedStudentIds ?? []);
     console.log(preselectedStudents);
-    </script>
-    
-    <script>
+</script>
+
+<script>
     $(document).ready(function() {
         $('#group').on('change', function() {
             let GroupId = $(this).val();
@@ -698,12 +683,10 @@
                                     </td>
                                 </tr>
                             `;
-                            makeReadOnly();
-
                             });
                         } else {
                             rows =
-                                `<tr><td colspan="6" class="text-center">No students found for this Group.</td></tr>`;
+                                `<tr><td colspan="6" class="text-center">No students found for this section.</td></tr>`;
                         }
 
                         $('#section-data').html(rows);
@@ -828,25 +811,7 @@
             $('#select-all-students').prop('checked', total > 0 && total === selected);
         }
     });
-    </script>
-    
-    <script>
-
-    function makeReadOnly() {
-
-        const elements = document.querySelectorAll('input, select, textarea','a');
-
-        elements.forEach(element => {
-
-            element.disabled = true;  
-
-        });
-
-    }
-
-    window.onload = makeReadOnly();
-
-    </script>
+</script>
 
 
 @endsection

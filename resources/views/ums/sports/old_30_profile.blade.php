@@ -331,16 +331,16 @@
                                                         <tr>
                                                             <td class="poprod-decpt">1</td>
                                                             <td class="poprod-decpt">{{$date}}</td>
-                                                            <td>{{number_format($totalFees,2)}}</td>
-                                                            <td>{{ number_format($paid_amount, 2)}}</td>
-                                                           <td>{{number_format(intval($totalFees)- intval( $paid_amount),2)}}</td>
-                                                            {{-- <td></td> --}}
+                                                            <td>{{$totalFees}}</td>
+                                                            <td>{{$paid_amount}}</td>
+{{--                                                            <td>{{$totalFees-$paid_amount}}</td>--}}
+                                                            <td></td>
                                                             <td><span
                                                                     class="badge rounded-pill @if($student->payment_status == 'paid') badge-light-success @else badge-light-warning @endif  badgeborder-radius">{{$student->payment_status??'Pending'}}</span>
                                                             </td>
-                                                            <td><a href="#sponsor" data-bs-toggle="modal"type="button"
-                                                                    class="text-primary add-contact-row btn btn-sm   btn-success px-25 font-small-2 py-25">
-                                                                        Pay Now</a>
+                                                            <td><a href="#sponsor" data-bs-toggle="modal"
+                                                                    class="text-primary add-contact-row"><i
+                                                                        data-feather="eye" class="me-50"></i></a>
                                                                 {{-- @if($student->payment_status != 'paid')--}}
                                                                 {{-- Paid--}}
                                                                 {{-- @else--}}
@@ -348,11 +348,11 @@
                                                                 <span class="badge bg-success badge rounded-pill">Paid</span>
                                                                 @else
                                                                 <!-- <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn" data-user-id="{{ $student->id }}">Pay Now</button> -->
-                                                                <!-- <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"
+                                                                <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#paymentModal"
                                                                         data-user-id="{{ $user->id }}"
-                                                                        >Pay Now</button> -->
+                                                                        >Pay Now</button>
                                                                 @endif
                                                                 {{-- @if($student->payments != null)--}}
                                                                 <button
@@ -1005,35 +1005,36 @@
     </div>
 
 
-<!-- Main Fee Modal -->
-<div class="modal fade" id="sponsor" tabindex="-1" aria-labelledby="shareProjectTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 800px">
-        <div class="modal-content">
-            <div class="modal-header p-0 bg-transparent">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body px-sm-2 mx-50 pb-2">
-                <h1 class="text-center mb-1" id="shareProjectTitle">View Fees Structure</h1>
-                <p class="text-center">View the details below.</p>
 
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Fee Title</th>
-                                <th>Total Fees</th>
-                                <th>Fee Discount %</th>
-                                <th>Fee Discount Value</th>
-                                <th>Net Fee Payable</th>
-                                <th>Payment Schedule</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                            $onetimefees=0;
-                            @endphp
-                            @foreach($feeDetails as $index => $fee)
+
+    <div class="modal fade" id="sponsor" tabindex="-1" aria-labelledby="shareProjectTitle" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered" style="max-width: 800px">
+            <div class="modal-content">
+                <div class="modal-header p-0 bg-transparent">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-sm-2 mx-50 pb-2">
+                    <h1 class="text-center mb-1" id="shareProjectTitle">View Fees Structure</h1>
+                    <p class="text-center">View the details below.</p>
+
+
+
+                    <div class="table-responsive pomrnheadtffotsticky">
+                        <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fee Title</th>
+                                    <th>Total Fees</th>
+                                    <th>Fee Discount %</th>
+                                    <th>Fee Discount Value</th>
+                                    <th>Net Fee Payable Value</th>
+                                    <th>Payment Schedule</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($feeDetails as $index => $fee)
+{{--                                    @dump($fee)--}}
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $fee['title'] }}</td>
@@ -1042,93 +1043,160 @@
                                     <td>{{ number_format($fee['fee_discount_value'], 2) }}</td>
                                     <td>{{ number_format($fee['net_fee_payable'], 2) }}</td>
                                     <td>
-                                        @if(isset($fee['payment_mode']) && $fee['payment_mode'] === 'Monthly' && $fee['mandatory'])
-
-                                            <button class="btn btn-sm btn-primary view-schedule-btn"
-                                                    data-fee-id="{{ $index }}"
-                                                    data-user-id="{{ $user->id }}"
-                                                    data-total-amount="{{ $fee['net_fee_payable'] }}"
-                                                    data-duration="{{ $fee['duration'] }}"
-                                                    data-fee-head="{{ $fee['title'] }}">
-
-                                                View Schedule
-                                            </button>
+                                        @if(isset($fee['payment_mode']) && $fee['payment_mode'] == 'Monthly')
+                                        <button class="btn btn-sm btn-primary view-schedule-btn"
+                                                data-fee-id="{{ $index  }}"
+                                                data-total-amount="{{ $fee['net_fee_payable'] }}"
+                                                data-duration="{{ $fee['duration'] }}">
+                                            View Schedule
+                                        </button>
                                         @else
-                                            One-time Payment
+                                        One-time Payment
                                         @endif
-
-                                        @php
-                                         $totalFees1 = floatval($fee['total_fees'] ?? 0);
-                                           $feeDiscountPercent =$fee['fee_discount_percent'];
-                                            $feeDiscountValue = $fee['fee_discount_value'] ?? ($totalFees1 * $feeDiscountPercent / 100);
-                                           $netFee =   $totalFees1- $feeDiscountValue;
-                                        if(isset($fee['payment_mode']) && $fee['payment_mode'] != 'Monthly' && $fee['mandatory']){
-                                        $onetimefees+= $netFee;
-                                        }
-                                      
-                                        @endphp
-                                      
                                     </td>
                                 </tr>
+                                @endforeach
 
-                            @endforeach
+                                <tr>
+                                    <td></td>
+                                    <td colspan="4" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
+                                    <td class="fw-bolder text-dark font-large-1">{{ number_format($totalFees, 2) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                            <tr>
-                                
-                                <td colspan="2" class="text-end fw-bolder text-dark ">Total Fees</td>
-                                <td>{{ number_format($totalFees, 2) }}</td>
-                         
-                                <td colspan="2" class="text-end fw-bolder text-dark ">One Time PayableFee</td>
-                                <td id="onetime">{{  number_format($onetimefees , 2) }}</td>
-                                <td colspan="2">
-                                    <button class="btn btn-sm btn-success pay-monthly-btn" style="padding: 6px">
-                                        Pay Now
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
+                    </div>
 
 
-  
-
-<!-- Monthly Schedule Modal -->
-<div class="modal fade" id="monthlyScheduleModal" tabindex="-1" aria-labelledby="monthlyScheduleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="monthlyScheduleModalLabel">Monthly Payment Schedule</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Month</th>
-                                <th>Due Date</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Select</th>
-                            </tr>
-                        </thead>
-                        <tbody id="scheduleTableBody">
-                            <!-- JS will populate rows -->
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
+
     </div>
-</div>
+
+    <div class="modal fade" id="infodetail" tabindex="-1" aria-labelledby="shareProjectTitle" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered" style="max-width: 1200px">
+            <div class="modal-content">
+                <div class="modal-header p-0 bg-transparent">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-sm-2 mx-50 pb-2">
+                    <h1 class="text-center mb-1" id="shareProjectTitle">View Fees Discount</h1>
+                    <p class="text-center">View the details below.</p>
 
 
+
+                    <div class="table-responsive pomrnheadtffotsticky">
+                        <table
+                            class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fee Title</th>
+                                    <th>Fee Sponsor %</th>
+                                    <th>Fee Sponsor Value</th>
+                                    <th>Fee Discount %</th>
+                                    <th>Fee Discount Value</th>
+                                    <th>Fee Sponsorship<br />+ Discount %</th>
+                                    <th>Fee Sponsorship<br />+ Discount Value</th>
+                                    <th>Net Discount %</th>
+                                    <th>Net Discount Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Training</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                </tr>
+
+                                <tr>
+                                    <td>4</td>
+                                    <td>Security Deposit</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>Khelo India</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                    <td>10%</td>
+                                    <td>1000</td>
+                                </tr>
+
+
+
+                                <tr>
+                                    <td></td>
+                                    <td colspan="7" class="text-end fw-bolder text-dark font-large-1">Total Fees
+                                    </td>
+                                    <td class="fw-bolder text-dark font-large-1">10%</td>
+                                    <td class="fw-bolder text-dark font-large-1">100000</td>
+                                </tr>
+
+
+                            </tbody>
+
+
+                        </table>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+{{--<<<<<<< HEAD--}}
+
+    <!-- Monthly Payment Schedule Modal -->
+    <div class="modal fade" id="monthlyScheduleModal" tabindex="-1" aria-labelledby="monthlyScheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="monthlyScheduleModalLabel">Monthly Payment Schedule</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Due Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduleTableBody">
+                                <!-- Schedule rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{{--=======--}}
     <!-- Payment Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -1153,7 +1221,10 @@
                                 <p>Scan the QR code to make payment</p>
                                 <img src="{{asset('sports/img/sampleqr.jpeg')}}"
                                      alt="UPI QR Code" class="img-fluid">
-    
+                                {{--                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=UPI_ID:your-upi-id@bank&amount={{ $totalNetFeePayableValue }}"--}}
+                                {{--                                     alt="UPI QR Code" class="img-fluid">--}}
+                                {{--                                <p class="mt-2">OR</p>--}}
+                                {{--                                <p>Send payment to: your-upi-id@bank</p>--}}
                             </div>
                         </div>
 
@@ -1174,6 +1245,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="confirmPayment">Confirm Payment</button>
+{{-->>>>>>> 798b756dcee47b85dba55b98ac398261eac34584--}}
                 </div>
             </div>
         </div>
@@ -1200,524 +1272,247 @@
         });
     });
 </script>
+<script>
+       
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
 
+  
+    </script>
+    <script>
 
+        $(document).ready(function() {
+            // Handle payment mode selection
+            $('#paymentMode').change(function() {
+                const mode = $(this).val();
+                $('#upiSection, #impsSection').hide();
 
-    
-<!-- <script type="text/javascript">
-    let selectedSchedules = {};
-    let scheduleDataGlobal = {};
-
-    function populateSchedule(feeId, userId, totalAmount, duration, feeHead) {
-        const scheduleTableBody = document.getElementById('scheduleTableBody');
-        scheduleTableBody.innerHTML = '';
-
-        const monthNames = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"];
-
-        const scheduleData = [];
-        const monthlyAmount = (totalAmount / duration).toFixed(2);
-
-        for (let i = 0; i < duration; i++) {
-            const dueDate = new Date();
-            dueDate.setMonth(dueDate.getMonth() + i);
-            const index = i + 1;
-
-            scheduleData.push({
-                index: index,
-                month: monthNames[dueDate.getMonth()],
-                dueDate: dueDate.toISOString().split('T')[0],
-                amount: monthlyAmount,
-                status: 'Pending',
-                feeHead: feeHead
+                if (mode === 'UPI') {
+                    $('#upiSection').show();
+                } else if (mode === 'IMPS') {
+                    $('#impsSection').show();
+                }
             });
-        }
+            // Handle confirm payment button
+            $('#confirmPayment').click(function() {
+                const paymentMode = $('#paymentMode').val();
 
-        scheduleDataGlobal[feeHead] = scheduleData;
-        selectedSchedules[feeHead] = [];
-
-        // scheduleData.forEach((schedule) => {
-        //     const row = document.createElement('tr');
-        //     row.innerHTML = `
-        //         <td>${schedule.month}</td>
-        //         <td>${schedule.dueDate}</td>
-        //         <td>${schedule.amount}</td>
-        //         <td>${schedule.status}</td>
-        //         <td><input type="checkbox" class="select-payment" 
-        //                 data-fee-head="${schedule.feeHead}" 
-        //                 data-index="${schedule.index}" 
-        //                 data-amount="${schedule.amount}" 
-        //                 data-due-date="${schedule.dueDate}" 
-        //                 data-month="${schedule.month}" /></td>
-        //     `;
-        //     scheduleTableBody.appendChild(row);
-        // });
-        scheduleDataGlobal[feeHead] = scheduleData;
-
-if (!selectedSchedules[feeHead]) {
-    selectedSchedules[feeHead] = [];
-}
-
-scheduleData.forEach((schedule) => {
-    const isChecked = selectedSchedules[feeHead]?.some(item => item.index === schedule.index);
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${schedule.month}</td>
-        <td>${schedule.dueDate}</td>
-        <td>${schedule.amount}</td>
-        <td>${schedule.status}</td>
-        <td><input type="checkbox" class="select-payment" 
-                data-fee-head="${schedule.feeHead}" 
-                data-index="${schedule.index}" 
-                data-amount="${schedule.amount}" 
-                data-due-date="${schedule.dueDate}" 
-                data-month="${schedule.month}"
-                ${isChecked ? 'checked' : ''} /></td>
-    `;
-    scheduleTableBody.appendChild(row);
-});
-
-    }
-
-
-    
-    document.querySelectorAll('.view-schedule-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const feeId = this.getAttribute('data-fee-id');
-            const userId = this.getAttribute('data-user-id');
-            const totalAmount = parseFloat(this.getAttribute('data-total-amount'));
-            const duration = parseInt(this.getAttribute('data-duration'));
-            const feeHead = this.getAttribute('data-fee-head');
-
-            populateSchedule(feeId, userId, totalAmount, duration, feeHead);
-            $('#monthlyScheduleModal').modal('show');
-            document.getElementById('confirmPayment').setAttribute('data-user-id', userId);
-        });
-    });
-
-    document.getElementById('scheduleTableBody').addEventListener('change', function (event) {
-        if (event.target.classList.contains('select-payment')) {
-            const checkbox = event.target;
-            const feeHead = checkbox.getAttribute('data-fee-head');
-
-            if (!selectedSchedules[feeHead]) {
-                selectedSchedules[feeHead] = [];
-            }
-
-            const scheduleObj = {
-                index: parseInt(checkbox.getAttribute('data-index')),
-                month: checkbox.getAttribute('data-month'),
-                due_date: checkbox.getAttribute('data-due-date'),
-                amount: parseFloat(checkbox.getAttribute('data-amount')),
-                payment_date: new Date().toISOString().split('T')[0],
-                payment_time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                status: 'notconfirm'
-            };
-
-            if (checkbox.checked) {
-                selectedSchedules[feeHead].push(scheduleObj);
-            } else {
-                selectedSchedules[feeHead] = selectedSchedules[feeHead].filter(item => item.index !== scheduleObj.index);
-            }
-        }
-    });
-
-    document.querySelector('.pay-monthly-btn').addEventListener('click', function () {
-        let hasSelection = Object.values(selectedSchedules).some(arr => arr.length > 0);
-        if (!hasSelection) {
-            alert("Please select at least one month to proceed with payment.");
-            return;
-        }
-        $('#paymentModal').modal('show');
-    });
-
-    document.getElementById('paymentMode').addEventListener('change', function () {
-        const paymentMode = this.value;
-        document.getElementById('upiSection').style.display = (paymentMode === 'UPI') ? 'block' : 'none';
-        document.getElementById('impsSection').style.display = (paymentMode === 'IMPS') ? 'block' : 'none';
-    });
-
-    document.getElementById('confirmPayment').addEventListener('click', function () {
-        const paymentMode = document.getElementById('paymentMode').value;
-        const userId = this.getAttribute('data-user-id');
-
-        if (!paymentMode) {
-            alert("Please select a payment mode.");
-            return;
-        }
-
-        let hasData = Object.values(selectedSchedules).some(arr => arr.length > 0);
-        if (!hasData) {
-            alert("No months selected for payment.");
-            return;
-        }
-
-        const paidAmount = Object.values(selectedSchedules)
-            .flat()
-            .reduce((acc, item) => acc + parseFloat(item.amount), 0);
-
-        $('#confirmPayment').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Processing...');
-
-        const paymentData = {
-            _token: '{{ csrf_token() }}',
-            user_id: userId,
-            payment_mode: paymentMode,
-            fee_heads: JSON.stringify(selectedSchedules),
-            paid_amount: paidAmount
-        };
-
-        $.ajax({
-            url: "{{ url('update-payment-status') }}",
-            type: "POST",
-            data: paymentData,
-            success: function (response) {
-                if (response.success) {
-                    toastr.success(`Payment via ${paymentMode} was successful`, 'Success');
-                    $('#paymentModal').modal('hide');
-                    $('.pay-now-btn').replaceWith('<span class="badge bg-success">Paid</span>');
-                } else {
-                    toastr.error(response.message || 'Payment failed.', 'Error');
-                }
-            },
-            error: function (xhr) {
-                const errorMessage = xhr.responseJSON?.message || 'Something went wrong. Please try again.';
-                toastr.error(errorMessage, 'Error');
-            },
-            complete: function () {
-                $('#confirmPayment').prop('disabled', false).html('Confirm Payment');
-            }
-        });
-    });
-
-
-</script> -->
-
-<script>
-let selectedSchedules = {};
-let scheduleDataGlobal = {};
-let Onetime = {{ json_encode($onetimefees) }};
-
-const paidData = {!! json_encode($existingData) !!};
-
-
-
-let currentFeeId = null;
-let currentUserId = null;
-let currentTotalAmount = null;
-let currentDuration = null;
-let currentFeeHead = null;
-
-function populateSchedule(feeId, userId, totalAmount, duration, feeHead) {
-    currentFeeId = feeId;
-    currentUserId = userId;
-    currentTotalAmount = totalAmount;
-    currentDuration = duration;
-    currentFeeHead = feeHead;
-
-    const scheduleTableBody = document.getElementById('scheduleTableBody');
-    scheduleTableBody.innerHTML = '';
-
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"];
-
-    const scheduleData = [];
-    const monthlyAmount = (totalAmount / duration).toFixed(2);
-
-    for (let i = 0; i < duration; i++) {
-        const dueDate = new Date();
-        dueDate.setMonth(dueDate.getMonth() + i);
-        const index = i + 1;
-
-        scheduleData.push({
-            index: index,
-            month: monthNames[dueDate.getMonth()],
-            dueDate: dueDate.toISOString().split('T')[0],
-            amount: monthlyAmount,
-            status: 'Pending',
-            feeHead: feeHead
-        });
-    }
-
-    scheduleDataGlobal[feeHead] = scheduleData;
-    if (!selectedSchedules[feeHead]) {
-        selectedSchedules[feeHead] = [];
-    }
-
-    scheduleData.forEach((schedule) => {
-        const isChecked = selectedSchedules[feeHead].some(item => item.index === schedule.index);
-        const scheduleList = paidData[feeHead]?.schedule || [];
-        const paidItem = scheduleList.find(item => item.index === schedule.index);
-const isPaid = paidItem && paidItem.status.toLowerCase() === 'paid';
-const isWaiting = paidItem && paidItem.status.toLowerCase() === 'waiting for confirmation';
-
-if (isPaid) {
-    const onetimeEl = document.getElementById('onetime');
-    if (onetimeEl) {
-        onetimeEl.innerText = '0';
-    }
-    Onetime = 0;
-}
-// console.log(isPaid);
-
-       
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${schedule.month}</td>
-            <td>${schedule.dueDate}</td>
-            <td>${schedule.amount}</td>
-            <td>
-    <span class="badge ${isPaid ? 'bg-success' : isWaiting ? 'bg-info text-dark' : 'bg-warning text-dark'}">
-        ${isPaid ? 'Paid' : isWaiting ? 'Waiting for Confirmation' : schedule.status}
-    </span>
-</td>
-<td>
-    <input type="checkbox" class="select-payment" 
-        data-fee-head="${schedule.feeHead}" 
-        data-index="${schedule.index}" 
-        data-amount="${schedule.amount}" 
-        data-due-date="${schedule.dueDate}" 
-        data-month="${schedule.month}"
-        ${isChecked || isPaid || isWaiting ? 'checked' : ''} 
-        ${isPaid || isWaiting ? 'disabled' : ''} />
-</td>
-
-
-        `;
-        scheduleTableBody.appendChild(row);
-    });
-
-    
-}
-
-document.querySelectorAll('.view-schedule-btn').forEach(button => {
-    button.addEventListener('click', function () {
-        const feeId = this.getAttribute('data-fee-id');
-        const userId = this.getAttribute('data-user-id');
-        const totalAmount = parseFloat(this.getAttribute('data-total-amount'));
-        const duration = parseInt(this.getAttribute('data-duration'));
-        const feeHead = this.getAttribute('data-fee-head');
-
-        populateSchedule(feeId, userId, totalAmount, duration, feeHead);
-        $('#monthlyScheduleModal').modal('show');
-        document.getElementById('confirmPayment').setAttribute('data-user-id', userId);
-    });
-});
-
-document.getElementById('scheduleTableBody').addEventListener('change', function (event) {
-    if (event.target.classList.contains('select-payment')) {
-        const checkbox = event.target;
-        const feeHead = checkbox.getAttribute('data-fee-head');
-
-        if (!selectedSchedules[feeHead]) {
-            selectedSchedules[feeHead] = [];
-        }
-
-        const scheduleObj = {
-            index: parseInt(checkbox.getAttribute('data-index')),
-            month: checkbox.getAttribute('data-month'),
-            due_date: checkbox.getAttribute('data-due-date'),
-            amount: parseFloat(checkbox.getAttribute('data-amount')),
-            payment_date: new Date().toISOString().split('T')[0],
-            payment_time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            status: 'notconfirm'
-        };
-
-        if (checkbox.checked) {
-            if (!selectedSchedules[feeHead].some(item => item.index === scheduleObj.index)) {
-                selectedSchedules[feeHead].push(scheduleObj);
-            }
-        } else {
-            selectedSchedules[feeHead] = selectedSchedules[feeHead].filter(item => item.index !== scheduleObj.index);
-        }
-    }
-});
-
-document.querySelector('.pay-monthly-btn').addEventListener('click', function () {
-    let hasSelection = Object.values(selectedSchedules).some(arr => arr.length > 0);
-    if (!hasSelection) {
-        alert("Please select at least one month to proceed with payment.");
-        return;
-    }
-    $('#paymentModal').modal('show');
-});
-
-document.getElementById('paymentMode').addEventListener('change', function () {
-    const paymentMode = this.value;
-    document.getElementById('upiSection').style.display = (paymentMode === 'UPI') ? 'block' : 'none';
-    document.getElementById('impsSection').style.display = (paymentMode === 'IMPS') ? 'block' : 'none';
-});
-
-document.getElementById('confirmPayment').addEventListener('click', function () {
-    const paymentMode = document.getElementById('paymentMode').value;
-    const userId = this.getAttribute('data-user-id');
-
-    if (!paymentMode) {
-        alert("Please select a payment mode.");
-        return;
-    }
-
-    let hasData = Object.values(selectedSchedules).some(arr => arr.length > 0);
-    if (!hasData) {
-        alert("No months selected for payment.");
-        return;
-    }
-
-    let paidAmount = Object.values(selectedSchedules)
-        .flat()
-        .reduce((acc, item) => acc + parseFloat(item.amount), 0);
-
-       
-
-    $('#confirmPayment').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Processing...');
-    if (Onetime > 0) {
-        paidAmount += Onetime;
-    }
-
-    const paymentData = {
-        _token: '{{ csrf_token() }}',
-        user_id: userId,
-        payment_mode: paymentMode,
-        fee_heads: JSON.stringify(selectedSchedules),
-        paid_amount: paidAmount
-    };
-
-    $.ajax({
-        url: "{{ url('update-payment-status') }}",
-        type: "POST",
-        data: paymentData,
-        success: function (response) {
-            if (response.success) {
-                toastr.success(`Payment via ${paymentMode} was successful`, 'Success');
-                $('#paymentModal').modal('hide');
-
-                // Update paidData with the newly paid months
-                Object.entries(selectedSchedules).forEach(([feeHead, schedules]) => {
-        if (!paidData[feeHead]) {
-            paidData[feeHead] = {
-                duration: currentDuration,
-                schedule: []
-            };
-        }
-
-        schedules.forEach(schedule => {
-            const existing = paidData[feeHead].schedule;
-            if (!existing.some(p => p.index === schedule.index)) {
-                existing.push({ 
-                    ...schedule, 
-                    status: 'Waiting for Confirmation' 
-                });
-            }
-        });
-    });
-   
-    if (Onetime > 0) {
-                    document.getElementById('onetime').innerText = 0;
-                    Onetime = 0; // Prevent re-adding
+                if (!paymentMode) {
+                    toastr.error('Please select a payment mode');
+                    return;
                 }
 
+                const userId = $('.pay-now-btn').data('user-id');
+                const amount = $('.pay-now-btn').data('total-amount');
 
+                // Disable confirm button to prevent multiple submissions
+                $('#confirmPayment').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
 
-             
-                // Clear selected schedules because payment confirmed
-                selectedSchedules = {};
+                // Send AJAX request to update payment status
+                $.ajax({
+                    url: "{{ url('update-payment-status') }}",
+                    type: "POST",
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        user_id: userId,
+                        payment_mode: paymentMode
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(`Payment of ₹${amount} via ${paymentMode} was successful`, 'Success');
 
-                // Refresh the current schedule modal with updated paidData
-                if (currentFeeHead !== null) {
-                    populateSchedule(currentFeeId, currentUserId, currentTotalAmount, currentDuration, currentFeeHead);
-                }
+                            // Close the modal
+                            $('#paymentModal').modal('hide');
 
-            } else {
-                toastr.error(response.message || 'Payment failed.', 'Error');
-            }
-        },
-        error: function (xhr) {
-            const errorMessage = xhr.responseJSON?.message || 'Something went wrong. Please try again.';
-            toastr.error(errorMessage, 'Error');
-        },
-        complete: function () {
-            $('#confirmPayment').prop('disabled', false).html('Confirm Payment');
-        }
-    });
-
-});
-</script>
-
-
-<script>
-    $(document).ready(function() {
-        // Handle form submission
-        function toggleBankName() {
-            var payMode = $('select[name="pay_mode"]').val();
-
-            if (payMode === 'Cash') {
-                $('#bankNameDiv').hide();
-                $('#refNoDiv').hide();
-                $('#bank_name').val('').prop('required', false);
-                $('#ref_no').val('').prop('required', false);
-            } else {
-                $('#bankNameDiv').show();
-                $('#refNoDiv').show();
-                $('#bank_name').prop('required', true);
-                $('#ref_no').prop('required', true);
-            }
-        }
-
-        toggleBankName();
-
-        $('select[name="pay_mode"]').on('change', function() {
-            toggleBankName();
-        });
-
-        $('#paymentForm').on('submit', function(e) {
-            e.preventDefault();
-
-            // Get form data
-            var formData = new FormData(this);
-
-            // Disable submit button to prevent multiple submissions
-            $('#submitPayment').prop('disabled', true);
-
-            // Show loading indicator (optional)
-            $('#submitPayment').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
-
-            $.ajax({
-                url: "{{ url('update-payment') }}",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success(response.message, 'Success');
-
-                        // Close modal after 1.5 seconds
-                        setTimeout(function() {
-                            $('#update-payment').modal('hide');
-                        }, 1500);
-                    } else {
-                        toastr.error(response.message, 'Error');
+                            // Replace button with "Paid" badge
+                            $('.pay-now-btn').replaceWith('<span class="badge bg-success">Paid</span>');
+                        } else {
+                            toastr.error(response.message, 'Error');
+                            $('#confirmPayment').prop('disabled', false).html('Confirm Payment');
+                        }
+                    },
+                    error: function(xhr) {
+                        var errorMessage = xhr.responseJSON && xhr.responseJSON.message
+                            ? xhr.responseJSON.message
+                            : 'Something went wrong. Please try again.';
+                        toastr.error(errorMessage, 'Error');
+                        $('#confirmPayment').prop('disabled', false).html('Confirm Payment');
                     }
-                },
-                error: function(xhr, status, error) {
-                    var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred while processing your request.';
-                    $('#submitPayment').prop('disabled', false);
-                    $('#submitPayment').html('Submit');
-                    toastr.error(errorMessage, 'Error');
-                },
-                complete: function() {
-                    // Re-enable submit button
-                    $('#submitPayment').prop('disabled', false);
-                    $('#submitPayment').html('Submit');
-                    location.reload();
-                }
+                });
             });
         });
+        $(document).ready(function() {
+            // Handle form submission
+            function toggleBankName() {
+                var payMode = $('select[name="pay_mode"]').val();
 
-        $('#update-payment').on('hidden.bs.modal', function() {
-            $('#paymentForm')[0].reset();
+                if (payMode === 'Cash') {
+                    $('#bankNameDiv').hide();
+                    $('#refNoDiv').hide();
+                    $('#bank_name').val('').prop('required', false);
+                    $('#ref_no').val('').prop('required', false);
+                } else {
+                    $('#bankNameDiv').show();
+                    $('#refNoDiv').show();
+                    $('#bank_name').prop('required', true);
+                    $('#ref_no').prop('required', true);
+                }
+            }
+
+            toggleBankName();
+
+            $('select[name="pay_mode"]').on('change', function() {
+                toggleBankName();
+            });
+
+            $('#paymentForm').on('submit', function(e) {
+                e.preventDefault();
+
+                // Get form data
+                var formData = new FormData(this);
+
+                // Disable submit button to prevent multiple submissions
+                $('#submitPayment').prop('disabled', true);
+
+                // Show loading indicator (optional)
+                $('#submitPayment').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
+
+                $.ajax({
+                    url: "{{ url('update-payment') }}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success) {
+                            // Show success message
+                            toastr.success(response.message, 'Success');
+
+                            // Close modal after 1.5 seconds
+                            setTimeout(function() {
+                                $('#update-payment').modal('hide');
+                            }, 1500);
+
+                            // Optionally refresh part of the page or update UI
+                        } else {
+                            // Show error message
+                            toastr.error(response.message, 'Error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle errors
+                        var errorMessage = xhr.responseJSON && xhr.responseJSON.message ?
+                            xhr.responseJSON.message :
+                            'An error occurred while processing your request.';
+                        $('#submitPayment').prop('disabled', false);
+                        $('#submitPayment').html('Submit');
+                        toastr.error(errorMessage, 'Error');
+                    },
+                    complete: function() {
+                        // Re-enable submit button
+                        $('#submitPayment').prop('disabled', false);
+                        $('#submitPayment').html('Submit');
+                        location.reload();
+                    }
+                });
+            });
+
+            // Reset form when modal is closed
+            $('#update-payment').on('hidden.bs.modal', function() {
+                $('#paymentForm')[0].reset();
+            });
+            {{--$(document).on('click', '.pay-now-btn', function() {--}}
+            {{--    var userId = $(this).data('user-id');--}}
+            {{--    var $button = $(this);--}}
+
+            {{--    // Disable button to prevent multiple clicks--}}
+            {{--    $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');--}}
+
+            {{--    $.ajax({--}}
+            {{--        url: "{{ url('update-payment-status') }}", // Define the correct route--}}
+            {{--        type: "POST",--}}
+            {{--        data: {--}}
+            {{--            _token: '{{ csrf_token() }}', // Ensure CSRF protection--}}
+            {{--            user_id: userId--}}
+            {{--        },--}}
+            {{--        success: function(response) {--}}
+            {{--            if (response.success) {--}}
+            {{--                toastr.success(response.message, 'Success');--}}
+
+            {{--                // Replace "Pay Now" button with "Paid" badge--}}
+            {{--                $button.replaceWith('<span class="badge bg-success">Paid</span>');--}}
+            {{--                setTimeout(function() {--}}
+            {{--                    // location.reload()--}}
+            {{--                }, 1500);--}}
+
+            //             } else {
+            //                 toastr.error(response.message, 'Error');
+            //                 $button.prop('disabled', false).html('Pay Now');
+            //             }
+            //         },
+            //         error: function(xhr, status, error) {
+            //             var errorMessage = xhr.responseJSON && xhr.responseJSON.message ?
+            //                 xhr.responseJSON.message :
+            //                 'An error occurred while processing your request.';
+            //             toastr.error(errorMessage, 'Error');
+            //             $button.prop('disabled', false).html('Pay Now');
+            //         }
+            //     });
+            // });
+
+            $('.view-schedule-btn').click(function() {
+                const totalAmount = $(this).data('total-amount');
+                const duration = $(this).data('duration');
+                const feeId = $(this).data('fee-id');
+
+                // Calculate monthly amount
+                const monthlyAmount = totalAmount / duration;
+
+                // Clear previous schedule
+                $('#scheduleTableBody').empty();
+
+                // Generate schedule rows
+                const today = new Date();
+                for (let i = 0; i < duration; i++) {
+                    const dueDate = new Date(today);
+                    dueDate.setMonth(today.getMonth() + i);
+
+                    const row = `
+                        <tr>
+                            <td>Month ${i + 1}</td>
+                            <td>${dueDate.toLocaleDateString()}</td>
+                            <td>₹${monthlyAmount.toFixed(2)}</td>
+                            <td><span class="badge bg-warning">Pending</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-success pay-monthly-btn"
+                                        data-fee-id="${feeId}"
+                                        data-month="${i + 1}"
+                                        data-amount="${monthlyAmount}">
+                                    Pay Now
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    $('#scheduleTableBody').append(row);
+                }
+
+                // Show the modal
+                $('#monthlyScheduleModal').modal('show');
+            });
+
+            // Handle monthly payment button click
+            $('.pay-monthly-btn').click(function() {
+                const feeId = $(this).data('fee-id');
+                const month = $(this).data('month');
+                const amount = $(this).data('amount');
+
+                // Here you can implement the payment logic
+                // For example, redirect to payment gateway or show payment form
+                alert(`Processing payment for Month ${month} - Amount: ${amount.toFixed(2)}`);
+            });
+
         });
-    });
-</script>
-@endsection
-
+    </script>
+    @endsection

@@ -485,9 +485,7 @@
                                                         <div class="col-md-3">
                                                             <select id="other_country" class="form-select" name="country">
                                                                 <option value="">Select</option>
-                                                                @foreach($countries as $country)
-                                                                <option value="{{ $country->id }}" {{ old('country') == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
-                                                                @endforeach
+                                                               
                                                             </select>
                                                             @error('country')
                                                             <div class="text-danger">{{ $message }}</div>
@@ -2044,18 +2042,46 @@
                 }
             });
 
-            // When BWF ID field changes
-            $('#bwf_id').on('input', function() {
-                if ($(this).val().trim() !== '') {
-                    // Country becomes required
-                    $('#country').prop('required', true);
-                } else {
-                    // Only make country required if BAI ID is also empty
-                    if ($('#bai_id').val().trim() === '') {
-                        $('#country').prop('required', false);
-                    }
-                }
+          // When BWF ID field changes
+$('#bwf_id').on('input', function () {
+    const isBwfFilled = $(this).val().trim() !== '';
+    const $country = $('#other_country');
+    const $countryWrapper = $country.closest('.col-md-3');
+
+    if (isBwfFilled) {
+        $country.prop('required', true);
+        $countryWrapper.show(); // Optional: Show wrapper if needed
+        loadCountries(); // Load country list dynamically
+    } else {
+        $country.prop('required', false);
+        // Don't hide, just clear the dropdown
+        $country.html('<option value="">Select Country</option>').val('').trigger('change');
+
+        $('#other_state')
+            .html('<option value="">Select State</option>'); // Clear state dropdown
+    }
+});
+
+function loadCountries() {
+    $.ajax({
+        url: '/get-country',
+        method: 'GET',
+        success: function(data) {
+            var countryDropdown = $('#other_country');
+            countryDropdown.empty();
+            countryDropdown.append('<option value="">Select Country</option>');
+
+            $.each(data, function(key, country) {
+                countryDropdown.append('<option value="' + country.id + '" '  + '>' + country.name + '</option>');
             });
+        },
+        error: function(xhr, status, error) {
+            console.log("Error loading countries: ", status, error);
+            alert("Error loading countries. Please try again.");
+        }
+    });
+}
+
 
             // Ensure the script runs on page load as well
             if ($('#bai_id').val().trim() !== '') {
@@ -2064,7 +2090,7 @@
             }
 
             if ($('#bwf_id').val().trim() !== '') {
-                $('#country').prop('required', true);
+                $('#other_country').prop('required', true);
             }
         });
         $('#batch_name').change(function() {

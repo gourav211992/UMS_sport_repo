@@ -222,10 +222,10 @@
                                                         <label class="form-label">Batch Name <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <select class="form-select" id="batch_name" name="batch_id">
+                                                        <select class="form-select" id="batch_name" name="fee_batch_id">
                                                             <option value="">-----Select Batch-----</option>
                                                             @foreach($batch as $ba)
-                                                                <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif >{{ $ba->batch }}</option>
+                                                                <option value="{{ $ba->id }}" @if ($ba->id == $registration->fee_batch_id) selected @endif >{{ $ba->batch }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -248,10 +248,10 @@
                                                         <label class="form-label">Section <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <select class="form-select" name="section_id" id="section">
+                                                        <select class="form-select" name="fee_section_id" id="section">
                                                             <option value="">-----Select Section-----</option>
                                                             @foreach($sections as $section)
-                                                                <option value="{{ $section->id }}" @if ($section->id == $registration->section_id) selected @endif>{{ $section->section }}</option>
+                                                                <option value="{{ $section->id }}" @if ($section->id == $registration->fee_section_id) selected @endif>{{ $section->section }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -280,11 +280,15 @@
                                                             <label class="form-label">Group <span
                                                                         class="text-danger">*</span></label>
                                                         </div>
+                                                        @php
+                                                       // dd($groups);
+                                                        @endphp
                                                         <div class="col-md-5">
                                                             <select class="form-select" name="group">
                                                                 <option>Select</option>
+
                                                                 @foreach($groups as $group)
-                                                                    <option value="{{$group->id}}" @if($registration->group == $group->id) selected @endif>{{$group->group_name}}</option>
+                                                                    <option value="{{$group->id}}" {{isset($registration->group) ? (($registration->group == $group->id)?'selected':''): ""}}>{{$group->name}}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
@@ -323,8 +327,9 @@
                                                     </div>
                                                     <div class="col-md-5">
                                                         <input type="date" class="form-control" name="doj" id="dojInput"
-                                                               onfocus="this.min=getDate(-1); this.max=getDate(1);"
-                                                               onblur="validateDOJ()" value="{{ $registration->doj }}">
+                                                               onfocus="this.min=getDate(-1);"
+                                                               onblur="validateDOJ()" required
+                                                               value="{{ old('doj', $registration->doj) }}">
                                                         <small id="dojError" class="text-danger"></small>
                                                     </div>
                                                 </div>
@@ -349,15 +354,26 @@
                                                         </div>
                                                     </div>
                                                 @else
+                                                    <div class="appli-photobox">
+                                                        <p id="photoSizeText">Photo Size<br />25mm X 35mm</p>
+                                                        <img id="previewImg" src="{{ old('image') ? asset('storage/' . old('image')) : '' }}" alt="Profile Image" style="max-width: 150px; border-radius: 5px; display: {{ old('image') ? 'block' : 'none' }};">
+                                                    </div>
                                                     <div class="mt-2 text-center">
                                                         <div class="image-uploadhide">
                                                             <label for="imageUpload" class="btn btn-outline-primary btn-sm waves-effect">
                                                                 <i data-feather="upload"></i> Upload Profile Image
                                                             </label>
-                                                            <input type="file" id="imageUpload" name="image" class="d-none">
+                                                            <input type="file" id="imageUpload" name="image" accept="image/*" style="display: none;">
                                                         </div>
+                                                        @error('image')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                        @enderror
                                                     </div>
                                                 @endif
+
+                                                <div class="my-1 text-center">
+                                                    <small class="form-text text-danger ">Upload JPG, JPEG, or PNG<br>(10KB–5MB).</small>
+                                                </div>
 
                                                 <div class="row align-items-center mb-2 mt-4 justify-content-center text-center">
                                                     <div class="col-md-12">
@@ -1282,6 +1298,8 @@
 {{--                                                                        @endif--}}
                                                                     </td>
                                                                 </tr>
+                                                                <input type="hidden" name="fee_details[{{$key}}][payment_mode]" value="{{$fees['payment_mode'] ?? null}}">
+                                                                <input type="hidden" name="fee_details[{{$key}}][duration]" value="{{$fees['duration'] ?? null}}">
                                                             @endforeach
 
                                                             <!-- Add New Row -->
@@ -1413,12 +1431,12 @@
                                                                         </div>
 
                                                                         <div class="col-md-12 mb-1">
-                                                                            <label class="form-label">Payment Document <span class="text-danger"></span></label>
+                                                                            <label class="form-label">Payment Document <span class="text-danger">*</span></label>
                                                                             <input type="file" class="form-control" name="pay_doc" />
                                                                         </div>
 
                                                                          <div class="col-md-12 mb-1">
-                                                                            <label class="form-label">Paid Amount <span class="text-danger"></span></label>
+                                                                            <label class="form-label">Paid Amount <span class="text-danger">*</span></label>
                                                                             <input type="text" class="form-control" name="paid_amount" />
                                                                         </div>
 
@@ -1586,6 +1604,10 @@
                                                     <div class="row">
 
                                                         <div class="col-md-6">
+
+                                                            <div class="mb-2">
+                                                                <small class="form-text text-danger ">Supported formats: JPG, JPEG, PNG, PDF. file size between: 10KB and 5MB</small>
+                                                            </div>
 
                                                             <!-- Identity Proof -->
                                                             <div class="row mb-1">
@@ -1784,6 +1806,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const imageInput = document.getElementById('{{ $registration->image ? "replace-image" : "imageUpload" }}');
+            const previewImg = document.getElementById("previewImg");
+            const photoSizeText = document.getElementById("photoSizeText");
+
+            imageInput.addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewImg.style.display = "block";
+                        if (photoSizeText) photoSizeText.style.display = "none";
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
         $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
@@ -1907,12 +1947,15 @@
                 <td><input type="number" class="form-control net-value" value="${netFeePayableValue.toFixed(2)}" readonly></td>
                 <td>${mandatoryCheckbox}</td>
                 <td>
-                    <button type="button" class="btn btn-sm btn-outline-primary add-sponsor-btn" data-index="${index}" data-bs-toggle="modal" data-bs-target="#sponsorModal">
-                        Add Sponsor
-                    </button>
+                        <a href="#sponsorModal" data-bs-toggle="modal" data-index="${index}">
+                                                                            <span class="btn-outline-primary font-small-2 px25 btn btn-sm">Add Sponsor</span>
+                                                                        </a>
                     ${index !== 0 ? '<a href="#" class="text-danger ms-25 delete-fee-row"><i data-feather="trash-2" class="me-50"></i></a>' : ''}
                 </td>
             </tr>
+
+            <input type="hidden" name="fee_details[${index}][payment_mode]" value="${fee.payment_mode || ''}">
+            <input type="hidden" name="fee_details[${index}][duration]" value="${fee.duration || ''}">
         `;
                     feeTableBody.append(row);
 
@@ -1996,44 +2039,45 @@
                 $('#sponsorAmount').val(currentSponsorship);
             });
             $('#saveSponsor').on('click', function () {
-                let sponsorAmount = Number($('#sponsorAmount').val());
+                let sponsorAmount = parseFloat($('#sponsorAmount').val()) || 0;
                 let index = $('#feeIndex').val();
-                let totalNetFeePayableValue = Number($('#totalNetFeePayableValue').text());
-                let row = $(this).closest('tr');
-                // let netValue = row.find('.net-value').val();
-                const inputValue = document.querySelector(`input[name="fee_details[${index}][total_fees]"]`).value;
-                const netValue = document.querySelector(`input[name="fee_details[${index}][net_value]"]`).value;
-                const sponsorValue = document.querySelector(`input[name="fee_details[${index}][fee_sponsorship_value]"]`).value;
-                let sponsorPercentage = 0;
-                if (netValue > 0) {
-                    sponsorPercentage = (sponsorValue / netValue) * 100;
-                }
-                console.log('row net value:' + inputValue)
-                console.log(feeStructure);
-                console.log('Sponsor amount:', sponsorAmount); // Log sponsorAmount for debugging
-                console.log('Index from modal input:', index); // Log index from the hidden input for debugging
-                console.log('Net fee:', totalNetFeePayableValue); // Log index from the hidden input for debugging
-                // console.log('feeStructure array:', feeStructure); // Log the entire feeStructure array
-                // console.log(`feeStructure[${index}]:`, feeStructure[index]); // Log the specific feeStructure entry
 
-                // Check if the index is valid and the feeStructure entry exists
-                if (!isNaN(sponsorAmount) && sponsorAmount > 0) {
-                    // feeStructure[index].fee_sponsorship_value = sponsorAmount;
-                    // console.log('Sponsorship value updated:', feeStructure[index]); // Log the updated fee structure entry
-                    let totalNetFee = totalNetFeePayableValue - sponsorAmount;
-                    let totalFee = inputValue - sponsorAmount;
-                    let totalNetValue = netValue - sponsorAmount;
-                    let totalSponsor = Number(sponsorValue) + Number(sponsorAmount);
-                    $('#totalNetFeePayableValue').text(totalNetFee);
-                    document.querySelector(`input[name="fee_details[${index}][total_fees]"]`).value = totalFee;
-                    document.querySelector(`input[name="fee_details[${index}][net_value]"]`).value = totalNetValue;
-                    document.querySelector(`input[name="fee_details[${index}][fee_sponsorship_value]"]`).value = totalSponsor;
-                    document.querySelector(`input[name="fee_details[${index}][fee_sponsorship_percent]"]`).value = sponsorPercentage;
-                    $('#sponsorModal').modal('hide'); // Close the modal
-                    // updateFeeTable(feeStructure); // Recalculate and update the fee table
-                } else {
-                    console.error('Invalid index or sponsorship amount.');
+                if (isNaN(sponsorAmount) || sponsorAmount <= 0) {
+                    alert('Please enter a valid sponsorship amount');
+                    return;
                 }
+
+                // Get the current row values
+                let row = $('#feeTable tbody tr').eq(index);
+                let totalFee = parseFloat(row.find('input[name^="fee_details['+index+'][total_fees]"]').val()) || 0;
+                let currentSponsorshipValue = parseFloat(row.find('input[name^="fee_details['+index+'][fee_sponsorship_value]"]').val()) || 0;
+                let currentNetValue = parseFloat(row.find('input[name^="fee_details['+index+'][net_value]"]').val()) || 0;
+
+                // Calculate new values
+                let newSponsorshipValue = currentSponsorshipValue + sponsorAmount;
+                let newNetValue = currentNetValue - sponsorAmount;
+                let sponsorshipPercent = (newSponsorshipValue / totalFee) * 100;
+
+                // Update the row fields
+                row.find('input[name^="fee_details['+index+'][fee_sponsorship_value]"]').val(newSponsorshipValue.toFixed(2));
+                row.find('input[name^="fee_details['+index+'][fee_sponsorship_percent]"]').val(sponsorshipPercent.toFixed(2));
+                row.find('input[name^="fee_details['+index+'][net_value]"]').val(newNetValue.toFixed(2));
+
+                // Update the total discount and net values
+                let discountValue = parseFloat(row.find('.discount-value').val()) || 0;
+                let totalDiscountValue = newSponsorshipValue + discountValue;
+                let totalDiscountPercent = (totalDiscountValue / totalFee) * 100;
+                let netPercent = 100 - totalDiscountPercent;
+
+                row.find('.total-discount-value').val(totalDiscountValue.toFixed(2));
+                row.find('.total-discount-percent').val(totalDiscountPercent.toFixed(2));
+                row.find('.net-percent').val(netPercent.toFixed(2));
+
+                // Update the total fees
+                updateTotalFee();
+
+                // Close the modal
+                $('#sponsorModal').modal('hide');
             });
             $(document).on('change', '.sponsorship-percent', function() {
                 let row = $(this).closest('tr');
@@ -2319,10 +2363,10 @@
             });
 
             // Ensure the script runs on page load as well
-            if ($('#bai_id').val().trim() !== '') {
+            // if ($('#bai_id').val().trim() !== '') {
                 $('#country').val(101).trigger('change');
                 loadStates(101, 'other');
-            }
+            // }
 
             if ($('#bwf_id').val().trim() !== '') {
                 $('#country').prop('required', true);
@@ -2387,12 +2431,11 @@
         }
 
         // Calculate date X years ago
-        function getDate(yearsAgo) {
+        function getDate(yearsOffset) {
             let d = new Date();
-            d.setFullYear(d.getFullYear() + yearsAgo);
+            d.setFullYear(d.getFullYear() + yearsOffset);
             return d.toISOString().split('T')[0];
         }
-
         // Calculate age on page load if DOB exists
         document.addEventListener('DOMContentLoaded', function() {
             if (document.getElementById('dobInput').value) {
@@ -2401,15 +2444,27 @@
         });
 
         function validateDOJ() {
-            let doj = document.getElementById("dojInput").value;
-            let minDate = getDate(-1);
-            let maxDate = getDate(0);
+            let dojInput = document.getElementById("dojInput");
             let errorField = document.getElementById("dojError");
 
-            if (doj < minDate || doj > maxDate) {
-                errorField.textContent = "You can only select a date within the last 1 year.";
+            // Calculate date 1 year ago from today
+            let today = new Date();
+            let oneYearAgo = new Date();
+            oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+            // Convert to YYYY-MM-DD format
+            let minDate = oneYearAgo.toISOString().split('T')[0];
+
+            // Set the min attribute on the input field
+            dojInput.min = minDate;
+
+            // Validate the selected date
+            if (dojInput.value && new Date(dojInput.value) < oneYearAgo) {
+                // errorField.textContent = "Date of joining cannot be more than 1 year in the past.";
+                return false;
             } else {
                 errorField.textContent = "";
+                return true;
             }
         }
         $(document).ready(function () {
@@ -2761,24 +2816,6 @@
             });
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const imageInput = document.getElementById('{{ $registration->image ? "replace-image" : "imageUpload" }}');
-            const previewImg = document.getElementById("previewImg");
-            const photoSizeText = document.getElementById("photoSizeText");
-
-            imageInput.addEventListener("change", function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImg.src = e.target.result;
-                        previewImg.style.display = "block";
-                        if (photoSizeText) photoSizeText.style.display = "none";
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        });
         function saveDraft() {
             document.getElementById('status').value = 'on-hold';
             document.getElementById('postRegister').submit();

@@ -114,8 +114,8 @@
                                                 </div>
 
                                                 <div class="col-md-3">
-                                                    <select class="form-select select2" disabled id="group" name="group">
-                                                        <option value="{{ $data->groupRelation->name }}" selected>
+                                                    <select class="form-select select2" disabled>
+                                                        <option value="{{ $data->groupRelation->name ?? '' }}" selected>
                                                             {{ ucfirst($data->groupRelation->name ?? '') }}</option>
                                                     </select>
                                                 </div>
@@ -131,23 +131,10 @@
 
                                                 <div class="col-md-5">
                                                     <select class="form-select select2" disabled>
-                                                        <option value="" disabled selected>-- Select Trainer
-                                                            --</option>
-                                                        @foreach ($trainers as $item)
-                                                            <option value={{ $item['id'] }}
-                                                                {{ $item['id'] == $data->trainer ? 'selected' : '' }}>
-                                                                {{ ucfirst($item['name']) }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                
-                                                <!-- <div class="col-md-5">
-                                                    <select class="form-select select2" disabled>
                                                         <option value="{{ $data->trainer }}">{{ ucfirst($data->trainer) }}
                                                         </option>
                                                     </select>
-                                                </div> -->
+                                                </div>
                                             </div>
 
                                             <div class="row align-items-center mb-1">
@@ -407,8 +394,7 @@
                                                                             <td class="poprod-decpt">{{ $index + 1 }}
                                                                             </td>
                                                                             <td class="poprod-decpt">
-                                                                                <strong>{{ $day }}</strong>
-                                                                            </td>
+                                                                                <strong>{{ $day }}</strong></td>
 
                                                                             {{-- Start Time --}}
                                                                             <td class="poprod-decpt">
@@ -475,8 +461,6 @@
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
 
     <script>
         $(document).ready(function() {
@@ -603,250 +587,216 @@
     </script>
 
     <script>
-    $(document).ready(function() {
-        const selectedGroup = "{{ $data->group }}";
+        $(document).ready(function() {
+            const selectedGroup = "{{ $data->group }}";
 
-        $('#section').change(function() {
-            var section = $(this).val();
-            $('#group').html('<option value="" selected>-----Select Group-----</option>');
+            $('#section').change(function() {
+                var section = $(this).val();
+                $('#group').html('<option value="" selected>-----Select Group-----</option>');
 
-            if (section) {
-                $.ajax({
-                    url: "{{ route('get.section.group.activity') }}",
-                    type: "POST",
-                    data: {
-                        section: section,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if (response.length > 0) {
-                            $.each(response, function(index, item) {
-                                let isSelected = (item.id == selectedGroup) ?
-                                    'selected' : '';
-                                $('#group').append(
-                                    '<option value="' + item.id + '" ' +
-                                    isSelected + '>' + item.name + '</option>'
-                                );
-                            });
-                            $('#group').prop('disabled', false);
+                if (section) {
+                    $.ajax({
+                        url: "{{ route('get.section.group.activity') }}",
+                        type: "POST",
+                        data: {
+                            section: section,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.length > 0) {
+                                $.each(response, function(index, item) {
+                                    let isSelected = (item.id == selectedGroup) ?
+                                        'selected' : '';
+                                    $('#group').append(
+                                        '<option value="' + item.id + '" ' +
+                                        isSelected + '>' + item.name + '</option>'
+                                    );
+                                });
+                                $('#group').prop('disabled', false);
+                            } else {
+                                $('#group').prop('disabled', true);
+                            }
+                        }
+                    });
+                } else {
+                    $('#group').prop('disabled', true);
+                }
+            });
+            const sectionVal = $('#section').val();
+            if (sectionVal) {
+                $('#section').trigger('change');
+            }
+        });
+    </script>
 
-                            if (selectedGroup) {
-                                $('#group').val(selectedGroup).trigger('change').attr('disabled');
+    <script>
+        let preselectedStudents = @json($selectedStudentIds ?? []);
+        console.log(preselectedStudents);
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#section').on('change', function() {
+                let sectionId = $(this).val();
+
+                if (sectionId) {
+                    $('#section-data').html(
+                        '<tr><td colspan="6" class="text-center">Loading students...</td></tr>');
+
+                    $.ajax({
+                        url: "{{ route('get_batch_student') }}",
+                        type: "POST",
+                        data: {
+                            section_id: sectionId,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            let rows = '';
+
+                            if (response.length > 0) {
+                                $.each(response, function(index, student) {
+                                    let matched = preselectedStudents.find(s => s.id ==
+                                        student.id);
+                                    let isChecked = matched?.isChecked ? 'checked' : '';
+                                    let reason = (matched?.reason) ?? '';
+
+                                    rows += `
+                                    <tr>
+                                        <td>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input student-checkbox" disabled type="checkbox" name="batch_student[]" value="${student.id}" ${isChecked}>
+                                            </div>
+                                        </td>
+                                        <td><strong>${student.document_number ?? 'N/A'}</strong></td>
+                                        <td>${student.name ?? 'N/A'}</td>
+                                        <td>${student.last_name ?? 'N/A'}</td>
+                                        <td>${formatDate(student.document_date)}</td>
+                                        <td>
+                                            <input type="text" class="form-control mw-100 student-reason" data-student-id="${student.id}" placeholder="Enter reason" value="${reason}" disabled>
+                                        </td>
+                                    </tr>
+                                `;
+                                });
+                            } else {
+                                rows =
+                                    `<tr><td colspan="6" class="text-center">No students found for this section.</td></tr>`;
                             }
 
-                        } else {
-                            $('#group').prop('disabled', true);
+                            $('#section-data').html(rows);
+                            toggleSelectAllCheckbox();
+                            toggleReasonVisibility();
+                        },
+                        error: function(xhr) {
+                            console.error('AJAX error:', xhr.responseText);
+                            $('#section-data').html(
+                                '<tr><td colspan="6" class="text-danger text-center">Something went wrong</td></tr>'
+                                );
                         }
+                    });
+                } else {
+                    $('#section-data').html('');
+                }
+            });
+
+            $('#submit').on('click', function(e) {
+                e.preventDefault();
+
+                let batchStudents = [];
+                let allValid = true;
+
+                $('#section-data tr').each(function() {
+                    let $checkbox = $(this).find('input[name="batch_student[]"]');
+                    let studentId = $checkbox.val();
+                    let isChecked = $checkbox.prop('checked');
+                    let reason = $(this).find('.student-reason').val().trim();
+
+                    if (!isChecked && reason === '') {
+                        $(this).find('.student-reason').addClass('is-invalid');
+                        allValid = false;
+                    } else {
+                        $(this).find('.student-reason').removeClass('is-invalid');
+                        batchStudents.push({
+                            id: studentId,
+                            isChecked: isChecked,
+                            reason: reason
+                        });
                     }
-
                 });
-            } else {
-                $('#group').prop('disabled', true);
-            }
-        });
-        const sectionVal = $('#section').val();
-        if (sectionVal) {
-            $('#section').trigger('change');
-        }
-    });
-    </script>
-    
-    <script>
-    let preselectedStudents = @json($selectedStudentIds ?? []);
-    console.log(preselectedStudents);
-    </script>
-    
-    <script>
-    $(document).ready(function() {
-        $('#group').on('change', function() {
-            let GroupId = $(this).val();
 
-            if (GroupId) {
-                $('#section-data').html(
-                    '<tr><td colspan="6" class="text-center">Loading students...</td></tr>');
+                if (!allValid) {
+                    alert("Please fill reason for all unchecked students.");
+                    return;
+                }
+
+                let form = $('#form')[0];
+                let formData = new FormData(form);
+                formData.append('batch_students', JSON.stringify(batchStudents));
 
                 $.ajax({
-                    url: "{{ route('get_batch_student') }}",
-                    type: "POST",
-                    data: {
-                        group_id: GroupId,
-                        _token: '{{ csrf_token() }}'
-                    },
+                    url: "{{ route('activity-scheduler-edit', $data->id) }}",
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
                     success: function(response) {
-                        let rows = '';
-
-                        if (response.length > 0) {
-                            $.each(response, function(index, student) {
-                                let matched = preselectedStudents.find(s => s.id ==
-                                    student.id);
-                                let isChecked = matched?.isChecked ? 'checked' : '';
-                                let reason = (matched?.reason) ?? '';
-
-                                rows += `
-                                <tr>
-                                    <td>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input student-checkbox" type="checkbox" name="batch_student[]" value="${student.id}" ${isChecked}>
-                                        </div>
-                                    </td>
-                                    <td><strong>${student.document_number ?? 'N/A'}</strong></td>
-                                    <td>${student.name ?? 'N/A'}</td>
-                                    <td>${student.last_name ?? 'N/A'}</td>
-                                    <td>${formatDate(student.document_date)}</td>
-                                    <td>
-                                        <input type="text" class="form-control mw-100 student-reason" data-student-id="${student.id}" placeholder="Enter reason" value="${reason}">
-                                    </td>
-                                </tr>
-                            `;
-                            makeReadOnly();
-
-                            });
-                        } else {
-                            rows =
-                                `<tr><td colspan="6" class="text-center">No students found for this Group.</td></tr>`;
-                        }
-
-                        $('#section-data').html(rows);
-                        toggleSelectAllCheckbox();
-                        toggleReasonVisibility();
+                        window.location.href = response.redirect;
+                        console.log('Success:', response);
                     },
                     error: function(xhr) {
-                        console.error('AJAX error:', xhr.responseText);
-                        $('#section-data').html(
-                            '<tr><td colspan="6" class="text-danger text-center">Something went wrong</td></tr>'
-                            );
+                        $('#form-errors').html('');
+
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let errorMessages = '';
+                            $.each(errors, function(key, message) {
+                                errorMessages += `<div>${message}</div>`;
+                            });
+
+                            $('#form-errors').html(`<div>${errorMessages}</div>`).show();
+                        } else {
+                            $('#form-errors').html(
+                                `<div>Something went wrong with the request. Please try again.</div>`
+                                ).show();
+                        }
                     }
                 });
-            } else {
-                $('#section-data').html('');
-            }
-        });
-
-        $('#submit').on('click', function(e) {
-            e.preventDefault();
-
-            let batchStudents = [];
-            let allValid = true;
-
-            $('#section-data tr').each(function() {
-                let $checkbox = $(this).find('input[name="batch_student[]"]');
-                let studentId = $checkbox.val();
-                let isChecked = $checkbox.prop('checked');
-                let reason = $(this).find('.student-reason').val().trim();
-
-                if (!isChecked && reason === '') {
-                    $(this).find('.student-reason').addClass('is-invalid');
-                    allValid = false;
-                } else {
-                    $(this).find('.student-reason').removeClass('is-invalid');
-                    batchStudents.push({
-                        id: studentId,
-                        isChecked: isChecked,
-                        reason: reason
-                    });
-                }
             });
 
-            if (!allValid) {
-                alert("Please fill reason for all unchecked students.");
-                return;
+            const editingSectionId = $('#section').val();
+            if (editingSectionId) {
+                $('#section').trigger('change');
             }
 
-            let form = $('#form')[0];
-            let formData = new FormData(form);
-            formData.append('batch_students', JSON.stringify(batchStudents));
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const parts = dateString.split("-");
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
 
-            $.ajax({
-                url: "{{ route('activity-scheduler-edit', $data->id) }}",
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    window.location.href = response.redirect;
-                    console.log('Success:', response);
-                },
-                error: function(xhr) {
-                    $('#form-errors').html('');
+            function toggleReasonVisibility() {
+                $('.student-checkbox').each(function() {
+                    const $checkbox = $(this);
+                    const $reasonInput = $checkbox.closest('tr').find('.student-reason');
 
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        let errorMessages = '';
-                        $.each(errors, function(key, message) {
-                            errorMessages += `<div>${message}</div>`;
-                        });
-
-                        $('#form-errors').html(`<div>${errorMessages}</div>`).show();
+                    if ($checkbox.is(':checked')) {
+                        $reasonInput.closest('td').hide();
+                        $reasonInput.val('');
                     } else {
-                        $('#form-errors').html(
-                            `<div>Something went wrong with the request. Please try again.</div>`
-                            ).show();
+                        $reasonInput.closest('td').show();
                     }
-                }
-            });
+                });
+            }
+
+
         });
 
-        const editingSectionId = $('#section').val();
-        if (editingSectionId) {
-            $('#section').trigger('change');
+
+        function disableFormElements() {
+            $('input, select, textarea, button').prop('disabled', true);
         }
-
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            const parts = dateString.split("-");
-            return `${parts[2]}-${parts[1]}-${parts[0]}`;
-        }
-
-        function toggleReasonVisibility() {
-            $('.student-checkbox').each(function() {
-                const $checkbox = $(this);
-                const $reasonInput = $checkbox.closest('tr').find('.student-reason');
-
-                if ($checkbox.is(':checked')) {
-                    $reasonInput.closest('td').hide();
-                    $reasonInput.val('');
-                } else {
-                    $reasonInput.closest('td').show();
-                }
-            });
-        }
-
-        $(document).on('change', '#select-all-students', function() {
-            const isChecked = $(this).is(':checked');
-            $('.student-checkbox').prop('checked', isChecked);
-            toggleReasonVisibility();
-        });
-
-        $(document).on('change', '.student-checkbox', function() {
-            toggleSelectAllCheckbox();
-            toggleReasonVisibility();
-        });
-
-        function toggleSelectAllCheckbox() {
-            const total = $('.student-checkbox').length;
-            const selected = $('.student-checkbox:checked').length;
-            $('#select-all-students').prop('checked', total > 0 && total === selected);
-        }
-    });
+        $(document).ready(function() {
+            disableFormElements();
+        })
     </script>
     
-    <script>
-
-    function makeReadOnly() {
-
-        const elements = document.querySelectorAll('input, select, textarea','a');
-
-        elements.forEach(element => {
-
-            element.disabled = true;  
-
-        });
-
-    }
-
-    window.onload = makeReadOnly();
-
-    </script>
-
-
 @endsection

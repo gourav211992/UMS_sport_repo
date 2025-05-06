@@ -456,8 +456,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <!-- BAI ID -->
-                                                    <div class="row mb-1 align-items-center">
+                                                    <!-- <div class="row mb-1 align-items-center">
                                                         <div class="col-md-2">
                                                             <label class="form-label">BAI ID <span class="text-danger">*</span></label>
                                                         </div>
@@ -486,7 +485,6 @@
                                                             @enderror
                                                         </div>
                                                     </div>
-                                                    <!-- BWF ID -->
                                                     <div class="row align-items-center mb-1">
                                                         <div class="col-md-2">
                                                             <label class="form-label">BWF ID <span class="text-danger">*</span></label>
@@ -513,7 +511,62 @@
                                                             <div class="text-danger">{{ $message }}</div>
                                                             @enderror
                                                         </div>
+                                                    </div> -->
+
+                                                   
+
+                                                    <div class="row mb-1 align-items-center">
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">BAI ID</label>
+                                                        </div>
+                                                        <div class="col-md-3 mb-sm-0 mb-1">
+                                                            <input type="text" class="form-control" name="bai_id" value="{{ old('bai_id',$registration->bai_id) }}" id="bai_id">
+                                                            @error('bai_id')
+                                                            <div class="text-danger">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">BAI State</label>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <select id="other_state" class="form-select" name="bai_state">
+                                                                <option value="">Select State</option>
+
+                                                            </select>
+                                                            @error('bai_state')
+                                                            <div class="text-danger">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
                                                     </div>
+
+                                                    <div class="row mb-1 align-items-center">
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">BWF ID</label>
+                                                        </div>
+                                                        <div class="col-md-3 mb-sm-0 mb-1">
+                                                            <input type="text" class="form-control" name="bwf_id" value="{{ old('bwf_id', $registration->bwf_id) }}" id="bwf_id">
+                                                            @error('bwf_id')
+                                                            <div class="text-danger">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label class="form-label">Country</label>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <select id="country" class="form-select" name="country">
+                                                                <option value="">Select Country</option>
+                                                                <!-- @foreach($countries as $country)
+                                                                    <option value="{{ $country->id }}" {{ old('country', $registration->country) == $country->id ? 'selected' : '' }}>
+                                                                        {{ $country->name }}
+                                                                    </option>
+                                                                @endforeach -->
+                                                            </select>
+                                                            @error('country')
+                                                            <div class="text-danger">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
+
                                                     </div>
                                                 <div class="tab-pane" id="Address">
                                                     <div class="row">
@@ -1285,7 +1338,7 @@ foreach ($feeDetails as $fees) {
                                                                 <td></td>
                                                                 <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
                                                                 <td class="fw-bolder text-dark font-large-1">{{ $totalNetFeePayableValue }}</td>
-                                                                <td>
+                                                                <!-- <td>
                                                                     @if($user->payment_status == 'paid')
                                                                         <span class="badge bg-success">Paid</span>
                                                                     @else
@@ -1296,7 +1349,7 @@ foreach ($feeDetails as $fees) {
                                                                                 data-total-amount="{{ $totalNetFeePayableValue }}">Pay Now</button>
                                                                     @endif
                                                                     <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>
-                                                                </td>
+                                                                </td> -->
                                                             </tr>
                                                             </tbody>
                                                         </table>
@@ -1666,41 +1719,157 @@ foreach ($feeDetails as $fees) {
                 });
             });
         });
-        $(document).ready(function() {
-            // When BAI ID field changes
-            $('#bai_id').on('input', function() {
-                if ($(this).val().trim() !== '') {
-                    // Set country to India (assuming India's ID is 101)
-                    $('#country').val(101).trigger('change');
 
-                    // Load Indian states
-                    loadStates(101, 'other');
-                }
+        
+
+
+//add this script into profile-registration.blade.php
+
+
+$(document).ready(function () {
+    function handleBAI() {
+    const baiValue = $('#bai_id').val().trim();
+
+    if (baiValue !== '') {
+        // $('#country').val(101).trigger('change');
+        loadStates(101, 'other', '{{ old('bai_state', $registration->bai_state) }}'); // pass selected state
+    } else {
+        // $('#country').val('').trigger('change');
+        $('#other_state').empty().append('<option value="">Select State</option>');
+    }
+
+    // Bind event after initial load
+    $('#bai_id').on('change', function() {
+        if ($(this).val().trim() !== '') {
+            // $('#country').val(101).trigger('change');
+            loadStates(101, 'other');
+        } else {
+            // $('#country').val('').trigger('change');
+            $('#other_state').empty().append('<option value="">Select State</option>');
+        }
+    });
+}
+
+
+    function handleBWF() {
+        const bwfValue = $('#bwf_id').val().trim();
+        const selectedCountry = '{{ old('country', $registration->country) }}';
+
+        if (bwfValue !== '') {
+            $('#country').prop('required', true);
+            loadCountries(selectedCountry);
+        } else {
+            $('#country')
+                .prop('required', false)
+                .html('<option value="">Select Country</option>')
+                .val('').trigger('change');
+            // $('#other_state').html('<option value="">Select State</option>');
+        }
+    }
+
+    // Event bindings
+    $('#bai_id').on('input', handleBAI);
+    $('#bwf_id').on('input', handleBWF);
+
+    // Initial trigger on page load
+    handleBAI();
+    handleBWF();
+});
+
+
+
+function loadStates(countryId, type, selectedState = '') {
+    console.log('Calling loadStates with countryId:', countryId, 'selectedState:', selectedState);
+
+    $.ajax({
+        url: '/get-states/' + countryId,
+        method: 'GET',
+        success: function (states) {
+            console.log('States loaded:', states);
+
+            let options = '<option value="">Select State</option>';
+            $.each(states, function (i, state) {
+                const selected = state.id == selectedState ? 'selected' : '';
+                options += `<option value="${state.id}" ${selected}>${state.name}</option>`;
             });
+            $('#other_state').html(options);
+        },
+        error: function () {
+            console.error('Error loading states.');
+        }
+    });
+}
 
-            // When BWF ID field changes
-            $('#bwf_id').on('input', function() {
-                if ($(this).val().trim() !== '') {
-                    // Country becomes required
-                    $('#country').prop('required', true);
-                } else {
-                    // Only make country required if BAI ID is also empty
-                    if ($('#bai_id').val().trim() === '') {
-                        $('#country').prop('required', false);
-                    }
-                }
+function loadCountries(selectedCountry = '') {
+    console.log('Calling loadCountries with selectedCountry:', selectedCountry);
+
+    $.ajax({
+        url: '/get-country',
+        method: 'GET',
+        success: function (countries) {
+            console.log('Countries loaded:', countries); // Add this
+
+            let options = '<option value="">Select Country</option>';
+            $.each(countries, function (i, country) {
+                const selected = country.id == selectedCountry ? 'selected' : '';
+                options += `<option value="${country.id}" ${selected}>${country.name}</option>`;
             });
+            $('#country').html(options).val(selectedCountry).trigger('change');
+        },
+        error: function () {
+            console.error('Error loading countries.');
+        }
+    });
+}
 
-            // Ensure the script runs on page load as well
-            if ($('#bai_id').val().trim() !== '') {
-                $('#country').val(101).trigger('change');
-                loadStates(101, 'other');
-            }
 
-            if ($('#bwf_id').val().trim() !== '') {
-                $('#country').prop('required', true);
-            }
-        });
+// function loadCountries() {
+//     $.ajax({
+//         url: '/get-country',
+//         method: 'GET',
+//         success: function(data) {
+//             var countryDropdown = $('#country');
+//             var selectedCountry = "{{ old('country', $registration->country) }}";
+
+//             countryDropdown.empty();
+//             countryDropdown.append('<option value="">Select Country</option>');
+
+//             $.each(data, function(key, country) {
+//                 var isSelected = (country.id == selectedCountry) ? 'selected' : '';
+//                 countryDropdown.append('<option value="' + country.id + '" ' + isSelected + '>' + country.name + '</option>');
+//             });
+//         },
+//         error: function(xhr, status, error) {
+//             console.log("Error loading countries: ", status, error);
+//             alert("Error loading countries. Please try again.");
+//         }
+//     });
+// }
+
+// function loadStates(countryId, type) {
+//     $.ajax({
+//         url: '/get-states/' + countryId, 
+//         method: 'GET',
+//         success: function(data) {
+//             var stateDropdown = $('#' + type + '_state');
+//             var selectedState = "{{ old('bai_state', $registration->bai_state) }}"; 
+
+//             stateDropdown.empty();
+//             stateDropdown.append('<option value="">Select State</option>');
+
+//             $.each(data, function(key, state) {
+//                 var isSelected = (state.id == selectedState) ? 'selected' : '';
+//                 stateDropdown.append('<option value="' + state.id + '" ' + isSelected + '>' + state.name + '</option>');
+//             });
+//         },
+//         error: function(xhr, status, error) {
+//             console.log("Error loading states: ", status, error);
+//             alert("Error loading states. Please try again.");
+//         }
+//     });
+// } 
+
+
         $(document).ready(function() {
             $('#batch_name').change(function() {
                 let batchId = $(this).val();
@@ -1829,7 +1998,7 @@ foreach ($feeDetails as $fees) {
                     }
                 });
 
-                // Add total row
+//                 // Add total row
                 feeTableBody.append(`
         <tr>
             <td></td>

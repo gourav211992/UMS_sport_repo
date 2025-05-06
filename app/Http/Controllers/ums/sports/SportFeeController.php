@@ -240,9 +240,9 @@ class SportFeeController extends Controller
             $sportFeeMaster->admission_year = $request->admission_year;
             $sportFeeMaster->sport_name = $request->sport_name;
             $sportFeeMaster->batch = $request->batch_name;
-            $batch_id = SportBatch::where('batch_name', '=', $request->batch_name)->first()->id;
-            $sportFeeMaster->batch_id = $batch_id;
             $sportFeeMaster->batch_year= $request->batch_year;
+            $batch_id = SportBatch::where('batch_name', '=', $request->batch_name)->where('batch_year' ,$request->batch_year)->first()->id;
+            $sportFeeMaster->batch_id = $batch_id;
 
             $sportFeeMaster->section = $request->section;
             $sportFeeMaster->quota = $request->quota;

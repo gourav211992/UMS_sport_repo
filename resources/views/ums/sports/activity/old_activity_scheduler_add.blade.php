@@ -160,7 +160,7 @@
 
                                                 <!-- Rows will appear here -->
 
-                                                <!-- <div class="row align-items-center mb-1">
+                                                <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Trainer <span
                                                                 class="text-danger">*</span></label>
@@ -175,26 +175,7 @@
 
                                                         </select>
                                                     </div>
-                                                </div> -->
-
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Trainer <span
-                                                                class="text-danger">*</span></label>
-                                                    </div>
-
-                                                    <div class="col-md-5">
-                                                        <select class="form-select" name="trainer" id="trainer">
-                                                            <option value="">-----Select Trainer-----</option>
-                                                            @foreach ($trainers as $item)
-                                                                <option value={{ $item['id'] }}>
-                                                                    {{ $item['name'] }}</option>
-                                                            @endforeach
-
-                                                        </select>
-                                                    </div>
-                                                </div>div>
-
+                                                </div>
 
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
@@ -389,7 +370,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody id="section-data">
-
+                                                        <!-- Student rows will be populated here -->
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -416,19 +397,19 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
     <script>
         $(document).ready(function() {
 
-            $('#group').on('change', function() {
-                var GroupId = $(this).val();
+            // AJAX to load students based on section
+            $('#section').on('change', function() {
+                var sectionId = $(this).val();
 
-                if (GroupId) {
+                if (sectionId) {
                     $.ajax({
-                        url: "{{ route('get_batch_student') }}",
+                        url: "{{ route('get_batch_student') }}", // Your Laravel route
                         type: "POST",
                         data: {
-                            group_id: GroupId,
+                            section_id: sectionId,
                             _token: '{{ csrf_token() }}'
                         },
                         success: function(response) {
@@ -453,11 +434,11 @@
                                 });
                             } else {
                                 rows =
-                                    `<tr><td colspan="6" class="text-center">No students found for this Group.</td></tr>`;
+                                    `<tr><td colspan="6" class="text-center">No students found for this section.</td></tr>`;
                             }
 
                             $('#section-data').html(rows);
-                            $('#selectAll').prop('checked', false);
+                            $('#selectAll').prop('checked', false); // reset Select All checkbox
                         },
                         error: function(xhr) {
                             console.log('AJAX error:', xhr.responseText);
@@ -472,6 +453,7 @@
                 }
             });
 
+            // Format date from yyyy-mm-dd to dd-mm-yyyy
             function formatDate(dateString) {
                 if (!dateString) return 'N/A';
                 const parts = dateString.split("-");
@@ -486,6 +468,7 @@
                 });
             });
 
+            // Individual checkbox change
             $(document).on('change', '.student-checkbox', function() {
                 let allChecked = $('.student-checkbox').length === $('.student-checkbox:checked').length;
                 $('#selectAll').prop('checked', allChecked);
@@ -494,16 +477,18 @@
                 toggleReasonInput($(this), isChecked);
             });
 
+            // Function to toggle reason input visibility
             function toggleReasonInput(checkbox, isChecked) {
                 let reasonInput = checkbox.closest('tr').find('.student-reason');
 
                 if (isChecked) {
-                    reasonInput.closest('td').hide();
+                    reasonInput.closest('td').hide(); // Hide entire cell
                 } else {
-                    reasonInput.closest('td').show();
+                    reasonInput.closest('td').show(); // Show cell again
                 }
             }
 
+            // Submit button logic
 
         });
     </script>
@@ -517,16 +502,19 @@
             let batchStudents = [];
             let allReasonsValid = true;
 
+            // Iterate through each row in #section-data
             $('#section-data tr').each(function() {
                 let studentId = $(this).find('input[name="batch_student[]"]').val();
                 let studentReason = $(this).find('.student-reason').val()
-                    .trim();
+            .trim(); // assuming you have input field with class 'student-reason'
                 let isChecked = $(this).find('input[name="batch_student[]"]').prop('checked');
 
+                // Check if student is unchecked and reason is empty
                 if (!isChecked && studentReason === '') {
                     allReasonsValid = false;
                     $(this).find('.student-reason').addClass('is-invalid');
                 } else {
+                    // Remove invalid class and push data to batchStudents
                     $(this).find('.student-reason').removeClass('is-invalid');
                     batchStudents.push({
                         id: studentId,
@@ -536,36 +524,39 @@
                 }
             });
 
-
+            // If any unchecked student doesn't have a reason, show an alert
             if (!allReasonsValid) {
                 alert('Please enter a reason for all unchecked students.');
                 return;
             }
 
+            // Prepare form data
             let form = $('#form')[0];
             let formData = new FormData(form);
 
-            formData.append('batch_students', JSON.stringify(batchStudents));
+            // Append batch_students array manually to the FormData object
+            formData.append('batch_students', JSON.stringify(batchStudents)); // Convert array to JSON string
 
+            // Perform the AJAX request
             $.ajax({
                 url: "{{ route('activity-scheduler-add') }}",
                 type: 'POST',
                 data: formData,
-                contentType: false,
-                processData: false,
+                contentType: false, // Let jQuery set contentType to multipart/form-data
+                processData: false, // Don't let jQuery process the data
                 success: function(response) {
                     window.location.href = response.redirect;
                     console.log('Success:', response);
                 },
                 error: function(xhr) {
                     let errorDiv = $('#form-errors');
-                    errorDiv.hide().html('');
+                    errorDiv.hide().html(''); // Clear previous errors
 
                     if (xhr.responseJSON && xhr.responseJSON.errors) {
                         let errors = xhr.responseJSON.errors;
                         let messages = '';
 
-
+                        // Loop through all errors and append to the messages
                         $.each(errors, function(key, value) {
                             messages += `<p>${value}</p>`;
                         });

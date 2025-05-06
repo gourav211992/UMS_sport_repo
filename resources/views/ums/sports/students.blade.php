@@ -113,7 +113,7 @@
                                             <h4>{{ $totalRegisteredStudents }}</h4>
 
                                         </div>
-                                        <p>Total<br>Registeration</p>
+                                        <p>Total<br>Registration</p>
                                     </div>
                                 </div>
 
@@ -299,12 +299,16 @@
                                                             <i data-feather="edit" class="me-50"></i>
                                                             <span>View Detail</span>
                                                         </a>
-                                                        @if( $student->status != 'approved')
                                                         <a class="dropdown-item" href="{{route('edit-registration',$student->id)}}">
                                                             <i data-feather="edit-3" class="me-50"></i>
                                                             <span>Edit</span>
                                                         </a>
-                                                        @endif
+                                                        <!-- @if( $student->status != 'approved') -->
+                                                        <!-- <a class="dropdown-item" href="{{route('edit-registration',$student->id)}}">
+                                                            <i data-feather="edit-3" class="me-50"></i>
+                                                            <span>Edit</span>
+                                                        </a> -->
+                                                        <!-- @endif -->
                                                         <!-- <a class="dropdown-item" href="#">
                                                             <i data-feather="trash-2" class="me-50"></i>
                                                             <span>Delete</span>
