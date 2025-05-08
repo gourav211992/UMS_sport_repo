@@ -253,7 +253,7 @@
                                                     <div class="form-check form-check-primary mt-25">
                                                         <input type="radio" id="customColorRadio4" name="status"
                                                             value="Inactive" class="form-check-input"
-                                                            {{ old('status', $sportFeeMaster->status ?? '') == 'Inactive' ? 'checked' : '' }}>
+                                                            {{ old('status', $sportFeeMaster->status ?? '') == 'inactive' ? 'checked' : '' }}>
                                                         <label class="form-check-label fw-bolder"
                                                             for="customColorRadio4">Inactive</label>
                                                     </div>

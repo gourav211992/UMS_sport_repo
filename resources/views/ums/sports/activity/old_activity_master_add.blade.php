@@ -29,7 +29,6 @@
 
             <form id="cat_form" method="POST" action="{{ route('activity-master-add') }}">
                 @csrf
-                @include('ums.admin.notifications')
                 <div class="content-body">
                     <section id="basic-datatable">
                         <div class="row">
@@ -45,7 +44,7 @@
                                                                 class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <select class="form-select" name="sport_id">
+                                                        <select class="form-select" name="sport_id" id="sport_id">
                                                             <option value="">--Select Sport</option>
                                                             @foreach ($sportName as $name)
                                                                 <option value="{{ $name->id }}">
@@ -83,9 +82,9 @@
                                                             <div class="text-danger">{{ $message }}</div>
                                                         @enderror
                                                     </div>
-                                                     
                                                 </div>
                                                 <input type="hidden" id="sub_activity">
+                                                
                                                 <!-- Description Field -->
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
@@ -131,13 +130,11 @@
                                                                     <th>Sub Activity Name<span class="text-danger">*</span>
                                                                     </th>
                                                                     <th>Duration(min)<span class="text-danger">*</span></th>
-                            
-                                                                    <th>Shuddle<span class="text-danger"></span></th>
+                                                                    <th>Shuttle<span class="text-danger"></span></th>
                                                                     <th>Action</th>
                                                                 </tr>
                                                             </thead>
-
-                                                            {{-- <tbody id="sub-category-box">
+                                                            <tbody id="sub-category-box">
                                                                 <tr class="sub-category-template">
                                                                     <td class="row-number">1</td>
                                                                     <td><input type="text"
@@ -149,35 +146,6 @@
                                                                             class="form-control mw-100"
                                                                             placeholder="Enter Sub Activity Duration" />
                                                                     </td>
-                                                                    <td>
-                                                                        <div class="d-flex justify-content-around"> 
-                                                                        <div class="form-check">
-                                                                            <input type="hidden" name="subcategories[0][checkbox_status]" class="form-check-input" value="0">
-                                                                            <input type="checkbox" name="subcategories[0][checkbox_status]" class="form-check-input" id="toggleCheckbox0" onclick="toggleDropdown0()" value="1">
-                                                                        </div>
-                                                                    <div> 
-                                                                        <select id="dropdown0" class="form-control text-dark mw-100" name="subcategories[0][condition_status]" style="display: none;">
-                                                                            <option value="">---Select---</option>
-                                                                            <option value="fresh">Fresh</option>
-                                                                            <option value="used">Used</option>
-                                                                        </select>
-                                                                    </div>
-                                                                    </div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#"
-                                                                            class="text-primary add-address"><i
-                                                                                data-feather="plus-square"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody> --}}
-                                                            
-                                                            <tbody id="sub-category-box">
-                                                                <!-- Template Row (hidden by default) -->
-                                                                <tr class="sub-category-template" >
-                                                                    <td class="row-number">1</td>
-                                                                    <td><input type="text" name="subcategories[0][name]" class="form-control mw-100" placeholder="Enter Sub Activity Name" /></td>
-                                                                    <td><input type="number" name="subcategories[0][duration]" class="form-control mw-100" placeholder="Enter Sub Activity Duration" /></td>
                                                                     <td>
                                                                         <div class="d-flex justify-content-around">
                                                                             <div class="form-check">
@@ -194,7 +162,8 @@
                                                                         </div>
                                                                     </td>
                                                                     <td>
-                                                                        <a href="#" class="text-primary add-address"><i data-feather="plus-square"></i></a>
+                                                                        <a href="#" class="text-primary add-address"><i
+                                                                                data-feather="plus-square"></i></a>
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -217,356 +186,127 @@
     <script src="https://cdn.jsdelivr.net/npm/feather-icons"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
+     
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
             feather.replace();
 
             let subCategoryIndex = 1;
 
-            document.getElementById('cat_form').addEventListener('submit', function(e) {
-                let activityName = document.querySelector('input[name="activity_name"]');
-                let durationMin = document.querySelector('input[name="duration_min"]');
-                let subActivity = document.querySelectorAll('.parameter-input');
+            // Add new row
+            $('#sub-category-box').on('click', '.add-address', function (e) {
+                e.preventDefault();
+
+                let $templateRow = $('.sub-category-template').first().clone();
+
+                $templateRow.find('input[type="text"], input[type="number"]').val('');
+                $templateRow.find('input[type="checkbox"]').prop('checked', false);
+                $templateRow.find('select').val('').hide();
+                $templateRow.find('.text-danger.validation-error').remove();
+
+                $templateRow.find('input, select').each(function () {
+                    const attrName = $(this).attr('name');
+                    if (attrName) {
+                        $(this).attr('name', attrName.replace(/\[\d+]/, `[${subCategoryIndex}]`));
+                    }
+
+                    const attrId = $(this).attr('id');
+                    if (attrId?.includes('toggleCheckbox')) {
+                        $(this).attr('id', `toggleCheckbox${subCategoryIndex}`);
+                    }
+
+                    if ($(this).is('select')) {
+                        $(this).attr('id', `dropdown${subCategoryIndex}`);
+                    }
+                });
+
+                const newDropdownId = `dropdown${subCategoryIndex}`;
+                $templateRow.find('input[type="checkbox"]').off('click').on('click', function () {
+                    const isChecked = $(this).is(':checked');
+                    $(`#${newDropdownId}`).toggle(isChecked);
+                });
+
+                $templateRow.find('td:last').html(`
+                    <a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>
+                `);
+
+                $('#sub-category-box').append($templateRow);
+                updateRowNumbers();
+                feather.replace();
+                subCategoryIndex++;
+            });
+
+            // Delete row
+            $('#sub-category-box').on('click', '.delete-row', function (e) {
+                e.preventDefault();
+                $(this).closest('tr').remove();
+                updateRowNumbers();
+                subCategoryIndex = $('#sub-category-box tr').length;
+            });
+
+            $('#toggleCheckbox0').on('click', function () {
+                $('#dropdown0').toggle(this.checked);
+            });
+
+            function updateRowNumbers() {
+                $('#sub-category-box tr').each(function (i) {
+                    $(this).find('.row-number').text(i + 1);
+                });
+            }
+
+            // Form validation
+            $('#cat_form').on('submit', function (e) {
                 let isValid = true;
+                $('.text-danger.validation-error').remove();
+                $('.is-invalid').removeClass('is-invalid');
 
-                if (activityName.value.trim() === '') {
+                const activityName = $('input[name="activity_name"]');
+                if (activityName.val().trim() === '') {
                     isValid = false;
-                    activityName.classList.add('is-invalid');
-                    if (!document.querySelector('#activity-name-error')) {
-                        let errorMsg = document.createElement('div');
-                        errorMsg.id = 'activity-name-error';
-                        errorMsg.classList.add('text-danger');
-                        errorMsg.textContent = 'required.';
-                        activityName.parentElement.appendChild(errorMsg);
-                    }
+                    activityName.addClass('is-invalid');
+                    activityName.after('<div class="text-danger validation-error">Required.</div>');
                 }
 
-                if (durationMin.value.trim() === '' || isNaN(durationMin.value.trim())) {
+                const durationMin = $('input[name="duration_min"]');
+                if (durationMin.val().trim() === '' || isNaN(durationMin.val())) {
                     isValid = false;
-                    durationMin.classList.add('is-invalid');
-                    if (!document.querySelector('#duration-error')) {
-                        let errorMsg = document.createElement('div');
-                        errorMsg.id = 'duration-error';
-                        errorMsg.classList.add('text-danger');
-                        errorMsg.textContent = 'required.';
-                        durationMin.parentElement.appendChild(errorMsg);
-                    }
+                    durationMin.addClass('is-invalid');
+                    durationMin.after('<div class="text-danger validation-error">Required.</div>');
                 }
 
-                if (subActivity.value && subActivity.value.trim() === '') {
+                const sportSelect = $('select[name="sport_id"]');
+                if (sportSelect.val().trim() === '') {
                     isValid = false;
-                    subActivity.classList.add('is-invalid');
-                    if (!document.querySelector('#subactivity-name-error')) {
-                        let errorMsg = document.createElement('div');
-                        errorMsg.id = 'activity-name-error';
-                        errorMsg.classList.add('text-danger');
-                        errorMsg.textContent = 'required.';
-                        subActivity.parentElement.appendChild(errorMsg);
-                    }
+                    sportSelect.addClass('is-invalid');
+                    sportSelect.after('<div class="text-danger validation-error">Required.</div>');
                 }
+
+                $('#sub-category-box tr').each(function () {
+                    const nameInput = $(this).find('input[name^="subcategories"][name$="[name]"]');
+                    const durationInput = $(this).find('input[name^="subcategories"][name$="[duration]"]');
+
+                    if (nameInput.val().trim() === '') {
+                        isValid = false;
+                        nameInput.addClass('is-invalid');
+                        nameInput.after('<div class="text-danger validation-error">Required.</div>');
+                    }
+
+                    if (durationInput.val().trim() === '') {
+                        isValid = false;
+                        durationInput.addClass('is-invalid');
+                        durationInput.after('<div class="text-danger validation-error">Required.</div>');
+                    }
+                });
 
                 if (!isValid) {
                     e.preventDefault();
                 }
             });
 
-            document.querySelector('input[name="activity_name"]').addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-                document.querySelector('#activity-name-error')?.remove();
+            $(document).on('input change', 'input, select', function () {
+                $(this).removeClass('is-invalid');
+                $(this).next('.validation-error').remove();
             });
-
-            document.querySelector('input[name="duration_min"]').addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-                document.querySelector('#duration-error')?.remove();
-            });
-            
-            // Check if sub_activities input exists before adding event listener
-            const subActivitiesInput = document.querySelector('input[name="sub_activities"]');
-            if (subActivitiesInput) {
-                subActivitiesInput.addEventListener('input', function() {
-                    this.classList.remove('is-invalid');
-                    document.querySelector('#duration-error')?.remove();
-                });
-            }
         });
     </script>
-
-    <script>
-        function toggleDropdown0() {
-            const checkbox = document.getElementById("toggleCheckbox0");
-            const dropdown = document.getElementById("dropdown0");
-            
-            // Show dropdown if checkbox is checked
-            if (checkbox.checked) {
-                dropdown.style.display = "inline-block";
-            } else {
-                dropdown.style.display = "none";
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Feather icons
-            feather.replace();
-
-            let subCategoryIndex = 1;
-
-            // Add new subcategory row when the plus icon is clicked
-            document.querySelector('#sub-category-box').addEventListener('click', function(e) {
-                if (e.target.closest('.add-address')) {
-                    e.preventDefault();
-
-                    // Get the input values from the current row
-                    let subCategoryNameField = document.querySelector(
-                        '.sub-category-template input[name="subcategories[0][name]"]');
-                    let subCategoryDurationField = document.querySelector(
-                        '.sub-category-template input[name="subcategories[0][duration]"]');
-
-                    let subCategoryName = subCategoryNameField.value.trim();
-                    let subCategoryDuration = subCategoryDurationField.value.trim();
-
-                    if (subCategoryName === "" || subCategoryDuration === "") {
-                        alert("Please enter both subcategory name and duration.");
-                        return;
-                    }
-
-                    // Create a new row to display the filled subcategory and duration
-                    let newRow = document.createElement('tr');
-                    newRow.innerHTML = `
-                        <td>${subCategoryIndex + 1}</td>
-                        <td><input type="text" name="subcategories[${subCategoryIndex}][name]" class="form-control mw-100" value="${subCategoryName}" /></td>
-                        <td><input type="number" name="subcategories[${subCategoryIndex}][duration]" class="form-control mw-100" value="${subCategoryDuration}" /></td>
-                        <td>
-                            <div class="d-flex justify-content-around"> 
-                                <div class="form-check">
-                                    <input type="hidden" name="subcategories[${subCategoryIndex}][checkbox_status]" class="form-check-input" value="0">
-                                    <input type="checkbox" name="subcategories[${subCategoryIndex}][checkbox_status]" class="form-check-input" id="toggleCheckbox${subCategoryIndex}" onclick="toggleDropdown${subCategoryIndex}()" value="1" checked>
-                                </div>
-                                <div> 
-                                    <select id="dropdown${subCategoryIndex}" class="form-control text-dark mw-100" name="subcategories[${subCategoryIndex}][condition_status]" style="display: inline-block;">
-                                        <option value="">---Select---</option>
-                                        <option value="fresh">Fresh</option>
-                                        <option value="used">Used</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </td>
-                        <td><a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a></td>
-                    `;
-
-                    // Append the new row to the table body
-                    document.querySelector('#sub-category-box').preappend(newRow);
-
-                    // Create toggle function for this specific row
-                    window[`toggleDropdown${subCategoryIndex}`] = function() {
-                        const checkbox = document.getElementById(`toggleCheckbox${subCategoryIndex}`);
-                        const dropdown = document.getElementById(`dropdown${subCategoryIndex}`);
-                        
-                        // Show dropdown if checkbox is checked
-                        if (checkbox.checked) {
-                            dropdown.style.display = "inline-block";
-                        } else {
-                            dropdown.style.display = "none";
-                        }
-                    };
-
-                    // Reinitialize Feather icons for the new row
-                    feather.replace();
-
-                    // Clear the input fields and focus on the name field for the next entry
-                    subCategoryNameField.value = '';
-                    subCategoryDurationField.value = '';
-                    subCategoryNameField.focus();
-
-                    // Increment the index for the next subcategory
-                    subCategoryIndex++;
-                }
-            });
-
-            // Delete a subcategory row when the delete button is clicked
-            document.querySelector('#sub-category-box').addEventListener('click', function(e) {
-                if (e.target.closest('.delete-row')) {
-                    e.preventDefault();
-
-                    // Remove the row
-                    let row = e.target.closest('tr');
-                    row.remove();
-
-                    // Re-index the rows
-                    let rows = document.querySelectorAll('#sub-category-box tr');
-                    rows.forEach((row, index) => {
-                        row.querySelector('td:first-child').textContent = index + 1; // Update the row number
-                    });
-
-                    // Update subCategoryIndex based on the remaining rows
-                    subCategoryIndex = rows.length;
-                }
-            });
-        });
-    </script> --}}
-
-{{-- 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            feather.replace();
-    
-            let subCategoryIndex = 1;
-    
-            // Add row on plus icon click
-            $('#sub-category-box').on('click', '.add-address', function (e) {
-                e.preventDefault();
-    
-                let $templateRow = $('.sub-category-template').first().clone();
-    
-                // Clear input values
-                $templateRow.find('input[type="text"], input[type="number"]').val('');
-                $templateRow.find('input[type="checkbox"]').prop('checked', false);
-                $templateRow.find('select').val('').hide();
-    
-                // Remove any old errors
-                $templateRow.find('.text-danger').remove();
-    
-                // Update name and id attributes for cloned row
-                $templateRow.find('input, select').each(function () {
-                    const attrName = $(this).attr('name');
-                    if (attrName) {
-                        $(this).attr('name', attrName.replace(/\[\d+]/, `[${subCategoryIndex}]`));
-                    }
-    
-                    const attrId = $(this).attr('id');
-                    if (attrId?.includes('toggleCheckbox')) {
-                        $(this).attr('id', `toggleCheckbox${subCategoryIndex}`);
-                    }
-    
-                    if ($(this).is('select')) {
-                        $(this).attr('id', `dropdown${subCategoryIndex}`);
-                    }
-                });
-    
-                // Set new onclick toggle function for checkbox to show/hide dropdown
-                const newCheckboxId = `toggleCheckbox${subCategoryIndex}`;
-                const newDropdownId = `dropdown${subCategoryIndex}`;
-    
-                $templateRow.find('input[type="checkbox"]').off('click').on('click', function () {
-                    const isChecked = $(this).is(':checked');
-                    $(`#${newDropdownId}`).toggle(isChecked);
-                });
-    
-                // Change last <td> to delete icon for newly cloned rows
-                $templateRow.find('td:last').html(`
-                    <a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>
-                `);
-    
-                // Append and update row number
-                $('#sub-category-box').append($templateRow);
-                updateRowNumbers();
-    
-                feather.replace(); // Refresh icons
-                subCategoryIndex++;
-            });
-    
-            // Delete row on trash icon click
-            $('#sub-category-box').on('click', '.delete-row', function (e) {
-                e.preventDefault();
-                $(this).closest('tr').remove();
-                updateRowNumbers();
-                subCategoryIndex = $('#sub-category-box tr').length;
-            });
-    
-            // Handle checkbox toggle for initial row
-            $('#toggleCheckbox0').on('click', function () {
-                $('#dropdown0').toggle(this.checked);
-            });
-    
-            // Re-index row numbers
-            function updateRowNumbers() {
-                $('#sub-category-box tr').each(function (i) {
-                    $(this).find('.row-number').text(i + 1);
-                });
-            }
-        });
-    </script> --}}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            feather.replace();
-    
-            let subCategoryIndex = 1;
-    
-            // Add row on plus icon click
-            $('#sub-category-box').on('click', '.add-address', function (e) {
-                e.preventDefault();
-    
-                let $templateRow = $('.sub-category-template').first().clone();
-    
-                // Clear input values
-                $templateRow.find('input[type="text"], input[type="number"]').val('');
-                $templateRow.find('input[type="checkbox"]').prop('checked', false);
-                $templateRow.find('select').val('').hide();
-    
-                // Remove any old errors
-                $templateRow.find('.text-danger').remove();
-    
-                // Update name and id attributes for cloned row
-                $templateRow.find('input, select').each(function () {
-                    const attrName = $(this).attr('name');
-                    if (attrName) {
-                        $(this).attr('name', attrName.replace(/\[\d+]/, `[${subCategoryIndex}]`));
-                    }
-    
-                    const attrId = $(this).attr('id');
-                    if (attrId?.includes('toggleCheckbox')) {
-                        $(this).attr('id', `toggleCheckbox${subCategoryIndex}`);
-                    }
-    
-                    if ($(this).is('select')) {
-                        $(this).attr('id', `dropdown${subCategoryIndex}`);
-                    }
-                });
-    
-                // Set new onclick toggle function for checkbox to show/hide dropdown
-                const newCheckboxId = `toggleCheckbox${subCategoryIndex}`;
-                const newDropdownId = `dropdown${subCategoryIndex}`;
-    
-                // Handle checkbox toggle for each row individually
-                $templateRow.find('input[type="checkbox"]').off('click').on('click', function () {
-                    const isChecked = $(this).is(':checked');
-                    $(`#${newDropdownId}`).toggle(isChecked);
-                });
-    
-                // Change last <td> to delete icon for newly cloned rows
-                $templateRow.find('td:last').html(`
-                    <a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>
-                `);
-    
-                // Append and update row number
-                $('#sub-category-box').append($templateRow);
-                updateRowNumbers();
-    
-                feather.replace(); // Refresh icons
-                subCategoryIndex++;
-            });
-    
-            // Delete row on trash icon click
-            $('#sub-category-box').on('click', '.delete-row', function (e) {
-                e.preventDefault();
-                $(this).closest('tr').remove();
-                updateRowNumbers();
-                subCategoryIndex = $('#sub-category-box tr').length;
-            });
-    
-            // Handle checkbox toggle for initial row
-            $('#toggleCheckbox0').on('click', function () {
-                $('#dropdown0').toggle(this.checked);
-            });
-    
-            // Re-index row numbers
-            function updateRowNumbers() {
-                $('#sub-category-box tr').each(function (i) {
-                    $(this).find('.row-number').text(i + 1);
-                });
-            }
-        });
-    </script>
-    
-   
 @endsection

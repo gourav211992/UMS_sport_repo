@@ -30,6 +30,7 @@
             <form id="cat_form" method="POST" action="{{ route('activity-master-add') }}">
                 @csrf
                 <div class="content-body">
+                    @include('ums.admin.notifications')
                     <section id="basic-datatable">
                         <div class="row">
                             <div class="col-12">
@@ -45,7 +46,7 @@
                                                     </div>
                                                     <div class="col-md-5">
                                                         <select class="form-select" name="sport_id" id="sport_id">
-                                                            <option value="">--Select Sport</option>
+                                                            <option value="">--Select Sport--</option>
                                                             @foreach ($sportName as $name)
                                                                 <option value="{{ $name->id }}">
                                                                     {{ ucfirst($name->sport_name) }}</option>
@@ -95,6 +96,20 @@
                                                             value="{{ old('description') }}" />
                                                     </div>
                                                 </div>
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Weightage</label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="range" name="weightage" class="form-range" min="1" max="100" 
+                                                               value="{{ old('weightage', $activity->weightage ?? 0) }}"
+                                                               id="weightageRange" oninput="document.getElementById('weightageValue').innerText = this.value;">
+                                                        <span id="weightageValue">{{ old('weightage', $activity->weightage ?? 0) }}</span>%
+                                                    </div>
+                                                </div>
+                                                
+                                                
+                                                
 
                                                 <!-- Status Field -->
                                                 <div class="row align-items-center mb-2">

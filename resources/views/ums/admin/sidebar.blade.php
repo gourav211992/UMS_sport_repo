@@ -1233,7 +1233,7 @@
                     <li><a class="d-flex align-items-center" href="{{url('activity-attendance')}}"><i
                                 data-feather="circle"></i><span
                                 class="menu-item text-truncate">Attendance</span></a></li>
-                    <li><a class="d-flex align-items-center" href="{{url('activity-assessment')}}"><i
+                    <li><a class="d-flex align-items-center" href="{{url('screening-assessment')}}"><i
                                 data-feather="circle"></i><span
                                 class="menu-item text-truncate">Assessment</span></a></li>
                 </ul>

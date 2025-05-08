@@ -214,6 +214,9 @@ use App\Http\Controllers\ums\sports\Activity\ScreeningMasterController;
 use App\Http\Controllers\ums\sports\Activity\ActivityMasterController;
 use App\Http\Controllers\ums\sports\Activity\ActivitySchedulerController;
 use App\Http\Controllers\ums\sports\Activity\MyActivityController;
+use App\Http\Controllers\ums\sports\Activity\ScreeningAssesmentController;
+use App\Http\Controllers\ums\sports\Activity\RatingScaleController;
+
 
 // Password Reset Routes
 Route::get('sports/password/reset', [SportsForgotPasswordController::class, 'showForgotForm'])->name('sports.password.request');
@@ -352,9 +355,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/sports-fee-schedule/view/{id}',[SportFeeController::class,'ViewPage']);
     Route::post('sports-fee-schedule/update/{id}',[SportFeeController::class,'update']);
     Route::get('sports-fee-schedule/delete/{id}',[SportFeeController::class,'fee_delete']);
-
-    //clone 
-    Route::post('/sports-fee-schedule/clone/{id}',[SportFeeController::class,'clone'])->name('sports-fee-schedule-clone');
+    Route::post('/sports-fee-schedule/clone/id',[SportFeeController::class,'clone'])->name('sports-fee-schedule-clone');
 
 
     // MY ACTIVITY
@@ -407,6 +408,45 @@ Route::post('/get_batch_student', [ActivitySchedulerController::class, 'get_batc
 Route::post('/get-feesection',[SportRegisterController::class,'get_Feesection_group']);
 
 
+
+Route::controller(ScreeningAssesmentController::class)->group(function () {
+    Route::get('screening-assessment','listScreeningOuter');
+    Route::get('screening-assessment-inner/{date}/{id}','activityAssessment');
+
+    Route::get('mark-assess/{id}','remarkAssessment');
+    Route::get('screening-assessment-add','remarkAssessmentAdd'); //Blade calling for add
+    Route::get('screening-assessment-edit/{id}','remarkAssessmentEdit'); //Blade calling for edit
+    Route::get('screening-assessment-view/{id}','remarkAssessmentView');
+   Route::post('/get-screening-parameters','getScreeningParameters');
+   Route::post('screening-details-add','screeningAddData')->name('screening-details-add');  //form submit proess
+   Route::post('screening-details-edit','screeningEditData')->name('screening-details-edit');  //form submit proess
+    // Route::post('screening-update/{id}', )->name('screening.update');
+
+
+   
+   // Route::get('mark-assess','ums.sports.activity.mark_assess');
+
+    Route::post('/get-batch-names-screening',  'get_batch_names')->name('get.batch.names.screening');
+    Route::post('/get-batch-section-screening','get_batch_section')->name('get.batch.section.screening');
+    Route::post('/get-section-group-screening', 'get_section_group')->name('get.section.group.screening');
+    // Route::post('/get-activity-subactivity', 'get_activity_subactivity')->name('get.activity.subactivities.activity');
+    Route::post('/get-batch-student-screening',  'get_batch_student')->name('get.batch.student.screening');
+    Route::post('/get-group-players',  'get_group_players_screening')->name('get.group.players.screening');
+
+   
+   });
+
+   //rating scale
+
+    Route::get('rating_scale', [RatingScaleController::class, 'Index'])->name('rating_scale');
+    Route::get('rating_scale_add', [RatingScaleController::class, 'RatingScalesAddView']);
+    Route::post('rating_scale_add', [RatingScaleController::class, 'RatingScalesAdd'])->name('rating_scale.add');
+
+    Route::get('rating_scale_view/{id}', [RatingScaleController::class, 'RatingScalesview'])->name('rating_scale.view');
+    Route::get('rating_scale_edit/{id}', [RatingScaleController::class, 'RatingScalesEdit'])->name('rating_scale.edit');
+    Route::put('rating_scale_edit/{id}', [RatingScaleController::class, 'RatingScalesUpdate'])->name('rating_scale.update');
+    Route::delete('rating_scale_delete/{id}', [RatingScaleController::class, 'RatingScalesDelete'])->name('RatingScale.delete');
+
 //Screening Master 
 
 Route::get('screening-master',[ScreeningMasterController::class,'list']);
@@ -418,6 +458,8 @@ Route::post('screening-update/{id}', [ScreeningMasterController::class, 'update'
 
 Route::get('screening-master-edit/{id}',[ScreeningMasterController::class,'edit']);
 Route::get('screening-master-view/{id}',[ScreeningMasterController::class,'viewpage']);
+
+
 
 
 

@@ -49,10 +49,9 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Sport Name</th>
-                                                <th>Activity Name</th>
-                                                {{-- <th>Sub Activities </th> --}}
-                                                {{-- <th>Sub Activities Duration_min </th> --}}
+                                                <th>Activity Name</th>                                                 
                                                 <th>Duration (Min)</th>
+                                                <th>Weightage</th>
                                                 <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
@@ -63,37 +62,8 @@
                                                     <td>{{ $index + 1 }}</td>
                                                     <td class="fw-bolder text-dark">{{ $item->sport->sport_name }}</td>
                                                     <td>{{ $item->activity_name }}</td>
-                                                    {{-- <td>
-                                                        @if (isset($item->sub_activities) && count($item->sub_activities) > 0)
-                                                            <span class="badge rounded-pill badge-light-secondary badgeborder-radius">
-                                                                @foreach ($item->sub_activities as $subActivity)
-                                                                    @if (is_array($subActivity)) <!-- Ensure it's an array -->
-                                                                        {{ $subActivity['name'] }} @if (!$loop->last), @endif
-                                                                    @else
-                                                                        <span>Invalid Data Format</span>
-                                                                    @endif
-                                                                @endforeach
-                                                            </span>
-                                                        @else
-                                                            <span>No Sub Activities</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if (isset($item->sub_activities) && count($item->sub_activities) > 0)
-                                                            <span class="badge rounded-pill badge-light-secondary badgeborder-radius">
-                                                                @foreach ($item->sub_activities as $subActivity)
-                                                                    @if (is_array($subActivity)) <!-- Ensure it's an array -->
-                                                                        {{ $subActivity['duration'] }} @if (!$loop->last), @endif
-                                                                    @else
-                                                                        <span>Invalid Data Format</span>
-                                                                    @endif
-                                                                @endforeach
-                                                            </span>
-                                                        @else
-                                                            <span>No Sub Activities Duration</span>
-                                                        @endif
-                                                    </td> --}}
                                                     <td>{{ $item->duration_min }}</td>
+                                                    <td>{{ $item->weightage }}</td>
                                                     <td>
                                                         @if ($item->status == 'inactive')
                                                             <span

@@ -118,7 +118,7 @@
                                                                 <th>S.NO</th>
                                                                 <th>Sub Activity Name<span class="text-danger">*</span></th>
                                                                 <th>Duration(min)<span class="text-danger">*</span></th>
-                                                                <th>Shuddle<span class="text-danger">*</span></th>
+                                                                <th>Shuttle<span class="text-danger">*</span></th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
@@ -204,251 +204,240 @@
  
         <script>
             $(document).ready(function () {
-    // Load existing parameter data
-    let parameterData = @json($sub_activity ?? []);
-    let $tableBody = $('#parameter-table-body');
-
-    // Populate first row with existing data if available
-    if (parameterData.length > 0) {
-        $tableBody.find('.add-template .parameter-input').val(parameterData[0].name ?? '');
-        $tableBody.find('.add-template .parameter-duration').val(parameterData[0].duration ?? '');
+                let parameterData = @json($sub_activity ?? []);
+                let $tableBody = $('#parameter-table-body');
         
-        // Set checkbox status
-        if (parameterData[0].checkbox_status == 1) {
-            $tableBody.find('.add-template .parameter-check').prop('checked', true);
-            $tableBody.find('.add-template .parameter-condition').show();
-        } else {
-            $tableBody.find('.add-template .parameter-check').prop('checked', false);
-            $tableBody.find('.add-template .parameter-condition').hide();
-        }
+                // Populate first row with existing data
+                if (parameterData.length > 0) {
+                    $tableBody.find('.add-template .parameter-input').val(parameterData[0].name ?? '');
+                    $tableBody.find('.add-template .parameter-duration').val(parameterData[0].duration ?? '');
         
-        $tableBody.find('.add-template .parameter-condition').val(parameterData[0].condition_status ?? '');
-    }
-
-    // Add any additional rows from existing data
-    for (let i = 1; i < parameterData.length; i++) {
-        let row = $('.add-template').clone().removeClass('add-template');
-        row.find('.parameter-input').val(parameterData[i].name ?? '');
-        row.find('.parameter-duration').val(parameterData[i].duration ?? '');
+                    if (parameterData[0].checkbox_status == 1) {
+                        $tableBody.find('.add-template .parameter-check').prop('checked', true);
+                        $tableBody.find('.add-template .parameter-condition').show();
+                    } else {
+                        $tableBody.find('.add-template .parameter-check').prop('checked', false);
+                        $tableBody.find('.add-template .parameter-condition').hide();
+                    }
         
-        // Set checkbox and dropdown for existing rows
-        if (parameterData[i].checkbox_status == 1) {
-            row.find('.parameter-check').prop('checked', true);
-            row.find('.parameter-condition').show();
-        } else {
-            row.find('.parameter-check').prop('checked', false);
-            row.find('.parameter-condition').hide();
-        }
-        
-        row.find('.parameter-condition').val(parameterData[i].condition_status ?? '');
-        row.find('a')
-            .removeClass('add-row text-primary')
-            .addClass('delete-row text-danger')
-            .html('<i data-feather="trash-2"></i>');
-        $tableBody.append(row);
-    }
-
-    updateSerialsAndNames();
-    collectJsonData();
-    setupCheckboxHandlers();
-    feather.replace();
-    
-    // Add new row event handler
-    $(document).on('click', '.add-row', function (e) {
-        e.preventDefault();
-
-        let addRow = $('.add-template');
-        let inputVal = addRow.find('.parameter-input').val().trim();
-        let durationVal = addRow.find('.parameter-duration').val().trim();
-
-        if (inputVal === '' || durationVal === '') {
-            return;
-        }
-        
-        collectJsonData();
-        let clone = addRow.clone(false, false).removeClass('add-template');
-
-        // Clear inputs in new row
-        clone.find('.parameter-input').val('');
-        clone.find('.parameter-duration').val('');
-        clone.find('.parameter-check').prop('checked', false);
-        clone.find('.parameter-condition').val('').hide();
-
-        clone.find('td:last').html(
-            '<a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>'
-        );
-
-        $('#parameter-table-body').append(clone);
-        feather.replace();
-        updateSerialsAndNames();
-        setupCheckboxHandlers();
-        collectJsonData();
-    });
-
-    // Delete row event handler
-    $(document).on('click', '.delete-row', function (e) {
-        e.preventDefault();
-        $(this).closest('tr').remove();
-        updateSerialsAndNames();
-        setupCheckboxHandlers();
-        collectJsonData();
-    });
-
-    // Input event handlers
-    $(document).on('input', '.parameter-input, .parameter-duration', function () {
-        collectJsonData();
-    });
-    
-    $(document).on('change', '.parameter-check, .parameter-condition', function () {
-        collectJsonData();
-    });
-
-    // Form submission handler
-    $('#myForm').submit(function (e) {
-        e.preventDefault();
-        
-        // Basic validation
-        let isValid = true;
-        let activityName = $('input[name="activity_name"]').val().trim();
-        let durationMin = $('input[name="duration_min"]').val().trim();
-        
-        if (activityName === '') {
-            isValid = false;
-            // Add validation error
-        }
-        
-        if (durationMin === '' || isNaN(durationMin)) {
-            isValid = false;
-            // Add validation error
-        }
-        
-        // Validate first row sub-activity
-        let firstRowInput = $('.add-template .parameter-input').val().trim();
-        let firstRowDuration = $('.add-template .parameter-duration').val().trim();
-        
-        if (firstRowInput === '' || firstRowDuration === '') {
-            isValid = false;
-            // Add validation error
-            return false;
-        }
-
-        if (!isValid) {
-            return false;
-        }
-        
-        $('#alertContainer').html('');
-        let formData = new FormData(this);
-
-        $.ajax({
-            url: "{{ url('activity-master-edit/' . $activity->id) }}",
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                let alertClass = response.success ? 'alert-success' : 'alert-danger';
-                let alertHTML = `
-                    <div class="alert p-2 ${alertClass} alert-dismissible fade show" role="alert">
-                        <strong>${response.success ? 'Success' : 'Error'}:</strong> ${response.message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                `;
-                $('#alertContainer').html(alertHTML);
-
-                if (response.success) {
-                    setTimeout(() => {
-                        window.location.href = "{{ url('activity-master') }}";
-                    }, 500);
+                    $tableBody.find('.add-template .parameter-condition').val(parameterData[0].condition_status ?? '');
                 }
-            },
-            error: function (xhr) {
-                $('#alertContainer').html(`
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>Error!</strong> Something went wrong.
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                `);
-            }
-        });
-    });
-});
-
-// Function to update row numbers and input names
-function updateSerialsAndNames() {
-    $('#parameter-table-body .parameter-row').each(function (index) {
-        // Update row number
-        $(this).find('.sno').text(index + 1);
-
-        // Update input names with correct index
-        $(this).find('.parameter-input').attr('name', `subcategories[${index}][name]`);
-        $(this).find('.parameter-duration').attr('name', `subcategories[${index}][duration]`);
-        $(this).find('.parameter-check').attr('name', `subcategories[${index}][checkbox_status]`);
-        $(this).find('.parameter-condition').attr('name', `subcategories[${index}][condition_status]`);
         
-        // Add hidden field for checkbox if not exists
-        let hiddenCheckbox = $(this).find('input[type="hidden"][name="subcategories[' + index + '][checkbox_status]"]');
-        if (hiddenCheckbox.length === 0) {
-            $(this).find('.parameter-check').before('<input type="hidden" name="subcategories[' + index + '][checkbox_status]" value="0">');
-        }
-    });
-}
-
-// Function to collect form data into JSON
-function collectJsonData() {
-    let data = [];
-    $('#parameter-table-body .parameter-row').each(function () {
-        let name = $(this).find('.parameter-input').val();
-        let duration = $(this).find('.parameter-duration').val();
-        let checkboxStatus = $(this).find('.parameter-check').is(':checked') ? 1 : 0;
-        let conditionStatus = $(this).find('.parameter-condition').val();
+                for (let i = 1; i < parameterData.length; i++) {
+                    let row = $('.add-template').clone().removeClass('add-template');
+                    row.find('.parameter-input').val(parameterData[i].name ?? '');
+                    row.find('.parameter-duration').val(parameterData[i].duration ?? '');
         
-        data.push({ 
-            name: name, 
-            duration: duration,
-            checkbox_status: checkboxStatus,
-            condition_status: conditionStatus
-        });
-    });
-    $('#sub_activity').val(JSON.stringify(data));
-}
-
-// Function to handle checkbox-dropdown visibility
-function toggleDropdown(index) {
-    // Find the checkbox by name with the given index
-    const checkbox = document.querySelector(`input[name="subcategories[${index}][checkbox_status]"][type="checkbox"]`);
-    
-    // Find the corresponding dropdown in the same row
-    const dropdown = document.querySelector(`select[name="subcategories[${index}][condition_status]"]`);
-    
-    if (checkbox && dropdown) {
-        // Show/hide dropdown based on checkbox state
-        if (checkbox.checked) {
-            dropdown.style.display = "inline-block";
-        } else {
-            dropdown.style.display = "none";
-        }
-    }
-}
-
-// Function to set up checkbox event handlers for all rows
-function setupCheckboxHandlers() {
-    // For each parameter row
-    document.querySelectorAll('.parameter-row').forEach((row, index) => {
-        // Find the checkbox in this row
-        const checkbox = row.querySelector('.parameter-check');
-        if (checkbox) {
-            // Update the onclick attribute with the correct index
-            checkbox.setAttribute('onclick', `toggleDropdown(${index})`);
-            
-            // Get the corresponding dropdown
-            const dropdown = row.querySelector('.parameter-condition');
-            if (dropdown) {
-                // Set initial visibility based on checkbox state
-                dropdown.style.display = checkbox.checked ? "inline-block" : "none";
+                    if (parameterData[i].checkbox_status == 1) {
+                        row.find('.parameter-check').prop('checked', true);
+                        row.find('.parameter-condition').show();
+                    } else {
+                        row.find('.parameter-check').prop('checked', false);
+                        row.find('.parameter-condition').hide();
+                    }
+        
+                    row.find('.parameter-condition').val(parameterData[i].condition_status ?? '');
+                    row.find('a')
+                        .removeClass('add-row text-primary')
+                        .addClass('delete-row text-danger')
+                        .html('<i data-feather="trash-2"></i>');
+                    $tableBody.append(row);
+                }
+        
+                updateSerialsAndNames();
+                collectJsonData();
+                setupCheckboxHandlers();
+                feather.replace();
+        
+                // Add row
+                $(document).on('click', '.add-row', function (e) {
+                    e.preventDefault();
+                    let addRow = $('.add-template');
+                    let inputVal = addRow.find('.parameter-input').val().trim();
+                    let durationVal = addRow.find('.parameter-duration').val().trim();
+        
+                    if (inputVal === '' || durationVal === '') return;
+        
+                    collectJsonData();
+                    let clone = addRow.clone(false, false).removeClass('add-template');
+        
+                    clone.find('.parameter-input').val('');
+                    clone.find('.parameter-duration').val('');
+                    clone.find('.parameter-check').prop('checked', false);
+                    clone.find('.parameter-condition').val('').hide();
+        
+                    clone.find('td:last').html(
+                        '<a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>'
+                    );
+        
+                    $('#parameter-table-body').append(clone);
+                    feather.replace();
+                    updateSerialsAndNames();
+                    setupCheckboxHandlers();
+                    collectJsonData();
+                });
+        
+                // Delete row
+                $(document).on('click', '.delete-row', function (e) {
+                    e.preventDefault();
+                    $(this).closest('tr').remove();
+                    updateSerialsAndNames();
+                    setupCheckboxHandlers();
+                    collectJsonData();
+                });
+        
+                // Update JSON on input
+                $(document).on('input', '.parameter-input, .parameter-duration', function () {
+                    collectJsonData();
+                });
+        
+                $(document).on('change', '.parameter-check, .parameter-condition', function () {
+                    collectJsonData();
+                });
+        
+                // Remove validation error on typing
+                $(document).on('input', '.parameter-input, .parameter-duration, input[name="activity_name"], input[name="duration_min"]', function () {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.validation-error').remove();
+                });
+        
+                // Form validation
+                $('#myForm').submit(function (e) {
+                    e.preventDefault();
+        
+                    // Remove old errors
+                    $('.validation-error').remove();
+                    $('.is-invalid').removeClass('is-invalid');
+        
+                    let isValid = true;
+                    let activityName = $('input[name="activity_name"]');
+                    let durationMin = $('input[name="duration_min"]');
+        
+                    if (activityName.val().trim() === '') {
+                        isValid = false;
+                        activityName.addClass('is-invalid');
+                        activityName.after('<div class="text-danger validation-error">Required.</div>');
+                    }
+        
+                    if (durationMin.val().trim() === '' || isNaN(durationMin.val().trim())) {
+                        isValid = false;
+                        durationMin.addClass('is-invalid');
+                        durationMin.after('<div class="text-danger validation-error">Required.</div>');
+                    }
+        
+                    // Validate all rows
+                    $('#parameter-table-body .parameter-row').each(function () {
+                        let nameField = $(this).find('.parameter-input');
+                        let durationField = $(this).find('.parameter-duration');
+        
+                        if (nameField.val().trim() === '') {
+                            isValid = false;
+                            nameField.addClass('is-invalid');
+                            if (!nameField.next('.validation-error').length) {
+                                nameField.after('<div class="text-danger validation-error">Required.</div>');
+                            }
+                        }
+        
+                        if (durationField.val().trim() === '') {
+                            isValid = false;
+                            durationField.addClass('is-invalid');
+                            if (!durationField.next('.validation-error').length) {
+                                durationField.after('<div class="text-danger validation-error">Required.</div>');
+                            }
+                        }
+                    });
+        
+                    if (!isValid) return false;
+        
+                    $('#alertContainer').html('');
+                    let formData = new FormData(this);
+        
+                    $.ajax({
+                        url: "{{ url('activity-master-edit/' . $activity->id) }}",
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            let alertClass = response.success ? 'alert-success' : 'alert-danger';
+                            let alertHTML = `
+                                <div class="alert p-2 ${alertClass} alert-dismissible fade show" role="alert">
+                                    <strong>${response.success ? 'Success' : 'Error'}:</strong> ${response.message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>`;
+                            $('#alertContainer').html(alertHTML);
+        
+                            if (response.success) {
+                                setTimeout(() => {
+                                    window.location.href = "{{ url('activity-master') }}";
+                                }, 500);
+                            }
+                        },
+                        error: function () {
+                            $('#alertContainer').html(`
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    Something went wrong. Please try again.
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>`);
+                        }
+                    });
+                });
+            });
+        
+            function updateSerialsAndNames() {
+                $('#parameter-table-body .parameter-row').each(function (index) {
+                    $(this).find('.sno').text(index + 1);
+                    $(this).find('.parameter-input').attr('name', `subcategories[${index}][name]`);
+                    $(this).find('.parameter-duration').attr('name', `subcategories[${index}][duration]`);
+                    $(this).find('.parameter-check').attr('name', `subcategories[${index}][checkbox_status]`);
+                    $(this).find('.parameter-condition').attr('name', `subcategories[${index}][condition_status]`);
+        
+                    let hiddenCheckbox = $(this).find(`input[type="hidden"][name="subcategories[${index}][checkbox_status]"]`);
+                    if (hiddenCheckbox.length === 0) {
+                        $(this).find('.parameter-check').before(`<input type="hidden" name="subcategories[${index}][checkbox_status]" value="0">`);
+                    }
+                });
             }
-        }
-    });
-}
+        
+            function collectJsonData() {
+                let data = [];
+                $('#parameter-table-body .parameter-row').each(function () {
+                    let name = $(this).find('.parameter-input').val();
+                    let duration = $(this).find('.parameter-duration').val();
+                    let checkboxStatus = $(this).find('.parameter-check').is(':checked') ? 1 : 0;
+                    let conditionStatus = $(this).find('.parameter-condition').val();
+        
+                    data.push({ 
+                        name: name, 
+                        duration: duration,
+                        checkbox_status: checkboxStatus,
+                        condition_status: conditionStatus
+                    });
+                });
+                $('#sub_activity').val(JSON.stringify(data));
+            }
+        
+            function toggleDropdown(index) {
+                const checkbox = document.querySelector(`input[name="subcategories[${index}][checkbox_status]"][type="checkbox"]`);
+                const dropdown = document.querySelector(`select[name="subcategories[${index}][condition_status]"]`);
+                if (checkbox && dropdown) {
+                    dropdown.style.display = checkbox.checked ? "inline-block" : "none";
+                }
+            }
+        
+            function setupCheckboxHandlers() {
+                document.querySelectorAll('.parameter-row').forEach((row, index) => {
+                    const checkbox = row.querySelector('.parameter-check');
+                    if (checkbox) {
+                        checkbox.setAttribute('onclick', `toggleDropdown(${index})`);
+                        const dropdown = row.querySelector('.parameter-condition');
+                        if (dropdown) {
+                            dropdown.style.display = checkbox.checked ? "inline-block" : "none";
+                        }
+                    }
+                });
+            }
         </script>
+        
     
 @endsection

@@ -8,6 +8,7 @@ use App\Models\Payment;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\models\SportPayment;
 
 
 class User extends Authenticatable
@@ -100,7 +101,7 @@ class User extends Authenticatable
     }
     public function payments()
     {
-        return $this->hasOne(Payment::class, 'user_id');
+        return $this->hasOne(SportPayment::class, 'user_id');
     }
 
 }

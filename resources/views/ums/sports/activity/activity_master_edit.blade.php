@@ -85,6 +85,23 @@
                                                     <input type="text" name="description" class="form-control" value="{{ $activity->description }}" />    
                                                 </div>
                                             </div>
+                                            @php
+                                            // $weightageOptions = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+                                        @endphp
+                                        
+                                        <div class="row align-items-center mb-1">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Weightage</label>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <input type="range" name="weightage" class="form-range" min="1" max="100" 
+                                                       value="{{ old('weightage', $activity->weightage ?? 0) }}"
+                                                       id="weightageRange" oninput="document.getElementById('weightageValue').innerText = this.value;">
+                                                <span id="weightageValue">{{ old('weightage', $activity->weightage ?? 0) }}</span>%
+                                            </div>
+                                        </div>
+                                        
+                                            
 
                                        <!-- Status Field -->
                                        <div class="row align-items-center mb-2">

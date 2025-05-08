@@ -14,20 +14,16 @@ class SportActivityMaster extends Model
     protected $dates = ['deleted_at'];
     protected $table = 'sports_activity_master';
 
-   
     protected $fillable = [
-        'sport_id',
+        'sport_id',          // Foreign key to the sports_master table
         'activity_name',
-        'weightage', 
-        'duration_min',
+       
+        'sub_activities',
+        'duration_min',      // Corrected to match your column name (was 'Duration(min)')
         'description',
         'status',
-        'sub_activities',
-        'organization_id',
-        'group_id',
-        'company_id',
     ];
-    // protected $guarded=[];
+
     public function sport()
     {
         return $this->belongsTo(Sport_master::class, 'sport_id');

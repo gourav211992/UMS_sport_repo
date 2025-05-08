@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SportRegisterRequest;
 use App\Models\City;
 use App\Models\Country;
+use App\Models\SportPayment;
 use App\Models\SportRegister;
 use App\Models\State;
 // use App\Models\ums\Quota;
@@ -619,7 +620,7 @@ public function confirm(  Request $request, $id){
         $userId=User::find($registration->userable_id);
 
     
-        $RecivedPayment=Payment::where('user_id',$userId->id)->first();
+        $RecivedPayment=SportPayment::where('user_id',$userId->id)->first();
         $user = Helper::getAuthenticatedUser();
         $parentURL = request()->segments()[0];
         $parentURL = 'sport-registration';
@@ -1357,7 +1358,7 @@ public function confirm(  Request $request, $id){
     {
         $student = User::findOrFail($id);
         $quota = SportQuota::find($student->registration->quota_id);
-        $payment = Payment::where(['user_id' => $student->id])->first();
+        $payment = SportPayment::where(['user_id' => $student->id])->first();
         $existingData = json_decode($payment->fee_heads_durations ?? '{}', true);
         $familyDetails = SportFamilyDetail::where('registration_id', $student->registration->id)->first();
 //        dd($student->registration);
@@ -1544,7 +1545,7 @@ if ($sportRegister) {
 
         $totalFees = 0;
 
-         $payment=Payment::where('user_id',$id)->first();
+         $payment=SportPayment::where('user_id',$id)->first();
 
         $paid_amount = $payment ? $payment->paid_amount : 0;
 
@@ -2228,7 +2229,7 @@ public function update_payment(Request $request)
         ]);
 
 
-        $payment = Payment::firstOrNew(['user_id' => $validated['user_id']]);
+        $payment = SportPayment::firstOrNew(['user_id' => $validated['user_id']]);
         
 
         $existingData = json_decode($payment->fee_heads_durations ?? '{}', true);
@@ -2289,7 +2290,7 @@ public function update_payment(Request $request)
  public function update_payment_status(Request $request)
 {
     try {
-        $payment = Payment::firstOrNew(['user_id' => $request->user_id]);
+        $payment =  SportPayment::firstOrNew(['user_id' => $request->user_id]);
         $existingData = json_decode($payment->user_side_data ?? '{}', true);
 
         $feeHeads = is_string($request->fee_heads) ? json_decode($request->fee_heads, true) : $request->fee_heads;
@@ -2383,7 +2384,7 @@ public function update_payment(Request $request)
 
     public function ConfirmfeeStatus(Request $request)
     {
-        $payment = Payment::firstOrNew(['user_id' => $request->user_id]);
+        $payment = SportPayment::firstOrNew(['user_id' => $request->user_id]);
     
         // Decode existing data
         $existingData = json_decode($payment->fee_heads_durations, true) ?? [];
