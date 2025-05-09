@@ -10,14 +10,11 @@ class Sport_Rating_Scale extends Model
     use SoftDeletes;
     use HasFactory;
 
-    protected $table = 'sports_rating_scales';
+    protected $table = 'sport_rating_scales';
     protected $fillable = [
         'scores',
         'remarks',
-        'status',
-        'organization_id',
-        'company_id',
-        'group_id'
+        'status'
     ];
     
 }

@@ -4,11 +4,10 @@ namespace App\models\ums;
 
 // use Laravel\Passport\HasApiTokens;
 use App\Models\SportRegister;
-use App\Models\Payment;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\models\SportPayment;
+use App\Models\SportPayment;
 
 
 class User extends Authenticatable

@@ -4,46 +4,41 @@ namespace App\Http\Controllers\ums\sports\Activity;
 use App\Models\ums\Activity\Sport_Rating_Scale;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\Rule;
-use App\Helpers\Helper;
 use Illuminate\Http\Request;
 
 class RatingScaleController extends Controller
 {
     //
     public function RatingScalesAdd(Request $request)
-{
-    $user = Helper::getAuthenticatedUser();
-
-    // Validate the incoming request data
-    $validationData = $request->validate([
-        'scores' => 'required|integer', // Removed max:255 to allow any integer
-        'remarks' => 'required|string|max:1000', // Still has max 1000 chars for safety
-        'status' => 'required|string', // Change to boolean if needed
-    ]);
-
-    // Check if the score already exists
-    $scoresExists = Sport_Rating_Scale::where('scores', $validationData['scores'])->exists();
-
+    {
+        // Validate the incoming request data
+        // dd($request->all());
+        $validationData = $request->validate([
+            'scores' => 'required| integer|max:255', // Adding max length for safety
+            'remarks' => 'required|string|max:1000', // Adding max length for safety
+            'status' => 'required|string', // Assuming status is a boolean (e.g., 1 or 0)
+        ]);
+        $scoresExists = Sport_Rating_Scale::where('scores', $validationData['scores'])
+        ->exists();
+    
     if ($scoresExists) {
         return redirect()->back()
             ->withInput()
             ->withErrors(['scores' => 'This score already exists.']);
     }
-
-    // Create the RatingScale record using the validated data
-    Sport_Rating_Scale::create([
-        'scores' => $validationData['scores'],
-        'remarks' => $validationData['remarks'],
-        'organization_id' => $user->organization_id,
-        'group_id' => $user->group_id,
-        'company_id' => $user->company_id,
-        'status' => $validationData['status'],
-    ]);
-
-    return redirect()->route('rating_scale')
-                     ->with('success', 'Rating Scale added successfully!');
-}
-
+    
+        
+        // Create the RatingScale record using the validated data
+        Sport_Rating_Scale::create([
+            'scores' => $validationData['scores'],
+            'remarks' => $validationData['remarks'],
+            'status' => $validationData['status'],
+        ]);
+        
+        // Redirect with success message after saving the data
+        return redirect()->route('rating_scale')  // Ensure this route name is correct
+                         ->with('success', 'Rating Scale added successfully!');
+    }
 
 
     function RatingScalesAddView(){
@@ -67,34 +62,33 @@ class RatingScaleController extends Controller
     
     public function RatingScalesUpdate(Request $request, $id)
     {
-        $user = Helper::getAuthenticatedUser();
-    
+        // Validate the incoming request data
         $validationData = $request->validate([
-            'scores' => [
+            // 'scores' => 'required|string|max:255',  // Adding max length for safety
+            'scores'                          => [
                 'required',
-                'string',
+                'integer',
                 'max:255',
-                Rule::unique('sports_rating_scales', 'scores')->ignore($id)->whereNull('deleted_at'),
+                Rule::unique('sport_rating_scales', 'scores')->ignore($id)
             ],
-            'remarks' => 'required|string|max:1000',
-            'status' => 'required|string|max:15',
+           'remarks' => 'required|string|max:1000',
+            'status' => 'required|string', // Assuming status is a string (e.g., "active" or "inactive")
         ]);
     
+        // Find the existing rating scale by ID
         $scalesData = Sport_Rating_Scale::findOrFail($id);
     
+        // Update the record using the model instance
         $scalesData->update([
             'scores' => $validationData['scores'],
             'remarks' => $validationData['remarks'],
             'status' => $validationData['status'],
-            'organization_id' => $user->organization_id,
-            'group_id' => $user->group_id,
-            'company_id' => $user->company_id,
         ]);
     
+        // Redirect back to the rating scale list page with success message
         return redirect()->route('rating_scale')
                          ->with('success', 'Rating Scale updated successfully!');
     }
-    
     public function RatingScalesview(Request $request, $id)
     {
         // Find the Rating Scale by its ID

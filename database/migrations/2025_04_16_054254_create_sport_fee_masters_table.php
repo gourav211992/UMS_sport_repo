@@ -39,10 +39,10 @@ return new class extends Migration
             $table->string('batch_year', 4)->nullable(); 
             $table->string('section', 50); 
             $table->unsignedBigInteger('section_id')->index(); 
-            $table->string('quota', 50); 
+            $table->string('quota', 200); 
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->string('status');
+            $table->string('status',30);
             $table->longText('fee_details');
             $table->timestamps();
             $table->softDeletes();

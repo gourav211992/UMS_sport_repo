@@ -29,7 +29,8 @@
 							</div>
 						</div>
 						<div class="content-header-right text-sm-end col-md-6 mb-50 mb-sm-0">
-							<form action="" method="post" id="myForm">
+							<form action="" method="POST" enctype="multipart/form-data" id="myForm">
+							
 								<div class="form-group breadcrumb-right">
 									<button onClick="javascript: history.go(-1)" type="button"
 										class="btn btn-secondary btn-sm mb-50 mb-sm-0"><i
@@ -97,7 +98,6 @@
 														<input type="text" class="form-control" name="description" value="{{$sport_screening->description}}" />
 													</div>
 												</div>
-
 											</div>
 											<input type="hidden" id="parameter-json-data" name="parameter_details">
 
@@ -134,34 +134,41 @@
 														<div class="col-md-9">
 															
 															<div class="table-responsive-md">
-																<table
-																	class="mt-1 table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable">
-																	<thead>
-																		<tr>
-																			<th>S.NO</th>
-																			<th>Parameter Name<span
-																					class="text-danger">*</span></th>
-																			<th>Action</th>
-																		</tr>
-																	</thead>
-																	<tbody id="parameter-table-body">
-																		<!-- Always first row with + icon -->
-																		<tr class="parameter-row add-template">
-																			<td class="sno">1</td>
-																			<td>
-																				<input type="text"
-																					class="form-control parameter-input mw-100"
-																					placeholder="Enter Parameter Name" />
-																					<span class="text-danger error-parameter_details"></span>
+																<table class="mt-1 table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable">
+    <thead>
+        <tr>
+            <th>S.NO</th>
+            <th>Parameter Name<span class="text-danger">*</span></th>
+            <th>Weightage <span class="text-danger">*</span></th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="parameter-table-body">
+        <tr class="parameter-row add-template">
+            <td class="sno">1</td>
+            <td>
+                <input type="text" class="form-control parameter-input mw-100" placeholder="Enter Parameter Name" />
+                <span class="text-danger error-parameter_details"></span>
+            </td>
+            <td>
+                <input type="text" class="form-control weight-input mw-100" placeholder="Enter Weightage value 1 to 100 only">
+                <span class="text-danger error-parameter_details"></span>
+            </td>
+            <td>
+                <a href="#" class="text-primary add-row"><i data-feather="plus-square"></i></a>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td><strong>Total Weightage: <span id="total-weight">0</span>%</strong></td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
 
-																			</td>
-																			<td>
-																				<a href="#" class="text-primary add-row"><i
-																						data-feather="plus-square"></i></a>
-																			</td>
-																		</tr>
-																	</tbody>
-																</table>
 															</div>
 
 														</div>
@@ -185,18 +192,51 @@
 
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="https://unpkg.com/feather-icons"></script>
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+
+<!-- jQuery (required) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 		<script>
+
+
+function collectJsonData() {
+        let data = [];
+    $('#parameter-table-body .parameter-row').each(function () {
+        let parameterName = $(this).find('.parameter-input').val().trim();
+        let weightage = $(this).find('.weight-input').val().trim();
+
+        if (parameterName || weightage) {
+            data.push({
+                parametername: parameterName,
+                weightage: weightage
+            });
+        }
+    });
+	console.log(data);
+
+    $('#parameter-json-data').val(JSON.stringify(data));
+
+}
 			$(document).ready(function () {
 				let parameterData = @json($parameter_details ?? []);
 				let $tableBody = $('#parameter-table-body');
 
 				if (parameterData.length > 0) {
 					$tableBody.find('.add-template .parameter-input').val(parameterData[0].parametername ?? '');
+					$tableBody.find('.add-template .weight-input').val(parameterData[0].weightage ?? '');
+					 $tableBody.find('.add-template .range-value').text(`${parameterData[0].weightage}`);
+					
 				}
 
 				for (let i = 1; i < parameterData.length; i++) {
 					let row = $('.add-template').clone().removeClass('add-template');
 					row.find('.parameter-input').val(parameterData[i].parametername ?? '');
+					row.find('.weight-input').val(parameterData[i].weightage ?? '');
+					// Set the range value display
+					row.find('.range-value').text(`${parameterData[i].weightage}`);
 					row.find('a')
 						.removeClass('add-row text-primary')
 						.addClass('delete-row text-danger')
@@ -221,20 +261,17 @@
 
 					if (!$(this).hasClass('add-template')) {
 						$(this).find('.parameter-input').attr('name', `parameters[${index}][name]`); // Start with index = 0
+						$(this).find('.weight-input').attr('name', `parameters[${index}][weightage]`);
 					}
 				});
 			}
 
-			function collectJsonData() {
-				let data = [];
-				$('#parameter-table-body .parameter-row').each(function () {
-					let value = $(this).find('.parameter-input').val(); 
-					data.push({ parametername: value });
-				});
-				$('#parameter-json-data').val(JSON.stringify(data));
-			}
+			
+
+
 
 			$(document).on('click', '.add-row', function (e) {
+
 				e.preventDefault();
 
 				let addRow = $('.add-template');
@@ -248,6 +285,19 @@
 				let clone = addRow.clone(false, false).removeClass('add-template');
 
 				clone.find('input').val('');
+				clone.find('input[type="range"]').val(0);
+				clone.find('.range-value').text('0');
+				let totalWeight = 0;
+    $('.weight-input').each(function () {
+        let val = parseFloat($(this).val()) || 0;
+        totalWeight += val;
+    });
+
+    if (totalWeight > 100) {
+        clone.find('input[type="range"]').prop('disabled', true);
+        clone.find('input[type="range"]').val(0);
+        clone.find('.range-value').text('0');
+    }
 
 				clone.find('td:last').html(
 					'<a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>'
@@ -259,6 +309,7 @@
 
 				updateSerialsAndNames();
 				collectJsonData();
+				
 			});
 
 			$(document).on('click', '.delete-row', function (e) {
@@ -268,9 +319,62 @@
 				collectJsonData();
 			});
 
-			$(document).on('input', '.parameter-input', function () {
-				collectJsonData();
-			});
+
+			$(document).on('blur', '.parameter-input', function() {
+    collectJsonData();
+});
+  $(document).ready(function(){
+	let totalWeight=0;
+	$('.weight-input').not(this).each(function () {
+        let val = parseFloat($(this).val()) || 0;
+        totalWeight += val;
+    });
+	$('#total-weight').text( totalWeight);
+
+
+
+
+
+	$(document).on('input', '.weight-input', function () {
+    let maxTotal = 100;
+    let totalWeight = 0;
+
+    $('.weight-input').not(this).each(function () {
+        let val = parseFloat($(this).val()) || 0;
+        totalWeight += val;
+    });
+
+    let allowed = maxTotal - totalWeight;
+    let currentVal = parseFloat($(this).val()) || 0;
+
+    if (currentVal > allowed) {
+        $(this).val(allowed);
+        currentVal = allowed;
+    }
+
+    totalWeight += currentVal;
+
+	$('#total-weight').text( totalWeight);
+    $('.weight-input').each(function () {
+        let othersTotal = 0;
+        $('.weight-input').not(this).each(function () {
+            othersTotal += parseFloat($(this).val()) || 0;
+        });
+
+        let dynamicMax = maxTotal - othersTotal;
+
+        $(this).attr('max', dynamicMax);
+
+        if (parseFloat($(this).val()) > dynamicMax) {
+            $(this).val(dynamicMax);
+        }
+    });
+
+    collectJsonData();
+});
+
+		  })
+    
 
 			$(document).ready(function () {
 				updateSerialsAndNames();
@@ -285,7 +389,28 @@
 <script>
 		$(document).ready(function () {
 			$('#myForm').submit(function (e) {
-				e.preventDefault();
+				let total = 0;
+   
+   $('.weight-input').each(function () {
+	   let val = parseFloat($(this).val()) || 0;
+	   total += val;
+   });
+   
+   if (total < 100) {
+	toastr.error('Total weightage must be exactly 100 before submitting.', 'Validation Error', {
+            positionClass: 'toast-top-right',
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000,
+            extendedTimeOut: 1000
+        });
+
+	   e.preventDefault(); 
+	   return false;
+   }
+   
+   e.preventDefault(); 
+			  
 		
 				let isValid = true;
 		
@@ -354,6 +479,7 @@
 								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 							</div>
 							`);
+						
 						}
 					});
 				}

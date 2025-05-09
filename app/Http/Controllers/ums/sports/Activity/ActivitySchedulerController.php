@@ -158,11 +158,86 @@ if ($existing) {
     
 
     
-    public function index(Request $request)
-    {
-        $activityScheduler =SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation','sportRelation','trainerRelation'])->orderBy('id', 'DESC')->get();
-        return view('ums.sports.activity.activity_scheduler', compact('activityScheduler'));
+    // public function index(Request $request)
+    // {
+    //     $activityScheduler =SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation','sportRelation','trainerRelation'])->orderBy('id', 'DESC')->get();
+    //     return view('ums.sports.activity.activity_scheduler', compact('activityScheduler'));
+    // }
+
+  
+public function index(Request $request)
+{
+    $query = SportActivityScheduler::with([
+        'sectionRelation',
+        'groupRelation',
+        'batchRelation',
+        'sportRelation',
+        'trainerRelation'
+    ])->orderBy('id', 'DESC');
+
+    if ($request->filled('trainer')) {
+        $query->whereHas('trainerRelation', function ($q) use ($request) {
+            $q->where('name', $request->trainer);
+        });
     }
+
+    if ($request->filled('activity')) {
+        $query->where('activity', $request->activity);
+    }
+
+    if ($request->filled('group')) {
+        $query->whereHas('groupRelation', function ($q) use ($request) {
+            $q->where('name', $request->group);
+        });
+    }
+
+    if ($request->filled('section')) {
+        $query->whereHas('sectionRelation', function ($q) use ($request) {
+            $q->where('name', $request->section);
+        });
+    }
+
+    if ($request->filled('start_date')) {
+        $start = Carbon::parse($request->start_date)->format('Y-m-d');
+        $query->whereDate('start_date', '>=', $start);
+    }
+
+    if ($request->filled('end_date')) {
+        $end = Carbon::parse($request->end_date)->format('Y-m-d');
+        $query->whereDate('end_date', '<=', $end);
+    }
+
+    $activityScheduler = $query->get();
+
+    // Dropdown options
+    $allActivities = SportActivityScheduler::pluck('activity')->unique()->values();
+
+    $allTrainers = SportActivityScheduler::with('trainerRelation')->get()
+        ->pluck('trainerRelation.name')
+        ->filter()
+        ->unique()
+        ->values();
+
+    $allGroups = SportActivityScheduler::with('groupRelation')->get()
+        ->pluck('groupRelation.name')
+        ->filter()
+        ->unique()
+        ->values();
+
+    $allSections = SportActivityScheduler::with('sectionRelation')->get()
+        ->pluck('sectionRelation.name')
+        ->filter()
+        ->unique()
+        ->values();
+
+    return view('ums.sports.activity.activity_scheduler', compact(
+        'activityScheduler',
+        'allTrainers',
+        'allActivities',
+        'allGroups',
+        'allSections'
+    ));
+}
 
     public function ActivityEdit($id)
 {

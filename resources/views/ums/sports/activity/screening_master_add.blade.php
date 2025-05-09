@@ -92,6 +92,8 @@
                                                     </div>
                                                 </div>
                                                 
+
+                                                
                                             </div>
                                             
                                             <div class="col-md-4 border-start">
@@ -124,36 +126,47 @@
 																
                                                                 <div class="table-responsive-md">
 																	
-																	<table class="mt-1 table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable">
-																		<thead>
-																			<tr>
-																				<th>S.NO</th>
-																				<th>Parameter Name <span class="text-danger">*</span></th>
-																				<th>Action</th>
-																			</tr>
-																		</thead>
-																		<tbody id="parameter-table-body">
-																	
-																			<tr class="parameter-row add-template">
-																				<td class="sno">1</td>
-																				<td>
-																					<input type="text" class="form-control parameter-input mw-100" placeholder="Enter Parameter Name" />
-                                                                                    <span class="text-danger error-parameter_details"></span>
-																				</td>
-																				<td>
-																					<a href="#" class="text-primary add-row"><i data-feather="plus-square"></i></a>
-																				</td>
-																			</tr>
-																		</tbody>
-																	</table>
-																</div>
+                                                                <table class="mt-1 table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable">
+                                                                   <thead>
+                                                                       <tr>
+                                                                           <th>S.NO</th>
+                                                                           <th>Parameter Name <span class="text-danger">*</span></th>
+                                                                           <th>Weightage <span class="text-danger">*</span></th>
+                                                                           <th>Action</th>
+                                                                       </tr>
+                                                                   </thead>
+                                                                   <tbody id="parameter-table-body">
+                                                                       <!-- Example row -->
+                                                                       <tr class="parameter-row add-template">
+                                                                           <td class="sno">1</td>
+                                                                           <td>
+                                                                               <input type="text" class="form-control parameter-input mw-100" placeholder="Enter Parameter Name" />
+                                                                               <span class="text-danger error-parameter_details"></span>
+                                                                           </td>
+                                                                           <td>
+                                                                               <input type="text" class="form-control weight-input mw-100" placeholder="Enter Weightage value 1 to 100 only">
+                                                                               <span class="text-danger error-parameter_details"></span>
+                                                                           </td>
+                                                                           <td>
+                                                                               <a href="#" class="text-primary add-row"><i data-feather="plus-square"></i></a>
+                                                                           </td>
+                                                                       </tr>
+                                                                   </tbody>
 
+                                                                   <!-- Total only under Weightage -->
+                                                                   <tfoot>
+                                                                       <tr>
+                                                                           <td></td> <!-- Empty under S.NO -->
+                                                                           <td></td> <!-- Empty under Parameter Name -->
+                                                                           <td class="fw-bold">Total Weightage: <span id="total-weightage">0</span>%</td>
+                                                                           <td></td> <!-- Empty under Action -->
+                                                                       </tr>
+                                                                   </tfoot>
+                                                               </table>
+																</div>
 															</div>
-														</div>
-														
-												 </div>
-                                            
-                                            
+														</div>													
+												 </div>                                         
                                         </div>
                                     </div>
                                 </div>
@@ -168,7 +181,18 @@
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://unpkg.com/feather-icons"></script>
-	<script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+
+<!-- jQuery (required) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+		
+
+
+
+<script>
 	function updateSerialsAndNames() {
     $('#parameter-table-body .parameter-row').each(function (index) {
         $(this).find('.sno').text(index + 1); 
@@ -178,45 +202,60 @@
             $(this).find('.parameter-input').attr('name', `parameters[${index}][name]`);
         }
     });
-}
-
+};
+</script>
+<script>
 function collectJsonData() {
     let data = [];
     $('#parameter-table-body .parameter-row').each(function () {
-        let value = $(this).find('.parameter-input').val(); 
-        data.push({ parametername: value });
+        let parameterName = $(this).find('input').eq(0).val().trim();
+        let weightage = $(this).find('.weight-input').val();
+        if (parameterName || weightage) {
+            data.push({ 
+                parametername: parameterName, 
+                weightage: weightage 
+            });
+        }
     });
+    console.log(data);
     $('#parameter-json-data').val(JSON.stringify(data));
 }
+
 
 $(document).on('click', '.add-row', function (e) {
     e.preventDefault();
 
-    let addRow = $('.add-template');
-    let inputVal = addRow.find('input').val().trim();
+    let $template = $('.add-template');
+    let parameterVal = $template.find('.parameter-input').val().trim();
+    let weightVal = $template.find('.weight-input').val(); 
 
-    if (inputVal === '') {
-        alert('Please enter a parameter name before adding a new row.');
+    if (parameterVal === '' || weightVal === '') {
+        alert('Please enter both Parameter Name and Weightage before adding a new row.');
         return;
     }
-   
+    let newRow = $template.clone(false, false)
+        .removeClass('add-template')
+        .addClass('parameter-row');
 
-	collectJsonData();
-    let clone = addRow.clone(false, false).removeClass('add-template');
+    newRow.find('.parameter-input').val(parameterVal);
+    newRow.find('.weight-input').val(weightVal);
+    newRow.find('output').text(weightVal);
 
-    clone.find('input').val('');
+    $template.find('.parameter-input').val('');
+    $template.find('.weight-input').val(0);  
+    $template.find('output').text('0');      
 
-    clone.find('td:last').html(
+    newRow.find('td:last').html(
         '<a href="#" class="text-danger delete-row"><i data-feather="trash-2"></i></a>'
     );
 
-    $('#parameter-table-body').append(clone);
+    $template.after(newRow);
 
     feather.replace();
-
     updateSerialsAndNames();
     collectJsonData();
 });
+
 
 $(document).on('click', '.delete-row', function (e) {
     e.preventDefault();
@@ -225,9 +264,41 @@ $(document).on('click', '.delete-row', function (e) {
     collectJsonData();
 });
 
-$(document).on('input', '.parameter-input', function () {
+
+$(document).on('input', '.weight-input', function () {
+    let maxTotal = 100;
+    let totalWeight = 0;
+
+    $('.weight-input').not(this).each(function () {
+        let val = parseFloat($(this).val()) || 0;
+        totalWeight += val;
+    });
+
+    let allowed = maxTotal - totalWeight;
+    let currentVal = parseFloat($(this).val()) || 0;
+
+    if (currentVal > allowed) {
+        $(this).val(allowed);
+        currentVal = allowed;
+    }
+
+    totalWeight += currentVal;
+    $('#total-weight').text(totalWeight);
+
+    $('.weight-input').each(function () {
+        let othersTotal = 0;
+        $('.weight-input').not(this).each(function () {
+            othersTotal += parseFloat($(this).val()) || 0;
+        });
+        let dynamicMax = maxTotal - othersTotal;
+        $(this).attr('max', dynamicMax);
+    });
+   
+
+    
     collectJsonData();
 });
+
 
 $(document).ready(function() {
     updateSerialsAndNames();
@@ -239,36 +310,70 @@ feather.replace();
 
 </script>
 
+<script>
+   
+function updateTotalWeightage() {
+    let total = 0;
+
+    // Loop through all weight input fields
+    $('.weight-input').each(function () {
+        let val = parseFloat($(this).val()) || 0;
+        total += val;
+    });
+
+    // Update the total display
+    $('#total-weightage').text(total);
+}
+
+$(document).on('input', '.weight-input', function () {
+    updateTotalWeightage();
+});
+
+$(document).ready(function () {
+    updateTotalWeightage();
+});
+
+</script>
 
 <script>
     $(document).ready(function() {
         $('#myForm').submit(function(e) {
-            e.preventDefault(); // Prevent form from submitting normally
+            let total = 0;
+   
+$('.weight-input').each(function () {
+    let val = parseFloat($(this).val()) || 0;
+    total += val;
+});
 
-            // Clear previous error messages
+if (total < 100) {
+    toastr.error('Total weightage must be exactly 100 before submitting.', 'Validation Error', {
+            positionClass: 'toast-top-right',
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000,
+            extendedTimeOut: 1000
+        })
+    e.preventDefault(); 
+    return false;
+}
+
+e.preventDefault(); 
+
+           
+        
             $('.text-danger').text('');
 
-            let valid = true; // Flag to track if form is valid
+            let valid = true; 
 
-            // Validate Sport selection
             if ($('#sport_id').val() === '---Select sport----') {
                 $('.error-sport_id').text('*Required.');
                 valid = false;
             }
 
-            // Validate Screening Name
             if ($("input[name='screening_name']").val().trim() === '') {
                 $('.error-screening_name').text('*Required.');
                 valid = false;
             }
-
-            // Validate Description
-            // if ($("input[name='description']").val().trim() === '') {
-            //     $('.error-description').text('Description is required.');
-            //     valid = false;
-            // }
-
-            // Validate Parameter Names in the table
             let isParameterValid = true;
             $('#parameter-table-body .parameter-row').each(function () {
                 let parameterValue = $(this).find('.parameter-input').val().trim();
@@ -278,7 +383,6 @@ feather.replace();
                 }
             });
 
-            // If all validations pass, submit the form
             var formData = new FormData(this);
 
             $.ajax({

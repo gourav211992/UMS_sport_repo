@@ -436,6 +436,10 @@ Route::controller(ScreeningAssesmentController::class)->group(function () {
    
    });
 
+
+
+
+
    //rating scale
 
     Route::get('rating_scale', [RatingScaleController::class, 'Index'])->name('rating_scale');
@@ -456,7 +460,7 @@ Route::get('screening-master-delete/{id}',[ScreeningMasterController::class,'scr
 // Route::post('screening-edit/{id}',[ScreeningMasterController::class,'store'])->name('screening-edit');
 Route::post('screening-update/{id}', [ScreeningMasterController::class, 'update'])->name('screening.update');
 
-Route::get('screening-master-edit/{id}',[ScreeningMasterController::class,'edit']);
+Route::get('screening-master-edit/{id}',[ScreeningMasterController::class,'edit'])->name('screening.edit');
 Route::get('screening-master-view/{id}',[ScreeningMasterController::class,'viewpage']);
 
 

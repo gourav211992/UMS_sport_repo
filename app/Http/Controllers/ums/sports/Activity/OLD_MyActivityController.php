@@ -22,20 +22,10 @@ class MyActivityController extends Controller
 
     public function index(Request $request)
     {
-        $activities = SportActivityScheduler::where('trainer', '409')
-            ->with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation','trainerRelation'])
+        $activities = SportActivityScheduler::where('trainer', 'dhan')
+            ->with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation'])
             ->orderBy('id', 'DESC')
             ->get();
-    //     $activities = SportActivityScheduler::with([
-    //     'sectionRelation',
-    //     'groupRelation',
-    //     'batchRelation',
-    //     'sportRelation',
-    //     'trainerRelation'
-    // ])
-    // ->orderBy('id', 'DESC')
-    // ->get();
-
     
         $allActivities = $activities->pluck('activity')->unique()->values();
         $finalActivities = collect();
@@ -62,7 +52,6 @@ class MyActivityController extends Controller
                             'end_time' => $dayData['end_time'],
                             'section' => $activity->sectionRelation->name ?? '',
                             'group' => $activity->groupRelation->name ?? '',
-                            'trainer' => $activity->trainerRelation->name ?? '',
                             'status' => $activity->status,
                             'student_count' => $studentCount,
                         ]);
@@ -109,7 +98,7 @@ class MyActivityController extends Controller
 
     $attendanceData = $activityDetails ? json_decode($activityDetails->students, true) : [];
 
-    $data = SportActivityScheduler::where('trainer', '409')
+    $data = SportActivityScheduler::where('trainer', 'dhan')
         ->with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation'])
         ->find($id);
 
@@ -261,12 +250,12 @@ public function saveActivityDetails(Request $request)
 
 public function review(Request $request)
 {
-    $activities = SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation', 'trainerRelation'])
+    $activities = SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation'])
         ->orderBy('id', 'DESC')
         ->get();
 
     $allActivities = $activities->pluck('activity')->unique()->values();
-    $allTrainers = $activities->pluck('trainerRelation.name')->unique()->values();
+    $allTrainers = $activities->pluck('trainer')->unique()->values();
     $finalActivities = collect();
 
     foreach ($activities as $activity) {
@@ -300,7 +289,6 @@ public function review(Request $request)
                         'end_date' => $activity->end_date,
                         'section' => $activity->sectionRelation->name ?? '',
                         'group' => $activity->groupRelation->name ?? '',
-                        'trainer' => $activity->trainerRelation->name ?? '',
                         'status' => $activity->status,
                         'student_count' => $studentCount,
                         'marked_status' => $isMarked ? 'Marked' : 'Unmarked',
@@ -403,7 +391,7 @@ public function playerEdit($id, $date)
 
     $attendanceData = $activityDetails ? json_decode($activityDetails->students, true) : [];
 
-    $data = SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation', 'trainerRelation' ])
+    $data = SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation'])
         ->find($id);
 
     if (!$data) {

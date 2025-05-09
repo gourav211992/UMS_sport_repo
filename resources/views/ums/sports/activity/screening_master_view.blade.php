@@ -87,6 +87,7 @@
                                                     <input type="text" class="form-control" name="description" value="{{$sport_screening->description}}" />
                                                 </div>
                                             </div>
+
                                         </div>
                                         <input type="hidden" id="parameter-json-data" name="parameter_details">
 
@@ -113,27 +114,40 @@
                                             <div class="tab-pane active" id="othActivitieser">
                                                 <div class="col-md-9">
                                                     <div class="table-responsive-md">
-                                                        <table class="mt-1 table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>S.NO</th>
-                                                                    <th>Parameter Name<span class="text-danger">*</span></th>
-                                                                    <th>Action</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody id="parameter-table-body">
-                                                                <!-- Always first row with + icon -->
-                                                                <tr class="parameter-row add-template">
-                                                                    <td class="sno">1</td>
-                                                                    <td>
-                                                                        <input type="text" class="form-control parameter-input mw-100" placeholder="Enter Parameter Name" />
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="#" class="text-primary add-row"><i data-feather="plus-square"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
+                                                    <table class="mt-1 table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable">
+    <thead>
+        <tr>
+            <th>S.NO</th>
+            <th>Parameter Name<span class="text-danger">*</span></th>
+            <th>Weightage <span class="text-danger">*</span></th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="parameter-table-body">
+        <tr class="parameter-row add-template">
+            <td class="sno">1</td>
+            <td>
+                <input type="text" class="form-control parameter-input mw-100" placeholder="Enter Parameter Name" />
+                <span class="text-danger error-parameter_details"></span>
+            </td>
+            <td>
+                <input type="text" class="form-control weight-input mw-100" placeholder="Enter your weightage">
+                <span class="text-danger error-parameter_details"></span>
+            </td>
+            <td>
+                <a href="#" class="text-primary add-row"><i data-feather="plus-square"></i></a>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td><strong>Total Weightage: <span id="total-weight">0</span>%</strong></td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
                                                     </div>
                                                 </div>
                                             </div>
@@ -156,18 +170,23 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <script>
         $(document).ready(function () {
+
+     
+
             let parameterData = @json($parameter_details ?? []);
             let $tableBody = $('#parameter-table-body');
 
             // Fill in data if available
             if (parameterData.length > 0) {
                 $tableBody.find('.add-template .parameter-input').val(parameterData[0].parametername ?? '');
+                $tableBody.find('.add-template .weight-input').val(parameterData[0].weightage ?? '');
             }
 
             // Loop through the data and add rows
             for (let i = 1; i < parameterData.length; i++) {
                 let row = $('.add-template').clone().removeClass('add-template');
                 row.find('.parameter-input').val(parameterData[i].parametername ?? '');
+                row.find('.weight-input').val(parameterData[i].weightage ?? '');
                 row.find('a')
                     .removeClass('add-row text-primary')
                     .addClass('delete-row text-danger')
@@ -201,13 +220,22 @@
             });
             $('#parameter-json-data').val(JSON.stringify(parameterDetails));
         }
-
-        // Disable all input and select fields
+     
         function disableForm() {
             $('input').prop('disabled', true);
             $('select').prop('disabled', true);
         }
         disableForm();
+
+
+        $(document).ready(function(){
+            let totalWeight=0;
+	$('.weight-input').not(this).each(function () {
+        let val = parseFloat($(this).val()) || 0;
+        totalWeight += val;
+    });
+	$('#total-weight').text( totalWeight);
+        })
 
         // Enable all input and select fields
     </script>

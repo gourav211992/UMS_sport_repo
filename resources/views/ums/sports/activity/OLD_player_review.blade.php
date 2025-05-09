@@ -184,7 +184,7 @@
                     <div class="mb-1">
                         <label class="form-label">Trainer</label>
                         <select class="form-select select2" name="trainer" id="trainer">
-                            <option value="Select"> Select </option>
+                            <option value="Select">Select</option>
                             @foreach ($allTrainers as $trainer)
                                 <option value="{{ $trainer }}"
                                     {{ request()->trainer == $trainer ? 'selected' : '' }}>

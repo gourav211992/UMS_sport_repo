@@ -741,6 +741,7 @@ public function confirm(  Request $request, $id){
         $quotas = SportQuota::where('status', 'active')->get();
         $batchYears = sport_fee_master::select('batch_year')->distinct()->get();
         $batch = sport_fee_master::all()->unique('batch');
+        // dd($batch);
         $selectedBatch = sport_fee_master::where('batch_id', $registration->batch_id)->first();
         $sections = sport_fee_master::all();
         $quota = SportQuota::find($registration->quota_id);

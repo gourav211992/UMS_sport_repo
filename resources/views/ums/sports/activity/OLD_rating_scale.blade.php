@@ -12,11 +12,11 @@
                 <div class="content-header-left col-md-5 mb-2">
                     <div class="row breadcrumbs-top">
                         <div class="col-12">
-                            <h2 class="content-header-title float-start mb-0">RatingScale Master</h2>
+                            <h2 class="content-header-title float-start mb-0">Rating Scale Master</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a  href="{{url('rating_scale')}}">Home</a></li>  
-                                    <li class="breadcrumb-item active">RatingScale Master List</li>
+                                    <li class="breadcrumb-item active">Rating Scale Master List</li>
                                 </ol>
                             </div>
                         </div>
@@ -39,7 +39,7 @@
 								
 								   
                                 <div class="table-responsive candidates-tables">
-									<table  class="datatables-basic table table-striped myrequesttablecbox loanapplicationlist tasklist"> 
+									<table class="datatables-basic table table-striped myrequesttablecbox loanapplicationlist tasklist"> 
                                         <thead>
                                              <tr>
 												<th>#</th>
@@ -49,11 +49,10 @@
 												<th>Action</th>
 											  </tr>
 											</thead>
-                                           
+                                            @foreach ($RatingScaleSData as $index=> $item)
                                                 
                                             
-											<tbody >
-												@foreach ($RatingScaleSData as $index=> $item)
+											<tbody>
 												 <tr>
 													<td>{{$index+1}}</td>
 													<td class="fw-bolder text-dark">{{$item->scores}}</td>
@@ -62,11 +61,11 @@
                                                         @if($item->status == "active")
                                                         <span class="badge rounded-pill badge-light-success">Active</span>
                                                         @else
-                                                        <span  class="badge rounded-pill badge-light-danger">Inactive</span>
+                                                        <span  class="badge rounded-pill badge-light-danger">InActive</span>
                                                         @endif
                                                     </td>
-													<td class="tableactionnew mb-auto">
-														<div class="dropdown dropup">
+													<td class="tableactionnew">
+														<div class="dropdown">
 															<button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
 																<i data-feather="more-vertical"></i>
 															</button>
@@ -82,22 +81,22 @@
 																<form id="deleteForm-{{ $item->id }}" action="{{ route('RatingScale.delete', $item->id) }}" method="POST" style="display: inline;">
 																	@csrf
 																	@method('DELETE')
-																	<a type="button"
+																	<button type="button"
 																			class="dropdown-item"
 																			data-bs-toggle="modal"
 																			data-bs-target="#staticBackdrop"
 																			onclick="setDeleteId('{{ $item->id }}')">
 																		<i data-feather="trash-2" class="me-50"></i>
 																		<span>Delete</span>
-																	</a>
+																	</button>
 																</form> 
 															</div>
 														</div>
 													</td>
 												  </tr>
-												  @endforeach
+												
 											   </tbody>
-                                              
+                                               @endforeach
 
 									</table>
 								</div>

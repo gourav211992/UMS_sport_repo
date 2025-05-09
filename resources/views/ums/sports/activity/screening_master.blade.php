@@ -51,6 +51,7 @@
                                                 <th>Sport Master</th>
                                                 <th>Screening Name</th>
                                                 <th>Description</th>
+                                                <!-- <th>Weightage</th> -->
                                                 <th>Parameter Name</th>
                                                 <th>Status</th>
                                                 <th>Action</th>
@@ -64,6 +65,7 @@
                                                 <td>{{ $item->screen->sport_name ?? 'N/A' }}</td>
                                                 <td class="fw-bolder text-dark">{{ $item->screening_name }}</td>
                                                 <td>{{ $item->description ?? 'N/A' }}</td>
+                                                <!-- <td>10</td> -->
                                                 <td>
                                                     @php
                                                         $parameters = json_decode($item->parameter_details, true);
@@ -93,16 +95,10 @@
                                                                 href="{{ url('screening-master-edit', $item->id) }}">
                                                                 <i data-feather="edit-3" class="me-50"></i> Edit
                                                             </a>
-                                                            {{-- <a class="dropdown-item" onclick="window.confirm('Are you sure to Delete this Item')"
+                                                            <a class="dropdown-item"
                                                                 href="{{ url('screening-master-delete', $item->id) }}">
                                                                 <i data-feather="trash-2" class="me-50"></i> Delete
-                                                            </a> --}}
-                                                            <a href="#" 
-                                                            class="dropdown-item open-confirm-modal" 
-                                                            data-href="{{ url('screening-master-delete/'.$item->id) }}">
-                                                             <i data-feather="trash-2" class="me-50"></i>
-                                                             <span>Delete</span>
-                                                         </a>
+                                                            </a>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -115,23 +111,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title">Confirm Deletion</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                              Are you sure you want to delete this fee record?
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                              <a href="#" class="btn btn-danger" id="confirmDeleteBtn">Delete</a>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+
                 </section>
 
 
@@ -185,23 +165,4 @@
             </form>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-
-
-
-
-    <script>
-        $(document).on('click', '.open-confirm-modal', function (e) {
-    e.preventDefault(); 
-
-    let deleteUrl = $(this).data('href');
-    $('#confirmDeleteBtn').attr('href', deleteUrl); 
-
-    $('#confirmDeleteModal').modal('show'); 
-});
-
-    </script>
 @endsection
-

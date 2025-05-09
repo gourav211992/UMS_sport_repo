@@ -11,7 +11,7 @@
                     <div class="content-header-left col-md-6 mb-2">
                         <div class="row breadcrumbs-top">
                             <div class="col-12">
-                                <h2 class="content-header-title float-start mb-0">View Registration</h2>
+                                <h2 class="content-header-title float-start mb-0">View Registration </h2>
                                 <div class="breadcrumb-wrapper">
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="">Home</a>
@@ -267,10 +267,13 @@
                                                                         class="text-danger">*</span></label>
                                                         </div>
                                                         <div class="col-md-5">
-                                                            <select class="form-select" name="group">
+                                                        <select class="form-select" name="group">
                                                                 <option>Select</option>
                                                                 @foreach($groups as $group)
-                                                                    <option value="{{$group->id}}" @if($registration->group == $group->id) selected @endif>{{$group->group_name}}</option>
+                                                                    <option value="{{$group->id}}" @if($registration->group == $group->id) selected @endif>{{$group->name}}</option>
+                                                                    <script>
+                                                                        console.log({{ $group->id }},{{  $registration->group }});
+                                                                    </script>
                                                                 @endforeach
                                                             </select>
                                                         </div>
@@ -478,74 +481,39 @@
                                                         </div>
                                                     </div> -->
 
-                                                    <div class="row align-items-center mb-1">
-                                                        <div class="col-md-2">
-                                                            <label class="form-label">BAI ID <span
-                                                                        class="text-danger">*</span></label>
-                                                        </div>
-                                                        <div class="col-md-3 mb-sm-0 mb-1">
-                                                            <input type="text" class="form-control" name="bai_id" value="{{ $registration->bai_id }}"/>
-                                                        </div>
-                                                        <div class="col-md-1 mb-sm-0 mb-1">
-                                                            <label class="form-label">State <span
-                                                                        class="text-danger">*</span></label>
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                          
-                                                            <!-- <input type="text" class="form-control" name="bai_state" value="{{ $registration->bai_state }}"/> -->
-                                                             <select id="other_state" class="form-select" name="bai_state">
-                                                                <option value="">Select State</option>
-                                                                @if(isset($otherStates) && count($otherStates) > 0)
-                                                                    @foreach($otherStates as $state)
-                                                                        <option value="{{ $state->id }}"
-                                                                                @if($registration->bai_state == $state->id) selected @endif>
-                                                                            {{ $state->name }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                @endif
-                                                            </select>
-                                                        </div>
+                                                    <div class="row mb-1 align-items-center">
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">BAI ID <span class="text-danger">*</span></label>
                                                     </div>
-
-                                                    <div class="row align-items-center mb-1">
-                                                        <div class="col-md-2">
-                                                            <label class="form-label">BWF ID <span
-                                                                        class="text-danger">*</span></label>
-                                                        </div>
-                                                        <div class="col-md-3">
-                                                            <input type="text" class="form-control" name="bwf_id" value="{{ $registration->bwf_id }}"/>
-                                                        </div>
-                                                        <div class="col-md-1 mb-sm-0 mb-1">
-                                                            <label class="form-label">Country <span
-                                                                        class="text-danger">*</span></label>
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                        
-                                                        
-                                                        <select id="other_country" class="form-select" name="country">
-                                                            <option value="">Select</option>
-                                                            @foreach($countries as $country)
-                                                                <option value="{{ $country->id }}"
-                                                                    @if(isset($selectedCountry) && $selectedCountry->id == $country->id) selected @endif>
-                                                                    {{ $country->name }}
-                                                                </option>
-                                                            @endforeach
+                                                    <div class="col-md-3 mb-sm-0 mb-1">
+                                                        <input type="text" class="form-control" name="bai_id" id="bai_id" value="{{ $registration->bai_id }}" />
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">State</label>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <select id="bai_state" class="form-select" name="bai_state">
+                                                            <option value="">Select State</option>
                                                         </select>
-
-                                                        
-                                                        
-                                                        <!-- <select id="other_country" class="form-select" name="country">
-                                                                <option value="">Select</option>
-                                                                @foreach($countries as $country)
-                                                                    <option value="{{ $country->id }}"
-                                                                            @if($registration->country == $country->id) selected @endif>
-                                                                            
-                                                                        {{ $country->name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select> -->
-                                                        </div>
                                                     </div>
+                                                </div>
+
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">BWF ID <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <input type="text" class="form-control" name="bwf_id" id="bwf_id" value="{{ $registration->bwf_id }}" />
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Country</label>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <select id="other_country" class="form-select" name="country">
+                                                            <option value="">Select Country</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
                                                 </div>
                                                 <div class="tab-pane" id="Address">
                                                     <div class="row">
@@ -1571,36 +1539,37 @@
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
     <script>
-        function loadStates(countryId, type) {
-            $.ajax({
-                url: '/get-states/' + countryId,
-                method: 'GET',
-                success: function(data) {
-                    var stateDropdown = $('#' + type + '_state');
-                    stateDropdown.empty();
-                    stateDropdown.append('<option>Select State</option>');
-                    $.each(data, function(key, state) {
-                        stateDropdown.append('<option value="' + state.id + '">' + state.name + '</option>');
-                    });
-                }
-            });
-        }
+        // function loadStates(countryId, type) {
+        //     $.ajax({
+        //         url: '/get-states/' + countryId,
+        //         method: 'GET',
+        //         success: function(data) {
+        //             var stateDropdown = $('#' + type + '_state');
+        //             stateDropdown.empty();
+        //             stateDropdown.append('<option>Select State</option>');
+        //             $.each(data, function(key, state) {
+        //                 stateDropdown.append('<option value="' + state.id + '">' + state.name + '</option>');
+        //             });
+        //         }
+        //     });
+        // }
 
-        function loadCities(stateId, type) {
-            $.ajax({
-                url: '/get-cities/' + stateId,
-                method: 'GET',
-                success: function(data) {
-                    var cityDropdown = $('#' + type + '_district');
-                    cityDropdown.empty();
-                    cityDropdown.append('<option>Select City</option>');
-                    $.each(data, function(key, city) {
-                        cityDropdown.append('<option value="' + city.id + '">' + city.name + '</option>');
-                    });
-                }
-            });
-        }
+        // function loadCities(stateId, type) {
+        //     $.ajax({
+        //         url: '/get-cities/' + stateId,
+        //         method: 'GET',
+        //         success: function(data) {
+        //             var cityDropdown = $('#' + type + '_district');
+        //             cityDropdown.empty();
+        //             cityDropdown.append('<option>Select City</option>');
+        //             $.each(data, function(key, city) {
+        //                 cityDropdown.append('<option value="' + city.id + '">' + city.name + '</option>');
+        //             });
+        //         }
+        //     });
+        // }
         function saveDraft() {
             document.getElementById('status').value = 'on-hold';
             document.getElementById('postRegister').submit();
@@ -2001,6 +1970,88 @@
             $('input[name^="family_details"]').prop('disabled', true);
         });
     </script>
+      <script>
+    $(document).ready(function() {
+
+        $('#bai_id').on('input', function() {
+            const baiValue = $(this).val().trim();
+
+            if (baiValue !== '') {
+                loadStates(101, 'bai', '{{ old('bai_state', $registration->bai_state) }}'); // Pass selected state
+            } else {
+                $('#bai_state').empty().append('<option value="">Select State</option>');
+            }
+        });
+
+        // Handle BWF ID input
+        $('#bwf_id').on('input', function() {
+            const bwfValue = $(this).val().trim();
+            const selectedCountry = '{{ old('country', $registration->country) }}';
+
+            if (bwfValue !== '') {
+                $('#other_country').prop('required', true);
+                loadCountries(selectedCountry); // Trigger country load
+            } else {
+                $('#other_country').prop('required', false)
+                    .html('<option value="">Select Country</option>')
+                    .val('').trigger('change');
+                $('#bai_state').html('<option value="">Select State</option>');
+            }
+        });
+
+        // Initial triggers when the page loads (if there’s any pre-filled data)
+        $('#bai_id').trigger('input');
+        $('#bwf_id').trigger('input');
+
+
+        // Load countries
+        function loadCountries(selectedCountry = '') {
+            console.log("Loading countries...");
+
+            $.ajax({
+                url: '/get-country',
+                method: 'GET',
+                success: function(data) {
+                    var countryDropdown = $('#other_country');
+                    countryDropdown.empty();
+                    countryDropdown.append('<option value="">Select Country</option>');
+
+                    $.each(data, function(key, country) {
+                        var isSelected = (country.id == selectedCountry) ? 'selected' : '';
+                        countryDropdown.append('<option value="' + country.id + '" ' + isSelected + '>' + country.name + '</option>');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.log("Error loading countries: ", status, error);
+                }
+            });
+        }
+
+        // Load states based on country
+        function loadStates(countryId, type, selectedState = '') {
+            console.log("Loading states for country ID:", countryId);
+
+            $.ajax({
+                url: '/get-states/' + countryId,
+                method: 'GET',
+                success: function(data) {
+                    var stateDropdown = $('#' + type + '_state');
+                    stateDropdown.empty();
+                    stateDropdown.append('<option value="">Select State</option>');
+
+                    $.each(data, function(key, state) {
+                        var isSelected = (state.id == selectedState) ? 'selected' : '';
+                        stateDropdown.append('<option value="' + state.id + '" ' + isSelected + '>' + state.name + '</option>');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.log("Error loading states: ", status, error);
+                }
+            });
+        }
+
+    });
+</script>
 
     <!-- Modals and scripts can be reused from the registration.blade.php -->
 @endsection

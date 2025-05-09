@@ -21,10 +21,7 @@
                 </div>
                 <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">
-						<button class="btn btn-dark btn-sm mb-50 mb-sm-0" onclick="window.location.href='activity-scheduler'">
-                            <i data-feather="refresh-cw" class="me-50"></i> Reset
-                        </button>
-                        <button class="btn btn-warning btn-sm mb-50 mb-sm-0" data-bs-target="#filter" data-bs-toggle="modal"><i data-feather="filter"></i> Filter</button> 
+                        {{-- <button class="btn btn-warning btn-sm mb-50 mb-sm-0" data-bs-target="#filter" data-bs-toggle="modal"><i data-feather="filter"></i> Filter</button>  --}}
 						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('activity-scheduler-add')}}"><i data-feather="plus-circle"></i> Add New</a> 
                     </div>
                 </div>
@@ -63,15 +60,15 @@
 											</thead>
 											<tbody>
 												@foreach ($activityScheduler as $index=>$item)
-												
 												 <tr class="text-center">
 													<td>{{$index+1}}</td>
 													<td class="fw-bolder text-dark">{{$item->activity}}</td>
 													<td>{{$item->scheduler_no}}</td>
-													<td>{{$item->trainerRelation?->name ?? 'N/A' }}</td>													<td>{{$item->start_date}}</td>
+													<td>{{$item->trainer}}</td>
+													<td>{{$item->start_date}}</td>
 													<td>{{$item->end_date}}</td>
-													<td>{{$item->sectionRelation->name ?? 'N/A' }}</td>
-													<td>{{$item->groupRelation->name ?? 'N/A' }}</td>												
+													<td>{{ $item->sectionRelation->name ?? 'N/A' }}</td>
+													<td>{{ $item->groupRelation->name ?? 'N/A' }}</td>												
 													@php
 													$student = json_decode($item->batch_student , true);
 													$count = is_array($student) ? count($student) : 0;
@@ -150,90 +147,7 @@
 
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
-
-	@include('ums.admin.search-model', ['searchTitle' => 'sport List Search'])
     <div class="modal modal-slide-in fade filterpopuplabel" id="filter">
-        <div class="modal-dialog sidebar-sm">
-            <form class="add-new-record modal-content pt-0" id="approveds-form" method="GET" novalidate
-                action="{{ url('activity-scheduler') }}">
-                @csrf
-                <div class="modal-header mb-1">
-                    <h5 class="modal-title" id="exampleModalLabel">Apply Filter</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
-                </div>
-                <div class="modal-body flex-grow-1">
-
-                    <div class="mb-1">
-                        <label class="form-label">Start Date</label>
-                        <input type="date" class="form-control" name="start_date" value="{{ request()->start_date }}">
-                    </div>
-
-                    <div class="mb-1">
-                        <label class="form-label">End Date</label>
-                        <input type="date" class="form-control" name="end_date" value="{{ request()->end_date }}">
-                    </div>
-
-                    <div class="mb-1">
-                        <label class="form-label">Activity</label>
-                        <select class="form-select select2" name="activity" id="activity">
-                            <option value="">Select</option>
-                            @foreach ($allActivities as $activity)
-                                <option value="{{ $activity }}"
-                                    {{ request()->activity == $activity ? 'selected' : '' }}>
-                                    {{ $activity }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-1">
-                        <label class="form-label">Trainer</label>
-                        <select class="form-select select2" name="trainer" id="trainer">
-                            <option value=""> Select </option>
-                            @foreach ($allTrainers as $trainer)
-                                <option value="{{ $trainer }}"
-                                    {{ request()->trainer == $trainer ? 'selected' : '' }}>
-                                    {{ $trainer }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-1">
-                        <label class="form-label">Group</label>
-                        <select class="form-select select2" name="group" id="group">
-                            <option value=""> Select </option>
-                            @foreach ($allGroups as $group)
-                                <option value="{{ $group }}"
-                                    {{ request()->group == $group ? 'selected' : '' }}>
-                                    {{ $group }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-1">
-                        <label class="form-label">Section</label>
-                        <select class="form-select select2" name="section" id="secton">
-                            <option value=""> Select </option>
-                            @foreach ($allSections as $section)
-                                <option value="{{ $section }}"
-                                    {{ request()->section == $section ? 'selected' : '' }}>
-                                    {{ $section }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                </div>
-                <div class="modal-footer justify-content-start">
-                    <button type="submit" class="btn btn-primary">Apply Filters</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {{-- <div class="modal modal-slide-in fade filterpopuplabel" id="filter">
 		<div class="modal-dialog sidebar-sm">
 			<form class="add-new-record modal-content pt-0"> 
 				<div class="modal-header mb-1">
@@ -283,7 +197,7 @@
 				</div>
 			</form>
 		</div>
-	</div> --}}
+	</div>
 	
 	<script>
 		document.addEventListener('DOMContentLoaded', function () {

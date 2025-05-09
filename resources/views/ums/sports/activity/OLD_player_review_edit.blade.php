@@ -115,8 +115,8 @@
                                                     </div>
 
                                                     <div class="col-md-3 mb-75 col-6">
-                                                        <h6 class="fw-bolder text-dark mb-25">Trainer</h6>
-                                                        <p class="font-small-3">{{ $data->trainerRelation->name }}</p>
+                                                        <h6 class="fw-bolder text-dark mb-25">Group</h6>
+                                                        <p class="font-small-3">{{ $data->trainer }}</p>
                                                     </div>
 
                                                     <div class="col-md-3 mb-75 col-6">

@@ -79,7 +79,10 @@
                                                     </div>
                                                 </div>
 
-                                              
+                                                <div class="mt-3">
+                                                    <button onClick="javascript: history.go(-1)" class="btn btn-secondary btn-sm"><i data-feather="arrow-left-circle"></i> Back</button>
+                                                    <button type="submit" class="btn btn-primary btn-sm ms-1"><i data-feather="check-circle"></i> Update</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
