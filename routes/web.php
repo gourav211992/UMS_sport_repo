@@ -368,6 +368,8 @@ Route::get('player-review', [MyActivityController::class, 'review'])->name('play
 Route::get('player-review-view/{id}/{date}', [MyActivityController::class, 'playerView'])->name('player-review-view');
 Route::get('player-review-edit/{id}/{date}', [MyActivityController::class, 'playerEdit'])->name('player-review-edit');
 Route::post('save-player-details', [MyActivityController::class, 'savePlayerDetails'])->name('save-player-details');
+Route::post('/fetch-rating-remark', [MyActivityController::class, 'FetchRatingRemark'])->name('fetch.rating.remark');
+
 
 
 // Sport TYPE

@@ -270,11 +270,12 @@
                                                                             class="form-select attendance-related attendance-{{ $stu->id }} rating-select"
                                                                             data-id="{{ $stu->id }}">
                                                                             <option value="">Select</option>
-                                                                            @for ($i = 5; $i >= 1; $i--)
-                                                                                <option value="{{ $i }}"
-                                                                                    @if (($data['rating'] ?? '') == $i) selected @endif>
-                                                                                    {{ $i }}</option>
-                                                                            @endfor
+                                    @foreach ($RatingScale as $rating)
+    <option value="{{ $rating->id }}"
+        @if(isset($data['rating']) && $data['rating'] == $rating->id) selected @endif>
+        {{ $rating->scores }}
+    </option>
+@endforeach
                                                                         </select>
                                                                     </td>
 

@@ -247,18 +247,22 @@
                                                                         <select
                                                                             name="students[{{ $stu->id }}][rating]"
                                                                             class="form-select attendance-related attendance-{{ $stu->id }} rating-select"
-                                                                            data-id="{{ $stu->id }}">
+                                                                            data-id="{{ $stu->id }}"
+                                                                             id="rating" >
                                                                             <option value="">Select</option>
-                                                                            @for ($i = 5; $i >= 1; $i--)
-                                                                                <option value="{{ $i }}"
-                                                                                    @if (($data['rating'] ?? '') == $i) selected @endif>
-                                                                                    {{ $i }}</option>
-                                                                            @endfor
+                                                                            @foreach ($RatingScale as $rating)
+    <option value="{{ $rating->id }}"
+        @if(isset($data['rating']) && $data['rating'] == $rating->id) selected @endif>
+        {{ $rating->scores }}
+    </option>
+@endforeach
+
+                                                                            
                                                                         </select>
                                                                     </td>
 
                                                                     <td>
-                                                                        @php
+                                                                        <!-- @php
                                                                             $rating = $data['rating'] ?? '';
                                                                             $badgeClass = '';
                                                                             switch ($rating) {
@@ -280,19 +284,26 @@
                                                                                 default:
                                                                                     $badgeClass = 'bg-secondary';
                                                                             }
-                                                                        @endphp
+                                                                        @endphp -->
 
                                                                         <span
                                                                             class="badge {{ $badgeClass }} badgeborder-radius p-25 rating-badge"
                                                                             id="badge-{{ $stu->id }}">&nbsp;</span>
                                                                     </td>
 
-                                                                    <td>
+                                                                    <!-- <td>
                                                                         <input type="text"
                                                                             name="students[{{ $stu->id }}][remarks]"
                                                                             class="form-control attendance-related attendance-{{ $stu->id }}"
                                                                             value="{{ $data['remarks'] ?? '' }}">
-                                                                    </td>
+                                                                    </td> -->
+                                                                    <td>
+    <input type="text" style="max-width: 200px;"
+        name="students[{{ $stu->id }}][remarks]"
+       
+        class="form-control attendance-related mw-100 attendance-{{ $stu->id }} remark-input remark-{{ $stu->id }}"
+        value="{{ $data['remarks'] ?? '' }}">
+</td>
                                                                 </tr>
                                                             @endforeach
                                                         </tbody>
@@ -323,10 +334,31 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script>
+    <!-- <script>
         $(document).ready(function() {
             $('.rating-select').on('change', function() {
                 const rating = $(this).val();
+                if( rating != ''){
+              $.ajax({
+                url:"{{ route('fetch.rating.remark') }}",
+                type:"Post",
+                data: { rating_id: rating},
+                success: function (response) {
+                if (response.success) {
+                    $('.remark-' + studentId).text(response.data.remarks); 
+                } else {
+                    $('.remark-' + studentId).text('No remark found');
+                }
+            },
+            error: function () {
+                $('.remark-' + studentId).text('Server error');
+            }
+
+
+              })}
+              else{
+  $('.remark-' + studentId).text('');
+              }
                 const studentId = $(this).data('id');
                 const badge = $('#badge-' + studentId);
 
@@ -357,9 +389,35 @@
                 badge.addClass(badgeClass);
             });
         });
-    </script>
+    </script> -->
 
 
+<script>
+    $(document).ready(function () {
+        $('.rating-select').on('change', function () {
+            const rating = $(this).val();
+            const studentId = $(this).data('id');
+            const badge = $('#badge-' + studentId);
+
+            
+            let badgeClass = 'bg-secondary';
+            switch (parseInt(rating)) {
+                case 5: badgeClass = 'bg-success'; break;
+                case 4: badgeClass = 'bg-primary'; break;
+                case 3: badgeClass = 'bg-info'; break;
+                case 2: badgeClass = 'bg-warning'; break;
+                case 1: badgeClass = 'bg-danger'; break;
+            }
+
+            badge.removeClass(function (index, className) {
+                return (className.match(/(^|\s)bg-\S+/g) || []).join(' ');
+            }).addClass(badgeClass);
+
+           
+           
+        });
+    });
+</script>
 
     <script>
         $('#checkAll').on('change', function() {

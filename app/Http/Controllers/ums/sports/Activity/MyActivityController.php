@@ -7,6 +7,7 @@ use App\Models\MasterGroup;
 use App\Models\ums\Activity\SportActivityScheduler;
 use App\Models\ums\activity\MyActivity;
 use App\Models\ums\Activity\SportActivityDetail;
+use App\Models\ums\Activity\Sport_Rating_Scale;
 use App\Models\ums\ActivityMaster;
 use App\Models\ums\batch;
 use App\Models\ums\Section;
@@ -107,6 +108,8 @@ class MyActivityController extends Controller
         ->where('date', Carbon::parse($date)->format('Y-m-d'))
         ->first();
 
+        $RatingScale = Sport_Rating_Scale::where('status','active')->get();
+
     $attendanceData = $activityDetails ? json_decode($activityDetails->students, true) : [];
 
     $data = SportActivityScheduler::where('trainer', '409')
@@ -147,9 +150,31 @@ class MyActivityController extends Controller
         'data',
         'activityDate',
         'students',
-        'attendanceData'
+        'attendanceData',
+        'RatingScale'
     ));
 }
+
+
+public function FetchRatingRemark(Request $request)
+{
+    $RatingScale = Sport_Rating_Scale::where('status', 'active')
+                    ->where('id', $request->rating_id)
+                    ->first();
+
+    if ($RatingScale) {
+        return response()->json([
+            'success' => true,
+            'data' => $RatingScale
+        ]);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'Rating not found or inactive.'
+        ]);
+    }
+}
+
 
 
 public function saveActivityDetails(Request $request)
@@ -400,7 +425,7 @@ public function playerEdit($id, $date)
     $activityDetails = SportActivityDetail::where('scheduler_id', $id)
         ->where('date', Carbon::parse($date)->format('Y-m-d'))
         ->first();
-
+  $RatingScale = Sport_Rating_Scale::where('status','active')->get();
     $attendanceData = $activityDetails ? json_decode($activityDetails->students, true) : [];
 
     $data = SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation', 'trainerRelation' ])
@@ -440,7 +465,8 @@ public function playerEdit($id, $date)
         'data',
         'activityDate',
         'students',
-        'attendanceData'
+        'attendanceData',
+        'RatingScale'
     ));
 }
 

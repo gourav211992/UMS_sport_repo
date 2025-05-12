@@ -910,6 +910,7 @@ public function confirm(  Request $request, $id){
             'otherStates'
         ));
     }
+
     public function postRegistrationUpdate(Request $request, $id)
     {
 //        dd($request->all());
@@ -991,6 +992,7 @@ public function confirm(  Request $request, $id){
         $feeDependentFields = [
             'quota_id' => $registration->quota_id,
             'fee_batch_id' => $registration->fee_batch_id,
+            'fee_section_id'=>$registration->fee_section_id,
             'group' => $registration->group,
         ];
 
@@ -1232,7 +1234,7 @@ public function confirm(  Request $request, $id){
                         $message->subject('Application On Hold');
                     });
                 }
-                if( $feeDependentChanged){
+                if( $feeDependentChanged||$sendOnHoldEmail){
                     Mail::send('ums.sports.on_hold_email', [
                         'user' => $user,
                         'remarks' => $request->remarks,
