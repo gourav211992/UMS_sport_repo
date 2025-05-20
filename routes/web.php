@@ -195,7 +195,6 @@ use App\Http\Controllers\DiscountMasterController;
 use App\Http\Controllers\ExpenseMasterController;
 use App\Http\Controllers\PurchaseReturnController;
 //s
-use App\Http\Controllers\ums\sports\SportsMasterController;
 use App\Http\Controllers\ums\SportsController;
 use App\Http\Controllers\ums\SportRegisterController;
 //
@@ -216,7 +215,8 @@ use App\Http\Controllers\ums\sports\Activity\ActivitySchedulerController;
 use App\Http\Controllers\ums\sports\Activity\MyActivityController;
 use App\Http\Controllers\ums\sports\Activity\ScreeningAssesmentController;
 use App\Http\Controllers\ums\sports\Activity\RatingScaleController;
-
+use App\Http\Controllers\ums\sports\sportFeeHeadController;
+use App\Http\Controllers\ums\sports\FeeRefundController;
 
 // Password Reset Routes
 Route::get('sports/password/reset', [SportsForgotPasswordController::class, 'showForgotForm'])->name('sports.password.request');
@@ -358,6 +358,34 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/sports-fee-schedule/clone/id',[SportFeeController::class,'clone'])->name('sports-fee-schedule-clone');
 
 
+
+    //fee head master
+
+Route::get('sport_fee_head', [sportFeeHeadController::class, 'index'])->name('sport_fee_head.index');
+Route::get('sport_fee_head_add', [sportFeeHeadController::class, 'create'])->name('sport_fee_head.create');
+Route::post('sport_fee_head_store', [sportFeeHeadController::class, 'store'])->name('sport_fee_head.store');
+Route::get('sport_fee_head_edit/{id}', [sportFeeHeadController::class, 'edit'])->name('sport_fee_head.edit');
+Route::post('sport_fee_head_update/{id}', [sportFeeHeadController::class, 'update'])->name('sport_fee_head.update');
+Route::get('sport_fee_head_view/{id}', [sportFeeHeadController::class, 'show'])->name('sport_fee_head.view');
+Route::get('sport_fee_head_delete/{id}', [SportFeeHeadController::class, 'destroy'])->name('sport_fee_head.delete');
+Route::get('/get-sections', [FeeRefundController::class, 'getSections'])->name('getSections');
+Route::get('/get-students', [FeeRefundController::class, 'getStudents'])->name('getStudents');
+Route::get('/get-all-sections', [FeeRefundController::class, 'getAllSections'])->name('getAllSections');
+Route::get('/get-all-students', [FeeRefundController::class, 'getAllStudents'])->name('getAllStudent');
+//fee head master end
+
+Route::get('fee_refund', [FeeRefundController::class, 'index'])->name('FeeRefund.list');
+Route::get('fee_refund_add', [FeeRefundController::class, 'FeeRefundAdd'])->name('FeeRefund.Add');
+Route::post('fee_refund_add', [FeeRefundController::class, 'FeeRefundCreate'])->name('FeeRefund_add.create');
+Route::get('/get-fee-details/{id}', [FeeRefundController::class, 'getFeeDetails']);
+Route::delete('/fee_refund_delete/{id}', [FeeRefundController::class, 'softDelete'])->name('feeRefund.delete');
+Route::get('/fee_refund_edit/{id}', [FeeRefundController::class, 'feeRefundEdit'])->name('fee_refund.edit');
+Route::post('/fee_refund_edit/{id}', [FeeRefundController::class, 'feeRefundUpdate'])->name('FeeRefund_Update');
+Route::get('/fee_refund_view/{id}', [FeeRefundController::class, 'feeRefundView'])->name('FeeRefund_View');
+Route::get('/getStudentsBySectionOnly', [FeeRefundController::class, 'getStudentsBySectionOnly'])->name('getStudentsBySectionOnly');
+    
+
+
     // MY ACTIVITY
     Route::get('my-activity', [MyActivityController::class, 'index'])->name('my-activity');
 Route::get('my-activity-view/{id}/{date}', [MyActivityController::class, 'ActivityView'])->name('activity-view');
@@ -373,12 +401,12 @@ Route::post('/fetch-rating-remark', [MyActivityController::class, 'FetchRatingRe
 
 
 // Sport TYPE
-Route::post('sport-type-add', [SportsMasterController::class, 'SportTypeAdd'])->name('sport-type-add');
-Route::get('sport-type', [SportsMasterController::class, 'indexSportType'])->name('sport-type');
-Route::get('sport-type-add', [SportsMasterController::class, 'showSportTypeAddForm'])->name('sport-type-add.form');
-Route::get('sport-type-edit/{id}', [SportsMasterController::class, 'SportTypeEdit'])->name('sport-type-edit');
-Route::put('sport-type-edit/{id}', [SportsMasterController::class, 'SportTypeUpdate'])->name('sport-type-update');
-Route::get('sport-type-delete/{id}', [SportsMasterController::class, 'sportTypeDelete'])->name('sport-type-delete');
+Route::post('sport-type-add', [sportMasterController::class, 'SportTypeAdd'])->name('sport-type-add');
+Route::get('sport-type', [sportMasterController::class, 'indexSportType'])->name('sport-type');
+Route::get('sport-type-add', [sportMasterController::class, 'showSportTypeAddForm'])->name('sport-type-add.form');
+Route::get('sport-type-edit/{id}', [sportMasterController::class, 'SportTypeEdit'])->name('sport-type-edit');
+Route::put('sport-type-edit/{id}', [sportMasterController::class, 'SportTypeUpdate'])->name('sport-type-update');
+Route::get('sport-type-delete/{id}', [sportMasterController::class, 'sportTypeDelete'])->name('sport-type-delete');
 
 
 //
@@ -473,14 +501,14 @@ Route::get('screening-master-view/{id}',[ScreeningMasterController::class,'viewp
 
 //sport master
 
-Route::get('sport-master-add', [SportsMasterController::class, 'SportType'])->name('sport-master-add');
-Route::post('sport-master-add', [SportsMasterController::class, 'SportMasterAdd']);
-Route::get('sport-master', [SportsMasterController::class, 'indexSportMaster'])->name('sport-master');
-Route::get('sport-master-edit/{id}', [SportsMasterController::class, 'SportMasterEdit'])->name('sport-master-edit');
+Route::get('sport-master-add', [sportMasterController::class, 'SportType'])->name('sport-master-add');
+Route::post('sport-master-add', [sportMasterController::class, 'SportMasterAdd']);
+Route::get('sport-master', [sportMasterController::class, 'indexSportMaster'])->name('sport-master');
+Route::get('sport-master-edit/{id}', [sportMasterController::class, 'SportMasterEdit'])->name('sport-master-edit');
 
-Route::put('sport-master-edit/{id}', [SportsMasterController::class, 'SportMasterUpdate'])->name('sport-master-update');
-Route::get('sport-master-delete/{id}', [SportsMasterController::class, 'softDelete']);
-Route::get('sport-master-view/{id}', [SportsMasterController::class, 'SportMasterView'])->name('sport-master-view');
+Route::put('sport-master-edit/{id}', [sportMasterController::class, 'SportMasterUpdate'])->name('sport-master-update');
+Route::get('sport-master-delete/{id}', [sportMasterController::class, 'softDelete']);
+Route::get('sport-master-view/{id}', [sportMasterController::class, 'SportMasterView'])->name('sport-master-view');
 
 
 //fee master

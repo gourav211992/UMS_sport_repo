@@ -62,6 +62,9 @@ data-scroll-to-active="true">
             <li class="nav-item"><a class="d-flex align-items-center" href="{{url('sports-students')}}"><i
                         data-feather="users"></i><span class="menu-title text-truncate">Candidates Master</span></a>
             </li>
+            <li class="nav-item"><a class="d-flex align-items-center" href="{{url('/fee_refund')}}"><i
+                        data-feather="users"></i><span class="menu-title text-truncate">Fee Refund</span></a>
+            </li>
 
             <li class="{{ Route::currentRouteName() == 'book' || Route::currentRouteName() == 'book_create' || Route::currentRouteName() == 'bookEdit' ? 'active' : '' }}"><a class="d-flex align-items-center" href="{{ route('book') }}"><i
                         data-feather="circle"></i><span class="menu-item text-truncate">Series</span></a>
@@ -142,6 +145,10 @@ data-scroll-to-active="true">
                     <li class="nav-item"><a class="d-flex align-items-center" href="{{url('sport-master')}}"><i
                                 data-feather="grid"></i><span class="menu-title text-truncate">Sports Master</span></a>
                     </li>
+                     <li><a class="d-flex align-items-center" href="{{url('sport_fee_head')}}"><i
+                                data-feather="circle"></i><span
+                                class="menu-item text-truncate">Fee Head Master</span></a>
+                    </li>
 
                     <li class="nav-item"><a class="d-flex align-items-center" href="{{url('sports-fee-schedule')}}"><i
                                 data-feather="file-text"></i><span class="menu-title text-truncate">Fee Master</span></a>
@@ -162,6 +169,7 @@ data-scroll-to-active="true">
                                 data-feather="circle"></i><span
                                 class="menu-item text-truncate">Group Master</span></a>
                     </li>
+                   
                 </ul>
 
             </li>

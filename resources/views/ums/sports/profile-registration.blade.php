@@ -217,19 +217,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-{{--                                                <div class="row align-items-center mb-1">--}}
-{{--                                                    <div class="col-md-3">--}}
-{{--                                                        <label class="form-label">Batch Year <span class="text-danger">*</span></label>--}}
-{{--                                                    </div>--}}
-{{--                                                    <div class="col-md-5">--}}
-{{--                                                        <select class="form-select" id="batch_year" name="batch_year" disabled>--}}
-{{--                                                            <option value="">-----Select Year-----</option>--}}
-{{--                                                            @foreach($batch as $ba)--}}
-{{--                                                                <option value="{{ $ba->id }}" @if ($ba->id == $registration->batch_id) selected @endif>{{ $ba->batch_year }}</option>--}}
-{{--                                                            @endforeach--}}
-{{--                                                        </select>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
+                                    
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Section <span class="text-danger">*</span></label>
@@ -1870,32 +1858,56 @@ function loadCountries(selectedCountry = '') {
 // } 
 
 
-        $(document).ready(function() {
-            $('#batch_name').change(function() {
-                let batchId = $(this).val();
-                $('#section').html('<option value="" selected>-----Select Section-----</option>');
+       $(document).ready(function () {
+ $('#batch_name').change(function () {
+    let batchId = $(this).val();
+    $('#section').html('<option value="">-----Select Section-----</option>');
 
-                if (batchId) {
-                    $.ajax({
-                        url: "{{ route('get.sections.by.batch') }}",
-                        type: "POST",
-                        data: {
-                            batch_id: batchId,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            if (response.length > 0) {
-                                $.each(response, function(index, section) {
-                                    $('#section').append('<option value="' + section.id + '">' + section.section + '</option>');
-                                });
-                            }
+    if (batchId) {
+        $.ajax({
+            url: "{{ route('get.sections.by.batch') }}",
+            type: "POST",
+            data: {
+                batch_id: batchId,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function (response) {
+                // Populate sections
+                if (response.sections && response.sections.length > 0) {
+                    $.each(response.sections, function (index, section) {
+                        $('#section').append('<option value="' + section.id + '">' + section.section + '</option>');
+                    });
+                }
+
+                // Replace selected quota dynamically
+                if (response.quota_name) 
+                {
+                    // Set hidden input quota_id_hidden value
+
+                    $('#quota_id option').each(function () 
+                    {
+                        if ($(this).text().trim().toLowerCase() === response.quota_name.toLowerCase()) {
+                            $(this).prop('selected', true);
+                                            let selectedOption = $('#quota_id option:selected');
+                $('#quota_id_hidden').val(selectedOption.val());
+
+                        } else {
+                            $(this).prop('selected', false);
                         }
                     });
                 }
-            });
-            $('#section').change(function() {
-                fetchFeeStructure();
-            });
+            }
+        });
+    }
+});
+
+
+
+    // Section change triggers fetch fee structure
+    $('#section').change(function () {
+        fetchFeeStructure();
+    });
+
             function fetchFeeStructure()
             {
                 // Get all required values
@@ -1904,7 +1916,7 @@ function loadCountries(selectedCountry = '') {
                 const sectionId = $('#section').val();
                 const batchYear = $('#batch_year').val();
                 const batchId = $('#batch_name').val();
-                const quotaId = $('#quota').val();
+                const quotaId = $('#quota_id').val();
 
                 // Make sure all fields are selected
                 // if (!sportId || !sectionId || !batchYear || !batchId || !quotaId) {

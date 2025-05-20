@@ -45,7 +45,7 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="table-responsive candidates-tables">
-									<table class="datatables-basic table table-striped myrequesttablecbox loanapplicationlist tasklist "> 
+									<table class="datatables-basic table table-striped myrequesttablecbox tasklist "> 
                                         <thead>
                                              <tr class="text-center">
 												<th>#</th>

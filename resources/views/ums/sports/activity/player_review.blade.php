@@ -95,7 +95,7 @@
                                                     </td>
 
                                                     <td class="tableactionnew">
-                                                        <div class="dropdown">
+                                                        <div class="dropdown dropup">
                                                             <button type="button"
                                                                 class="btn btn-sm dropdown-toggle hide-arrow py-0"
                                                                 data-bs-toggle="dropdown">

@@ -161,7 +161,7 @@
                                                                         placeholder="Enter Parameter Name" />
                                                                 </td>
                                                                 <td>
-                                                                    <input type="text"
+                                                                    <input type="number"
                                                                         class="form-control parameter-duration mw-100"
                                                                         placeholder="Enter Parameter duration" />
                                                                 </td>

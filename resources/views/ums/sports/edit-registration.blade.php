@@ -430,6 +430,11 @@
                                                     <a class="nav-link" data-bs-toggle="tab"
                                                         href="#payment">Payment Details</a>
                                                 </li>
+
+                                                <li class="nav-item">
+                                                    <a class="nav-link" data-bs-toggle="tab"
+                                                        href="#payment_schedule">Payment Schedule</a>
+                                                </li>
                                             </ul>
                                         </div>
                                         <div class="tab-content pb-1 px-1">
@@ -1358,7 +1363,7 @@
 
                                                             <!-- Total Fees Row -->
                                                             @php
-                                                            $totalFeesSum = 0;
+                                                    
                                                             $totalNetFeePayableValue = 0;
 
                                                             foreach ($feeDetails as $fees) {
@@ -1369,8 +1374,8 @@
                                                             $feeSponsorshipValue = $fees['fee_sponsorship_value'] ?? (($fees['total_fees'] ?? 0) * ($fees['fee_sponsorship_percent'] ?? 0) / 100);
                                                             $feeDiscountValue = $fees['fee_discount_value'] ?? (($fees['total_fees'] ?? 0) * ($fees['fee_discount_percent'] ?? 0) / 100);
 
-                                                            $totalFeesSum += $totalFees;
                                                             $totalNetFeePayableValue += $totalFees - ($feeSponsorshipValue + $feeDiscountValue);
+                                                           
                                                             }
                                                             }
                                                             @endphp
@@ -1403,11 +1408,13 @@
 
                                                                 @endif
                                                                 </td> --}}
-                                                                <td>
+                                                                <!-- <td>
                                                                     @php
                                                                     $paidAmount = $RecivedPayment->paid_amount ?? 0;
 
-                                                                    $isFullyPaid = $paidAmount == $totalFeesSum;
+              $isFullyPaid = abs($paidAmount -  $totalNetFeePayableValue) <= 1.00;
+            //   dd(  $isFullyPaid);
+
 
                                                                     $hasAnyPayment = $paidAmount > 0;
                                                                     @endphp
@@ -1447,7 +1454,7 @@
                                                                     </button>
 
                                                                     @endif
-                                                                </td>
+                                                                </td> -->
 
                                                             </tr>
                                                         </tbody>
@@ -1455,11 +1462,11 @@
                                                     {{-- <input type="hidden" name="fee_details" id="feeDetailsInput">--}}
                                                 </div>
                                             </div>
-                                            <div class="modal fade" id="update-payment" tabindex="-1" aria-labelledby="shareProjectTitle" aria-hidden="true">
+                                            <!-- <div class="modal fade" id="update-payment" tabindex="-1" aria-labelledby="shareProjectTitle" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <form id="paymentForm" method="post" enctype="multipart/form-data">
                                                         @csrf
-                                                        {{-- @dump($registration->user->id) --}}
+                                                      
                                                         <input type="hidden" name="user_id" value="{{ $registration->userable_id }}">
                                                         <div class="modal-content">
                                                             <div class="modal-header p-0 bg-transparent">
@@ -1486,7 +1493,6 @@
                                                                     $scheduleStatus = [];
                                                                     $show_status = false;
 
-                                                                    // Step 1: Decode paid durations
                                                                     if (!empty($RecivedPayment->fee_heads_durations)) {
                                                                     $feeHeadsDurations = json_decode($RecivedPayment->fee_heads_durations, true);
                                                                     if (is_array($feeHeadsDurations)) {
@@ -1575,12 +1581,12 @@
 
 
 
-                                                                            <!-- Duration and Fee Calculation -->
+                                                                        
                                                                             <div class="col-md-12 mb-1" id="duration_container">
-                                                                                <!-- Dynamic duration blocks will be added here -->
+                                                                               
                                                                             </div>
 
-                                                                            <!-- Total Monthly and One-Time Amount -->
+                                                                         
                                                                             <div class="col-md-12 mb-1">
                                                                                 <label class="form-label">Total Monthly Amount</label>
                                                                                 <input type="text" id="total_monthly_amount" class="form-control" readonly />
@@ -1595,13 +1601,13 @@
                                                                                 <input type="text" id="total_one_time_amount" class="form-control" name="total_one_time_amount" readonly />
                                                                             </div>
 
-                                                                            <!-- Grand Total Amount -->
+                                                                        
                                                                             <div class="col-md-12 mb-1">
                                                                                 <label class="form-label">Grand Total Amount</label>
                                                                                 <input type="text" id="grand_total_amount" class="form-control" readonly />
                                                                             </div>
 
-                                                                            <!-- Bank and Payment Details -->
+                                                                            
                                                                             <div class="col-md-12 mb-1" id="bankNameDiv">
                                                                                 <label class="form-label">Bank name <span class="text-danger">*</span></label>
                                                                                 <select class="form-control select2" name="bank_name" id="bank_name" required>
@@ -1614,7 +1620,7 @@
                                                                                 </select>
                                                                             </div>
 
-                                                                            <!-- Payment Mode -->
+                                                                         
                                                                             <div class="col-md-12 mb-1">
                                                                                 <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
                                                                                 <select class="form-control select2" name="pay_mode" required>
@@ -1626,7 +1632,7 @@
                                                                                 </select>
                                                                             </div>
 
-                                                                            <!-- Additional Fields -->
+                                                                         
                                                                             <div class="col-md-12 mb-1" id="refNoDiv">
                                                                                 <label class="form-label">Ref No. <span class="text-danger">*</span></label>
                                                                                 <input type="text" class="form-control" name="ref_no" id="ref_no" required />
@@ -1647,7 +1653,7 @@
                                                                                 <textarea class="form-control" name="pay_remark"></textarea>
                                                                             </div>
 
-                                                                            <!-- New Fields -->
+                                                                    
                                                                             <div class="col-md-12 mb-1">
                                                                                 <label class="form-label">Payment Confirmation Date <span class="text-danger">*</span></label>
                                                                                 <input type="date" class="form-control" name="pay_confirmation_date" required />
@@ -1674,10 +1680,10 @@
                                                         </div>
                                                     </form>
                                                 </div>
-                                            </div>
+                                            </div> -->
 
                                             <!-- Payment Schedule Modal -->
-                                            <div class="modal fade" id="paymentScheduleModal" tabindex="-1" aria-labelledby="paymentScheduleModalLabel" aria-hidden="true">
+                                            <!-- <div class="modal fade" id="paymentScheduleModal" tabindex="-1" aria-labelledby="paymentScheduleModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
                                                         <div class="modal-header bg-primary text-white">
@@ -1689,7 +1695,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> -->
 
                                             <div class="tab-pane" id="Hostel">
                                                 <div class="row">
@@ -1978,9 +1984,286 @@
 
 
                                             </div>
+   <div class="tab-pane" id="payment_schedule">
+                                              
+@php
+$feeItems = $feeDetails;
+$monthlyGrouped = [];
+$startDate = \Carbon\Carbon::parse($user->registration->doj);
+$userfee = isset($RecivedPayment->user_side_data) ? json_decode($RecivedPayment->user_side_data, true) : [];
+$feeHeadsDurations = isset($RecivedPayment->fee_heads_durations) ? json_decode($RecivedPayment->fee_heads_durations, true) : [];
+$paidData = $feeHeadsDurations;
+$unpaidData = $userfee;
 
-                                            <!-- Other tabs like Address, Family, Emergency, Medical, Sponsor, Fee, Hostel, Document -->
-                                            <!-- You can follow the same pattern as above to pre-fill the data in these tabs -->
+$intervalMap = [
+    'Monthly' => 1,
+    'Quarterly' => 3,
+    'Semi-Yearly' => 6,
+    'Yearly' => 12
+];
+
+$oneTimeItems = [];
+
+foreach ($feeItems as $item) {
+    $totalFees = $item['total_fees'] ?? 0;
+
+    $feeSponsorshipPercent = $item['fee_sponsorship_percent'] ?? 0;
+    $feeSponsorshipValue = $item['fee_sponsorship_value'] ?? ($totalFees * $feeSponsorshipPercent / 100);
+
+    $feeDiscountPercent = $item['fee_discount_percent'] ?? 0;
+    $feeDiscountValue = $item['fee_discount_value'] ?? ($totalFees * $feeDiscountPercent / 100);
+
+    $feeSponsorshipPlusDiscountPercent = $feeSponsorshipPercent + $feeDiscountPercent;
+
+    $paymentMode = $item['payment_mode'] ?? '';
+    $feeHead = $item['title'] ?? 'Unknown Fee';
+
+    $netFeePayable = $totalFees - $feeSponsorshipValue - $feeDiscountValue;
+
+    // Monthly or recurring items
+    if (isset($intervalMap[$paymentMode]) && !empty($item['duration']) && !empty($item['mandatory'])) {
+        $interval = $intervalMap[$paymentMode];
+        $installments = ceil($item['duration'] / $interval);
+        $groupAmount = round($netFeePayable / $installments, 2);
+
+        for ($i = 0; $i < $installments; $i++) {
+            $dueDate = $startDate->copy()->addMonths($i * $interval)->format('Y-m-d');
+            $index = $i + 1;
+            $paid_amount = 0;
+            $status = 'Pending';
+            $isDisabled = false;
+            $WaitConfirm = false;
+
+            if (isset($paidData[$feeHead])) {
+                foreach ($paidData[$feeHead]['schedule'] as $paidItem) {
+                    if ($paidItem['index'] == $index) {
+                        $paid_amount = $paidItem['amount'];
+                        $status = $paidItem['status'];
+                        $isDisabled = $status === 'Paid';
+                        break;
+                    }
+                }
+            }
+
+            if (isset($unpaidData[$feeHead])) {
+                foreach ($unpaidData[$feeHead]['schedule'] as $unpaidItem) {
+                    if ($unpaidItem['index'] == $index) {
+                        $status = $unpaidItem['status'];
+                        $isDisabled = $status === 'notconfirm';
+                        $WaitConfirm = true;
+                        break;
+                    }
+                }
+            }
+
+            $monthlyGrouped[$dueDate][] = [
+                'type' => $paymentMode,
+                'title' => $feeHead,
+                'amount' => $groupAmount,
+                'index' => $index,
+                'feeHead' => $feeHead,
+                'paid_amount' => $paid_amount,
+                'status' => $status,
+                'isDisabled' => $isDisabled,
+                'waitconfirm' => $WaitConfirm
+            ];
+        }
+    }
+
+    // One-time fees
+    if (!isset($intervalMap[$paymentMode]) && !empty($item['mandatory'])) {
+        $paid_amount = 0;
+        $status = 'Pending';
+        $isDisabled = false;
+        $WaitConfirm = false;
+
+        if (isset($paidData[$feeHead])) {
+            foreach ($paidData[$feeHead]['schedule'] as $paidItem) {
+                $paid_amount = $paidItem['amount'];
+                $status = $paidItem['status'];
+                $isDisabled = $status === 'Paid';
+                break;
+            }
+        }
+
+        if (isset($unpaidData[$feeHead])) {
+            foreach ($unpaidData[$feeHead]['schedule'] as $unpaidItem) {
+                $status = $unpaidItem['status'];
+                $isDisabled = $status === 'notconfirm';
+                $WaitConfirm = true;
+                break;
+            }
+        }
+
+        $oneTimeItems[] = [
+            'type' => $paymentMode,
+            'title' => $feeHead,
+            'amount' => round($netFeePayable, 2),
+            'index' => 1,
+            'feeHead' => $feeHead,
+            'paid_amount' => $paid_amount,
+            'status' => $status,
+            'isDisabled' => $isDisabled,
+            'waitconfirm' => $WaitConfirm
+        ];
+    }
+}
+
+// Merge one-time items
+if (!empty($oneTimeItems)) {
+    if (empty($monthlyGrouped)) {
+        $monthlyGrouped[$startDate->format('Y-m-d')] = $oneTimeItems;
+    } else {
+        $firstDueDate = array_key_first($monthlyGrouped);
+        foreach ($oneTimeItems as $oneTimeItem) {
+            $alreadyExists = false;
+            foreach ($monthlyGrouped[$firstDueDate] as $existingItem) {
+                if ($existingItem['feeHead'] === $oneTimeItem['feeHead']) {
+                    $alreadyExists = true;
+                    break;
+                }
+            }
+            if (!$alreadyExists) {
+                $monthlyGrouped[$firstDueDate][] = $oneTimeItem;
+            }
+        }
+    }
+
+    $oneTimeItems = [];
+}
+
+ksort($monthlyGrouped);
+@endphp
+
+
+<h4>Monthly Fee Due Schedule</h4>
+<table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad">
+    <thead>
+        <tr>
+            <th>S.NO</th>
+            <th>Due Date</th>
+            <th>Amount</th>
+            <th>Paid Amount</th>
+            <th>Remaining Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php $i = 1; $total_amount = 0; $paidAmount = 0; @endphp
+        @foreach($monthlyGrouped as $dueDate => $items)
+            @php
+                $total = array_sum(array_column($items, 'amount'));
+                $paid = array_sum(array_column($items, 'paid_amount'));
+                $remaining = $total - $paid;
+                $status = $paid > 0 ? ($remaining == 0 ? 'Paid' : 'Partial') : 'Pending';
+
+                $isDisabled = collect($items)->every(fn($item) => $item['isDisabled']);
+                $WaitConfirm = collect($items)->every(fn($item) => $item['waitconfirm']);
+                if ($WaitConfirm && !$paid) {
+                    $status = "Confirmation required";
+                }
+
+                $total_amount += $total;
+                $paidAmount += $paid;
+            @endphp
+            <tr>
+                <td>{{ $i++ }}</td>
+                <td>{{ \Carbon\Carbon::parse($dueDate)->format('d M Y') }}</td>
+                <td>₹{{ number_format($total, 2) }}</td>
+                <td>₹{{ number_format($paid, 2) }}</td>
+                <td>₹{{ number_format($remaining, 2) }}</td>
+                <td>
+                    <span class="badge
+                        {{ $status == 'Paid' ? 'bg-success' :
+                            ($status == 'Partial' ? 'bg-info text-dark' :
+                            ($status == 'Confirmation required' ? 'bg-secondary text-white' : 'bg-warning text-dark')) }}">
+                        {{ $status }}
+                    </span>
+                </td>
+               <td>
+    @if ($status === 'Paid')
+        <input type="checkbox" checked disabled>
+    @elseif ($status === 'Confirmation required')
+        <input type="checkbox" checked disabled>
+        <button class="btn btn-sm btn-info ms-2 confirm-btn" 
+                data-date="{{ $dueDate }}"
+                data-items='@json($items)'>
+            Confirm
+        </button>
+    @else
+        <input type="checkbox" class="due-check" 
+            data-date="{{ $dueDate }}"
+            data-items='@json($items)'
+            data-total="{{ $total }}">
+    @endif
+
+    <i class="fa fa-eye text-primary ms-2 view-schedule" style="cursor:pointer"
+        data-bs-toggle="modal"
+        data-bs-target="#feeDetailModal"
+        data-date="{{ $dueDate }}"
+        data-items='@json($items)'
+        data-remaining="{{ $remaining }}"
+        title="View Fee Schedule">
+    </i>
+</td>
+
+            </tr>
+        @endforeach
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td colspan="2"><strong>Total Amount: ₹{{ number_format($total_amount, 2) }}</strong></td>
+            <td colspan="2"><strong>Payable Amount: ₹{{ number_format($paidAmount, 2) }}</strong></td>
+            <td></td>
+            <td>
+             
+                <button class="btn btn-primary btn-sm px-25 font-small-2 py-25 pay-now-btn"  id ="payNowBtn"
+      
+        data-user-id="{{ $user->id  }}">
+    Pay Now
+</button>
+
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="feeDetailModal" tabindex="-1" aria-labelledby="feeDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="feeDetailModalLabel">Fee Schedule Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6 id="modalDueDate"></h6>
+        <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad ">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Fee Head</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Paid</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="modalFeeDetails"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+                                            </div>
+
+                                         
                                         </div>
                                     </div>
                                 </div>
@@ -1992,6 +2275,29 @@
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="confirmPaymentModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Payment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to confirm payment for:</p>
+        <ul id="confirm-items-list"></ul>
+        <input type="hidden" id="confirm-due-date">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="confirmPaymentBtn" class="btn btn-success">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal fade" id="sponsorModal" tabindex="-1" aria-labelledby="sponsorModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -2051,7 +2357,622 @@
 
 
 
+
 @php
+$userfee = isset($RecivedPayment->user_side_data) ? json_decode($RecivedPayment->user_side_data, true) : [];
+$feeHeadsDurations = isset($RecivedPayment->fee_heads_durations) ? json_decode($RecivedPayment->fee_heads_durations, true) : [];
+@endphp
+
+
+
+<script>
+    const userfee = @json($userfee);
+    const updatedfees = @json($feeHeadsDurations);
+    let isModified = false;
+
+
+    function getMergedFeeData() {
+        const mergedData = JSON.parse(JSON.stringify(updatedfees));
+
+        Object.keys(userfee).forEach(feeHeadId => {
+            if (!mergedData[feeHeadId]) {
+                mergedData[feeHeadId] = userfee[feeHeadId];
+            } else {
+                const confirmedIndexes = mergedData[feeHeadId].schedule.map(m => m.index);
+                const newMonths = userfee[feeHeadId].schedule.filter(m => !confirmedIndexes.includes(m.index));
+
+                mergedData[feeHeadId].schedule = [...mergedData[feeHeadId].schedule, ...newMonths];
+                mergedData[feeHeadId].duration = mergedData[feeHeadId].schedule.length;
+            }
+        });
+
+        return mergedData;
+    }
+
+//     function showPaymentSchedule(data) {
+//         let html = '';
+//         let totalFeeHeads = 0;
+//         let totalMonths = 0;
+//         let MonthlyAmount = 0;
+//         let TotalAmount = 0;
+
+//         Object.entries(data).forEach(([feeHeadId, fee]) => {
+//             totalFeeHeads++;
+//             totalMonths += fee.duration;
+
+//             html += `<div class="mb-3 border p-3 rounded shadow-sm">
+//                         <h5>Fee Head ${feeHeadId} <small class="text-muted">(Duration: ${fee.duration} month${fee.duration > 1 ? 's' : ''})</small></h5>
+//                         <div class="table-responsive">
+//                             <table class="table table-bordered table-sm mt-2">
+//                                 <thead class="table-light">
+//                                     <tr>
+//                                         <th>Month</th>
+//                                         <th>Due Date</th>
+//                                         <th>Amount (₹)</th>
+//                                         <th>Payment Date</th>
+//                                         <th>Payment Time</th>
+//                                         <th>Status</th>
+//                                     </tr>
+//                                 </thead>
+//                                 <tbody>`;
+
+//             fee.schedule.forEach((entry) => {
+//                 MonthlyAmount += parseFloat(entry.amount || 0);
+//                 TotalAmount = parseFloat(entry.Total_amount || 0);
+
+//                 html += `<tr>
+//                             <td>${entry.month}</td>
+//                             <td>${entry.due_date}</td>
+//                             <td>${entry.amount}</td>
+//                             <td>${entry.payment_date ?? '-'}</td>
+//                             <td>${entry.payment_time ?? '-'}</td>
+//                             <td><span class="badge bg-${entry.status === 'notconfirm' ? 'warning' : 'success'}">${entry.status}</span></td>
+//                         </tr>`;
+//             });
+
+//             html += `</tbody></table></div></div>`;
+//         });
+
+//         html += `
+//             <div class="border-top pt-3 mt-3">
+//                 <div class="table-responsive">
+//                     <table class="table table-bordered table-sm">
+//                         <thead class="table-light">
+//                             <tr>
+//                                 <th>Total Fee Heads</th>
+//                                 <th>Total Duration (Months)</th>
+//                                 <th>Monthly Amount</th>
+//                                 <th>OneTimeAmount (₹)</th>
+//                                 <th>Total Amount (₹)</th>
+//                                 <th>Action</th>
+//                             </tr>
+//                         </thead>
+//                         <tbody>
+//                             <tr>
+//                                 <td>${totalFeeHeads}</td>
+//                                 <td>${totalMonths}</td>
+//                                 <td>₹${MonthlyAmount.toFixed(2)}</td>
+//                                 <td>₹${(TotalAmount - MonthlyAmount).toFixed(2)}</td>
+//                                 <td>₹${TotalAmount}</td>
+//                                 <td><button type="button" id="confirmButton" class="btn btn-success btn-sm" onclick="confirmAndSubmit()">Confirm & Submit</button></td>
+//                             </tr>
+//                         </tbody>
+//                     </table>
+//                 </div>
+//             </div>`;
+
+//         document.getElementById('payment-schedule-content').innerHTML = html;
+//         const modal = new bootstrap.Modal(document.getElementById('paymentScheduleModal'));
+//         modal.show();
+// }
+
+function showPaymentSchedule(data) {
+    let onetimeRows = '';
+    let monthlyHtml = '';
+    let totalFeeHeads = 0;
+    let totalMonths = 0;
+    let monthlyAmount = 0;
+    let oneTimeAmount = 0;
+    let totalAmount = 0;
+
+    // First pass: One-Time Fee Heads
+    Object.entries(data).forEach(([feeHeadId, fee]) => {
+        const feeType = fee.schedule[0]?.type || 'Monthly';
+
+        if (feeType === 'One Time') {
+            totalFeeHeads++;
+            fee.schedule.forEach(entry => {
+                const amount = parseFloat(entry.amount || 0);
+                oneTimeAmount += amount;
+                totalAmount += amount;
+
+                onetimeRows += `<tr>
+                    <td>${feeHeadId}</td>
+                    <td>${entry.type || 'One Time'}</td>
+                    <td>${entry.month || '-'}</td>
+                    <td>${entry.due_date || '-'}</td>
+                    <td>₹${amount.toFixed(2)}</td>
+                    <td>${entry.payment_date ?? '-'}</td>
+                    <td>${entry.payment_time ?? '-'}</td>
+                      <td>${entry.Payment_Confirm_time ?? '-'}</td>
+                    <td>${entry.Payment_Confirm_date ?? '-'}</td>
+                    <td><span class="badge bg-${entry.status === 'notconfirm' ? 'primary' : 'success'}">${(entry.status=='notconfirm')?'Confirmation required': 'Paid' }</span></td>
+                </tr>`;
+            });
+        }
+    });
+
+  
+   const onetimeTable = onetimeRows
+    ? `
+    <div class="mb-4 border p-1 w-100 rounded shadow-lg bg-light">
+        
+        <div class="table-responsive">
+            <table class="table datatable-basic myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad ">
+                <thead class="table-light">
+                    <tr class="text-center">
+                        <th>Fee Head</th>
+                        <th>Type</th>
+                        <th>Month</th>
+                        <th>Due Date</th>
+                        <th>Amount (₹)</th>
+                        <th>Payment Date</th>
+                        <th>Payment Time</th>
+                        <th>Payment Confirm Time</th>
+                         <th>Payment Confirm Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${onetimeRows}
+                </tbody>
+            </table>
+        </div>
+    </div>`
+    : '';
+
+
+    // Second pass: Monthly Fee Heads
+    Object.entries(data).forEach(([feeHeadId, fee]) => {
+        const feeType = fee.schedule[0]?.type || 'Monthly';
+
+        if (feeType === 'Monthly') {
+            totalFeeHeads++;
+            totalMonths += fee.duration;
+
+            let rows = '';
+            fee.schedule.forEach(entry => {
+                const amount = parseFloat(entry.amount || 0);
+                monthlyAmount += amount;
+                totalAmount += amount;
+
+                rows += `<tr>
+                    <td>${entry.month}</td>
+                    <td>${entry.due_date || '-'}</td>
+                    <td>₹${amount.toFixed(2)}</td>
+                    <td>${entry.payment_date ?? '-'}</td>
+                    <td>${entry.payment_time ?? '-'}</td>
+                    <td>${entry.Payment_Confirm_time ?? '-'}</td>
+                    <td>${entry.Payment_Confirm_date ?? '-'}</td>
+
+                    <td><span class="badge bg-${entry.status === 'notconfirm' ? 'primary' : 'success'}">${(entry.status=='notconfirm')?'Confirmation required': 'Paid' }</span></td>
+                </tr>`;
+            });
+
+            monthlyHtml += `
+                <div class="mb-3 border p-1 rounded shadow-sm">
+                    <h5>${feeHeadId} <small class="text-muted">(Duration: ${fee.duration} month${fee.duration > 1 ? 's' : ''})</small></h5>
+                    <div class="table-responsive">
+                        <table class="table  datatables-basic  myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad ">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Due Date</th>
+                                    <th>Amount (₹)</th>
+                                    <th>Payment Date</th>
+                                    <th>Payment Time</th>
+                                    <th>Payment Confirm Time</th>
+                                    <th>Payment Confirm Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                </div>`;
+        }
+    });
+
+    // Summary
+    const summaryHtml = `
+        <div class="border-top pt-3 mt-4">
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Total Fee Heads</th>
+                            <th>Total Months</th>
+                            <th>Monthly Total</th>
+                            <th>One-Time Total</th>
+                            <th>Grand Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>${totalFeeHeads}</td>
+                            <td>${totalMonths}</td>
+                            <td>₹${monthlyAmount.toFixed(2)}</td>
+                            <td>₹${oneTimeAmount.toFixed(2)}</td>
+                            <td>₹${totalAmount.toFixed(2)}</td>
+                            <td>
+                                <button type="button" id="confirmButton" class="btn btn-success btn-sm" onclick="confirmAndSubmit()">Confirm & Submit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+
+    // Final HTML
+    const finalHtml = onetimeTable + monthlyHtml + summaryHtml;
+    document.getElementById('payment-schedule-content').innerHTML = finalHtml;
+
+    const modal = new bootstrap.Modal(document.getElementById('paymentScheduleModal'));
+    modal.show();
+}
+
+// function confirmAndSubmit() {
+
+// $('#confirmationModal').modal('show');
+
+
+// $('#confirmBtn').on('click', function() {
+
+//     $('#confirmationModal').modal('hide');
+
+//     let monthAmount = 0;
+//     let totalAmount = 0;
+//     const updatedData = {};
+
+//     Object.keys(userfee).forEach(feeHeadId => {
+//         let updatedMonths = [];
+
+//         userfee[feeHeadId].schedule = userfee[feeHeadId].schedule.map(month => {
+//             const index = month.index;
+
+//             const alreadyConfirmed = updatedfees[feeHeadId]?.schedule?.some(
+//                 m => m.index === index && m.status === 'Paid'
+//             );
+
+//             if (!alreadyConfirmed && month.status === 'notconfirm') {
+//                 const now = new Date();
+           
+//               const date = now.getDate().toString().padStart(2, '0') + '/' + (now.getMonth() + 1).toString().padStart(2, '0') + '/' + now.getFullYear().toString();
+
+
+
+//                 const time = now.toLocaleTimeString('en-IN', {
+//                     hour: '2-digit',
+//                     minute: '2-digit',
+//                     hour12: true
+//                 });
+
+//                 monthAmount += parseFloat(month.amount || 0);
+//                 totalAmount = parseFloat(month.Total_amount || 0);
+
+//                 const updatedMonth = {
+//                     ...month,
+//                     status: 'Paid',
+//                     Payment_Confirm_time:time,
+//                     Payment_Confirm_date:date,
+
+//                 };
+
+//                 updatedMonths.push(updatedMonth);
+//                 return updatedMonth;
+//             }
+
+//             return month;
+//         });
+
+//         if (updatedMonths.length > 0) {
+//             updatedData[feeHeadId] = {
+//                 ...userfee[feeHeadId],
+//                 schedule: updatedMonths
+//             };
+//         }
+//     });
+
+//     if (Object.keys(updatedData).length === 0) {
+//         toastr.info('All durations are already marked as Paid.', 'Info', {
+//             positionClass: 'toast-top-right',
+//             closeButton: true,
+//             progressBar: true,
+//             timeOut: 5000,
+//             extendedTimeOut: 1000
+//         });
+//         return;
+//     }
+
+//     let paidAmount = 0;
+//     if (((totalAmount - monthAmount).toFixed(2)) > 0) {
+//         paidAmount = totalAmount;
+//     } else {
+//         paidAmount = monthAmount;
+//     }
+
+//     $.ajax({
+//         url: '/admin/confirm-fee-schedule',
+//         method: 'POST',
+//         data: {
+//             _token: '{{ csrf_token() }}',
+//             user_id: '{{$RecivedPayment-> user_id ?? 0}}',
+//             confirmfees:JSON.stringify(updatedData),
+//             paid_amount:paidAmount
+//         },
+//         success: function(response) {
+//             toastr.success('Fee schedule updated successfully!', 'Success', {
+//                 positionClass: 'toast-top-right',
+//                 closeButton: true,
+//                 progressBar: true,
+//                 timeOut: 5000,
+//                 extendedTimeOut: 1000
+//             });
+//             showPaymentSchedule(getMergedFeeData());
+//             $('#paymentScheduleModal').modal('hide');
+//             setTimeout(() => location.reload(), 500);
+//         },
+//         error: function() {
+//             toastr.error('Something went wrong while saving!', 'Error', {
+//                 positionClass: 'toast-top-right',
+//                 closeButton: true,
+//                 progressBar: true,
+//                 timeOut: 5000,
+//                 extendedTimeOut: 1000
+//             });
+//         }
+//     });
+// });
+
+// // If the user cancels, hide the modal
+// $('#confirmationModal').on('hidden.bs.modal', function() {
+//     $('#confirmBtn').off('click'); // Remove the click event listener to avoid multiple bindings
+// });
+// }
+ 
+ showPaymentSchedule(getMergedFeeData());
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.view-schedule').forEach(icon => {
+        icon.addEventListener('click', function () {
+            const dueDate = this.getAttribute('data-date');
+            const items = JSON.parse(this.getAttribute('data-items'));
+            const remaining = parseFloat(this.getAttribute('data-remaining')) || 0;
+
+            console.log("Remaining:", remaining);
+            console.log("Items:", items);
+
+            // If remaining is 0, mark all statuses as 'Paid'
+            if (remaining === 0) {
+                items.forEach(item => {
+                    item.status = 'Paid';
+                });
+            }
+
+            document.getElementById('modalDueDate').textContent = "Due Date: " + new Date(dueDate).toLocaleDateString();
+            const tbody = document.getElementById('modalFeeDetails');
+            tbody.innerHTML = '';
+
+            items.forEach((item, index) => {
+                if (item.status === 'notconfirm') {
+                    item.status = 'Confirmation required';
+                }
+
+                let statusClass = 'bg-warning text-dark';
+                if (item.status === 'Paid') {
+                    statusClass = 'bg-success';
+                } else if (item.status === 'Partial') {
+                    statusClass = 'bg-info text-dark';
+                } else if (item.status === 'Confirmation required') {
+                    statusClass = 'bg-secondary text-white';
+                }
+
+                const row = `<tr>
+                    <td>${index + 1}</td>
+                    <td>${item.feeHead}</td>
+                    <td>${item.type}</td>
+                    <td>₹${parseFloat(item.amount).toFixed(2)}</td>
+                    <td>₹${parseFloat(item.paid_amount).toFixed(2)}</td>
+                    <td><span class="badge ${statusClass}">${item.status}</span></td>
+                </tr>`;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        });
+    });
+});
+</script>
+
+
+
+<script>
+let itemsToConfirm = [];
+
+$(document).on('click', '.confirm-btn', function () {
+    const dueDate = $(this).data('date');
+    const items = JSON.parse($(this).attr('data-items'));
+
+    itemsToConfirm = items.map(item => ({
+        ...item,
+        due_date: new Date(dueDate).toLocaleDateString('en-GB'),
+        selected_at: new Date().toLocaleString('en-GB', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+        })
+    }));
+
+    $('#confirm-due-date').val(dueDate);
+    const itemList = itemsToConfirm.map(item => `<li>${item.feeHead} - ₹${item.amount}</li>`);
+    $('#confirm-items-list').html(itemList.join(''));
+
+
+    $('#confirmPaymentModal').modal('show');
+});
+
+$('#confirmPaymentBtn').on('click', function () {
+    const dueDate = $('#confirm-due-date').val();
+    const userId = $('#payNowBtn').data('user-id');
+
+    if (!itemsToConfirm.length) return;
+
+    $.ajax({
+        url: "{{ url('update-payment') }}",
+        type: 'POST',
+        contentType: 'application/json',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        data: JSON.stringify({
+            user_id: userId,
+            payments: itemsToConfirm
+        }),
+        success: function (response) {
+            if (response.success) {
+                toastr.success("Payment confirmed successfully!");
+                $('#confirmPaymentModal').modal('hide');
+            
+
+                // Update UI
+                $(`.due-check[data-date="${dueDate}"]`).each(function () {
+                    $(this).prop('checked', true).prop('disabled', true);
+
+                    const row = $(this).closest('tr');
+                    const badge = row.find('span.badge');
+                    badge
+                        .removeClass()
+                        .addClass('badge bg-success')
+                        .text('Paid');
+
+                    // Remove Confirm Button
+                    row.find('.confirm-btn').remove();
+                    window.location.reload();
+                });
+            } else {
+                toastr.error("Confirmation failed.");
+            }
+        },
+        error: function (xhr) {
+            console.error(xhr.responseText);
+            alert("An error occurred.");
+        }
+    });
+});
+</script>
+
+<script>
+let selectedPayments = [];
+
+$(document).ready(function () {
+    $('.due-check').on('change', function () {
+        const dueDate = $(this).data('date');
+        const feeItems = JSON.parse($(this).attr('data-items'));
+
+        const formattedDueDate = new Date(dueDate).toLocaleDateString('en-GB');
+        const currentDate = new Date();
+        const formattedDateTime = currentDate.toLocaleString('en-GB', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+        });
+
+        if ($(this).is(':checked')) {
+            feeItems.forEach(item => {
+                if (item.status === 'Pending') {
+                    item.status = 'Paid';
+                    item.due_date = formattedDueDate;
+                    item.selected_at = formattedDateTime;
+
+                    const key = `${item.due_date}-${item.feeHead}`;
+                    const exists = selectedPayments.find(sp => `${sp.due_date}-${sp.feeHead}` === key);
+
+                    if (!exists) selectedPayments.push(item);
+                }
+            });
+        } else {
+            feeItems.forEach(item => {
+                selectedPayments = selectedPayments.filter(sp =>
+                    !(sp.due_date === formattedDueDate && sp.feeHead === item.feeHead)
+                );
+            });
+        }
+
+        console.log('Selected Payments:', selectedPayments);
+    });
+
+    $('#payNowBtn').on('click', function () {
+        const userId = $(this).data('user-id');
+
+        if (selectedPayments.length === 0) {
+toastr.info("Please select at least one fee!");
+            return;
+        }
+        
+
+        $.ajax({
+            url: "{{ url('update-payment') }}",
+            type: 'POST',
+            contentType: 'application/json',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            data: JSON.stringify({
+                user_id: userId,
+                payments: selectedPayments
+            }),
+            success: function (response) {
+                if (response.success) {
+                 toastr.success("Payment submitted successfully!");
+                
+
+                    $('.due-check:checked:not(:disabled)').each(function () {
+                        $(this).prop('disabled', true);
+
+                        const row = $(this).closest('tr');
+                        const badge = row.find('span.badge');
+                        badge
+                            .removeClass()
+                            .addClass('badge bg-secondary text-white')
+                            .text('Confirmation required');
+                    });
+
+                    selectedPayments = [];
+                     setTimeout(() => {
+            window.location.reload();
+        }, 1500); 
+                } else {
+        toastr.error("Failed to submit payment.");
+    }
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+                alert("Something went wrong.");
+            }
+        });
+    });
+});
+
+toastr.options = {
+    "closeButton": true,
+    "progressBar": true,
+    "positionClass": "toast-top-right",
+    "timeOut": "3000"
+};
+</script>
+
+{{-- @php
 $userfee = isset($RecivedPayment->user_side_data) ? json_decode($RecivedPayment->user_side_data, true) : [];
 $feeHeadsDurations = isset($RecivedPayment->fee_heads_durations) ? json_decode($RecivedPayment->fee_heads_durations, true) : [];
 @endphp
@@ -2273,12 +3194,12 @@ $('#confirmationModal').on('hidden.bs.modal', function() {
 }
  
  showPaymentSchedule(getMergedFeeData());
-</script>
+</script> --}}
 
 
 
 
-<script>
+{{-- <script>
     $(document).ready(function() {
         const feeHeadDetails = @json($perMonthFees);
         const feeDetails = @json($feeDetails);
@@ -2489,7 +3410,7 @@ $('#confirmationModal').on('hidden.bs.modal', function() {
             $('#paymentForm')[0].reset();
         });
     });
-</script>
+</script> --}}
 
 
 <script>
@@ -2764,24 +3685,53 @@ $('#confirmationModal').on('hidden.bs.modal', function() {
             <td></td>
             <td colspan="9" class="text-end fw-bolder text-dark font-large-1">Total Fees</td>
             <td class="fw-bolder text-dark font-large-1 total-net-fee">${totalNetFeePayableValue.toFixed(2)}</td>
-            <td>
-                @if($user->payment_status == 'paid')
-                <span class="badge bg-success">Paid</span>
-@else
-                <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"
-                        data-bs-toggle="modal"
-                        data-bs-target="#paymentModal"
-                        data-user-id="{{ $user->id }}"
-                            data-total-amount="${totalNetFeePayableValue.toFixed(2)}">Pay Now</button>
-                @endif
-                <button data-bs-target="#update-payment" data-bs-toggle="modal" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Detail</button>
-            </td>
-                             <td>
-       @if (isset($RecivedPayment->user_side_data))
-    <button type="button" data-bs-target="#paymentScheduleModal" data-bs-toggle="modal" class="btn btn-info btn-sm px-25 font-small-2 py-25">Payment confirm</button>
+                      <td>
+                                                                    @php
+                                                                    $paidAmount = $RecivedPayment->paid_amount ?? 0;
 
-    @endif
-    </td>
+              $isFullyPaid = abs($paidAmount -  $totalNetFeePayableValue) <= 1.00;
+            //   dd(  $isFullyPaid);
+
+
+                                                                    $hasAnyPayment = $paidAmount > 0;
+                                                                    @endphp
+
+                                                                    @if ($user->payment_status == 'paid' || $hasAnyPayment)
+                                                                    @if ($isFullyPaid)
+                                                                    <input type="hidden" name="confirm_payment" value="Paid">
+                                                                    <span class="badge bg-success">Paid</span>
+                                                                    @else
+                                                                    <input type="hidden" name="confirm_payment" value="Partially-Paid">
+                                                                    <span class="badge bg-warning">Partially-Paid</span>
+                                                                    @endif
+                                                                    @else
+                                                                    <button class="btn btn-success btn-sm px-25 font-small-2 py-25 pay-now-btn"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#paymentModal"
+                                                                        data-user-id="{{ $user->id }}"
+                                                                        data-total-amount="{{ $totalNetFeePayableValue }}">
+                                                                        Pay Now
+                                                                    </button>
+                                                                    @endif
+
+                                                                   
+                                                                    <button type="button" class="btn btn-primary btn-sm px-25 font-small-2 py-25"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#update-payment">
+                                                                        Payment Details
+                                                                    </button>
+                                                               
+                                                                </td>
+
+                                                                <td>
+                                                                    @if (isset($RecivedPayment->user_side_data))
+                                                                    <button type="button" data-bs-target="#paymentScheduleModal" data-bs-toggle="modal" class="btn btn-info btn-sm px-25 font-small-2 py-25">
+                                                                        Payment confirm
+
+                                                                    </button>
+
+                                                                    @endif
+                                                                </td>   
         </tr>
     `);
 

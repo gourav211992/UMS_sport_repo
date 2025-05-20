@@ -93,4 +93,13 @@ class SportRegister extends Model
     {
         return $this->belongsTo(SportBatch::class, 'batch_id');
     }
+    public function feeRefund()
+    {
+        return $this->hasOne(Sports_Fee_Refund::class, 'registration_id', 'id');
+    }
+
+    public function section()
+    {
+        return $this->belongsTo(SportSection::class,'section_id');
+    }
 }

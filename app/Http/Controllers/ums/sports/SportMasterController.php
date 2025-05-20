@@ -312,83 +312,276 @@ class SportMasterController extends Controller
 
 
     //sports master
-    public function index()
+    // public function index()
+    // {
+    //     $Sportmaster = Sport_master::all();
+
+
+    //     return view('ums.sports.sport_master', compact('Sportmaster'));
+    // }
+    // public function SportType()
+    // {
+    //     $SportType = Sport_type::all();
+
+
+    //     return view('ums.sports.sport_master_add', compact('SportType'));
+    // }
+
+    // public function SportTypeAdd(Request $request)
+    // {
+    //     // Validate the form data
+    //     $validatedData = $request->validate([
+    //         'sport_type' => 'required|exists:sports_type,id',  // Ensure the sport type exists
+    //         'sport_name' => 'required|string|max:255',  // Ensure the sport name is provided
+    //         'status' => 'required|in:active,inactive',  // Ensure the status is either active or inactive
+    //     ]);
+
+    //     // Create a new sport entry
+    //     Sport_master::create([
+    //         'sport_type' => $validatedData['sport_type'],  // Assuming `sport_type_id` is the foreign key in the sports table
+    //         'sport_name' => $validatedData['sport_name'],
+    //         'status' => $validatedData['status'],
+    //         'organization_id' => $user->organization_id,
+    //         'group_id' => $user->group_id,
+    //         'company_id' => $user->company_id
+    //     ]);
+
+    //     // Redirect back with a success message
+    //     return redirect()->route('sport-master')->with('success', 'Sport type has been added successfully!');
+    // }
+
+
+    // public function SportTypeEdit($id)
+    // {
+    //     $sportMaster = Sport_master::findOrFail($id);
+
+    //     $SportType = Sport_type::all();
+
+    //     return view('ums.sports.sport_master_edit', compact('sportMaster', 'SportType'));
+    // }
+
+    // public function SportTypeUpdate(Request $request, $id)
+    // {
+    //     // Validate the form data
+    //     $validatedData = $request->validate([
+    //         'sport_type' => 'required|exists:sports_type,id',  // Ensure the sport type exists
+    //         'sport_name' => 'required|string|max:255',  // Ensure the sport name is provided
+    //         'status' => 'required|in:active,inactive',  // Ensure the status is either active or inactive
+    //     ]);
+
+    //     // Fetch the existing sport master record
+    //     $sportMaster = Sport_master::findOrFail($id);
+
+    //     // Update the record
+    //     $sportMaster->update([
+    //         'sport_type' => $validatedData['sport_type'],
+    //         'sport_name' => $validatedData['sport_name'],
+    //         'status' => $validatedData['status'],
+    //     ]);
+
+    //     // Redirect back with a success message
+    //     return redirect()->route('sport-master')->with('success', 'Sport type has been updated successfully!');
+    // }
+    // public function softDelete(Request $request, $slug)
+    // {
+
+    //     Sport_master::where('id', $slug)->delete();
+    //     return redirect()->route('sport-master')->with('success', 'Deleted Successfully');
+    // }
+
+
+     public function indexSportMaster(Request $request)
     {
-        $Sportmaster = Sport_master::all();
-
-
+        
+        $Sportmaster = Sport_master::orderBy('id', 'DESC');
+     if (!empty($request->sport_name)) {
+            $Sportmaster->where('sport_name', 'LIKE', '%' . $request->sport_name . '%');
+        }
+     $recordsPerPage = $request->per_page ?: 7; 
+        $Sportmaster = $Sportmaster->paginate($recordsPerPage);
+        
         return view('ums.sports.sport_master', compact('Sportmaster'));
     }
-    public function SportType()
+
+
+    public function SportMasterAdd(Request $request)
     {
-        $SportType = Sport_type::all();
-
-
-        return view('ums.sports.sport_master_add', compact('SportType'));
-    }
-
-    public function SportTypeAdd(Request $request)
-    {
-        // Validate the form data
+        $user = Helper::getAuthenticatedUser();
         $validatedData = $request->validate([
-            'sport_type' => 'required|exists:sports_type,id',  // Ensure the sport type exists
-            'sport_name' => 'required|string|max:255',  // Ensure the sport name is provided
-            'status' => 'required|in:active,inactive',  // Ensure the status is either active or inactive
+            'sport_type' => 'required|exists:sports_type,id',  
+            'sport_name' => 'required|string|max:255',
+            'status' => 'required|in:active,inactive',  
         ]);
-
-        // Create a new sport entry
+    
+        
         Sport_master::create([
-            'sport_type' => $validatedData['sport_type'],  // Assuming `sport_type_id` is the foreign key in the sports table
+            'sport_type' => $validatedData['sport_type'],  
             'sport_name' => $validatedData['sport_name'],
             'status' => $validatedData['status'],
             'organization_id' => $user->organization_id,
             'group_id' => $user->group_id,
-            'company_id' => $user->company_id
+            'company_id' => $user->company_id,
         ]);
-
-        // Redirect back with a success message
+    
+        
         return redirect()->route('sport-master')->with('success', 'Sport type has been added successfully!');
     }
 
-
-    public function SportTypeEdit($id)
-    {
-        $sportMaster = Sport_master::findOrFail($id);
-
-        $SportType = Sport_type::all();
-
-        return view('ums.sports.sport_master_edit', compact('sportMaster', 'SportType'));
-    }
-
-    public function SportTypeUpdate(Request $request, $id)
-    {
-        // Validate the form data
-        $validatedData = $request->validate([
-            'sport_type' => 'required|exists:sports_type,id',  // Ensure the sport type exists
-            'sport_name' => 'required|string|max:255',  // Ensure the sport name is provided
-            'status' => 'required|in:active,inactive',  // Ensure the status is either active or inactive
-        ]);
-
-        // Fetch the existing sport master record
-        $sportMaster = Sport_master::findOrFail($id);
-
-        // Update the record
-        $sportMaster->update([
-            'sport_type' => $validatedData['sport_type'],
-            'sport_name' => $validatedData['sport_name'],
-            'status' => $validatedData['status'],
-        ]);
-
-        // Redirect back with a success message
-        return redirect()->route('sport-master')->with('success', 'Sport type has been updated successfully!');
-    }
-    public function softDelete(Request $request, $slug)
-    {
-
+    public function softDelete(Request $request,$slug) {
+        
         Sport_master::where('id', $slug)->delete();
-        return redirect()->route('sport-master')->with('success', 'Deleted Successfully');
+        return redirect()->route('sport-master')->with('success','Deleted Successfully');
+        
     }
 
+
+    public function SportMasterEdit($id)
+{
+    $sportMaster = Sport_master::findOrFail($id);
+    
+    $SportType = Sport_type::all();
+
+    return view('ums.sports.sport_master_edit', compact('sportMaster', 'SportType'));
+}
+
+public function SportMasterUpdate(Request $request, $id)
+{
+    $user = Helper::getAuthenticatedUser();
+    $validatedData = $request->validate([
+        'sport_type' => 'required|exists:sports_type,id',  
+        'sport_name' => 'required|string|max:255', 
+        'status' => 'required|in:active,inactive',  
+    ]);
+
+    
+    $sportMaster = Sport_master::findOrFail($id);
+
+   
+    $sportMaster->update([
+        'sport_type' => $validatedData['sport_type'],
+        'sport_name' => $validatedData['sport_name'],
+        'status' => $validatedData['status'],
+        'organization_id' => $user->organization_id,
+        'group_id' => $user->group_id,
+        'company_id' => $user->company_id
+    ]);
+
+    
+    return redirect()->route('sport-master')->with('success', 'Sport type has been updated successfully!');
+}
+
+public function SportType()
+{
+    $SportType = Sport_type::all();
+
+    
+    return view('ums.sports.sport_master_add', compact('SportType'));
+}
+public function SportMasterView($id)
+{
+    $sportMaster = Sport_master::findOrFail($id);
+    
+    $SportType = Sport_type::all();
+
+    return view('ums.sports.sport_master_view', compact('sportMaster', 'SportType'));
+}
+
+
+// SportType
+    public function indexSportType(Request $request)
+    {
+        // Start the query on Sport_master
+        $Sporttype = Sport_type::orderBy('id', 'DESC');
+     if (!empty($request->type)) {
+            $Sporttype->where('type', 'LIKE', '%' . $request->type . '%');
+        }
+     $recordsPerPage = $request->per_page ?: 7; 
+        $Sporttype = $Sporttype->paginate($recordsPerPage);
+        // Return the view with the paginated results
+        return view('ums.sports.sport_type', compact('Sporttype'));
+    }
+    
+    
+
+
+
+
+public function showSportTypeAddForm()
+{
+    
+    return view('ums.sports.sport_type_add'); 
+}
+
+public function SportTypeAdd(Request $request)
+
+{
+    $user = Helper::getAuthenticatedUser();
+    // dd($request->all());
+    $validatedData = $request->validate([
+        'type' => 'required|string|max:255', 
+    ]);
+
+    
+    Sport_Type::create([
+        'type' => $validatedData['type'],
+        'organization_id' => $user->organization_id,
+        'group_id' => $user->group_id,
+        'company_id' => $user->company_id  
+    ]);
+
+    
+    return redirect()->route('sport-type')->with('success', 'Sport type has been added successfully!');
+}
+
+
+
+
+public function SportTypeEdit($id)
+{
+    
+    $sporttype = Sport_type::findOrFail($id);
+
+    
+    return view('ums.sports.sport_type_edit', compact('sporttype'));
+}
+
+
+public function SportTypeUpdate(Request $request, $id)
+{
+    
+    $validatedData = $request->validate([
+         
+        'type' => 'required|string|max:255', 
+        
+    ]);
+
+    
+    $sportType = Sport_type::findOrFail($id);
+
+    
+    $sportType->update([
+        'type' => $validatedData['type'],
+        
+    ]);
+
+   
+    return redirect()->route('sport-type')->with('success', 'Sport type has been updated successfully!');
+}
+
+
+
+
+public function sportTypeDelete(Request $request,$slug) {
+        
+    Sport_type::where('id', $slug)->delete();
+    return redirect()->route('sport-type')->with('success','Deleted Successfully');
+    
+}
+
+function activityMaster(){
+    $sportName=Sport_master::all();
+    return view('ums.sports.activity_master_add', compact('sportName'));
+}
 
     // SportBatch master
 

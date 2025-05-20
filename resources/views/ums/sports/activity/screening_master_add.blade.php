@@ -144,7 +144,7 @@
                                                                                <span class="text-danger error-parameter_details"></span>
                                                                            </td>
                                                                            <td>
-                                                                               <input type="text" class="form-control weight-input mw-100" placeholder="Enter Weightage value 1 to 100 only">
+                                                                               <input type="number" class="form-control weight-input mw-100" placeholder="Enter Weightage value 1 to 100 only">
                                                                                <span class="text-danger error-parameter_details"></span>
                                                                            </td>
                                                                            <td>
