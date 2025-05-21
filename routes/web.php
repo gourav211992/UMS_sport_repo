@@ -218,7 +218,16 @@ use App\Http\Controllers\ums\sports\Activity\ScreeningAssesmentController;
 use App\Http\Controllers\ums\sports\Activity\RatingScaleController;
 use App\Http\Controllers\ums\sports\sportFeeHeadController;
 use App\Http\Controllers\ums\sports\FeeRefundController;
-
+use App\Http\Controllers\ums\ums_master\CourseController as Ums_masterCourseController;
+use App\Http\Controllers\ums\ums_master\CategoryProgDocController;
+use App\Http\Controllers\ums\ums_master\AffiliateController;
+use App\Http\Controllers\ums\ums_master\erp_ums_documentcontroller;
+use App\Http\Controllers\ums\ums_master\CollageMappingController;
+use App\Http\Controllers\ums\ums_master\Program_Branch_Controller;
+use App\Http\Controllers\ums\ums_master\Program_Type_Controller;
+use App\Http\Controllers\ums\ums_master\erp_ums_semesterController;
+use App\Http\Controllers\ums\ums_master\InstituteMappingController;
+use App\Http\Controllers\ums\ums_master\AcademicYearController;
 // Password Reset Routes
 Route::get('sports/password/reset', [SportsForgotPasswordController::class, 'showForgotForm'])->name('sports.password.request');
 Route::post('sports/password/email', [SportsForgotPasswordController::class, 'sendResetLink'])->name('sports.password.email');
@@ -577,7 +586,120 @@ Route::get('group-master-view/{id}',[GroupMasterController::class,'GroupMasterVi
 Route::put('group-master-update/{id}',[GroupMasterController::class,'GroupMasterUpdate'])->name('group-master-update');
 Route::get('group-master-delete/{id}', [GroupMasterController::class, 'GroupMasterDelete'])->name('group-master-delete');
 
+// UMS New Master Start
 
+
+
+    // Institute Routes
+
+    Route::get('institute', [InstituteMappingController::class, 'index'])->name('institute');         
+    Route::get('/institute_add', [InstituteMappingController::class, 'create'])->name('institute-add'); 
+    Route::post('/institute_add', [InstituteMappingController::class, 'store'])->name('institute-add'); 
+    Route::get('/institute/{id}/edit', [InstituteMappingController::class, 'edit'])->name('institute-edit');
+    Route::put('institute/{id}/update', [InstituteMappingController::class, 'update'])->name('institute-update');
+    Route::get('institute/{id}/view', [InstituteMappingController::class, 'show'])->name('institute.view');
+    Route::delete('institute/{id}', [InstituteMappingController::class, 'destroy'])->name('institute.destroy');
+
+    // Institute Routes End
+
+    // Semester Routes
+
+    Route::get('semesters', [erp_ums_semesterController::class, 'index'])->name('semesters');
+    Route::get('/semesters_add', [erp_ums_semesterController::class, 'create'])->name('semesters-add');
+    Route::post('/semesters_add', [erp_ums_semesterController::class, 'store'])->name('semesters.store');
+    Route::get('semesters/{id}/edit', [erp_ums_semesterController::class, 'edit'])->name('semesters.edit');
+    Route::put('semesters/{id}/update', [erp_ums_semesterController::class, 'update'])->name('semesters.update');
+    Route::get('/semesters/{id}/view', [erp_ums_semesterController::class, 'view'])->name('semesters.view');
+    Route::delete('semesters/{id}', [erp_ums_semesterController::class, 'destroy'])->name('semesters.destroy');
+
+     // Semester Routes End
+
+     // program_type
+    Route::get('/program_master', [Program_Type_Controller::class, 'index'])->name('program.master.list');
+    Route::get('/program_add_master', [Program_Type_Controller::class, 'create'])->name('program.add.master.form');
+    Route::post('/program_add_master', [Program_Type_Controller::class, 'store'])->name('program.add.master.store');
+    Route::get('program_view_master/{id}', [Program_Type_Controller::class, 'show']);
+    Route::get('program_edit_master/{id}', [Program_Type_Controller::class, 'edit']);
+    Route::post('program_update_master/{id}', [Program_Type_Controller::class, 'update']);
+    Route::delete('program_delete_master/{id}', [Program_Type_Controller::class, 'destroy'])->name('program_delete_master');
+
+     // program_type End
+
+     // Academic Start
+     Route::get('/academic', [AcademicYearController::class, 'index'])->name('academic.index');
+     Route::get('/academic-add', [AcademicYearController::class, 'create'])->name('academic.create');
+     Route::post('/academic-store', [AcademicYearController::class, 'store'])->name('academic.store');
+     Route::get('/academic-edit/{id}', [AcademicYearController::class, 'edit'])->name('academic.edit');
+     Route::put('/academic-update/{id}', [AcademicYearController::class, 'update'])->name('academic.update');
+     Route::get('/academic-view/{id}', [AcademicYearController::class, 'show'])->name('academic.view');
+     Route::delete('/academic-year/{id}', [AcademicYearController::class, 'delete'])->name('academic.delete');     
+     // Academic End
+
+     // Program_Branch
+    Route::get('/program_branch', [Program_Branch_Controller::class, 'index']);
+    Route::get('/program_branch_add', [Program_Branch_Controller::class, 'create'])->name('program.add.branch.form');
+    Route::post('/program_branch_add', [Program_Branch_Controller::class, 'store'])->name('program.add.branch.store');
+    Route::get('/edit/{id}', [Program_Branch_Controller::class, 'edit'])->name('program_branch.edit');
+    Route::post('/update/{id}', [Program_Branch_Controller::class, 'update'])->name('program_branch.update');
+    Route::get('/program_branch_view/{id}', [Program_Branch_Controller::class, 'view'])->name('program_branch.view');
+    Route::delete('program_branch_delete/{id}', [Program_Branch_Controller::class, 'destroy'])->name('program_branch.destroy');
+     // Program_Branch End
+
+     //erp_ums_documents 
+    Route::get('/document', [erp_ums_documentcontroller::class, 'index'])->name('document');       
+    Route::get('/document_add', [erp_ums_documentcontroller::class, 'create'])->name('document-add');    
+    Route::post('/document_add', [erp_ums_documentcontroller::class, 'store'])->name('document-store');
+    Route::get('/document/{id}', [erp_ums_documentcontroller::class, 'show'])->name('document-show');
+    Route::get('/document/{id}/edit', [erp_ums_documentcontroller::class, 'edit'])->name('document-edit');
+    Route::put('/document/{id}', [erp_ums_documentcontroller::class, 'update'])->name('document-update');    
+    Route::delete('/document/{id}', [erp_ums_documentcontroller::class, 'destroy'])->name('document-destroy');
+     //erp_ums_documents End
+
+     //Collage Mapping Start
+
+     Route::get('college', [CollageMappingController::class, 'index'])->name('college');
+     Route::get('college_add', [CollageMappingController::class, 'viewAddIndex'])->name('collegemapping.add');
+     Route::post('college_add', [CollageMappingController::class, 'CollegeAdd'])->name('collegemapping.add');
+     Route::get('college_edit/{id}', [CollageMappingController::class, 'collegeMappingEdit'])->name('collegeMapping.edit');
+     Route::put('college_edit/{id}', [CollageMappingController::class, 'collegeMappingUpdate'])->name('collegemapping.update');
+     Route::get('college_view/{id}', [CollageMappingController::class, 'collegeMappingView'])->name('collegeMapping.view');
+     Route::delete('college_delete/{id}', [CollageMappingController::class, 'collegeMappingDelete'])->name('collegeMapping.delete');
+
+     //Collage Mapping End
+     
+     //affiliate Start
+     
+     Route::get('affiliate', [AffiliateController::class, 'index'])->name('affiliate');
+     Route::get('affiliate_add', [AffiliateController::class, 'AffiliateAddview'])->name('affiliate.add');
+     Route::post('affiliate_add', [AffiliateController::class, 'AffiliateAdd']);
+     Route::get('affiliate_edit/{id}', [AffiliateController::class, 'AffiliateEdit'])->name('affiliate_edit');
+     Route::put('affiliate_edit/{id}', [AffiliateController::class, 'AffiliateUpdate'])->name('affiliate_update');
+     Route::get('affiliate_view/{id}', [AffiliateController::class, 'AffiliateView'])->name('affiliate_view');
+     Route::delete('/affiliate-delete/{id}', [AffiliateController::class, 'AffiliateDelete'])->name('affiliate_delete');
+
+      //affiliate End
+
+      //Category Programme Start
+     Route::get('/cat_prog_add', [CategoryProgDocController::class, 'create'])->name('category-prog-doc.create');
+     Route::post('/cat_prog_add', [CategoryProgDocController::class, 'store'])->name('category-prog-doc.store');
+     Route::get('/cat_prog', [CategoryProgDocController::class, 'index'])->name('cat-prog-doc.index');
+     Route::get('/cat_prog_view/{id}', [CategoryProgDocController::class, 'view'])->name('cat-prog-doc.view');
+     Route::get('/cat_prog/edit/{id}', [CategoryProgDocController::class, 'edit'])->name('cat-prog-doc.edit');
+     Route::put('/cat_prog/edit/{id}', [CategoryProgDocController::class, 'update'])->name('cat-prog-doc.update');
+     Route::get('/cat_prog/delete/{id}', [CategoryProgDocController::class, 'softDelete'])->name('cat-prog-doc.delete');
+     //Category Programme End
+
+     //erp course master Start
+     Route::get('course', [Ums_masterCourseController::class, 'index'])->name('course');
+     Route::get('course-add', [Ums_masterCourseController::class, 'add']);
+     Route::post('course-add', [Ums_masterCourseController::class, 'addCourse'])->name('course-add');
+     Route::get('course-edit/{id}', [Ums_masterCourseController::class, 'edit'])->name('course-edit');
+     Route::post('course-edit/{id}', [Ums_masterCourseController::class, 'update'])->name('course-update');
+     Route::get('course-view/{id}', [Ums_masterCourseController::class, 'view'])->name('course-view');
+     Route::get('course-delete/{id}', [Ums_masterCourseController::class, 'delete'])->name('course-delete');
+     //erp course master End
+
+// UMS New Master End
 
 
 

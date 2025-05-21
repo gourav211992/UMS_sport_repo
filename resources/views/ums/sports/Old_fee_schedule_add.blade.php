@@ -316,10 +316,11 @@
                                                                 <td>
                                                                     <select class="form-select mw-100 payment-frequency" name="payment_mode" required>
                                                                         <option>Select</option>
+                                                                        <option value="Weekly">Weekly</option>
                                                                         <option value="Monthly">Monthly</option>
                                                                         <option value="Quarterly">Quarterly</option>
                                                                         <option value="Semi-Yearly">Semi-Yearly</option>
-                                                                        <option value="Yearly">Yearly</option>
+                                                                        <option selected value="Yearly">Yearly</option>
                                                                         <option value="One Time">One Time</option>
                                                                     </select>
                                                                 </td>
@@ -482,44 +483,21 @@ function captureTableData() {
 }
     </script>
 
-
-<script>
-    $(document).on('change', '.payment-frequency', function() {
-    var durationSelect = $(this).closest('tr').find('.duration-select');
-    var selectedValue = $(this).val();
-
-    var showOptions = ['Monthly', 'Quarterly', 'Semi-Yearly', 'Yearly'];
-
-    if (showOptions.includes(selectedValue)) {
-        durationSelect.show().prop('required', true);
-        
-        durationSelect.empty();
-
-        var options = [];
-
-        if (selectedValue === 'Monthly') {
-            for (var i = 1; i <= 12; i++) {
-                options.push(`<option value="${i}">${i} month${i > 1 ? 's' : ''}</option>`);
-            }
-        } else {
-            for (var i = 1; i <= 5; i++) {
-                options.push(`<option value="${i*12}">${i} year${i > 1 ? 's' : ''}</option>`);
-            }
-        }
-
-        durationSelect.append(options.join(''));
-
-    } else {
-        durationSelect.hide().prop('required', false).empty();
-    }
-});
-
-$(document).ready(function() {
-    $('.payment-frequency').trigger('change');
-});
-
-</script>
-
+    <script>
+        // $(document).ready(function () {
+            // Handle payment frequency change
+            $(document).on('change', '.payment-frequency', function() {
+                var durationSelect = $(this).closest('tr').find('.duration-select');
+                if ($(this).val() === 'Monthly') {
+                    durationSelect.show();
+                    durationSelect.prop('required', true);
+                } else {
+                    durationSelect.hide();
+                    durationSelect.prop('required', false);
+                }
+            });
+    </script>
+{{--    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>--}}
 
     <script>
         $(document).ready(function () {
@@ -773,7 +751,7 @@ $(document).on('change', '.bulk-upload', function() {
                             <td>
                                 <select class="form-select mw-100 payment-frequency">
                                     <option>Select</option>
-                                
+                                    <option>Weekly</option>
                                     <option>Monthly</option>
                                     <option>Quarterly</option>
                                     <option>Semi-Yearly</option>
