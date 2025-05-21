@@ -35,52 +35,62 @@ use Illuminate\Http\Request;
 
 class ScreeningAssesmentController extends Controller
 {
-    public function listScreeningOuter(Request $request){
-            $screening_name = $request->input('screening_name');        
-            $player_name = $request->input('player_name');
-            $query = SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screening_details.screening_id', '=', 'sport_screening_masters.id')
-            ->leftJoin('sport_registers', 'sport_screening_details.registration_id', '=', 'sport_registers.id')
-            ->where('sport_screening_masters.status', 'active')
-            ->select(
-                DB::raw('MIN(sport_screening_details.id) as id'),
-                'sport_screening_details.screening_date',
-                'sport_registers.name as player_name',
-                'sport_registers.id as player_id',
+    public function listScreeningOuter(Request $request)
+    {
+        $screening_name = $request->input('screening_name');
+        $player_name = $request->input('player_name');
+$query = SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screening_details.screening_id', '=', 'sport_screening_masters.id')
+    ->leftJoin('sport_registers', 'sport_screening_details.registration_id', '=', 'sport_registers.id')
+    ->leftJoin('sport_master_group', 'sport_screening_details.sports_group_id', '=', 'sport_master_group.id')
 
-                'sport_registers.id as player_id',
-                DB::raw('GROUP_CONCAT(sport_screening_masters.screening_name SEPARATOR ", ") as screening_names')
-            )
-            ->groupBy('sport_screening_details.screening_date', 'sport_registers.name', 'sport_registers.id');
-            
-            if ($screening_name && $screening_name != 'Select') {
-                $query->where('sport_screening_details.screening_id', '=', $screening_name);
-            }
-            if ($player_name && $player_name != 'Select') {
-                $query->where('sport_registers.id', '=', $player_name);
-            }
-            $screeningSummary = $query->get(); // 'id' can be replaced with any other column
+    ->where('sport_screening_masters.status', 'active')
+    ->select(
+        DB::raw('MIN(sport_screening_details.id) as id'),
+        'sport_screening_details.screening_date',
+        // 'sport_registers.name as player_name',
+        // 'sport_registers.id as player_id',
+        'sport_screening_details.sports_group_id',
+        'sport_master_group.name as groupName',
 
+        DB::raw('GROUP_CONCAT(distinct(sport_screening_masters.screening_name) SEPARATOR ", ") as screening_names')
+    )
+    ->groupBy(
+        'sport_screening_details.screening_date',
+        'sport_master_group.name',
+
+        'sport_screening_details.sports_group_id',
+        
+    )->orderBy('sport_screening_details.screening_date','desc');
+        if ($screening_name && $screening_name != 'Select') {
+            $query->where('sport_screening_details.screening_id', '=', $screening_name);
+        }
+        if ($player_name && $player_name != 'Select') {
+            $query->where('sport_registers.id', '=', $player_name);
+        }
+
+        $screeningSummary = $query->get(); // 'id' can be replaced with any other column
         $allscreening = SportScreeningMaster::all();
-        $allplayers = SportRegister:: leftJoin('users', 'users.id', '=', 'sport_registers.userable_id')
-        ->where('users.status', 'active')->select('sport_registers.id as player_id', 'sport_registers.name')->get();
-            return view('ums.sports.activity.screening_list_main',compact('screeningSummary','allscreening','allplayers'));
+        $allplayers = SportRegister::leftJoin('users', 'users.id', '=', 'sport_registers.userable_id')
+            ->where('users.status', 'active')->select('sport_registers.id as player_id', 'sport_registers.name')->get();
+        return view('ums.sports.activity.screening_list_main', compact('screeningSummary', 'allscreening', 'allplayers'));
     }
 
-    public function activityAssessment(Request $request){
-        
-            $screening_name = $request->input('screening_name');        
-            $batch_name = $request->input('batch_name');        
-            $group_name = $request->input('group_name');
-            $screening_date=$request->date;
-            $player_id=$request->id;
-            $query= SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screening_details.screening_id', '=', 'sport_screening_masters.id')
+    public function activityAssessment(Request $request)
+    {
+
+        $screening_name = $request->input('screening_name');
+        $batch_name = $request->input('batch_name');
+        $group_name = $request->input('group_name');
+        $screening_date = base64_decode($request->date);
+        $sports_group_id = $request->id;
+        $query = SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screening_details.screening_id', '=', 'sport_screening_masters.id')
             ->leftJoin('sport_registers', 'sport_screening_details.registration_id', '=', 'sport_registers.id')
             ->leftJoin('users', 'sport_registers.userable_id', '=', 'users.id')
-            ->leftJoin('sport_master_group', 'sport_registers.group_id', '=', 'sport_master_group.id')
+            ->leftJoin('sport_master_group', 'sport_screening_details.sports_group_id', '=', 'sport_master_group.id')
             ->leftJoin('employees', 'sport_screening_details.trainer_id', '=', 'employees.id')
 
             ->where('sport_screening_details.screening_date', $screening_date)
-            ->where('sport_screening_details.registration_id', $player_id)
+            ->where('sport_screening_details.sports_group_id', $sports_group_id)
 
             ->select(
                 DB::raw('DISTINCT sport_registers.id AS sport_register_id'),
@@ -93,8 +103,8 @@ class ScreeningAssesmentController extends Controller
                 'sport_registers.document_number',
 
                 'sport_screening_details.screening_id',
-                DB::raw("CONCAT(users.first_name, ' ', users.last_name) as name"),
-                'users.email',
+                DB::raw("CONCAT(sport_registers.name) as name"),
+                'sport_registers.email',
                 'users.payment_status',
                 'sport_master_group.name as groupName',
                 'sport_master_group.batch_year as batchYear',
@@ -104,33 +114,31 @@ class ScreeningAssesmentController extends Controller
 
             );
 
-            if ($screening_name && $screening_name != 'Select') {
-                $query->where('sport_screening_details.screening_id', '=', $screening_name);
-            }
-            if ($batch_name && $batch_name != 'Select') {
-                $query->where('sport_screening_details.batch_id', '=', $batch_name);
-            }
-            if ($group_name && $group_name != 'Select') {
-                $query->where('sport_screening_details.sports_group_id', '=', $group_name);
-            }
-            $screeningSummary = $query->get(); // 'id' can be replaced with any other column
-
-        
+        if ($screening_name && $screening_name != 'Select') {
+            $query->where('sport_screening_details.screening_id', '=', $screening_name);
+        }
+        if ($batch_name && $batch_name != 'Select') {
+            $query->where('sport_screening_details.batch_id', '=', $batch_name);
+        }
+        if ($group_name && $group_name != 'Select') {
+            $query->where('sport_screening_details.sports_group_id', '=', $group_name);
+        }
+        $screeningSummary = $query->get(); // 'id' can be replaced with any other column
         $allscreening = SportScreeningMaster::all();
         $batchs = SportBatch::all();
-        $groups = SportGroupMaster::all();        
-        //  dd($groups);
+        $groups = SportGroupMaster::all();
+// dd($screeningSummary);
+        return view('ums.sports.activity.screening_assessment', compact('screeningSummary', 'allscreening', 'batchs', 'groups', 'screening_date', 'sports_group_id'));
+    }
 
-            return view('ums.sports.activity.screening_assessment',compact('screeningSummary','allscreening','batchs','groups','screening_date','player_id'));
-        }
-
-        public function remarkAssessmentEdit(Request $request){
+    public function remarkAssessmentEdit(Request $request)
+    {
 
 
-            // $screening_date=$request->date;
-            $id=$request->id;        
+        // $screening_date=$request->date;
+        $id = $request->id;
 
-            $screeningData = SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screening_details.screening_id', '=', 'sport_screening_masters.id')
+        $screeningData = SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screening_details.screening_id', '=', 'sport_screening_masters.id')
             ->leftJoin('sport_registers', 'sport_screening_details.registration_id', '=', 'sport_registers.id')
             ->leftJoin('users', 'sport_registers.userable_id', '=', 'users.id')
             ->leftJoin('sport_batches', 'sport_screening_details.batch_id', '=', 'sport_batches.id')
@@ -168,28 +176,28 @@ class ScreeningAssesmentController extends Controller
             ->first();
 
         $sel_parameter_values = is_array($screeningData->parameter_values)
-        ? $screeningData->parameter_values
-        : (is_string($screeningData->parameter_values)
-            ? json_decode($screeningData->parameter_values, true)
-            : []);
-            $batchs = SportBatch::all();
-            $screening = SportScreeningMaster::all();
-            $trainers = Employee::where('designation_id', '=', 344)->get(); 
+            ? $screeningData->parameter_values
+            : (is_string($screeningData->parameter_values)
+                ? json_decode($screeningData->parameter_values, true)
+                : []);
+        $batchs = SportBatch::all();
+        $screening = SportScreeningMaster::all();
+        $trainers = Employee::where('designation_id', '=', 344)->get();
 
-            $screeningAssesment=$screeningData;
-            // dd($sel_parameter_values);
-            return view('ums.sports.activity.mark_assess_edit',compact('screeningAssesment','batchs','screening','sel_parameter_values','trainers'));
-
-        }
-
-
-        public function remarkAssessmentView(Request $request){
+        $screeningAssesment = $screeningData;
+        // dd($sel_parameter_values);
+        return view('ums.sports.activity.mark_assess_edit', compact('screeningAssesment', 'batchs', 'screening', 'sel_parameter_values', 'trainers'));
+    }
 
 
-            // $screening_date=$request->date;
-            $id=$request->id;        
+    public function remarkAssessmentView(Request $request)
+    {
 
-            $screeningData = SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screening_details.screening_id', '=', 'sport_screening_masters.id')
+
+        // $screening_date=$request->date;
+        $id = $request->id;
+
+        $screeningData = SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screening_details.screening_id', '=', 'sport_screening_masters.id')
             ->leftJoin('sport_registers', 'sport_screening_details.registration_id', '=', 'sport_registers.id')
             ->leftJoin('users', 'sport_registers.userable_id', '=', 'users.id')
             ->leftJoin('sport_batches', 'sport_screening_details.batch_id', '=', 'sport_batches.id')
@@ -228,82 +236,83 @@ class ScreeningAssesmentController extends Controller
             ->first();
 
         $sel_parameter_values = is_array($screeningData->parameter_values)
-        ? $screeningData->parameter_values
-        : (is_string($screeningData->parameter_values)
-            ? json_decode($screeningData->parameter_values, true)
-            : []);
-            $batchs = SportBatch::all();
-            $screening = SportScreeningMaster::all();
-    
-            $screeningAssesment=$screeningData;
-            $trainers = Employee::where('designation_id', '=', 344)->get(); 
+            ? $screeningData->parameter_values
+            : (is_string($screeningData->parameter_values)
+                ? json_decode($screeningData->parameter_values, true)
+                : []);
+        $batchs = SportBatch::all();
+        $screening = SportScreeningMaster::all();
 
-            //  dd($screeningAssesment);
-            return view('ums.sports.activity.mark_assess_view',compact('screeningAssesment','batchs','screening','sel_parameter_values','trainers'));
+        $screeningAssesment = $screeningData;
+        $trainers = Employee::where('designation_id', '=', 344)->get();
 
-        }
-        
-        
-
-        public function remarkAssessmentAdd(Request $request){
-        
-            $batchs = SportBatch::all();
-                $screening = SportScreeningMaster::all();  
-                $trainers = Employee::where('designation_id', '=', 344)->get(); 
-                // dd($trainers);
-  
-            $screeningAssesment=[];
-            return view('ums.sports.activity.mark_assess_add',compact('screeningAssesment','batchs','screening','trainers'));
-
-        }
+        //  dd($screeningAssesment);
+        return view('ums.sports.activity.mark_assess_view', compact('screeningAssesment', 'batchs', 'screening', 'sel_parameter_values', 'trainers'));
+    }
 
 
-        public function viewRemarkAssessment(Request $request){
-            $id=$request->id;
-            $screeningCandidate = SportRegister::join('users', 'sport_registers.userable_id', '=', 'users.id')
+
+    public function remarkAssessmentAdd(Request $request)
+    {
+
+        $batchs = SportBatch::all();
+        $screening = SportScreeningMaster::all();
+        $trainers = Employee::where('designation_id', '=', 344)->get();
+        // dd($trainers);
+
+        $screeningAssesment = [];
+        return view('ums.sports.activity.mark_assess_add', compact('screeningAssesment', 'batchs', 'screening', 'trainers'));
+    }
+
+
+    public function viewRemarkAssessment(Request $request)
+    {
+        $id = $request->id;
+        $screeningCandidate = SportRegister::join('users', 'sport_registers.userable_id', '=', 'users.id')
             ->where('sport_registers.id', $id)
             ->select(
                 // 'sport_registers.*',
                 'users.first_name as firstName',
-                'users.last_name as lastName',       
+                'users.last_name as lastName',
             )
             ->get();
-            $screening = SportScreeningMaster::all();
+        $screening = SportScreeningMaster::all();
 
-            // dd($screening);
-            $screeningAssesment=[];
-            return view('ums.sports.activity.view_mark_assess',compact('screeningCandidate','screening',));
-
-        }
-
-
-        public function getScreeningParameters(Request $request){         
-                $parameterDetails = SportScreeningMaster::where('id', $request->screeningId)
-                ->pluck('parameter_details')
-                ->first();
-                $parameters = json_decode($parameterDetails, true);
-                return response()->json($parameters);
-            }
+        // dd($screening);
+        $screeningAssesment = [];
+        return view('ums.sports.activity.view_mark_assess', compact('screeningCandidate', 'screening',));
+    }
 
 
-        public function screeningAddData(Request $request){
-            $user = Helper::getAuthenticatedUser();
-//  dd($request->all());
+    public function getScreeningParameters(Request $request)
+    {
+        $parameterDetails = SportScreeningMaster::where('id', $request->screeningId)
+            ->pluck('parameter_details')
+            ->first();
+        $parameters = json_decode($parameterDetails, true);
+        return response()->json($parameters);
+    }
 
-            $validatedData = $request->validate([
-                'screening_date' => 'required|date',
-                // 'sport' => 'required|integer',
-                'batch_year' => 'required',
-                'batch_name' => 'required',
-                'section_name' => 'required|integer',
-                'group_name' => 'required|integer',
-                'trainer' => 'required|integer',
-                'player_name' => 'required|integer',
-                'screening_name' => 'required',
-                // 'remarks' => 'required|string',
-                // 'status' => 'required|in:active,inactive',
-                // 'batch_students' => 'required',
-            ]);
+
+    public function screeningAddData(Request $request)
+    {
+        $user = Helper::getAuthenticatedUser();
+        //  dd($request->all());
+
+        $validatedData = $request->validate([
+            'screening_date' => 'required|date',
+            // 'sport' => 'required|integer',
+            'batch_year' => 'required',
+            'batch_name' => 'required',
+            'section_name' => 'required|integer',
+            'group_name' => 'required|integer',
+            'trainer' => 'required|integer',
+            'player_name' => 'required|integer',
+            'screening_name' => 'required',
+            // 'remarks' => 'required|string',
+            // 'status' => 'required|in:active,inactive',
+            // 'batch_students' => 'required',
+        ]);
         $parametersJson = json_encode($request->input('parameters', []));
         $screening = new SportScreeningDetail();
         // Assign validated fields
@@ -315,7 +324,7 @@ class ScreeningAssesmentController extends Controller
         $screening->trainer_id = $validatedData['trainer'];
         $screening->registration_id = $validatedData['player_name'];
         $screening->screening_id = $validatedData['screening_name'];
-       
+
         // Save parameters JSON
 
         $screening->organization_id = $user->organization_id;
@@ -324,22 +333,21 @@ class ScreeningAssesmentController extends Controller
 
         $screening->parameter_values = $parametersJson;   // Save the record
         // dd($request->input('parameters'));
-        $existing = SportScreeningDetail::where('screening_date', $validatedData['screening_date'])    
-        // ->where('trainer_id', $validatedData['trainer'])
-        ->where('registration_id', $validatedData['player_name'])
-        ->where('sports_group_id', $validatedData['group_name'])
-        ->where('batch_id', $validatedData['batch_name'])
-        ->where('section_id', $validatedData['section_name'])
-        ->where('screening_id', $validatedData['screening_name'])->first();
-        if(!$existing){
-                // Create new instance of the model
+        $existing = SportScreeningDetail::where('screening_date', $validatedData['screening_date'])
+            // ->where('trainer_id', $validatedData['trainer'])
+            ->where('registration_id', $validatedData['player_name'])
+            ->where('sports_group_id', $validatedData['group_name'])
+            ->where('batch_id', $validatedData['batch_name'])
+            ->where('section_id', $validatedData['section_name'])
+            ->where('screening_id', $validatedData['screening_name'])->first();
+        if (!$existing) {
+            // Create new instance of the model
             $screening->save();
-        return response()->json([
-            'message' => 'Screening data saved successfully!',
-            'data' => $screening,
-        ]);
-
-        }else{
+            return response()->json([
+                'message' => 'Screening data saved successfully!',
+                'data' => $screening,
+            ]);
+        } else {
 
             $existing->update([
                 'screening_date' => $validatedData['screening_date'],
@@ -358,26 +366,27 @@ class ScreeningAssesmentController extends Controller
             ]);
         }
         return $existing;
-        }
+    }
 
 
-        
-        public function screeningEditData(Request $request){
-            $screening_detail_id=$request->input('id');
-            $validatedData = $request->validate([
-                'screening_date' => 'required|date',
-                // 'sport' => 'required|integer',
-                'batch_year' => 'required',
-                'batch_name' => 'required',
-                'section_name' => 'required|integer',
-                'group_name' => 'required|integer',
-                'trainer' => 'required|integer',
-                'player_name' => 'required|integer',
-                'screening_name' => 'required',
-                // 'remarks' => 'required|string',
-                // 'status' => 'required|in:active,inactive',
-                // 'batch_students' => 'required',
-            ]);
+
+    public function screeningEditData(Request $request)
+    {
+        $screening_detail_id = $request->input('id');
+        $validatedData = $request->validate([
+            'screening_date' => 'required|date',
+            // 'sport' => 'required|integer',
+            'batch_year' => 'required',
+            'batch_name' => 'required',
+            'section_name' => 'required|integer',
+            'group_name' => 'required|integer',
+            'trainer' => 'required|integer',
+            'player_name' => 'required|integer',
+            'screening_name' => 'required',
+            // 'remarks' => 'required|string',
+            // 'status' => 'required|in:active,inactive',
+            // 'batch_students' => 'required',
+        ]);
         $parametersJson = json_encode($request->input('parameters', []));
         $screening = new SportScreeningDetail();
         // Assign validated fields
@@ -392,24 +401,23 @@ class ScreeningAssesmentController extends Controller
         // Save parameters JSON
         $screening->parameter_values = $parametersJson;   // Save the record
 
-        $existing = SportScreeningDetail::where('screening_date', $validatedData['screening_date'])    
-        // ->where('trainer_id', $validatedData['trainer'])
-        ->where('registration_id', $validatedData['player_name'])
-        ->where('sports_group_id', $validatedData['group_name'])
-        ->where('batch_id', $validatedData['batch_name'])
-        ->where('section_id', $validatedData['section_name'])
-        ->where('screening_id', $validatedData['screening_name'])
-        ->where('id',$screening_detail_id)
-        ->first();
-        if(!$existing){
-                // Create new instance of the model
+        $existing = SportScreeningDetail::where('screening_date', $validatedData['screening_date'])
+            // ->where('trainer_id', $validatedData['trainer'])
+            ->where('registration_id', $validatedData['player_name'])
+            ->where('sports_group_id', $validatedData['group_name'])
+            ->where('batch_id', $validatedData['batch_name'])
+            ->where('section_id', $validatedData['section_name'])
+            ->where('screening_id', $validatedData['screening_name'])
+            ->where('id', $screening_detail_id)
+            ->first();
+        if (!$existing) {
+            // Create new instance of the model
             $screening->save();
-        return response()->json([
-            'message' => 'Screening data saved successfully!',
-            'data' => $screening,
-        ]);
-
-        }else{
+            return response()->json([
+                'message' => 'Screening data saved successfully!',
+                'data' => $screening,
+            ]);
+        } else {
 
             $existing->update([
                 'screening_date' => $validatedData['screening_date'],
@@ -428,7 +436,7 @@ class ScreeningAssesmentController extends Controller
             ]);
         }
         return $existing;
-        }
+    }
 
     public function get_batch_names(Request $request)
     {
@@ -438,12 +446,12 @@ class ScreeningAssesmentController extends Controller
 
     public function get_batch_section(Request $request)
     {
-        $section = SportSection::where('batch_id', $request->batch_id)->get();    
+        $section = SportSection::where('batch_id', $request->batch_id)->get();
         return response()->json($section);
     }
 
     public function get_section_group(Request $request)
-    {    
+    {
         $sectionValue = $request->section_id;
         if (is_numeric($sectionValue)) {
             $group = SportGroupMaster::where('section_id', $sectionValue)->get();
@@ -454,10 +462,11 @@ class ScreeningAssesmentController extends Controller
     }
 
 
-    public function get_batch_student(Request $request) {
+    public function get_batch_student(Request $request)
+    {
         $section = SportSection::where('id', $request->section_id)
-                        ->orWhere('name', $request->section_id)
-                        ->first();
+            ->orWhere('name', $request->section_id)
+            ->first();
 
         if (!$section) {
             return response()->json([]);
@@ -468,13 +477,11 @@ class ScreeningAssesmentController extends Controller
         return response()->json($students);
     }
 
-    public function get_group_players_screening(Request $request){
+    public function get_group_players_screening(Request $request)
+    {
         $player_list = SportRegister::where('group', $request->group)
-                            ->distinct()
-                            ->get();
+            ->distinct()
+            ->get();
         return response()->json($player_list);
     }
-
-
-    
 }

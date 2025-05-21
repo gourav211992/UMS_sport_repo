@@ -100,6 +100,7 @@ use App\Http\Controllers\ums\Student\ExaminationController as StudentExamination
 use App\Http\Controllers\ums\Student\SemesterFeeController;
 use App\Http\Controllers\ums\Student\SemesterFeeController as studentformsemesterFeeController;
 use App\Http\Controllers\ums\Student\AdmitCardController as StudentAdmitCardController;
+use App\Http\Controllers\ums\sports\StudentReportController as StudentReportController;
 
 
 use App\Http\Controllers\TaxController;
@@ -466,6 +467,8 @@ Route::controller(ScreeningAssesmentController::class)->group(function () {
    
    });
 
+    Route::get('/student-screening-report/{id}',[StudentReportController::class, 'report_screening'])->name('student-screening-report');
+    Route::post('/submit-report-comment',[StudentReportController::class, 'submitReportComment'])->name('submit-report-comment');
 
 
 

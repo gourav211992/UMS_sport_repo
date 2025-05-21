@@ -109,30 +109,23 @@
                                                                     <i data-feather="edit-3" class="me-50"></i>
                                                                     <span>Edit</span>
                                                                 </a>
+                                                                <a class="dropdown-item" href="#"
+                                                                    onClick="viewStudentReport('{{ $item->sport_register_id }}')">
+                                                                    <i data-feather="edit-3" class="me-50"></i>
+                                                                    <span>View Report</span>
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     </td>
                                                 </tr>
                                             @endforeach
-
-
                                         </tbody>
-
-
                                     </table>
                                 </div>
-
-
-
-
-
                             </div>
                         </div>
                     </div>
-
                 </section>
-
-
             </div>
         </div>
     </div>
@@ -144,7 +137,7 @@
     <div class="modal modal-slide-in fade filterpopuplabel" id="filter">
         <div class="modal-dialog sidebar-sm">
             <form class="add-new-record modal-content pt-0" id="approveds-form" method="GET" novalidate
-                action="{{ url('screening-assessment-inner/' . $screening_date . '/' . $player_id) }}">
+                action="{{ url('screening-assessment-inner/' . $screening_date . '/' . $sports_group_id) }}">
                 @csrf
 
                 <div class="modal-header mb-1">
@@ -237,20 +230,26 @@
             </form>
         </div>
     </div>
-    
-    
+
+
     <script>
         function editScreeiningAssesment(slug) {
             var url = "{{ url('screening-assessment-edit') }}" + "/" + slug;
             window.location.href = url;
         }
-        
-        
-        
+
+
+
         function viewScreeiningAssesment(slug) {
             var url = "{{ url('screening-assessment-view') }}" + "/" + slug;
             window.location.href = url;
         }
-    </script>
 
+        function viewStudentReport(slug) {
+            // alert(slug);
+            var url = "{{ url('/student-screening-report') }}" + "/" + slug;
+            // alert(url);
+            window.location.href = url;
+        }
+    </script>
 @endsection
