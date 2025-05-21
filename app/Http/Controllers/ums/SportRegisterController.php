@@ -50,9 +50,9 @@ class SportRegisterController extends Controller
         return view('ums.sports.login');
     }
     public function guidelines(){
-        $sport = Helper::getAuthenticatedsport();
-//        dd($sport);
-        $registration = SportRegister::where('sportable_id',$sport->id)->first();
+        $user = Helper::getAuthenticatedUser();
+//        dd($user);
+        $registration = SportRegister::where('userable_id',$user->id)->first();
         if (!$registration){
             return view('ums.sports.guidelines');
         }
@@ -60,7 +60,7 @@ class SportRegisterController extends Controller
     }
     public function registration()
 {
-    $sport_student = Helper::getAuthenticatedUser();
+    $User = Helper::getAuthenticatedUser();
 //    dd($user);
     $parentURL = request()->segments()[0];
     $servicesBooks = Helper::getAccessibleServicesFromMenuAlias($parentURL);
@@ -71,7 +71,7 @@ class SportRegisterController extends Controller
 
     $firstService = $servicesBooks['services'][0];
     $series = Helper::getBookSeriesNew($firstService->alias, $parentURL)->get();
-    $student = sport_student::findOrFail($user->id);
+    $student = User::findOrFail($User->id);
         if ($student->registration) {
             return redirect()->route('sports.profile', ['id' => $student->id]);
         }
@@ -84,7 +84,7 @@ class SportRegisterController extends Controller
     $sportFeeMaster = sport_fee_master::where('quota','General')->first();
     $feeDetails = json_decode($sportFeeMaster->fee_details, true);
         $countries  = Country::all();
-        $user = sport_student::with('payments')->findOrFail($sport_student->id);
+        $user = User::with('payments')->findOrFail($User->id);
         $batchYears = SportBatch::select('batch_year')->distinct()->get();
         $groups = SportGroupMaster::where('status', 'active')->get();
         $qouta_id =  SportQuota::where('quota_name','General')->first();
@@ -418,7 +418,7 @@ class SportRegisterController extends Controller
         }
         DB::commit();
 
-        $student = sport_student::find($user->id);
+        $student = User::find($user->id);
 //        dd($student->registration);
         return redirect()->route('sports.profile', ['id' => $user->id])->with('success', 'Registration pending');
 
@@ -446,8 +446,8 @@ class SportRegisterController extends Controller
 //     public function fetch(Request $request)
 // {
 //     $query = SportRegister::with('batch')
-//         ->leftJoin('sport_student', 'sport_registers.userable_id', '=', 'sport_student.id')
-//         ->select('sport_registers.*', 'sport_student.payment_status as user_payment_status');
+//         ->leftJoin('User', 'sport_registers.userable_id', '=', 'User.id')
+//         ->select('sport_registers.*', 'User.payment_status as user_payment_status');
 
 
 //     if ($request->filled('date_range')) {
@@ -467,7 +467,7 @@ class SportRegisterController extends Controller
 //     }
 
 //     if ($request->filled('payment_Status')) {
-//         $query->where('sport_student.payment_status', $request->payment_Status);
+//         $query->where('User.payment_status', $request->payment_Status);
 //     }
 
 
@@ -477,8 +477,8 @@ class SportRegisterController extends Controller
 
 //         $students = SportRegister::with('batch')->latest()->get();
 //         $totalRegisteredStudents = SportRegister::count();
-//         $totalPaidStudents = SportRegister::join('sport_student', 'sport_registers.userable_id', '=', 'sport_student.id')
-//             ->where('sport_student.payment_status', 'paid')
+//         $totalPaidStudents = SportRegister::join('User', 'sport_registers.userable_id', '=', 'User.id')
+//             ->where('User.payment_status', 'paid')
 //             ->count();
 
 //         $totalApprovedStudents = SportRegister::where('sport_registers.status', 'approved')->count();
@@ -488,7 +488,7 @@ class SportRegisterController extends Controller
 
 //         $students = $query->get();
 //         $totalRegisteredStudents = $query->count();
-//         $totalPaidStudents = (clone $query)->where('sport_student.payment_status', 'paid')->count();
+//         $totalPaidStudents = (clone $query)->where('User.payment_status', 'paid')->count();
 //         $totalApprovedStudents = (clone $query)->where('sport_registers.status', 'approved')->count();
 //         $totalRejectedStudents = (clone $query)->where('sport_registers.status', 'rejected')->count();
 //     }
@@ -509,8 +509,8 @@ class SportRegisterController extends Controller
 public function fetch(Request $request)
 {
     $query = SportRegister::with('batch')
-        ->leftJoin('sport_student', 'sport_registers.userable_id', '=', 'sport_student.id')
-        ->select('sport_registers.*', 'sport_student.payment_status as user_payment_status');
+        ->leftJoin('users', 'sport_registers.userable_id', '=', 'users.id')
+        ->select('sport_registers.*', 'users.payment_status as users_payment_status');
 
 
     if ($request->filled('date_range')) {
@@ -531,12 +531,12 @@ public function fetch(Request $request)
 
     if ($request->payment_Status == 'pending') {
         $query->where(function($q) {
-            $q->whereNotIn('sport_student.payment_status', ['paid', 'confirm'])
-              ->orWhereNull('sport_student.payment_status');
+            $q->whereNotIn('users.payment_status', ['paid', 'confirm'])
+              ->orWhereNull('users.payment_status');
         });
     }
     elseif ($request->filled('payment_Status')) {
-        $query->where('sport_student.payment_status', $request->payment_Status);
+        $query->where('users.payment_status', $request->payment_Status);
     }
 
 
@@ -547,8 +547,8 @@ public function fetch(Request $request)
 
         $students = SportRegister::with('batch')->latest()->get();
         $totalRegisteredStudents = SportRegister::count();
-        $totalPaidStudents = SportRegister::join('sport_student', 'sport_registers.userable_id', '=', 'sport_student.id')
-            ->where('sport_student.payment_status', 'paid')
+        $totalPaidStudents = SportRegister::join('users', 'sport_registers.userable_id', '=', 'users.id')
+            ->where('users.payment_status', 'paid')
             ->count();
 
         $totalApprovedStudents = SportRegister::where('sport_registers.status', 'approved')->count();
@@ -561,7 +561,7 @@ public function fetch(Request $request)
         $students = $query->latest()->get();
 
         $totalRegisteredStudents = $query->count();
-        $totalPaidStudents = (clone $query)->where('sport_student.payment_status', 'paid')->count();
+        $totalPaidStudents = (clone $query)->where('users.payment_status', 'paid')->count();
         $totalApprovedStudents = (clone $query)->where('sport_registers.status', 'approved')->count();
         $totalRejectedStudents = (clone $query)->where('sport_registers.status', 'rejected')->count();
         $totalOnholdStudents = (clone $query)->where('sport_registers.status', 'on-hold')->count();
@@ -602,7 +602,7 @@ public function confirm(  Request $request, $id){
         return back()->with('error', 'Student not found');
     }
     $student->userable_id;
-    $user= sport_student::find($student->userable_id);
+    $user= User::find($student->userable_id);
     if (!$user) {
         return  back()->with('error', 'User not found');
     }
@@ -617,7 +617,7 @@ public function confirm(  Request $request, $id){
     public function edit($id)
     {
         $registration = SportRegister::findOrFail($id);
-        $userId=sport_student::find($registration->userable_id);
+        $userId=User::find($registration->userable_id);
 
     
         $RecivedPayment=SportPayment::where('user_id',$userId->id)->first();
@@ -680,7 +680,7 @@ public function confirm(  Request $request, $id){
             $states = [];
             $cities = [];
         }
-        $user = sport_student::with('payments')->findOrFail($registration->userable_id);
+        $user = User::with('payments')->findOrFail($registration->userable_id);
         $otherStates = State::where('country_id', $registration->bai_state)->get();
         return view('ums.sports.edit-registration', compact(
             'registration',
@@ -780,7 +780,7 @@ public function confirm(  Request $request, $id){
             $cities = [];
         }
 //        dd($feeDetails);
-        $user = sport_student::with('payments')->findOrFail($registration->userable_id);
+        $user = User::with('payments')->findOrFail($registration->userable_id);
         return view('ums.sports.profile_view_detail', compact(
             'registration',
             'series',
@@ -876,7 +876,7 @@ public function confirm(  Request $request, $id){
         $otherStates = State::where('country_id', $registration->bai_state)->get();
 
 //        dd($feeDetails);
-        $user = sport_student::with('payments')->findOrFail($registration->userable_id);
+        $user = User::with('payments')->findOrFail($registration->userable_id);
         
         // dd($otherStates);
         return view('ums.sports.view-registration', compact(
@@ -916,7 +916,7 @@ public function confirm(  Request $request, $id){
 //        dd($request->all());
         // Fetch the existing registration record
         $registration = SportRegister::findOrFail($id);
-        $user = \App\Models\sport_student::find($registration->userable_id);
+        $user = \App\Models\User::find($registration->userable_id);
         if ($request->status == 'rejected') {
             Mail::send('ums.sports.rejection_email', ['user' => $user,'remarks'=>$request->remarks,'name'=>$request->name], function($message) use ($user) {
                 $message->to($user->email);
@@ -1574,11 +1574,11 @@ public function confirm(  Request $request, $id){
 
  public function showProfile($id)
     {
-        $student = sport_student::findOrFail($id);
+        $student = User::findOrFail($id);
         $quota = SportQuota::find($student->registration->quota_id);
         $payment = SportPayment::where(['user_id' => $student->id])->first();
         $existingData = json_decode($payment->fee_heads_durations ?? '{}', true);
-        $sport_studentideData= json_decode($payment->user_side_data ?? '{}', true);
+        $UsersideData= json_decode($payment->user_side_data ?? '{}', true);
         $familyDetails = SportFamilyDetail::where('registration_id', $student->registration->id)->first();
 //        dd($student->registration);
 
@@ -1777,8 +1777,8 @@ if ($sportRegister) {
             $totalFees += $netFeePayable;
         }
 
-        $user = sport_student::with('payments')->findOrFail($id);
-        return view('ums.sports.profile', compact('student', 'sport_studentideData','sportFeeMaster',  'existingData','feeDetails', 'totalFees','familyDetails', 'previousStudentActivities',
+        $user = User::with('payments')->findOrFail($id);
+        return view('ums.sports.profile', compact('student', 'UsersideData','sportFeeMaster',  'existingData','feeDetails', 'totalFees','familyDetails', 'previousStudentActivities',
             'studentActivities','user','paid_amount','date'))
             ->with('success', 'Registration successful');
     }
@@ -1841,7 +1841,7 @@ if ($sportRegister) {
             $cities = [];
         }
         $otherStates = State::where('country_id', $registration->bai_state)->get();
-        $user = sport_student::with('payments')->findOrFail($registration->userable_id);
+        $user = User::with('payments')->findOrFail($registration->userable_id);
 //        dd($feeDetails);
         return view('ums.sports.profile-registration', compact(
             'registration',
@@ -2170,7 +2170,7 @@ if ($sportRegister) {
             }
 
             DB::commit();
-            $student = sport_student::find($user->id);
+            $student = User::find($user->id);
 //        dd($student->registration);
             return redirect()->route('sports.profile', ['id' => $user->id])->with('success', 'Registration Pending');
 
@@ -2218,7 +2218,7 @@ if ($sportRegister) {
 //     try {
 //         // Validate the request
 //         $validated = $request->validate([
-//             'user_id' => 'required|exists:sport_student,id',
+//             'user_id' => 'required|exists:User,id',
 //             'bank_name' => 'required_unless:pay_mode,Cash|string|nullable',
 //             'pay_mode' => 'required|string',
 //             'ref_no' => 'required_unless:pay_mode,Cash|string|nullable',

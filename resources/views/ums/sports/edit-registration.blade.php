@@ -2184,7 +2184,7 @@ ksort($monthlyGrouped);
                <td>
     @if ($status === 'Paid')
         <input type="checkbox" checked disabled>
-    @elseif ($status === 'Confirmation required')
+    @elseif ($status === 'Confirmation required' )
         <input type="checkbox" checked disabled>
         <button class="btn btn-sm btn-info ms-2 confirm-btn" 
                 data-date="{{ $dueDate }}"

@@ -373,15 +373,27 @@
                                                                     <option value="One Time" {{ $paymentMode == 'One Time' ? 'selected' : '' }}>One Time</option>
                                                                 </select>
                                                             </td>
-                                                           
+                                                            <!-- <td>
+                                                                <select class="form-select mw-100 duration-select" name="duration[]" style="{{ $paymentMode == 'Monthly' ? '' : 'display: none;' }}">
+                                                                    <option value="">Select Duration</option>
+                                                                    @php
+                                                                    $duration = old('duration.' . $key, $fees['duration'] ?? '');
+                                                                    @endphp
+                                                                    @for($i = 1; $i <= 12; $i++)
+                                                                        <option value="{{ $i }}" {{ $duration == $i ? 'selected' : '' }}>{{ $i }} Month{{ $i > 1 ? 's' : '' }}</option>
+                                                                    @endfor
+                                                                </select>
+                                                            </td> -->
                                                             <td>
+    <select class="form-select mw-100 duration-select" name="duration[]" style="{{ $paymentMode == 'Monthly' ? '' : 'display: none;' }}">
+        <option value="">Select Duration</option>
         @php
-            
+            //dd($fees['monthly_duration']);
             $duration = old('duration.' . $key, $fees['duration'] ?? ''); 
         @endphp
-    <select class="form-select mw-100 duration-select"  name="duration[]" data-selected="{{$duration}}" style="{{ $paymentMode == 'Monthly' ? '' : 'display: none;' }}">
-        <option value="">Select Duration</option>
-      
+        @for($i = 1; $i <= 12; $i++)
+            <option value="{{ $i }}" {{  $fees['duration'] == $i ? 'selected' : '' }}>{{ $i }} Month{{ $i > 1 ? 's' : '' }}</option>
+        @endfor
     </select>
 </td>
 
@@ -454,7 +466,7 @@
         }
     })
 </script>
-{{-- <script>
+<script>
   
 $(document).on('change', '.form-select', function() {
     var frequency = $(this).val(); 
@@ -467,7 +479,7 @@ $(document).on('change', '.form-select', function() {
         durationSelect.hide(); 
     }
 });
-</script> --}}
+</script>
 <script>
 
     function captureTableData() {
@@ -797,7 +809,7 @@ $('body').on('click', '.delete-item', function (e) {
     });
 </script>
 
-{{-- <script>
+<script>
     $(document).ready(function() {
         $(document).on('change', '.payment-frequency', function() {
             var $row = $(this).closest('tr');
@@ -836,84 +848,8 @@ $('body').on('click', '.delete-item', function (e) {
             }
         });
     });
-    </script> --}}
-<script>
-    function updateDurationOptions(durationSelect, frequency, selectedVal = null) {
-        durationSelect.empty();
-
-        if (frequency === 'Monthly') {
-            for (let i = 1; i <= 12; i++) {
-                durationSelect.append(
-                    `<option value="${i}" ${selectedVal == i ? 'selected' : ''}>${i} month${i > 1 ? 's' : ''}</option>`
-                );
-            }
-        } else {
-            for (let i = 1; i <= 5; i++) {
-                let months = i * 12;
-                durationSelect.append(
-                    `<option value="${months}" ${selectedVal == months ? 'selected' : ''}>${i} year${i > 1 ? 's' : ''}</option>`
-                );
-            }
-        }
-
-        // Always ensure dropdown is visible
-        durationSelect.show().prop('required', true);
-    }
-
-    function handlePaymentFrequencyChange($row, showModal = true) {
-        let frequency = ($row.find('.payment-frequency').val() || '').trim();
-        let durationSelect = $row.find('.duration-select');
-
-        // get selected value from data-selected or current .val() if options already exist
-        let selectedDuration =  durationSelect.attr('data-selected') || durationSelect.val();
-        let title = $row.find('select[name="title"] option:selected').text().trim();
-
-        const durationModes = ['Monthly', 'Quarterly', 'Semi-Yearly', 'Yearly'];
-
-        if (durationModes.includes(frequency)) {
-            updateDurationOptions(durationSelect, frequency, selectedDuration);
-
-            if (showModal) {
-                $('#paymentTitle').text(title);
-                $('#paymentDuration').text(durationSelect.find('option:selected').text());
-                $('#monthlyPaymentModal').modal('show');
-            }
-        } else {
-            // Only hide when frequency is not valid
-            durationSelect.hide().prop('required', false).empty();
-        }
-    }
-
-    $(document).ready(function () {
-        // On change of payment frequency
-        $(document).on('change', '.payment-frequency', function () {
-            let $row = $(this).closest('tr');
-            handlePaymentFrequencyChange($row);
-        });
-
-        // On change of duration select (just show modal)
-        $(document).on('change', '.duration-select', function () {
-            let $row = $(this).closest('tr');
-            let title = $row.find('select[name="title"] option:selected').text().trim();
-            let durationText = $(this).find('option:selected').text();
-
-            $('#paymentTitle').text(title);
-            $('#paymentDuration').text(durationText);
-            $('#monthlyPaymentModal').modal('show');
-
-            // Ensure dropdown doesn't hide
-            $(this).show();
-        });
-
-        // Initial setup for all existing frequency dropdowns
-        $('.payment-frequency').each(function () {
-            let $row = $(this).closest('tr');
-            handlePaymentFrequencyChange($row, false);
-        });
-    });
-</script>
-
-
+    </script>
+    
 
 
 @endsection
