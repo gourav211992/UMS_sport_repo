@@ -182,11 +182,32 @@ $query = SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screen
                 : []);
         $batchs = SportBatch::all();
         $screening = SportScreeningMaster::all();
-        $trainers = Employee::where('designation_id', '=', 344)->get();
-
+        // $trainers = Employee::where('designation_id', '=', 344)->get();
         $screeningAssesment = $screeningData;
+
+        $keywords = ['coach', 'sr coach', 'yoga','s & c coach','asst. coach']; // already lowercase
+        $astkeywords= ['asst. coach']; // already lowercase
+
+        $trainers = Employee::leftJoin('designations', 'designations.id', '=', 'employees.designation_id')
+        ->where(function ($query) use ($keywords) {
+            foreach ($keywords as $keyword) {
+                $query->orWhereRaw('LOWER(designations.name) LIKE ?', ['%' . strtolower($keyword) . '%']);
+            }
+        })
+        ->select('employees.*', 'designations.name as designation_name')
+        ->get();
+
+        $assttrainers = Employee::leftJoin('designations', 'designations.id', '=', 'employees.designation_id')
+        ->where(function ($query) use ($astkeywords) {
+            foreach ($astkeywords as $keyword) {
+                $query->orWhereRaw('LOWER(designations.name) LIKE ?', ['%' . strtolower($keyword) . '%']);
+            }
+        })
+        ->select('employees.*', 'designations.name as designation_name')
+        ->get();
+
         // dd($sel_parameter_values);
-        return view('ums.sports.activity.mark_assess_edit', compact('screeningAssesment', 'batchs', 'screening', 'sel_parameter_values', 'trainers'));
+        return view('ums.sports.activity.mark_assess_edit', compact('screeningAssesment', 'batchs', 'screening', 'sel_parameter_values', 'trainers','assttrainers'));
     }
 
 
@@ -244,7 +265,27 @@ $query = SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screen
         $screening = SportScreeningMaster::all();
 
         $screeningAssesment = $screeningData;
-        $trainers = Employee::where('designation_id', '=', 344)->get();
+        $keywords = ['coach', 'sr coach', 'yoga','s & c coach','asst. coach']; // already lowercase
+        $astkeywords= ['asst. coach']; // already lowercase
+
+        $trainers = Employee::leftJoin('designations', 'designations.id', '=', 'employees.designation_id')
+        ->where(function ($query) use ($keywords) {
+            foreach ($keywords as $keyword) {
+                $query->orWhereRaw('LOWER(designations.name) LIKE ?', ['%' . strtolower($keyword) . '%']);
+            }
+        })
+        ->select('employees.*', 'designations.name as designation_name')
+        ->get();
+
+        $assttrainers = Employee::leftJoin('designations', 'designations.id', '=', 'employees.designation_id')
+        ->where(function ($query) use ($astkeywords) {
+            foreach ($astkeywords as $keyword) {
+                $query->orWhereRaw('LOWER(designations.name) LIKE ?', ['%' . strtolower($keyword) . '%']);
+            }
+        })
+        ->select('employees.*', 'designations.name as designation_name')
+        ->get();
+
 
         //  dd($screeningAssesment);
         return view('ums.sports.activity.mark_assess_view', compact('screeningAssesment', 'batchs', 'screening', 'sel_parameter_values', 'trainers'));
@@ -257,8 +298,26 @@ $query = SportScreeningDetail::leftJoin('sport_screening_masters', 'sport_screen
 
         $batchs = SportBatch::all();
         $screening = SportScreeningMaster::all();
-        $trainers = Employee::where('designation_id', '=', 344)->get();
-        // dd($trainers);
+        $keywords = ['coach', 'sr coach', 'yoga','s & c coach','asst. coach']; // already lowercase
+       $astkeywords= ['asst. coach']; // already lowercase
+
+        $trainers = Employee::leftJoin('designations', 'designations.id', '=', 'employees.designation_id')
+        ->where(function ($query) use ($keywords) {
+            foreach ($keywords as $keyword) {
+                $query->orWhereRaw('LOWER(designations.name) LIKE ?', ['%' . strtolower($keyword) . '%']);
+            }
+        })
+        ->select('employees.*', 'designations.name as designation_name')
+        ->get();
+
+        $assttrainers = Employee::leftJoin('designations', 'designations.id', '=', 'employees.designation_id')
+        ->where(function ($query) use ($astkeywords) {
+            foreach ($astkeywords as $keyword) {
+                $query->orWhereRaw('LOWER(designations.name) LIKE ?', ['%' . strtolower($keyword) . '%']);
+            }
+        })
+        ->select('employees.*', 'designations.name as designation_name')
+        ->get();
 
         $screeningAssesment = [];
         return view('ums.sports.activity.mark_assess_add', compact('screeningAssesment', 'batchs', 'screening', 'trainers'));

@@ -11,8 +11,16 @@
         color: white !important;
     }
 
+    table {
+        color: #000;
+    }
+
     .toast-message {
         font-size: 14px;
+    }
+
+    h6 {
+        color: #000;
     }
 
     @media print {
@@ -21,13 +29,16 @@
         }
     }
 </style>
+@php
+    $screeningTotalScore = [];
 
+@endphp
 @section('content')
     <div class="container" style="padding-top: 200px;">
         <form id="form" method="post" action="/submit-report-comment">
             <div id="reportSection"
                 style="border: black thin solid; width:700px; padding: 10px; font-family:Arial; color:#000; ">
-                <table style="width: 100%; font-size: 13px; margin-bottom: 10px;" cellspacing="0" cellpadding="0">
+                <table style="width: 100%; font-size: 13px; margin-bottom: 10px; color:#000; " cellspacing="0" cellpadding="0">
                     <tr>
                         <td style="text-align: center; font-weight: 600; font-size: 22px; ">Sports Quest Centre of
                             Excellence
@@ -253,43 +264,59 @@
 
 
                 </table>
-
                 @php
-                    $grouped = [];
-                    // print_r($studentScreeningData);
+                    // Group and handle missing ratings
                     foreach ($studentScreeningData as $month => $screenings) {
                         foreach ($screenings as $screeningEntries) {
                             foreach ($screeningEntries as $entry) {
                                 $screening = $entry['screening_name'];
                                 $parameter = $entry['parameter'];
+                                $weightage = $entry['weightage'];
+                                $rating = $entry['rating'];
 
-                                $grouped[$screening][$parameter]['weightage'] = $entry['weightage'];
-                                $grouped[$screening][$parameter]['months'][$month] = $entry['rating'];
+                                $grouped[$screening][$parameter]['weightage'] = $weightage;
+
+                                if ($rating === '-' && !empty($grouped[$screening][$parameter]['months'])) {
+                                    // Get previous valid ratings
+                                    $previousRatings = array_filter(
+                                        $grouped[$screening][$parameter]['months'],
+                                        fn($r) => $r !== '-',
+                                    );
+
+                                    // Use last valid rating if available
+                                    $lastValidRating = end($previousRatings);
+                                    $grouped[$screening][$parameter]['months'][$month] =
+                                        $lastValidRating !== false ? $lastValidRating : '-';
+                                } else {
+                                    $grouped[$screening][$parameter]['months'][$month] = $rating;
+                                }
                             }
                         }
                     }
 
-                    // Get all unique months for header
+                    // Month headers (formatted, e.g. Jan, Feb)
                     $allMonths = collect($studentScreeningData)
                         ->keys()
                         ->map(fn($month) => \Carbon\Carbon::parse($month . '-01')->format('M'))
                         ->unique()
                         ->toArray();
 
-                    // Raw month keys for matching month-wise ratings
+                    // Raw month keys (e.g. '2024-01') used for lookups
                     $monthKeys = collect($studentScreeningData)->keys()->toArray();
                 @endphp
-
-                <?php $lindex = 0;
-                
+                <?php
+                $lindex = 0;
+                $indexforgrandTotal = 0;
                 ?>
                 @foreach ($grouped as $screeningName => $parameters)
                     @php
                         $totalScreeningScore = 0;
                         $remark = '';
                         $finalRowRemark = '';
-
+                        $totalWeightage = 0;
+                        $indexforgrandTotal = $loop->iteration;
                     @endphp
+
                     <h6 style="margin: 0px; font-size: 16px; padding-bottom: 6px; padding-top: 6px;">
                         {{ $loop->iteration }}) {{ ucwords($screeningName) }}
                     </h6>
@@ -318,6 +345,7 @@
                                 $weightage = $paramData['weightage'];
                                 $totalRating = collect($ratings)->sum();
                                 $count = collect($ratings)->count();
+                                $totalWeightage += $weightage;
                             @endphp
                             <tr>
                                 <td style="border: 1px solid #000; padding: 5px;">{{ $loop->iteration }}</td>
@@ -326,26 +354,41 @@
                                 </td>
 
                                 @foreach ($monthKeys as $rawMonth)
+                                    @php
+                                        $finalScore = 0;
+                                    @endphp
                                     <td style="border: 1px solid #000; padding: 5px; text-align:right; ">
                                         {{ $paramData['months'][$rawMonth] ?? '-' }}
                                     </td>
                                     @php
-                                        $finalrating = $paramData['months'][$rawMonth] ?? '-';
-                                        $finalScore = ((int) $finalrating * $weightage) / 100;
+                                        $monthIndex = array_search($rawMonth, $monthKeys);
+
+                                        $rating = $paramData['months'][$rawMonth] ?? '-';
+
+                                        if ($rating === '-' && $monthIndex > 0) {
+                                            for ($i = $monthIndex - 1; $i >= 0; $i--) {
+                                                $previousMonth = $monthKeys[$i];
+                                                $previousRating = $paramData['months'][$previousMonth] ?? null;
+
+                                                if ($previousRating !== null && $previousRating !== '-') {
+                                                    $rating = $previousRating;
+                                                    $finalScore = ((int) $rating * $weightage) / 100;
+                                                    break;
+                                                }
+                                            }
+                                        } else {
+                                            $finalScore = ((int) $rating * $weightage) / 100;
+                                        }
+
                                     @endphp
                                 @endforeach
 
-                                @foreach ($allRatingScale as $index => $scaleItem)
-                                    <?php
-                                    if ($scaleItem->scores == $finalrating) {
-                                        $remark = $scaleItem->remarks;
-                                    }
-                                    ?>
-                                @endforeach
+
 
                                 <td style="border: 1px solid #000; padding: 5px; text-align:right;">
-                                    {{ $finalrating > 0 ? $finalScore : '-' }}</td>
-                                <td style="border: 1px solid #000; padding: 5px; text-align:left;">{{ $remark }}</td>
+                                    {{ $rating > 0 ? $finalScore : '-' }}</td>
+                                <td style="border: 1px solid #000; padding: 5px; text-align:left;">
+                                    {{ $ratingScaleArray[(int) $rating] }}</td>
                             </tr>
                             @php
 
@@ -365,7 +408,7 @@
                             </td>
                             <td
                                 style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; font-weight: bold; background: #dcd7d7; text-align: center;">
-                                {{-- {{ $totalWeightage }}% --}}
+                                {{ $totalWeightage }}%
                             </td>
                             <td
                                 style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; background: #dcd7d7;">
@@ -379,23 +422,18 @@
                                 style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; background: #dcd7d7; text-align: right;">
                                 {{ $totalScreeningScore }}
                             </td>
+                            @php
+                                $screeningTotalScore[$indexforgrandTotal] = $totalScreeningScore;
+                            @endphp
 
-                            @foreach ($allRatingScale as $index => $scaleItem)
-                                <?php
-                                if ($scaleItem->scores == (int) $totalScreeningScore) {
-                                    $finalRowRemark = $scaleItem->remarks;
-                                }
-                                ?>
-                            @endforeach
+
                             <td
                                 style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; font-weight: bold; background: #dcd7d7; text-align: left;">
-                                {{ $finalRowRemark }}
+                                {{ $ratingScaleArray[(int) $totalScreeningScore] }}
+
                             </td>
 
-                            {{-- <td
-                            style="border: 1px solid #000; padding: 5px 5px; border-left: none; border-top: none; font-weight: bold; background: #dcd7d7; text-align: center;">
-                            On Target
-                        </td> --}}
+
                         </tr>
                     </table>
                 @endforeach
@@ -481,97 +519,42 @@
                         </td>
                         <td
                             style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: right;">
-                            8
+                            {{ floor($activityTotalScore / 10) }}
                         </td>
                         <td
                             style="border: 1px solid #000; padding: 5px 5px; border-left: none; border-top: none; text-align: center;">
-                            Above Target
+                            {{ $ratingScaleArray[floor($activityTotalScore / 10)] }}
                         </td>
                     </tr>
 
-                    <tr>
-                        <td style="border: 1px solid #000; padding: 5px 5px; border-top: none;">
-                            2
-                        </td>
-                        <td style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none;">
-                            Technical Ability
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: center;">
-                            20%
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: right;">
-                            8
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px; border-left: none; border-top: none; text-align: center;">
-                            Above Target
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <td style="border: 1px solid #000; padding: 5px 5px; border-top: none;">
-                            3
-                        </td>
-                        <td style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none;">
-                            Tactical Awareness
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: center;">
-                            20%
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: right;">
-                            8
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px; border-left: none; border-top: none; text-align: center;">
-                            Above Target
-                        </td>
-                    </tr>
 
-                    <tr>
-                        <td style="border: 1px solid #000; padding: 5px 5px; border-top: none;">
-                            4
-                        </td>
-                        <td style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none;">
-                            Physical Aspects
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: center;">
-                            20%
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: right;">
-                            8
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px; border-left: none; border-top: none; text-align: center;">
-                            Above Target
-                        </td>
-                    </tr>
+                    @foreach ($grouped as $screeningName => $parameters)
+                        @php
+                            $thiScore = $screeningTotalScore[$loop->iteration];
+                        @endphp
+                        <tr>
+                            <td style="border: 1px solid #000; padding: 5px 5px; border-top: none;">
+                                {{ $loop->iteration + 1 }}
+                            </td>
+                            <td style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none;">
+                                {{ ucwords($screeningName) }}
+                            </td>
+                            <td
+                                style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: center;">
+                                20%
+                            </td>
+                            <td
+                                style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: right;">
+                                {{ $thiScore }}
+                            </td>
 
-                    <tr>
-                        <td style="border: 1px solid #000; padding: 5px 5px; border-top: none;">
-                            5
-                        </td>
-                        <td style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none;">
-                            Personality Traits
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: center;">
-                            20%
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px;  border-top: none; border-left: none; text-align: right;">
-                            8
-                        </td>
-                        <td
-                            style="border: 1px solid #000; padding: 5px 5px; border-left: none; border-top: none; text-align: center;">
-                            Above Target
-                        </td>
-                    </tr>
+                            <td
+                                style="border: 1px solid #000; padding: 5px 5px; border-left: none; border-top: none; text-align: center;">
+                                {{ $ratingScaleArray[floor((int) $thiScore)] }}
+                            </td>
+                        </tr>
+                    @endforeach
 
                     <tr>
                         <td

@@ -30,8 +30,10 @@ class StudentReportController extends Controller
         $studentScreeningData = $this->getScreeningWiseStudentSummary($sports_registers_id);
 
         $SportReportComment = SportReportComment::where('registration_id', $sports_registers_id)->first();
-        // dd($allactivities);
+        // dd($allRatingScale);
         //   dd($SportReportComment) ;
+        $ratingScaleArray = $allRatingScale->pluck('remarks', 'scores')->toArray();
+        // dd($ratingScaleArray);
 
         if ($SportReportComment) {
             $remarks = json_decode($SportReportComment->remark, true); // array of comments
@@ -49,7 +51,7 @@ class StudentReportController extends Controller
             'studentDetails',
             'studentActivityData',
             'studentScreeningData',
-            'sports_registers_id',
+            'sports_registers_id','ratingScaleArray'
         );
         return view('ums.sports.activity.report-screening', $cmpData);
     }
