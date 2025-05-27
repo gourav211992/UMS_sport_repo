@@ -2,6 +2,7 @@
 
 namespace App\Models\ums\Activity;
 
+use App\Models\ums\Activity\Designation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -144,4 +145,10 @@ class Employee extends Model
         'inactivation_date',
         'deleted_at',
     ];
+
+    public function designation()
+{
+    return $this->belongsTo(Designation::class, 'designation_id');
+}
+
 }

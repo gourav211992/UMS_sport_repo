@@ -32,7 +32,7 @@
 				</div>
 			</div>
             <div class="content-body">
-                <form id="submitData" method="POST" action="{{ url('college_add') }}">
+                <form id="submitData" method="POST" action="{{ url('college-add') }}">
                     @csrf
                     <section id="basic-datatable">
                         <div class="row">
@@ -117,11 +117,12 @@
                                                         <label class="form-label text-primary"><strong>Status</strong></label>
                                                         <div class="demo-inline-spacing">
                                                             <div class="form-check form-check-primary mt-25">
-                                                                <input type="radio" id="customColorRadio3" name="status" class="form-check-input" value="1" {{ old('status', 1) == 1 ? 'checked' : '' }}>
+                                                                <input type="radio" id="customColorRadio3" name="status" class="form-check-input" value="1" {{ old('status', '1') === '1' ? 'checked' : '' }}>
                                                                 <label class="form-check-label fw-bolder" for="customColorRadio3">Active</label>
                                                             </div>
                                                             <div class="form-check form-check-primary mt-25 me-0">
-                                                                <input type="radio" id="customColorRadio4" name="status" class="form-check-input" value="0" {{ old('status') == 0 ? 'checked' : '' }}>
+
+                                                                <input type="radio" id="customColorRadio4" name="status" class="form-check-input" value="0" {{ old('status') === '0' ? 'checked' : '' }}>
                                                                 <label class="form-check-label fw-bolder" for="customColorRadio4">Inactive</label>
                                                             </div>
                                                         </div>
@@ -315,6 +316,7 @@
                     success: function (courses) {
                         let options = '<option value="">Select Course</option>';
                         $.each(courses, function (i, course) {
+                        console.log(course,'fghjhg');
                             options += `<option value="${course.id}">${course.course_name}</option>`;
                         });
                         $('#courseDropdown').html(options);

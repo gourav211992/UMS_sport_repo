@@ -13,7 +13,7 @@
                             <h2 class="content-header-title float-start mb-0">Rating Scale View</h2>
                             <div class="breadcrumb-wrapper">
 									<ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{url('rating_scale')}}">Home</a>
+                                    <li class="breadcrumb-item"><a href="{{url('rating-scale')}}">Home</a>
                                     </li>  
                                     <li class="breadcrumb-item active">Readonly</li> 
                                 </ol>
@@ -25,7 +25,7 @@
                  
             </div>
             <div class="content-body">
-                <form method="POST" action="{{ route('rating_scale.update', $scalesData->id) }}">
+                <form method="POST" action="{{ route('rating-scale.update', $scalesData->id) }}">
                     @csrf
                     @method('PUT') <!-- For updating the record -->
 
@@ -79,7 +79,10 @@
                                                     </div>
                                                 </div>
 
-                                              
+                                                <div class="mt-3">
+                                                    <button onClick="javascript: history.go(-1)" class="btn btn-secondary btn-sm"><i data-feather="arrow-left-circle"></i> Back</button>
+           
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

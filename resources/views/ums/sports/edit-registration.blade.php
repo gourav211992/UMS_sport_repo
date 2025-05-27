@@ -3538,11 +3538,11 @@ $('#confirmationModal').on('hidden.bs.modal', function() {
                     _token: "{{ csrf_token() }}"
                 },
                 success: function (response) {
-                    if (response.length > 0) {
-                        $.each(response, function (index, section) {
-                            let isSelected = section.id == selectedSection ? 'selected' : '';
-                            $('#section').append('<option value="' + section.id + '" ' + isSelected + '>' + section.section + '</option>');
-                        });
+                                       if (response.sections && response.sections.length > 0) {
+                    $.each(response.sections, function (index, section) {
+                        $('#section').append('<option value="' + section.id + '">' + section.section + '</option>');
+                    });
+                
 
                         if (selectedSection) {
                             $('#section').val(selectedSection).trigger('change');

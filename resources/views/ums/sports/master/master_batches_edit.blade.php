@@ -62,7 +62,10 @@
                                                         <label class="form-label">Batch Name <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <input type="text" class="form-control" name="batch_name"  value="{{ $batch->batch_name }}"  />
+                                                        <input type="text" class="form-control @error('batch_name') is-invalid @enderror" name="batch_name"  value="{{ $batch->batch_name }}" />
+                                                        @error('batch_name')
+                                                            <div class="text-danger mt-25">{{ $message }}</div>
+                                                        @enderror
                                                     </div>
                                                 </div>
                                                 <div class="row align-items-center mb-1">
@@ -70,27 +73,50 @@
                                                         <label class="form-label">Batch Year <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <input type="text" class="form-control" name="batch_year"  value="{{ $batch->batch_year }}"  />
+                                                        <input type="text" class="form-control @error('batch_year') is-invalid @enderror" name="batch_year"  value="{{ $batch->batch_year}}" />
+                                                        @error('batch_year')
+                                                            <div class="text-danger mt-25">{{ $message }}</div>
+                                                        @enderror
+                                                    
                                                     </div>
                                                 </div>
-
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Session_Start Date <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        {{-- <input type="date" class="form-control" name="start_date" value="{{ $batch->start_date }}" required /> --}}
+                                                        <input type="date" class="form-control" name="start_date" value="{{ $batch->start_date }}" />
+                                                        @error('start_date')
+                                                            <div class="text-danger mt-25">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Session_end_date <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="date" class="form-control" name="end_date" value="{{ $batch->end_date }}" />
+                                                        @error('end_date')
+                                                            <div class="text-danger mt-25">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
                                                 <div class="row align-items-center mb-2">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Status</label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        {{-- <div class="demo-inline-spacing">
-                                                            <div class="form-check form-check-primary mt-25">
-                                                                <input type="radio" id="inactive" name="status" value="inactive" class="form-check-input">
-                                                                <label class="form-check-label fw-bolder" for="inactive">Inactive</label>
-                                                            </div>
-                                                            <div class="form-check form-check-primary mt-25">
-                                                                <input type="radio" id="active" name="status" value="active" class="form-check-input" checked>
-                                                                <label class="form-check-label fw-bolder" for="active">Active</label>
-                                                            </div>
-                                                        </div> --}}
+                                                      
                                                         <div class="demo-inline-spacing">
-
+                                                            <div class="form-check form-check-primary mt-25">
+                                                                <input type="radio" id="active" name="status"
+                                                                    value="active" class="form-check-input"
+                                                                    {{ old('status', $batch->status ?? '') == 'active' ? 'checked' : '' }}>
+                                                                <label class="form-check-label fw-bolder"
+                                                                    for="active">Active</label>
+                                                            </div>
                                                             <div class="form-check form-check-primary mt-25">
                                                                 <input type="radio" id="inactive" name="status"
                                                                     value="inactive" class="form-check-input"
@@ -99,13 +125,7 @@
                                                                     for="inactive">Inactive</label>
                                                             </div>
 
-                                                            <div class="form-check form-check-primary mt-25">
-                                                                <input type="radio" id="active" name="status"
-                                                                    value="active" class="form-check-input"
-                                                                    {{ old('status', $batch->status ?? '') == 'active' ? 'checked' : '' }}>
-                                                                <label class="form-check-label fw-bolder"
-                                                                    for="active">Active</label>
-                                                            </div>
+                                                           
                                                         </div>
                                                     </div>
                                                 </div>

@@ -2,6 +2,7 @@
 namespace App\Models\ums\ums_master;
 use App\Models\ums\ums_master\Erp_Ums_InstituteMapping;
 use App\Models\ums\ums_master\CourseModel;
+use App\Models\ums\ums_master\ProgramTypeModel;
 use App\Models\ums\ums_master\Program_Types;
 use App\Models\ums\ums_master\Program_branches;
 use Illuminate\Database\Eloquent\Model;
@@ -36,7 +37,7 @@ class Erp_Ums_CollegeMapping extends Model
 
     public function program_type()
     {
-        return $this->belongsTo(Program_Types::class, 'program_type_id');
+        return $this->belongsTo(ProgramTypeModel::class, 'program_type_id');
     }
 
     // Handle JSON field for program_branch_ids
@@ -44,5 +45,7 @@ class Erp_Ums_CollegeMapping extends Model
     {
         return json_decode($this->program_branch_ids, true);
     }
+
+
 }
 

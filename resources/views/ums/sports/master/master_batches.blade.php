@@ -67,6 +67,9 @@
                                             <th>#</th>
                                             <th>Batch Year </th>
                                             <th>Batch Name</th>
+                                            <th>Session Start Date</th>
+                                            <th>Session End Date</th>
+
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
@@ -78,6 +81,13 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td class="fw-bolder text-dark">{{ $row->batch_year }}</td>
                                             <td class="fw-bolder text-dark">{{ $row->batch_name }}</td>
+                                            <td class="fw-bolder text-dark">
+                                                {{ $row->start_date ? \Carbon\Carbon::parse($row->start_date)->format('d-m-Y') : '' }}
+                                            </td>
+                                            
+                                            <td class="fw-bolder text-dark">
+                                                {{ $row->end_date ? \Carbon\Carbon::parse($row->end_date)->format('d-m-Y') : '' }}
+                                            </td>
                                             <td><span class="badge rounded-pill 
                                                         {{ $row->status == 'active' ? 'badge-light-success' : 'badge-light-danger' }}">
                                                     {{ ucfirst($row->status) }}
@@ -96,17 +106,19 @@
                                                             <i data-feather="edit-3" class="me-50"></i>
                                                             <span>Edit</span>
                                                         </a>
-                                                        <form action="{{ route('batches-destroy', $row->id) }}"
-                                                            method="POST"
-                                                            onsubmit="return confirm('Are you sure you want to delete this batch?')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <!-- This line is essential to override the POST method -->
-                                                            <button type="submit" class="dropdown-item">
-                                                                <i data-feather="trash-2" class="me-50"></i>
-                                                                <span>Delete</span>
-                                                            </button>
-                                                        </form>
+                                                        
+                                                            <form id="deleteForm-{{ $row->id }}" action="{{ route('batches-destroy', $row->id) }}" method="POST" style="display: inline;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <a type="button"
+                                                                        class="dropdown-item"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#staticBackdrop"
+                                                                        onclick="setDeleteId('{{ $row->id }}')">
+                                                                    <i data-feather="trash-2" class="me-50"></i>
+                                                                    <span>Delete</span>
+                                                                </a>
+                                                            </form>
                                                     </div>
                                                 </div>
                                             </td>
@@ -129,6 +141,24 @@
             </section>
 
 
+        </div>
+    </div>
+</div>
+{{-- model --}}
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Confirm Deletion</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="deleteGroupName">
+                <!-- Group Name will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="deleteGroup()">Delete</button>
+            </div>
         </div>
     </div>
 </div>
@@ -174,4 +204,29 @@
         </form>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		let affiliateIdToDelete = null;
+		let affiliateNameToDelete = '';
+	
+		function setDeleteId(affiliateId) {
+			affiliateIdToDelete = affiliateId;
+			// affiliateNameToDelete = affiliateName;
+			document.getElementById('deleteGroupName').innerHTML =
+				`Are you sure you want to delete the sportBatch ?`;
+		}
+	
+		function deleteGroup() {
+			if (affiliateIdToDelete) {
+				const form = document.getElementById('deleteForm-' + affiliateIdToDelete);
+				if (form) {
+					form.submit();
+				} else {
+					alert('Form not found for deletion.');
+				}
+			} else {
+				alert('No affiliate selected for deletion.');
+			}
+		}
+	</script>
 @endsection

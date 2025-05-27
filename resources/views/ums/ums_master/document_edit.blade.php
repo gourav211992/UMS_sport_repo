@@ -1,4 +1,4 @@
-@extends('ums.sports.sports-meta.admin-sports-meta')
+@extends('ums.admin.admin-meta')     
 
 @section('content')
 <!-- BEGIN: Content-->
@@ -36,7 +36,7 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <form action="{{ route('document-update', $document->id) }}" method="POST" id="document_edit">
+                            <form action="{{ route('document.update', $document->id) }}" method="POST" id="document_edit">
                                 @csrf
                                 @method('PUT')
 

@@ -26,7 +26,7 @@
                     {{-- <button class="btn btn-warning btn-sm mb-50 mb-sm-0" data-bs-toggle="modal" data-bs-target="#filter">
                         <i data-feather="filter"></i> Filter
                     </button> --}}
-                    <a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{ url('institute_add') }}">
+                    <a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{ url('institute-add') }}">
                         <i data-feather="plus-circle"></i> Add New
                     </a>
                 </div>
@@ -76,11 +76,11 @@
                                                             <i data-feather="eye" class="me-50"></i>
                                                             <span>View Detail</span>
                                                         </a>
-                                                        <a class="dropdown-item" href="{{ route('institute-edit', $institute->id) }}">
+                                                        <a class="dropdown-item" href="{{ route('institute.edit', $institute->id) }}">
                                                             <i data-feather="edit-3" class="me-50"></i>
                                                             <span>Edit</span>
                                                         </a>
-                                                        <form action="{{ route('institute.destroy', $institute->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this institute?');">
+                                                        <form action="{{ url('institute-destroy', $institute->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this institute?');">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="setDeleteAction({{ $institute->id }})">
@@ -134,7 +134,7 @@
 
 <script>
     function setDeleteAction(id) {
-        const url = "{{ url('institute') }}/" + id;
+        const url = "{{ url('institute-delete') }}/" + id;
         document.getElementById('deleteForm').action = url;
     }
 </script>

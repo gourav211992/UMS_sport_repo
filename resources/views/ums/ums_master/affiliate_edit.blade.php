@@ -37,7 +37,7 @@
         </div>
         <div class="content-body">
             <section id="basic-datatable">
-                <form id="formdata" action="{{ route('affiliate_update', $affiliatesData->id) }}" method="POST">
+                <form id="formdata" action="{{ route('affiliate.update', $affiliatesData->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="row">

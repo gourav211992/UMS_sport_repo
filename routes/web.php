@@ -101,6 +101,7 @@ use App\Http\Controllers\ums\Student\SemesterFeeController;
 use App\Http\Controllers\ums\Student\SemesterFeeController as studentformsemesterFeeController;
 use App\Http\Controllers\ums\Student\AdmitCardController as StudentAdmitCardController;
 
+use App\Http\Controllers\ums\sports\StudentReportController;
 
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\AuthController;
@@ -236,10 +237,10 @@ Route::post('sports/password/reset', [SportsForgotPasswordController::class, 're
 
 Route::post('/get-sections-by-batch', [SportRegisterController::class, 'getSectionsByBatch'])->name('get.sections.by.batch');
 
- //my activity
+//my activity
 
- 
- Route::get('download-template', function () {
+
+Route::get('download-template', function () {
     $filePath = public_path('templates/bulk_upload_template.xlsx');
     if (file_exists($filePath)) {
         // dd('File exists at: ' . $filePath); 
@@ -252,10 +253,8 @@ Route::post('/get-sections-by-batch', [SportRegisterController::class, 'getSecti
 Route::post('/admin/confirm-fee-schedule', [SportRegisterController::class, 'ConfirmfeeStatus'])->name('admin.confirmFeeSchedule');
 
 // Sports Routes
-Route::group(['middleware' => ['sports']], function()
-{
-    Route::get('sports-students',function()
-    {
+Route::group(['middleware' => ['sports']], function () {
+    Route::get('sports-students', function () {
         return view('ums.sports.students');
     });
     Route::get('/sport-registration', [SportRegisterController::class, 'registration'])->name('sports.registration');
@@ -269,8 +268,6 @@ Route::group(['middleware' => ['sports']], function()
     Route::get('/get-quotas/{batchId}', [SportRegisterController::class, 'getQuotas']);
 
     Route::get('/profile-view-detail/{id}', [SportRegisterController::class, 'profileViewDetail'])->name('profile-view-detail');
-    
-
 });
 Route::get('/fetch-fee-structure', [SportRegisterController::class, 'fetchFeeStructure'])->name('fetch.fee.structure');
 Route::put('/sport-registration-update/{id}', [SportRegisterController::class, 'postRegistrationUpdate'])->name('sport-registration-update');
@@ -279,29 +276,28 @@ Route::get('/view-registration/{id}', [SportRegisterController::class, 'viewRegi
 Route::get('/sports-students', [SportRegisterController::class, 'fetch'])->name('sports-students');
 Route::get('/get-states/{countryId}', [SportRegisterController::class, 'getStates'])->name('get.states');
 Route::get('/get-cities/{stateId}', [SportRegisterController::class, 'getCities'])->name('get.cities');
-Route::post('update-payment',[SportRegisterController::class,'update_payment'])->name('update-payment');
-Route::post('update-payment-status',[SportRegisterController::class,'update_payment_status'])->name('update-payment-status');
+Route::post('update-payment', [SportRegisterController::class, 'update_payment'])->name('update-payment');
+Route::post('update-payment-status', [SportRegisterController::class, 'update_payment_status'])->name('update-payment-status');
 
-Route::post('/update-fee-mandatory-status',[SportRegisterController::class,'updateMandatoryStatus'])->name('update.fee.mandatory.status');
+Route::post('/update-fee-mandatory-status', [SportRegisterController::class, 'updateMandatoryStatus'])->name('update.fee.mandatory.status');
 
 // Route::get('sports-registration',function(){
 //     return view('ums.sports.registration');
 // });
 
 
-Route::get('sports-register/confirm-email',function(){
+Route::get('sports-register/confirm-email', function () {
     return view('ums.sports.confirm_email');
 });
-Route::get('sports-registration-approve',function(){
+Route::get('sports-registration-approve', function () {
     return view('ums.sports.registration_approve');
 });
 //  confirm payment
-Route::get('sport-confirm-stu/{id}', [SportRegisterController::class,'confirm'])->name('sport-confirm-stu');
+Route::get('sport-confirm-stu/{id}', [SportRegisterController::class, 'confirm'])->name('sport-confirm-stu');
 
-Route::get('sports-login',[SportRegisterController::class, 'login'])->name('sports.login');
+Route::get('sports-login', [SportRegisterController::class, 'login'])->name('sports.login');
 
-Route::get('sports-register',function () 
-{
+Route::get('sports-register', function () {
     return view('ums.sports.register');
 })->name('sports.register');
 // Route::view('sport-master','ums.sports.sport_master');
@@ -312,18 +308,20 @@ Route::get('sports-register',function ()
 //blades
 // Route::view('activity-scheduler','ums.sports.activity.activity_scheduler');
 // Route::view('activity-scheduler-add','ums.sports.activity.activity_scheduler_add');
-Route::view('activity-attendance','ums.sports.activity.activity_attendance');
-Route::view('activity-assessment','ums.sports.activity.activity_assessment');
-Route::view('mark-attendance','ums.sports.activity.mark_attendance');
-Route::view('view-mark-attendance','ums.sports.activity.view_mark_attendance');
-Route::view('view-mark-access','ums.sports.activity.view_mark_access');
-Route::view('mark-assess','ums.sports.activity.mark_assess');
+Route::view('activity-attendance', 'ums.sports.activity.activity_attendance');
+Route::view('activity-assessment', 'ums.sports.activity.activity_assessment');
+Route::view('mark-attendance', 'ums.sports.activity.mark_attendance');
+Route::view('view-mark-attendance', 'ums.sports.activity.view_mark_attendance');
+Route::view('view-mark-access', 'ums.sports.activity.view_mark_access');
+Route::view('mark-assess', 'ums.sports.activity.mark_assess');
 
 //blades
 
 
 
 //register and login
+Route::post('/sports-register/import', [SportRegisterController::class, 'importSportsRegister'])->name('sports.register.import');
+
 Route::post('/sports-register', [SportsController::class, 'register'])->name('sports-register');
 Route::post('/post-sports-login', [SportsController::class, 'login'])->name('post.sport.login');
 Route::get('/sports-logout', [SportsController::class, 'logout'])->name('sport.logout');
@@ -350,353 +348,382 @@ Route::post('forgot-password-change', [UmsHomeController::class, '@forgotPasswor
 
 Route::get('user-dashboard', [UserHomeController::class, 'userDashboardAndProfile'])->name('user.dashboard');
 Route::get('user-application-form', [UserHomeController::class, 'application_form'])->name('user-application-form');
-Route ::post('/application-course-list',[UserHomeController::class,'applicationCourseList']);
-Route ::post('/get-state',[UserHomeController::class,'get_state']);
-Route ::post('/get-district',[UserHomeController::class,'get_district']);
-Route::get('/education-single-row', [UserHomeController::class,'education_single_row'])->name('education-single-row');
-Route::get('entrance-admit-card/{id}', [UserHomeController::class,'entranceAdmitCard']);
+Route::post('/application-course-list', [UserHomeController::class, 'applicationCourseList']);
+Route::post('/get-state', [UserHomeController::class, 'get_state']);
+Route::post('/get-district', [UserHomeController::class, 'get_district']);
+Route::get('/education-single-row', [UserHomeController::class, 'education_single_row'])->name('education-single-row');
+Route::get('entrance-admit-card/{id}', [UserHomeController::class, 'entranceAdmitCard']);
 Route::post('application-form', [UserHomeController::class, 'applicationSave'])->middleware('auth');
 Route::group(['middleware' => ['admin']], function () {
-    Route::get('/sports-fee-schedule',[SportFeeController::class,'listing']);
-    Route::get('/sports-fee-schedule/add',[SportFeeController::class,'index']);
-    Route::post('fee-master/add',[SportFeeController::class,'store']);
-    Route::get('/sports-fee-schedule/edit/{id}',[SportFeeController::class,'edit']);
-    Route::get('/sports-fee-schedule/view/{id}',[SportFeeController::class,'ViewPage']);
-    Route::post('sports-fee-schedule/update/{id}',[SportFeeController::class,'update']);
-    Route::get('sports-fee-schedule/delete/{id}',[SportFeeController::class,'fee_delete']);
-    Route::post('/sports-fee-schedule/clone/id',[SportFeeController::class,'clone'])->name('sports-fee-schedule-clone');
+    Route::get('/sports-fee-schedule', [SportFeeController::class, 'listing']);
+    Route::get('/sports-fee-schedule/add', [SportFeeController::class, 'index']);
+    Route::post('fee-master/add', [SportFeeController::class, 'store']);
+    Route::get('/sports-fee-schedule/edit/{id}', [SportFeeController::class, 'edit']);
+    Route::get('/sports-fee-schedule/view/{id}', [SportFeeController::class, 'ViewPage']);
+    Route::post('sports-fee-schedule/update/{id}', [SportFeeController::class, 'update']);
+    Route::get('sports-fee-schedule/delete/{id}', [SportFeeController::class, 'fee_delete']);
+    Route::post('/sports-fee-schedule/clone/id', [SportFeeController::class, 'clone'])->name('sports-fee-schedule-clone');
 
 
 
     //fee head master
 
-Route::get('sport_fee_head', [sportFeeHeadController::class, 'index'])->name('sport_fee_head.index');
-Route::get('sport_fee_head_add', [sportFeeHeadController::class, 'create'])->name('sport_fee_head.create');
-Route::post('sport_fee_head_store', [sportFeeHeadController::class, 'store'])->name('sport_fee_head.store');
-Route::get('sport_fee_head_edit/{id}', [sportFeeHeadController::class, 'edit'])->name('sport_fee_head.edit');
-Route::post('sport_fee_head_update/{id}', [sportFeeHeadController::class, 'update'])->name('sport_fee_head.update');
-Route::get('sport_fee_head_view/{id}', [sportFeeHeadController::class, 'show'])->name('sport_fee_head.view');
-Route::get('sport_fee_head_delete/{id}', [SportFeeHeadController::class, 'destroy'])->name('sport_fee_head.delete');
-Route::get('/get-sections', [FeeRefundController::class, 'getSections'])->name('getSections');
-Route::get('/get-students', [FeeRefundController::class, 'getStudents'])->name('getStudents');
-Route::get('/get-all-sections', [FeeRefundController::class, 'getAllSections'])->name('getAllSections');
-Route::get('/get-all-students', [FeeRefundController::class, 'getAllStudents'])->name('getAllStudent');
-//fee head master end
+    Route::get('sport_fee_head', [sportFeeHeadController::class, 'index'])->name('sport_fee_head.index');
+    Route::get('sport_fee_head_add', [sportFeeHeadController::class, 'create'])->name('sport_fee_head.create');
+    Route::post('sport_fee_head_store', [sportFeeHeadController::class, 'store'])->name('sport_fee_head.store');
+    Route::get('sport_fee_head_edit/{id}', [sportFeeHeadController::class, 'edit'])->name('sport_fee_head.edit');
+    Route::post('sport_fee_head_update/{id}', [sportFeeHeadController::class, 'update'])->name('sport_fee_head.update');
+    Route::get('sport_fee_head_view/{id}', [sportFeeHeadController::class, 'show'])->name('sport_fee_head.view');
+    Route::get('sport_fee_head_delete/{id}', [SportFeeHeadController::class, 'destroy'])->name('sport_fee_head.delete');
 
-Route::get('fee_refund', [FeeRefundController::class, 'index'])->name('FeeRefund.list');
-Route::get('fee_refund_add', [FeeRefundController::class, 'FeeRefundAdd'])->name('FeeRefund.Add');
-Route::post('fee_refund_add', [FeeRefundController::class, 'FeeRefundCreate'])->name('FeeRefund_add.create');
-Route::get('/get-fee-details/{id}', [FeeRefundController::class, 'getFeeDetails']);
-Route::delete('/fee_refund_delete/{id}', [FeeRefundController::class, 'softDelete'])->name('feeRefund.delete');
-Route::get('/fee_refund_edit/{id}', [FeeRefundController::class, 'feeRefundEdit'])->name('fee_refund.edit');
-Route::post('/fee_refund_edit/{id}', [FeeRefundController::class, 'feeRefundUpdate'])->name('FeeRefund_Update');
-Route::get('/fee_refund_view/{id}', [FeeRefundController::class, 'feeRefundView'])->name('FeeRefund_View');
-Route::get('/getStudentsBySectionOnly', [FeeRefundController::class, 'getStudentsBySectionOnly'])->name('getStudentsBySectionOnly');
-    
+    //fee head master end
 
+
+    //feerefund start
+    Route::get('fee-refund', [FeeRefundController::class, 'index'])->name('FeeRefund.list');
+    Route::get('fee-refund-add', [FeeRefundController::class, 'FeeRefundAdd'])->name('FeeRefund.Add');
+    Route::post('fee-refund-add', [FeeRefundController::class, 'FeeRefundCreate'])->name('FeeRefund-add.create');
+    Route::get('/get-fee-details/{id}', [FeeRefundController::class, 'getFeeDetails']);
+    Route::delete('/fee-refund-delete/{id}', [FeeRefundController::class, 'softDelete'])->name('feeRefund.delete');
+    Route::get('/fee-refund-edit/{id}', [FeeRefundController::class, 'feeRefundEdit'])->name('fee-refund.edit');
+    Route::post('/fee-refund-edit/{id}', [FeeRefundController::class, 'feeRefundUpdate'])->name('FeeRefund-Update');
+    Route::get('/fee-refund-view/{id}', [FeeRefundController::class, 'feeRefundView'])->name('FeeRefund-View');
+    Route::get('/getStudentsBySectionOnly', [FeeRefundController::class, 'getStudentsBySectionOnly'])->name('getStudentsBySectionOnly');
+
+    // AJAX routes to fetch sections and students
+    Route::get('/get-sections', [FeeRefundController::class, 'getSections'])->name('getSections');
+    Route::get('/get-students', [FeeRefundController::class, 'getStudents'])->name('getStudents');
+    Route::get('/get-all-sections', [FeeRefundController::class, 'getAllSections'])->name('getAllSections');
+    Route::get('/get-all-students', [FeeRefundController::class, 'getAllStudents'])->name('getAllStudent');
+    //fee refund end
 
     // MY ACTIVITY
     Route::get('my-activity', [MyActivityController::class, 'index'])->name('my-activity');
-Route::get('my-activity-view/{id}/{date}', [MyActivityController::class, 'ActivityView'])->name('activity-view');
-Route::post('save-activity-details', [MyActivityController::class, 'saveActivityDetails'])->name('save-activity-details');
+    Route::get('my-activity-view/{id}/{date}', [MyActivityController::class, 'ActivityView'])->name('activity-view');
+    Route::post('save-activity-details', [MyActivityController::class, 'saveActivityDetails'])->name('save-activity-details');
 
-//player Review
-Route::get('player-review', [MyActivityController::class, 'review'])->name('player-review');
-Route::get('player-review-view/{id}/{date}', [MyActivityController::class, 'playerView'])->name('player-review-view');
-Route::get('player-review-edit/{id}/{date}', [MyActivityController::class, 'playerEdit'])->name('player-review-edit');
-Route::post('save-player-details', [MyActivityController::class, 'savePlayerDetails'])->name('save-player-details');
-Route::post('/fetch-rating-remark', [MyActivityController::class, 'FetchRatingRemark'])->name('fetch.rating.remark');
+    //player Review
+    Route::get('player-review', [MyActivityController::class, 'review'])->name('player-review');
+    Route::get('player-review-view/{id}/{date}', [MyActivityController::class, 'playerView'])->name('player-review-view');
+    Route::get('player-review-edit/{id}/{date}', [MyActivityController::class, 'playerEdit'])->name('player-review-edit');
+    Route::post('save-player-details', [MyActivityController::class, 'savePlayerDetails'])->name('save-player-details');
+    Route::post('/fetch-rating-remark', [MyActivityController::class, 'FetchRatingRemark'])->name('fetch.rating.remark');
 
 
 
-// Sport TYPE
-Route::post('sport-type-add', [sportMasterController::class, 'SportTypeAdd'])->name('sport-type-add');
-Route::get('sport-type', [sportMasterController::class, 'indexSportType'])->name('sport-type');
-Route::get('sport-type-add', [sportMasterController::class, 'showSportTypeAddForm'])->name('sport-type-add.form');
-Route::get('sport-type-edit/{id}', [sportMasterController::class, 'SportTypeEdit'])->name('sport-type-edit');
-Route::put('sport-type-edit/{id}', [sportMasterController::class, 'SportTypeUpdate'])->name('sport-type-update');
-Route::get('sport-type-delete/{id}', [sportMasterController::class, 'sportTypeDelete'])->name('sport-type-delete');
+    // Sport TYPE
+    Route::post('sport-type-add', [sportMasterController::class, 'SportTypeAdd'])->name('sport-type-add');
+    Route::get('sport-type', [sportMasterController::class, 'indexSportType'])->name('sport-type');
+    Route::get('sport-type-add', [sportMasterController::class, 'showSportTypeAddForm'])->name('sport-type-add.form');
+    Route::get('sport-type-edit/{id}', [sportMasterController::class, 'SportTypeEdit'])->name('sport-type-edit');
+    Route::put('sport-type-edit/{id}', [sportMasterController::class, 'SportTypeUpdate'])->name('sport-type-update');
+    Route::get('sport-type-delete/{id}', [sportMasterController::class, 'sportTypeDelete'])->name('sport-type-delete');
 
 
-//
+    //
 
-// Activity Marter 
+    // Activity Marter 
 
-Route::get('activity-master', [ActivityMasterController::class, 'index'])->name('activity-master');
-Route::get('activity-master-add', [ActivityMasterController::class, 'activityMaster'])->name('activity-master-add');
-Route::get('activity-master-edit/{id}', [ActivityMasterController::class, 'ActivityEdit'])->name('activity-master-edit');
-Route::get('activity-master-view/{id}', [ActivityMasterController::class, 'ActivityView'])->name('activity-master-view');
-Route::post('activity-master-edit/{id}', [ActivityMasterController::class, 'ActivityUpdate'])->name('activity-master-edit');
-Route::post('activity-master-add', [ActivityMasterController::class, 'activityMasterAdd'])->name('activity-master-add');
-Route::get('activity-master-delete/{id}', [ActivityMasterController::class, 'ActivityDelete'])->name('activity-master-delete');
+    Route::get('activity-master', [ActivityMasterController::class, 'index'])->name('activity-master');
+    Route::get('activity-master-add', [ActivityMasterController::class, 'activityMaster'])->name('activity-master-add');
+    Route::get('activity-master-edit/{id}', [ActivityMasterController::class, 'ActivityEdit'])->name('activity-master-edit');
+    Route::get('activity-master-view/{id}', [ActivityMasterController::class, 'ActivityView'])->name('activity-master-view');
+    Route::post('activity-master-edit/{id}', [ActivityMasterController::class, 'ActivityUpdate'])->name('activity-master-edit');
+    Route::post('activity-master-add', [ActivityMasterController::class, 'activityMasterAdd'])->name('activity-master-add');
+    Route::get('activity-master-delete/{id}', [ActivityMasterController::class, 'ActivityDelete'])->name('activity-master-delete');
 
 
-//scheduler
-Route::get('activity-scheduler', [ActivitySchedulerController::class, 'index'])->name('activity-scheduler');
-Route::get('activity-scheduler-add', [ActivitySchedulerController::class, 'activityScheduler'])->name('activity-scheduler-add');
-Route::post('activity-scheduler-add', [ActivitySchedulerController::class, 'activitySchedulerAdd'])->name('activity-scheduler-add');
-Route::get('activity-scheduler-edit/{id}', [ActivitySchedulerController::class, 'ActivityEdit'])->name('activity-scheduler-edit');
-Route::post('activity-scheduler-edit/{id}', [ActivitySchedulerController::class, 'ActivityUpdate'])->name('activity-scheduler-edit');
-Route::get('activity-scheduler-view/{id}', [ActivitySchedulerController::class, 'ActivityView'])->name('activity-scheduler-view');
-Route::get('activity-scheduler-delete/{id}', [ActivitySchedulerController::class, 'ActivityDelete'])->name('activity-scheduler-delete');
-Route::post('/get-batch-names-activity', [ActivitySchedulerController::class, 'get_batch_names'])->name('get.batch.names.activity');
-Route::post('/get-batch-section-activity', [ActivitySchedulerController::class, 'get_batch_section'])->name('get.batch.section.activity');
-Route::post('/get-section-group-activity', [ActivitySchedulerController::class, 'get_section_group'])->name('get.section.group.activity');
-Route::post('/get-activity-subactivity', [ActivitySchedulerController::class, 'get_activity_subactivity'])->name('get.activity.subactivities.activity');
-Route::post('/get_batch_student', [ActivitySchedulerController::class, 'get_batch_student'])->name('get_batch_student');
-Route::post('/get-feesection',[SportRegisterController::class,'get_Feesection_group']);
+    //scheduler
+    Route::get('activity-scheduler', [ActivitySchedulerController::class, 'index'])->name('activity-scheduler');
+    Route::get('activity-scheduler-add', [ActivitySchedulerController::class, 'activityScheduler'])->name('activity-scheduler-add');
+    Route::post('activity-scheduler-add', [ActivitySchedulerController::class, 'activitySchedulerAdd'])->name('activity-scheduler-add');
+    Route::get('activity-scheduler-edit/{id}', [ActivitySchedulerController::class, 'ActivityEdit'])->name('activity-scheduler-edit');
+    Route::post('activity-scheduler-edit/{id}', [ActivitySchedulerController::class, 'ActivityUpdate'])->name('activity-scheduler-edit');
+    Route::get('activity-scheduler-view/{id}', [ActivitySchedulerController::class, 'ActivityView'])->name('activity-scheduler-view');
+    Route::get('activity-scheduler-delete/{id}', [ActivitySchedulerController::class, 'ActivityDelete'])->name('activity-scheduler-delete');
+    Route::post('/get-batch-names-activity', [ActivitySchedulerController::class, 'get_batch_names'])->name('get.batch.names.activity');
+    Route::post('/get-batch-section-activity', [ActivitySchedulerController::class, 'get_batch_section'])->name('get.batch.section.activity');
+    Route::post('/get-section-group-activity', [ActivitySchedulerController::class, 'get_section_group'])->name('get.section.group.activity');
+    Route::post('/get-activity-subactivity', [ActivitySchedulerController::class, 'get_activity_subactivity'])->name('get.activity.subactivities.activity');
+    Route::post('/get_batch_student', [ActivitySchedulerController::class, 'get_batch_student'])->name('get_batch_student');
+    Route::post('/get-feesection', [SportRegisterController::class, 'get_Feesection_group']);
 
 
 
-Route::controller(ScreeningAssesmentController::class)->group(function () {
-    Route::get('screening-assessment','listScreeningOuter');
-    Route::get('screening-assessment-inner/{date}/{id}','activityAssessment');
+    //Screen Assessment routes start
 
-    Route::get('mark-assess/{id}','remarkAssessment');
-    Route::get('screening-assessment-add','remarkAssessmentAdd'); //Blade calling for add
-    Route::get('screening-assessment-edit/{id}','remarkAssessmentEdit'); //Blade calling for edit
-    Route::get('screening-assessment-view/{id}','remarkAssessmentView');
-   Route::post('/get-screening-parameters','getScreeningParameters');
-   Route::post('screening-details-add','screeningAddData')->name('screening-details-add');  //form submit proess
-   Route::post('screening-details-edit','screeningEditData')->name('screening-details-edit');  //form submit proess
-    // Route::post('screening-update/{id}', )->name('screening.update');
+    Route::controller(ScreeningAssesmentController::class)->group(function () {
+        Route::get('screening-assessment', 'listScreeningOuter');
+        Route::get('screening-assessment-inner/{date}/{id}', 'activityAssessment');
 
+        Route::get('mark-assess/{id}', 'remarkAssessment');
+        Route::get('screening-assessment-add', 'remarkAssessmentAdd'); //Blade calling for add
+        Route::get('screening-assessment-edit/{id}', 'remarkAssessmentEdit'); //Blade calling for edit
+        Route::get('screening-assessment-view/{id}', 'remarkAssessmentView');
+        Route::post('/get-screening-parameters', 'getScreeningParameters');
+        Route::post('screening-details-add', 'screeningAddData')->name('screening-details-add');  //form submit proess
+        Route::post('screening-details-edit', 'screeningEditData')->name('screening-details-edit');  //form submit proess
+        // Route::post('screening-update/{id}', )->name('screening.update');
 
-   
-   // Route::get('mark-assess','ums.sports.activity.mark_assess');
 
-    Route::post('/get-batch-names-screening',  'get_batch_names')->name('get.batch.names.screening');
-    Route::post('/get-batch-section-screening','get_batch_section')->name('get.batch.section.screening');
-    Route::post('/get-section-group-screening', 'get_section_group')->name('get.section.group.screening');
-    // Route::post('/get-activity-subactivity', 'get_activity_subactivity')->name('get.activity.subactivities.activity');
-    Route::post('/get-batch-student-screening',  'get_batch_student')->name('get.batch.student.screening');
-    Route::post('/get-group-players',  'get_group_players_screening')->name('get.group.players.screening');
 
-   
-   });
+        // Route::get('mark-assess','ums.sports.activity.mark_assess');
 
+        Route::post('/get-batch-names-screening',  'get_batch_names')->name('get.batch.names.screening');
+        Route::post('/get-batch-section-screening', 'get_batch_section')->name('get.batch.section.screening');
+        Route::post('/get-section-group-screening', 'get_section_group')->name('get.section.group.screening');
+        // Route::post('/get-activity-subactivity', 'get_activity_subactivity')->name('get.activity.subactivities.activity');
+        Route::post('/get-batch-student-screening',  'get_batch_student')->name('get.batch.student.screening');
+        Route::post('/get-group-players',  'get_group_players_screening')->name('get.group.players.screening');
+    });
 
+    //Screen Assessment routes end
 
 
+    Route::controller(ScreeningAssesmentController::class)->group(function () {
+        Route::get('screening-assessment', 'listScreeningOuter');
+        Route::get('screening-assessment-inner/{date}/{id}', 'activityAssessment');
 
-   //rating scale
+        Route::get('mark-assess/{id}', 'remarkAssessment');
+        Route::get('screening-assessment-add', 'remarkAssessmentAdd'); //Blade calling for add
+        Route::get('screening-assessment-edit/{id}', 'remarkAssessmentEdit'); //Blade calling for edit
+        Route::get('screening-assessment-view/{id}', 'remarkAssessmentView');
+        Route::post('/get-screening-parameters', 'getScreeningParameters');
+        Route::post('screening-details-add', 'screeningAddData')->name('screening-details-add');  //form submit proess
+        Route::post('screening-details-edit', 'screeningEditData')->name('screening-details-edit');  //form submit proess
+        // Route::post('screening-update/{id}', )->name('screening.update');
 
-    Route::get('rating_scale', [RatingScaleController::class, 'Index'])->name('rating_scale');
-    Route::get('rating_scale_add', [RatingScaleController::class, 'RatingScalesAddView']);
-    Route::post('rating_scale_add', [RatingScaleController::class, 'RatingScalesAdd'])->name('rating_scale.add');
 
-    Route::get('rating_scale_view/{id}', [RatingScaleController::class, 'RatingScalesview'])->name('rating_scale.view');
-    Route::get('rating_scale_edit/{id}', [RatingScaleController::class, 'RatingScalesEdit'])->name('rating_scale.edit');
-    Route::put('rating_scale_edit/{id}', [RatingScaleController::class, 'RatingScalesUpdate'])->name('rating_scale.update');
-    Route::delete('rating_scale_delete/{id}', [RatingScaleController::class, 'RatingScalesDelete'])->name('RatingScale.delete');
 
-//Screening Master 
+        // Route::get('mark-assess','ums.sports.activity.mark_assess');
 
-Route::get('screening-master',[ScreeningMasterController::class,'list']);
-Route::get('screening-master-add',[ScreeningMasterController::class,'index'])->name('screening-master/add');
-Route::post('screening-add',[ScreeningMasterController::class,'store'])->name('screening-add');
-Route::get('screening-master-delete/{id}',[ScreeningMasterController::class,'screening_delete']);
-// Route::post('screening-edit/{id}',[ScreeningMasterController::class,'store'])->name('screening-edit');
-Route::post('screening-update/{id}', [ScreeningMasterController::class, 'update'])->name('screening.update');
+        Route::post('/get-batch-names-screening',  'get_batch_names')->name('get.batch.names.screening');
+        Route::post('/get-batch-section-screening', 'get_batch_section')->name('get.batch.section.screening');
+        Route::post('/get-section-group-screening', 'get_section_group')->name('get.section.group.screening');
+        // Route::post('/get-activity-subactivity', 'get_activity_subactivity')->name('get.activity.subactivities.activity');
+        Route::post('/get-batch-student-screening',  'get_batch_student')->name('get.batch.student.screening');
+        Route::post('/get-group-players',  'get_group_players_screening')->name('get.group.players.screening');
+    });
 
-Route::get('screening-master-edit/{id}',[ScreeningMasterController::class,'edit'])->name('screening.edit');
-Route::get('screening-master-view/{id}',[ScreeningMasterController::class,'viewpage']);
 
+    Route::get('/student-screening-report/{id}', [StudentReportController::class, 'report_screening'])->name('student-screening-report');
+    Route::post('/submit-report-comment', [StudentReportController::class, 'submitReportComment'])->name('submit-report-comment');
 
+    //rating scale start
 
+    Route::get('rating-scale', [RatingScaleController::class, 'Index'])->name('rating-scale.list');
+    Route::get('rating-scale-add', [RatingScaleController::class, 'RatingScalesAddView']);
+    Route::post('rating-scale-add', [RatingScaleController::class, 'RatingScalesAdd'])->name('rating-scale.add');
 
+    Route::get('rating-scale-view/{id}', [RatingScaleController::class, 'RatingScalesview'])->name('rating-scale.view');
+    Route::get('rating-scale-edit/{id}', [RatingScaleController::class, 'RatingScalesEdit'])->name('rating-scale.edit');
+    Route::put('rating-scale-edit/{id}', [RatingScaleController::class, 'RatingScalesUpdate'])->name('rating-scale.update');
+    Route::delete('rating-scale-delete/{id}', [RatingScaleController::class, 'RatingScalesDelete'])->name('RatingScale.delete');
 
+    //rating scale end
+    //Screening Master 
 
+    Route::get('screening-master', [ScreeningMasterController::class, 'list']);
+    Route::get('screening-master-add', [ScreeningMasterController::class, 'index'])->name('screening-master/add');
+    Route::post('screening-add', [ScreeningMasterController::class, 'store'])->name('screening-add');
+    Route::get('screening-master-delete/{id}', [ScreeningMasterController::class, 'screening_delete']);
+    // Route::post('screening-edit/{id}',[ScreeningMasterController::class,'store'])->name('screening-edit');
+    Route::post('screening-update/{id}', [ScreeningMasterController::class, 'update'])->name('screening.update');
 
-//sport master
+    Route::get('screening-master-edit/{id}', [ScreeningMasterController::class, 'edit'])->name('screening.edit');
+    Route::get('screening-master-view/{id}', [ScreeningMasterController::class, 'viewpage']);
 
-Route::get('sport-master-add', [sportMasterController::class, 'SportType'])->name('sport-master-add');
-Route::post('sport-master-add', [sportMasterController::class, 'SportMasterAdd']);
-Route::get('sport-master', [sportMasterController::class, 'indexSportMaster'])->name('sport-master');
-Route::get('sport-master-edit/{id}', [sportMasterController::class, 'SportMasterEdit'])->name('sport-master-edit');
 
-Route::put('sport-master-edit/{id}', [sportMasterController::class, 'SportMasterUpdate'])->name('sport-master-update');
-Route::get('sport-master-delete/{id}', [sportMasterController::class, 'softDelete']);
-Route::get('sport-master-view/{id}', [sportMasterController::class, 'SportMasterView'])->name('sport-master-view');
 
 
-//fee master
 
-// quota_master
-Route::view('quota-master/add','ums.sports.master.quota_master_add');
-Route::post('quota-add',[SportMasterController::class,'quota_add']);
-Route::get('quota-master', [SportMasterController::class, 'quota_list'])->name('quota.index');
-Route::get('quota-edit/{id}', [SportMasterController::class, 'edit'])->name('quota.edit');
-Route::post('quota-update/{id}', [SportMasterController::class, 'quota_edit'])->name('quota.update');
-Route::get('quota-delete/{id}', [SportMasterController::class, 'delete'])->name('quota.delete');
 
 
-Route::post('/sports-fee-schedule/clone/{id}',[SportFeeController::class,'clone'])->name('sports-fee-schedule.clone');
+    //sport master
 
+    Route::get('sport-master-add', [sportMasterController::class, 'SportType'])->name('sport-master-add');
+    Route::post('sport-master-add', [sportMasterController::class, 'SportMasterAdd']);
+    Route::get('sport-master', [sportMasterController::class, 'indexSportMaster'])->name('sport-master');
+    Route::get('sport-master-edit/{id}', [sportMasterController::class, 'SportMasterEdit'])->name('sport-master-edit');
 
-Route::get('section-master/add',[SportMasterController::class,'section_index'])->name('section.add');
+    Route::put('sport-master-edit/{id}', [sportMasterController::class, 'SportMasterUpdate'])->name('sport-master-update');
+    Route::get('sport-master-delete/{id}', [sportMasterController::class, 'softDelete']);
+    Route::get('sport-master-view/{id}', [sportMasterController::class, 'SportMasterView'])->name('sport-master-view');
 
-Route::post('section-add',[SportMasterController::class,'section_add']);
 
-Route::get('section-master', [SportMasterController::class, 'section_list'])->name('section.index');
+    //fee master
 
-Route::get('section-edit/{id}', [SportMasterController::class, 'sec_edits'])->name('section.edit');
+    // quota_master
+    Route::view('quota-master/add', 'ums.sports.master.quota_master_add');
+    Route::post('quota-add', [SportMasterController::class, 'quota_add']);
+    Route::get('quota-master', [SportMasterController::class, 'quota_list'])->name('quota.index');
+    Route::get('quota-edit/{id}', [SportMasterController::class, 'edit'])->name('quota.edit');
+    Route::post('quota-update/{id}', [SportMasterController::class, 'quota_edit'])->name('quota.update');
+    Route::get('quota-delete/{id}', [SportMasterController::class, 'delete'])->name('quota.delete');
 
-Route::post('section-update/{id}', [SportMasterController::class, 'section_edit'])->name('section.update');
 
-Route::get('section-delete/{id}', [SportMasterController::class, 'sec_delete'])->name('section.delete');
+    Route::post('/sports-fee-schedule/clone/{id}', [SportFeeController::class, 'clone'])->name('sports-fee-schedule.clone');
 
 
-Route::get('/master-batches', [SportMasterController::class, 'batch']);
+    Route::get('section-master/add', [SportMasterController::class, 'section_index'])->name('section.add');
 
+    Route::post('section-add', [SportMasterController::class, 'section_add']);
 
+    Route::get('section-master', [SportMasterController::class, 'section_list'])->name('section.index');
 
-Route::post('/master-batches-add', [SportMasterController::class, 'store'])->name('batches-store');
+    Route::get('section-edit/{id}', [SportMasterController::class, 'sec_edits'])->name('section.edit');
 
-Route::get('/master-batches-edit/{id}', [SportMasterController::class, 'batch_edit'])->name('batches-edit');
+    Route::post('section-update/{id}', [SportMasterController::class, 'section_edit'])->name('section.update');
 
-Route::put('/master-batches-update/{id}', [SportMasterController::class, 'update'])->name('batches-update');
+    Route::get('section-delete/{id}', [SportMasterController::class, 'sec_delete'])->name('section.delete');
 
-Route::delete('/master-batches-delete/{id}', [SportMasterController::class, 'destroy'])->name('batches-destroy');
 
+    Route::get('/master-batches', [SportMasterController::class, 'batch']);
 
-Route::get('/get-batch-names', [SportFeeController::class,'get_batch_name'])->name('get-batches-name');
 
-Route::post('/get-batch-year', [SportFeeController::class, 'get_batch_year'])->name('get.batch.year');
-Route::post('/get-batch-names', [SportFeeController::class, 'get_batch_names'])->name('get.batch.names');
 
+    Route::post('/master-batches-add', [SportMasterController::class, 'store'])->name('batches-store');
 
-Route::post('/get-section-names', [SportFeeController::class, 'get_section_names'])->name('section.fetch');
-Route::post('/get-batch-names', [SportFeeController::class, 'get_batch_name'])->name('get-batches-name');
+    Route::get('/master-batches-edit/{id}', [SportMasterController::class, 'batch_edit'])->name('batches-edit');
 
-// import
-Route::post('fee-import', [SportFeeController::class, 'import'])->name('excel.import');
+    Route::put('/master-batches-update/{id}', [SportMasterController::class, 'update'])->name('batches-update');
 
-//Group Master
+    Route::delete('/master-batches-delete/{id}', [SportMasterController::class, 'destroy'])->name('batches-destroy');
 
-Route::get('group-master',[GroupMasterController::class,'Index'])->name('group-master');
 
-Route::post('group-master-add',[GroupMasterController::class,'GroupMasterAdd'])->name('group-master-add');
-Route::get('group-master-add',[GroupMasterController::class,'GroupAdd'])->name('group-add');
-Route::get('group-master-edit/{id}',[GroupMasterController::class,'GroupMasterEdit'])->name('group-master-edit');
-Route::get('group-master-view/{id}',[GroupMasterController::class,'GroupMasterView'])->name('group-master-view');
-Route::put('group-master-update/{id}',[GroupMasterController::class,'GroupMasterUpdate'])->name('group-master-update');
-Route::get('group-master-delete/{id}', [GroupMasterController::class, 'GroupMasterDelete'])->name('group-master-delete');
+    Route::get('/get-batch-names', [SportFeeController::class, 'get_batch_name'])->name('get-batches-name');
 
-// UMS New Master Start
+    Route::post('/get-batch-year', [SportFeeController::class, 'get_batch_year'])->name('get.batch.year');
+    Route::post('/get-batch-names', [SportFeeController::class, 'get_batch_names'])->name('get.batch.names');
+
+
+    Route::post('/get-section-names', [SportFeeController::class, 'get_section_names'])->name('section.fetch');
+    Route::post('/get-batch-names', [SportFeeController::class, 'get_batch_name'])->name('get-batches-name');
+
+    // import
+    Route::post('fee-import', [SportFeeController::class, 'import'])->name('excel.import');
+
+    //Group Master
+
+    Route::get('group-master', [GroupMasterController::class, 'Index'])->name('group-master');
+
+    Route::post('group-master-add', [GroupMasterController::class, 'GroupMasterAdd'])->name('group-master-add');
+    Route::get('group-master-add', [GroupMasterController::class, 'GroupAdd'])->name('group-add');
+    Route::get('group-master-edit/{id}', [GroupMasterController::class, 'GroupMasterEdit'])->name('group-master-edit');
+    Route::get('group-master-view/{id}', [GroupMasterController::class, 'GroupMasterView'])->name('group-master-view');
+    Route::put('group-master-update/{id}', [GroupMasterController::class, 'GroupMasterUpdate'])->name('group-master-update');
+    Route::get('group-master-delete/{id}', [GroupMasterController::class, 'GroupMasterDelete'])->name('group-master-delete');
+
+    // UMS New Master Start
 
 
 
     // Institute Routes
-
-    Route::get('institute', [InstituteMappingController::class, 'index'])->name('institute');         
-    Route::get('/institute_add', [InstituteMappingController::class, 'create'])->name('institute-add'); 
-    Route::post('/institute_add', [InstituteMappingController::class, 'store'])->name('institute-add'); 
-    Route::get('/institute/{id}/edit', [InstituteMappingController::class, 'edit'])->name('institute-edit');
-    Route::put('institute/{id}/update', [InstituteMappingController::class, 'update'])->name('institute-update');
-    Route::get('institute/{id}/view', [InstituteMappingController::class, 'show'])->name('institute.view');
-    Route::delete('institute/{id}', [InstituteMappingController::class, 'destroy'])->name('institute.destroy');
-
+    Route::get('institute', [InstituteMappingController::class, 'index'])->name('institute');
+    Route::get('institute-add', [InstituteMappingController::class, 'create'])->name('institute.add');
+    Route::post('institute-add', [InstituteMappingController::class, 'store'])->name('institute.store');
+    Route::get('get-affiliates-by-type/{type}', [InstituteMappingController::class, 'getAffiliatesByType']);
+    Route::get('institute-edit/{id}', [InstituteMappingController::class, 'edit'])->name('institute.edit');
+    Route::put('institute-update/{id}', [InstituteMappingController::class, 'update'])->name('institute.update');
+    Route::get('institute-view/{id}', [InstituteMappingController::class, 'show'])->name('institute.view');
+    Route::delete('institute-delete/{id}', [InstituteMappingController::class, 'destroy'])->name('institute.destroy');
     // Institute Routes End
 
     // Semester Routes
-
     Route::get('semesters', [erp_ums_semesterController::class, 'index'])->name('semesters');
-    Route::get('/semesters_add', [erp_ums_semesterController::class, 'create'])->name('semesters-add');
-    Route::post('/semesters_add', [erp_ums_semesterController::class, 'store'])->name('semesters.store');
-    Route::get('semesters/{id}/edit', [erp_ums_semesterController::class, 'edit'])->name('semesters.edit');
-    Route::put('semesters/{id}/update', [erp_ums_semesterController::class, 'update'])->name('semesters.update');
-    Route::get('/semesters/{id}/view', [erp_ums_semesterController::class, 'view'])->name('semesters.view');
-    Route::delete('semesters/{id}', [erp_ums_semesterController::class, 'destroy'])->name('semesters.destroy');
+    Route::get('semesters-add', [erp_ums_semesterController::class, 'create'])->name('semesters.add');
+    Route::post('semesters-add', [erp_ums_semesterController::class, 'store'])->name('semesters.store');
+    Route::get('semesters-edit/{id}', [erp_ums_semesterController::class, 'edit'])->name('semesters.edit');
+    Route::put('semesters-update/{id}', [erp_ums_semesterController::class, 'update'])->name('semesters.update');
+    Route::get('semesters-view/{id}', [erp_ums_semesterController::class, 'view'])->name('semesters.view');
+    Route::delete('semesters-delete/{id}', [erp_ums_semesterController::class, 'destroy'])->name('semesters.destroy');
+    // Semester Routes End
 
-     // Semester Routes End
+    // program_type
 
-     // program_type
-    Route::get('/program_master', [Program_Type_Controller::class, 'index'])->name('program.master.list');
-    Route::get('/program_add_master', [Program_Type_Controller::class, 'create'])->name('program.add.master.form');
-    Route::post('/program_add_master', [Program_Type_Controller::class, 'store'])->name('program.add.master.store');
-    Route::get('program_view_master/{id}', [Program_Type_Controller::class, 'show']);
-    Route::get('program_edit_master/{id}', [Program_Type_Controller::class, 'edit']);
-    Route::post('program_update_master/{id}', [Program_Type_Controller::class, 'update']);
-    Route::delete('program_delete_master/{id}', [Program_Type_Controller::class, 'destroy'])->name('program_delete_master');
+    Route::get('/program-master', [Program_Type_Controller::class, 'index'])->name('program.master.list');
+    Route::get('/program-add-master', [Program_Type_Controller::class, 'create'])->name('program.add.master.form');
+    Route::post('/program-add-master', [Program_Type_Controller::class, 'store'])->name('program.add.master.store');
+    Route::get('program-view-master/{id}', [Program_Type_Controller::class, 'show']);
+    Route::get('program-edit-master/{id}', [Program_Type_Controller::class, 'edit']);
+    Route::post('program-update-master/{id}', [Program_Type_Controller::class, 'update']);
+    Route::delete('program-delete-master/{id}', [Program_Type_Controller::class, 'destroy'])->name('program.delete.master');
 
-     // program_type End
+    // program_type End
 
-     // Academic Start
-     Route::get('/academic', [AcademicYearController::class, 'index'])->name('academic.index');
-     Route::get('/academic-add', [AcademicYearController::class, 'create'])->name('academic.create');
-     Route::post('/academic-store', [AcademicYearController::class, 'store'])->name('academic.store');
-     Route::get('/academic-edit/{id}', [AcademicYearController::class, 'edit'])->name('academic.edit');
-     Route::put('/academic-update/{id}', [AcademicYearController::class, 'update'])->name('academic.update');
-     Route::get('/academic-view/{id}', [AcademicYearController::class, 'show'])->name('academic.view');
-     Route::delete('/academic-year/{id}', [AcademicYearController::class, 'delete'])->name('academic.delete');     
-     // Academic End
+    // Academic Start
+    Route::get('/academic', [AcademicYearController::class, 'index'])->name('academic.index');
+    Route::get('/academic-add', [AcademicYearController::class, 'create'])->name('academic.create');
+    Route::post('/academic-store', [AcademicYearController::class, 'store'])->name('academic.store');
+    Route::get('/academic-edit/{id}', [AcademicYearController::class, 'edit'])->name('academic.edit');
+    Route::put('/academic-update/{id}', [AcademicYearController::class, 'update'])->name('academic.update');
+    Route::get('/academic-view/{id}', [AcademicYearController::class, 'show'])->name('academic.view');
+    Route::delete('/academic-year/{id}', [AcademicYearController::class, 'delete'])->name('academic.delete');
+    // Academic End
 
-     // Program_Branch
-    Route::get('/program_branch', [Program_Branch_Controller::class, 'index']);
-    Route::get('/program_branch_add', [Program_Branch_Controller::class, 'create'])->name('program.add.branch.form');
-    Route::post('/program_branch_add', [Program_Branch_Controller::class, 'store'])->name('program.add.branch.store');
-    Route::get('/edit/{id}', [Program_Branch_Controller::class, 'edit'])->name('program_branch.edit');
-    Route::post('/update/{id}', [Program_Branch_Controller::class, 'update'])->name('program_branch.update');
-    Route::get('/program_branch_view/{id}', [Program_Branch_Controller::class, 'view'])->name('program_branch.view');
-    Route::delete('program_branch_delete/{id}', [Program_Branch_Controller::class, 'destroy'])->name('program_branch.destroy');
-     // Program_Branch End
+    // Program_Branch
+    Route::get('/program-branch', [Program_Branch_Controller::class, 'index']);
+    Route::get('/program-branch-add', [Program_Branch_Controller::class, 'create'])->name('program.add.branch.form');
+    Route::post('/program-branch-add', [Program_Branch_Controller::class, 'store'])->name('program.add.branch.store');
+    Route::get('/edit/{id}', [Program_Branch_Controller::class, 'edit'])->name('program.branch.edit');
+    Route::post('/update/{id}', [Program_Branch_Controller::class, 'update'])->name('program-branch.update');
+    Route::get('/program-branch-view/{id}', [Program_Branch_Controller::class, 'view'])->name('program.branch.view');
+    Route::delete('program-branch-delete/{id}', [Program_Branch_Controller::class, 'destroy'])->name('program.branch.destroy');
+    // Program_Branch End
 
-     //erp_ums_documents 
-    Route::get('/document', [erp_ums_documentcontroller::class, 'index'])->name('document');       
-    Route::get('/document_add', [erp_ums_documentcontroller::class, 'create'])->name('document-add');    
-    Route::post('/document_add', [erp_ums_documentcontroller::class, 'store'])->name('document-store');
-    Route::get('/document/{id}', [erp_ums_documentcontroller::class, 'show'])->name('document-show');
-    Route::get('/document/{id}/edit', [erp_ums_documentcontroller::class, 'edit'])->name('document-edit');
-    Route::put('/document/{id}', [erp_ums_documentcontroller::class, 'update'])->name('document-update');    
-    Route::delete('/document/{id}', [erp_ums_documentcontroller::class, 'destroy'])->name('document-destroy');
-     //erp_ums_documents End
+    //erp_ums_documents 
+    Route::get('/document', [erp_ums_documentController::class, 'index'])->name('document');
+    Route::get('/document-add', [erp_ums_documentController::class, 'create'])->name('document.add');
+    Route::post('/document-add', [erp_ums_documentController::class, 'store'])->name('document.store');
+    Route::get('/document-view/{id}', [erp_ums_documentController::class, 'show'])->name('document.show');
+    Route::get('/document-edit/{id}/edit', [erp_ums_documentController::class, 'edit'])->name('document.edit');
+    Route::put('/document-update/{id}', [erp_ums_documentController::class, 'update'])->name('document.update');
+    Route::delete('/document-delete/{id}', [erp_ums_documentController::class, 'destroy'])->name('document.destroy');
+    //erp_ums_documents End
 
-     //Collage Mapping Start
+    //Collage Mapping Start
+    Route::get('college', [CollageMappingController::class, 'index'])->name('college');
+    Route::get('college-add', [CollageMappingController::class, 'viewAddIndex'])->name('collegemapping.add');
+    Route::post('college-add', [CollageMappingController::class, 'CollegeAdd'])->name('collegemapping.add');
+    Route::get('college-edit/{id}', [CollageMappingController::class, 'collegeMappingEdit'])->name('collegeMapping.edit');
+    Route::put('college-edit/{id}', [CollageMappingController::class, 'collegeMappingUpdate'])->name('collegemapping.update');
+    Route::get('college-view/{id}', [CollageMappingController::class, 'collegeMappingView'])->name('collegeMapping.view');
+    Route::delete('college-delete/{id}', [CollageMappingController::class, 'collegeMappingDelete'])->name('collegeMapping.delete');
+    Route::get('/get-courses/{programTypeId}', [CollageMappingController::class, 'getCoursesByProgramType']);
+    Route::post('/get-program-branches', [CollageMappingController::class, 'getProgramBranches']);
+    //Collage Mapping End
 
-     Route::get('college', [CollageMappingController::class, 'index'])->name('college');
-     Route::get('college_add', [CollageMappingController::class, 'viewAddIndex'])->name('collegemapping.add');
-     Route::post('college_add', [CollageMappingController::class, 'CollegeAdd'])->name('collegemapping.add');
-     Route::get('college_edit/{id}', [CollageMappingController::class, 'collegeMappingEdit'])->name('collegeMapping.edit');
-     Route::put('college_edit/{id}', [CollageMappingController::class, 'collegeMappingUpdate'])->name('collegemapping.update');
-     Route::get('college_view/{id}', [CollageMappingController::class, 'collegeMappingView'])->name('collegeMapping.view');
-     Route::delete('college_delete/{id}', [CollageMappingController::class, 'collegeMappingDelete'])->name('collegeMapping.delete');
+    //affiliate Start
+    Route::get('affiliate', [AffiliateController::class, 'index'])->name('affiliate');
+    Route::get('affiliate-add', [AffiliateController::class, 'AffiliateAddview'])->name('affiliate.add');
+    Route::post('affiliate-add', [AffiliateController::class, 'AffiliateAdd']);
+    Route::get('affiliate-edit/{id}', [AffiliateController::class, 'AffiliateEdit'])->name('affiliate.edit');
+    Route::put('affiliate-edit/{id}', [AffiliateController::class, 'AffiliateUpdate'])->name('affiliate.update');
+    Route::get('affiliate-view/{id}', [AffiliateController::class, 'AffiliateView'])->name('affiliate.view');
+    Route::delete('/affiliate-delete/{id}', [AffiliateController::class, 'AffiliateDelete'])->name('affiliate.delete');
+    //affiliate End
 
-     //Collage Mapping End
-     
-     //affiliate Start
-     
-     Route::get('affiliate', [AffiliateController::class, 'index'])->name('affiliate');
-     Route::get('affiliate_add', [AffiliateController::class, 'AffiliateAddview'])->name('affiliate.add');
-     Route::post('affiliate_add', [AffiliateController::class, 'AffiliateAdd']);
-     Route::get('affiliate_edit/{id}', [AffiliateController::class, 'AffiliateEdit'])->name('affiliate_edit');
-     Route::put('affiliate_edit/{id}', [AffiliateController::class, 'AffiliateUpdate'])->name('affiliate_update');
-     Route::get('affiliate_view/{id}', [AffiliateController::class, 'AffiliateView'])->name('affiliate_view');
-     Route::delete('/affiliate-delete/{id}', [AffiliateController::class, 'AffiliateDelete'])->name('affiliate_delete');
+    //Category Programme Start
+    Route::get('/cat_prog_add', [CategoryProgDocController::class, 'create'])->name('category-prog-doc.create');
+    Route::post('/cat_prog_add', [CategoryProgDocController::class, 'store'])->name('category-prog-doc.store');
+    Route::get('/cat_prog', [CategoryProgDocController::class, 'index'])->name('cat-prog-doc.index');
+    Route::get('/cat_prog_view/{id}', [CategoryProgDocController::class, 'view'])->name('cat-prog-doc.view');
+    Route::get('/cat_prog/edit/{id}', [CategoryProgDocController::class, 'edit'])->name('cat-prog-doc.edit');
+    Route::put('/cat_prog/edit/{id}', [CategoryProgDocController::class, 'update'])->name('cat-prog-doc.update');
+    Route::get('/cat_prog/delete/{id}', [CategoryProgDocController::class, 'softDelete'])->name('cat-prog-doc.delete');
+    //Category Programme End
 
-      //affiliate End
+    //erp course master Start
+    Route::get('course', [Ums_masterCourseController::class, 'index'])->name('course');
+    Route::get('course-add', [Ums_masterCourseController::class, 'add']);
+    Route::post('course-add', [Ums_masterCourseController::class, 'addCourse'])->name('course-add');
+    Route::get('course-edit/{id}', [Ums_masterCourseController::class, 'edit'])->name('course-edit');
+    Route::post('course-edit/{id}', [Ums_masterCourseController::class, 'update'])->name('course-update');
+    Route::get('course-view/{id}', [Ums_masterCourseController::class, 'view'])->name('course-view');
+    Route::get('course-delete/{id}', [Ums_masterCourseController::class, 'delete'])->name('course-delete');
+    //erp course master End
 
-      //Category Programme Start
-     Route::get('/cat_prog_add', [CategoryProgDocController::class, 'create'])->name('category-prog-doc.create');
-     Route::post('/cat_prog_add', [CategoryProgDocController::class, 'store'])->name('category-prog-doc.store');
-     Route::get('/cat_prog', [CategoryProgDocController::class, 'index'])->name('cat-prog-doc.index');
-     Route::get('/cat_prog_view/{id}', [CategoryProgDocController::class, 'view'])->name('cat-prog-doc.view');
-     Route::get('/cat_prog/edit/{id}', [CategoryProgDocController::class, 'edit'])->name('cat-prog-doc.edit');
-     Route::put('/cat_prog/edit/{id}', [CategoryProgDocController::class, 'update'])->name('cat-prog-doc.update');
-     Route::get('/cat_prog/delete/{id}', [CategoryProgDocController::class, 'softDelete'])->name('cat-prog-doc.delete');
-     //Category Programme End
-
-     //erp course master Start
-     Route::get('course', [Ums_masterCourseController::class, 'index'])->name('course');
-     Route::get('course-add', [Ums_masterCourseController::class, 'add']);
-     Route::post('course-add', [Ums_masterCourseController::class, 'addCourse'])->name('course-add');
-     Route::get('course-edit/{id}', [Ums_masterCourseController::class, 'edit'])->name('course-edit');
-     Route::post('course-edit/{id}', [Ums_masterCourseController::class, 'update'])->name('course-update');
-     Route::get('course-view/{id}', [Ums_masterCourseController::class, 'view'])->name('course-view');
-     Route::get('course-delete/{id}', [Ums_masterCourseController::class, 'delete'])->name('course-delete');
-     //erp course master End
-
-// UMS New Master End
+    // UMS New Master End
 
 
 
@@ -718,12 +745,12 @@ Route::get('group-master-delete/{id}', [GroupMasterController::class, 'GroupMast
 
 
 
-//----------------------------------------------------- UMS ROUTE --------------------------------------------------------------
+    //----------------------------------------------------- UMS ROUTE --------------------------------------------------------------
 
 
-//    Route::post('application-form', [UserHomeController::class, 'applicationSave']);
-Route::get('/ums-dashboard', [UmsHomeController::class, 'dashboard'])->name('ums.dashboard');
-Route::post('/ums-logout', [UmsHomeController::class, 'logout'])->name('ums.logout');
+    //    Route::post('application-form', [UserHomeController::class, 'applicationSave']);
+    Route::get('/ums-dashboard', [UmsHomeController::class, 'dashboard'])->name('ums.dashboard');
+    Route::post('/ums-logout', [UmsHomeController::class, 'logout'])->name('ums.logout');
 
 
 
@@ -732,7 +759,7 @@ Route::post('/ums-logout', [UmsHomeController::class, 'logout'])->name('ums.logo
     //     return view('ums.dashboard');
     // });
 
-    Route::get('/dashboard', [AdminDashboardController::class,'index'])->name('admin-dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin-dashboard');
 
     Route::get('/profile', function () {
         return view('ums.profile');
@@ -747,8 +774,8 @@ Route::post('/ums-logout', [UmsHomeController::class, 'logout'])->name('ums.logo
 
     //faculty 
 
-    Route::get('faculty-secret-login/{id}', [FacultyLoginController::class,'secretLogin'])->name('faculty-secret-login');
-    Route::get('/faculty',[FacultyController::class,'index'])->name('faculty');
+    Route::get('faculty-secret-login/{id}', [FacultyLoginController::class, 'secretLogin'])->name('faculty-secret-login');
+    Route::get('/faculty', [FacultyController::class, 'index'])->name('faculty');
     Route::get('faculty-dashboard', [FacultyDashboardController::class, 'index']);
 
 
@@ -759,7 +786,7 @@ Route::post('/ums-logout', [UmsHomeController::class, 'logout'])->name('ums.logo
         return view('ums.master.faculty.faculty_add');
     });
     Route::get('/facultynotification', [FacultyNotificationController::class, 'index2']);
-  
+
     Route::get('/Holiday', [HolidayCalenderController::class, 'holidayCalenderForStudent']);
 
 
@@ -823,7 +850,7 @@ Route::post('/ums-logout', [UmsHomeController::class, 'logout'])->name('ums.logo
 
     // Route::get('/stu-profile', [StudentDashboardController::class, 'profile'])->name('student-profile');
     // Route::get('/stu-dashboard', [StudentDashboardController::class, 'index'])->name('student-dashboard');
-    
+
 
 
 
@@ -1554,7 +1581,7 @@ Route::middleware(['user.auth'])->group(function () {
 
     Route::get('/vendors/users', [VendorController::class, 'users']);
 
-  
+
     Route::prefix('vendors')->controller(VendorController::class)->group(function () {
         Route::get('/', 'index')->name('vendor.index');
         Route::get('/create', 'create')->name('vendor.create');
@@ -1597,7 +1624,7 @@ Route::middleware(['user.auth'])->group(function () {
         Route::get('/compliance/{id}', 'getComplianceById');
     });
 
-  
+
     Route::prefix('pos')->controller(PurchaseOrderReportController::class)->group(function () {
         Route::get('/report', 'index')->name('po.report');
     });
@@ -2862,11 +2889,6 @@ Route::middleware(['user.auth'])->group(function () {
         'edit' => 'finance.fixed-asset.maintenance.edit',
         'update' => 'finance.fixed-asset.maintenance.update',
     ]);
-
-
-
-
-
 });
 
 
@@ -3226,7 +3248,7 @@ Route::get('/regular_exam_form_report', [ReportController::class, 'regularPaperR
 // Route::get('/faculty_dashboard', function () {
 //     return view('ums.master.faculty.faculty_dashboard');
 // });
-Route::get('/faculty_dashboard', [FacultyController::class,'index']);
+Route::get('/faculty_dashboard', [FacultyController::class, 'index']);
 
 // Route::get('/faculty_edit', function () {
 //     return view('ums.master.faculty.faculty_edit');

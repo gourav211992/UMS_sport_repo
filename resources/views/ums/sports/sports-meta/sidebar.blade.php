@@ -62,8 +62,8 @@ data-scroll-to-active="true">
             <li class="nav-item"><a class="d-flex align-items-center" href="{{url('sports-students')}}"><i
                         data-feather="users"></i><span class="menu-title text-truncate">Candidates Master</span></a>
             </li>
-            <li class="nav-item"><a class="d-flex align-items-center" href="{{url('/fee_refund')}}"><i
-                        data-feather="users"></i><span class="menu-title text-truncate">Fee Refund</span></a>
+            <li class="nav-item"><a class="d-flex align-items-center" href="{{url('/fee_refund')}}"><i data-feather="arrow-left-circle"></i>
+<span class="menu-title text-truncate">Fee Refund</span></a>
             </li>
 
             <li class="{{ Route::currentRouteName() == 'book' || Route::currentRouteName() == 'book_create' || Route::currentRouteName() == 'bookEdit' ? 'active' : '' }}"><a class="d-flex align-items-center" href="{{ route('book') }}"><i
@@ -117,7 +117,7 @@ data-scroll-to-active="true">
 
 
 
-                    <li><a class="d-flex align-items-center" href="{{url('rating_scale')}}"><i
+                    <li><a class="d-flex align-items-center" href="{{url('rating-scale')}}"><i
                                 data-feather="circle"></i><span
                                 class="menu-item text-truncate">Rating Scale</span></a></li>
                                 

@@ -37,7 +37,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body customernewsection-form">
-                               <form method="POST" action="{{ route('semesters.store') }}" id="semesterForm">
+                               <form method="POST" action="{{ url('semesters-add') }}" id="semesterForm">
                                     @csrf
                                     <div class="row">
                                         <div class="col-md-12">

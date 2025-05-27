@@ -40,7 +40,7 @@ class RatingScaleController extends Controller
         'status' => $validationData['status'],
     ]);
 
-    return redirect()->route('rating_scale')
+    return redirect()->route('rating-scale.list')
                      ->with('success', 'Rating Scale added successfully!');
 }
 
@@ -91,7 +91,7 @@ class RatingScaleController extends Controller
             'company_id' => $user->company_id,
         ]);
     
-        return redirect()->route('rating_scale')
+        return redirect()->route('rating-scale.list')
                          ->with('success', 'Rating Scale updated successfully!');
     }
     

@@ -109,10 +109,15 @@
                                                             <i data-feather="edit-3" class="me-50"></i>
                                                             <span>Edit</span>
                                                         </a>
-                                                        <a class="dropdown-item" href="{{'sports-fee-schedule/delete/'.$fee->id}}">
-                                                            <i data-feather="trash-2" class="me-50"></i>
-                                                            <span>Delete</span>
-                                                        </a>
+                                                       <a href="javascript:void(0);" 
+   class="dropdown-item "
+   data-bs-toggle="modal" 
+   data-bs-target="#confirmDeleteModal" 
+   data-url="{{ url('sports-fee-schedule/delete/'.$fee->id) }}">
+    <i data-feather="trash-2" class="me-50"></i>
+    <span>Delete</span>
+</a>
+
                                                         <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#confirmModal{{ $fee->id }}" href="javascript:void(0)">
                                                             <i data-feather="copy" class="me-50"></i>
                                                             <span>Clone</span>
@@ -175,6 +180,27 @@
 
             </section>
 
+         
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-body text-center p-4">
+                <div class="mb-3">
+                    <i class="text-danger" data-feather="alert-triangle" style="width: 48px; height: 48px;"></i>
+                </div>
+                <h5 class="text-danger mb-3">Are you sure?</h5>
+                <p class="text-muted mb-4">This action cannot be undone.<br>Do you really want to delete this fee schedule?</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Yes, Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
             <!-- The Modal -->
             <div class="modal fade" id="uploadExcelModal" tabindex="-1" aria-labelledby="uploadExcelModalLabel" aria-hidden="true">
@@ -211,4 +237,16 @@
     </div>
 </div>
 <!-- END: Content-->
+<script>
+    const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const url = button.getAttribute('data-url');
+        confirmDeleteModal.querySelector('#confirmDeleteBtn').setAttribute('href', url);
+    });
+</script>
+<script>
+    feather.replace();
+</script>
+
 @endsection

@@ -24,7 +24,7 @@
                 </div>
                 <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">
-						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('affiliate_add')}}"><i data-feather="plus-circle"></i> Add New</a> 
+						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('affiliate-add')}}"><i data-feather="plus-circle"></i> Add New</a> 
                     </div>
                 </div>
             </div>
@@ -87,16 +87,16 @@
 																<i data-feather="more-vertical"></i>
 															</button>
 															<div class="dropdown-menu dropdown-menu-end">
-																<a class="dropdown-item" href="{{route('affiliate_view', $affiliate->id)}}">
+																<a class="dropdown-item" href="{{route('affiliate.view', $affiliate->id)}}">
 																	<i data-feather="edit" class="me-50"></i>
 																	<span>View Detail</span>
 																</a>
-																<a class="dropdown-item" href="{{ route('affiliate_edit', $affiliate->id) }}">
+																<a class="dropdown-item" href="{{ route('affiliate.edit', $affiliate->id) }}">
 																	<i data-feather="edit-3" class="me-50"></i>
 																	<span>Edit</span>
 																</a>
 																
-																<form id="deleteForm-{{ $affiliate->id }}" action="{{ route('affiliate_delete', $affiliate->id) }}" method="POST" style="display: inline;">
+																<form id="deleteForm-{{ $affiliate->id }}" action="{{ route('affiliate.delete', $affiliate->id) }}" method="POST" style="display: inline;">
 																	@csrf
 																	@method('DELETE')
 																	<a type="button"

@@ -1,4 +1,5 @@
-@extends('ums.sports.sports-meta.admin-sports-meta')
+@extends('ums.admin.admin-meta')
+
 
 @section('content')
     <form action="{{ route('cat-prog-doc.view', $categoryProgDoc->id) }}" method="GET">

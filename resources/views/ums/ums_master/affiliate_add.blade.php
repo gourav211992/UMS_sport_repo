@@ -38,7 +38,7 @@
 
         <div class="content-body">
             <section id="basic-datatable">
-                <form method="POST" id="formdata" action="{{ url('affiliate_add') }}">
+                <form method="POST" id="formdata" action="{{ url('affiliate-add') }}">
                     @csrf
                     <div class="row">
                         <div class="col-12">

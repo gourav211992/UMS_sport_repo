@@ -9,7 +9,7 @@ use App\Helpers\Helper;
  use App\Models\ums\ums_master\CourseModel;
  use App\Models\ums\ums_master\Erp_Ums_InstituteMapping;
  use App\Models\ums\ums_master\Erp_Ums_CollegeMapping;
- use App\Models\ums\ums_master\Program_Types;
+ use App\Models\ums\ums_master\ProgramTypeModel;
  use App\Models\ums\ums_master\Program_branches;
 class CollageMappingController extends Controller
 {
@@ -44,7 +44,7 @@ class CollageMappingController extends Controller
     {
         $instituteData = Erp_Ums_InstituteMapping::where('status', 'active')->get();
         $courseData = CourseModel::where('status', 'active')->get();
-        $programTypeData = Program_Types::with(['programBranches' => function($query) {
+        $programTypeData = ProgramTypeModel::with(['programBranches' => function($query) {
             $query->where('status', 'active');
         }])->where('status', 'active')->get();
         $programBranchData = Program_branches::where('status', 'active')->get();
@@ -54,7 +54,7 @@ class CollageMappingController extends Controller
     
     public function getCoursesByProgramType($programTypeId)
     {
-        $courses = CourseModel::where('program_type', $programTypeId)->get(); // ✅ correct
+        $courses = CourseModel::where('program_id', $programTypeId)->get(); 
         return response()->json($courses);
     }
     
@@ -129,7 +129,7 @@ public function collegeMappingEdit($id)
 
     $instituteData = Erp_Ums_InstituteMapping::where('status', 'active')->get();
     $courseData = CourseModel::where('status', 'active')->get();
-    $programTypeData = Program_Types::with(['programBranches' => function($query) {
+    $programTypeData = ProgramTypeModel::with(['programBranches' => function($query) {
         $query->where('status', 'active');
     }])->where('status', 'active')->get();
     $programBranchData = Program_branches::where('status',' active')->get();
@@ -158,7 +158,7 @@ public function collegeMappingView($id)
     $collegeMapping = Erp_Ums_CollegeMapping::with('institute', 'program_type', 'courses')->findOrFail($id);
     $instituteData = Erp_Ums_InstituteMapping::all();
     $courseData = CourseModel::all();
-    $programTypeData = Program_Types::with('programBranches')->get();
+    $programTypeData = ProgramTypeModel::with('programBranches')->get();
     $programBranchData = Program_branches::all();
 
     $branches = json_decode($collegeMapping->program_branch_ids, true);

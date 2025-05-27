@@ -24,7 +24,7 @@
                 </div>
                 <div class="content-header-right text-sm-end col-md-6 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">   
-                        <a href="{{ route('semesters') }}" class="btn btn-secondary btn-sm mb-50 mb-sm-0">
+                        <a href="{{ url('semesters') }}" class="btn btn-secondary btn-sm mb-50 mb-sm-0">
                             <i data-feather="arrow-left-circle"></i> Back
                         </a>
                         <button form="semesterForm" class="btn btn-primary btn-sm mb-50 mb-sm-0">
@@ -41,7 +41,7 @@
                     <div class="col-12">  
                         <div class="card">
                             <div class="card-body customernewsection-form"> 
-                                <form method="POST" action="{{ route('semesters.update', $semester->id) }}" id="semesterForm">
+                                <form method="POST" action="{{ url('semesters-update', $semester->id) }}" id="semesterForm">
                                     @csrf
                                     @method('PUT')
                                     <div class="row">

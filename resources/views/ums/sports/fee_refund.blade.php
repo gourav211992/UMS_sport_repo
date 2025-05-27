@@ -1,4 +1,4 @@
-@extends('ums.sports.sports-meta.admin-sports-meta')
+@extends('ums.admin.admin-meta')
 
 @section('content')
 
@@ -15,7 +15,7 @@
                             <h2 class="content-header-title float-start mb-0">Fee Refund Master</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{url('fee_refund')}}">Home</a></li>  
+                                    <li class="breadcrumb-item"><a href="{{url('fee-refund')}}">Home</a></li>  
                                     <li class="breadcrumb-item active">FeeRefund  List</li>
                                 </ol>
                             </div>
@@ -24,7 +24,7 @@
                 </div>
                 <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">
-						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('fee_refund_add')}}"><i data-feather="plus-circle"></i> Add New</a> 
+						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('fee-refund-add')}}"><i data-feather="plus-circle"></i> Add New</a> 
                     </div>
                 </div>
             </div>
@@ -38,7 +38,7 @@
                             <div class="card">
 								
 								   
-                                <div class="table-responsive candidates-tables ">
+                                <div class="table-responsive ">
 									<table class="datatables-basic table table-striped myrequesttablecbox  tasklist"> 
 										<thead>
 											<tr>
@@ -76,11 +76,11 @@
 																<i data-feather="more-vertical"></i>
 															</button>
 															<div class="dropdown-menu dropdown-menu-end">
-																<a class="dropdown-item" href="{{url('fee_refund_view',$refund->id)}}">
+																<a class="dropdown-item" href="{{url('fee-refund-view',$refund->id)}}">
 																	<i data-feather="edit" class="me-50"></i>
 																	<span>View Detail</span>
 																</a>
-																<a class="dropdown-item" href="{{url('fee_refund_edit',$refund->id)}}">
+																<a class="dropdown-item" href="{{url('fee-refund-edit',$refund->id)}}">
 																	<i data-feather="edit-3" class="me-50"></i>
 																	<span>Edit</span>
 																</a>

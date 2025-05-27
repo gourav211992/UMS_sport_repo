@@ -22,6 +22,9 @@
             </div>
             <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                 <div class="form-group breadcrumb-right">
+                                  <button type="button" class="btn btn-success  btn-sm mb-50 mb-sm-0" data-bs-toggle="modal" data-bs-target="#importModal" ><i data-feather="upload"></i>
+ Bulk Registration upload
+</button>
                     <a class="btn btn-dark btn-sm mb-50 mb-sm-0" href="{{ url('sports-students') }}"><i data-feather="refresh-ccw"></i> Reset</a>
                     <button class="btn btn-warning btn-sm mb-50 mb-sm-0" data-bs-target="#filter" data-bs-toggle="modal"><i data-feather="filter"></i> Filter</button>
                     <!-- <a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{ url('sports-registration') }}"><i data-feather="plus-circle"></i> Add New</a> -->
@@ -31,6 +34,43 @@
         <div class="content-body">
 
             @include('ums.admin.notifications')
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{{ route('sports.register.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title text-white" id="importModalLabel">  Sports Register Import</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="importFile" class="form-label">Select Excel File</label>
+            <input
+              type="file"
+              name="file"
+              id="importFile"
+              class="form-control"
+              accept=".xlsx,.xls"
+              required
+            >
+          </div>
+          <p>Download Bulk Sports Register Template</p>
+        <a href="{{ asset('templates/Student%20Master.xlsx') }}" class="btn btn-primary btn-sm" download>
+  Download Template
+</a>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Import</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
             <div class="row match-height">
                 <div class="col-md-12">

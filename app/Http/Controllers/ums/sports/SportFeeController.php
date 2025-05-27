@@ -134,6 +134,7 @@ class SportFeeController extends Controller
             $sportFeeMaster->batch_year= $request->batch_year;
             $sportFeeMaster->section = $request->section;
             $section_id = SportSection::where('name', $request->section)->where('batch','=', $request->batch_name)->first()->id;
+           
             $sportFeeMaster->section_id= $section_id;
             $sportFeeMaster->quota = $request->quota;
             $sportFeeMaster->start_date= $request->start_date;
@@ -245,7 +246,10 @@ class SportFeeController extends Controller
             $sportFeeMaster->batch_id = $batch_id;
 
             $sportFeeMaster->section = $request->section;
+            
+            $section_id = SportSection::where('name', $request->section)->where('batch','=', $request->batch_name)->first()->id;
             $sportFeeMaster->quota = $request->quota;
+            $sportFeeMaster->section_id=$section_id;
             $sportFeeMaster->start_date= $request->start_date;
             $sportFeeMaster->end_date= $request->end_date;
             $sportFeeMaster->status = $request->status;
@@ -311,40 +315,83 @@ class SportFeeController extends Controller
 
 
 
-    public function import(Request $request)
-    {
-        $request->validate([
-            'excel_file' => 'required',
-        ]);
+    // public function import(Request $request)
+    // {
+    //     $request->validate([
+    //         'excel_file' => 'required',
+    //     ]);
 
-        try {
-            $file = $request->file('excel_file');
+    //     try {
+    //         $file = $request->file('excel_file');
 
-            $parentURL = 'fee-master';
-            $servicesBooks = Helper::getAccessibleServicesFromMenuAlias($parentURL);
+    //         $parentURL = 'fee-master';
+    //         $servicesBooks = Helper::getAccessibleServicesFromMenuAlias($parentURL);
 
-            if (empty($servicesBooks['services'])) {
-                return back()->with('error', 'No services found for fee-master.');
-            }
+    //         if (empty($servicesBooks['services'])) {
+    //             return back()->with('error', 'No services found for fee-master.');
+    //         }
 
-            $firstService = $servicesBooks['services'][0];
-            $series = Helper::getBookSeriesNew($firstService->alias, $parentURL)->get();
+    //         $firstService = $servicesBooks['services'][0];
+    //         $series = Helper::getBookSeriesNew($firstService->alias, $parentURL)->get();
 
-            if ($series->isEmpty()) {
-                return back()->with('error', 'No book series found for fee-master.');
-            }
+    //         if ($series->isEmpty()) {
+    //             return back()->with('error', 'No book series found for fee-master.');
+    //         }
 
-            $bookId = $series->first()->id;
+    //         $bookId = $series->first()->id;
 
-            Excel::import(new FeeImport($bookId), $file); // Pass bookId here
+    //         Excel::import(new FeeImport($bookId), $file); // Pass bookId here
 
-            return redirect()->back()->with('success', 'Fee Import Successfully');
-        } catch (\Exception $e) {
-            Log::error('Error importing Excel file: ' . $e->getMessage());
-            return back()->with('error', $e->getMessage());
+    //         return redirect()->back()->with('success', 'Fee Import Successfully');
+    //     } catch (\Exception $e) {
+    //         Log::error('Error importing Excel file: ' . $e->getMessage());
+    //         return back()->with('error', $e->getMessage());
+    //     }
+    // }
+
+ 
+ public function import(Request $request)
+{
+    $request->validate([
+        'excel_file' => 'required|file|mimes:xlsx,xls,csv|max:2048',
+    ]);
+
+    try {
+        $file = $request->file('excel_file');
+
+        $parentURL = 'fee-master';
+        $servicesBooks = Helper::getAccessibleServicesFromMenuAlias($parentURL);
+
+        if (empty($servicesBooks['services'])) {
+            return back()->with('error', 'No services found for fee-master.');
         }
-    }
 
+        $firstService = $servicesBooks['services'][0];
+        $series = Helper::getBookSeriesNew($firstService->alias, $parentURL)->get();
+
+        if ($series->isEmpty()) {
+            return back()->with('error', 'No book series found for fee-master.');
+        }
+
+        $bookId = $series->first()->id;
+
+        $import = new FeeImport($bookId);
+        Excel::import($import, $file);
+
+        $errors = $import->getErrors();
+
+        if ($errors->isNotEmpty()) {
+            return back()->withErrors($errors)->with('warning', 'Some rows were skipped due to validation errors.');
+        }
+
+        return back()->with('success', 'Fee imported successfully.');
+    } catch (\Exception $e) {
+        Log::error('Error importing Excel file: ' . $e->getMessage());
+        return back()->with('error', 'Import failed: ' . $e->getMessage());
+    }
+}
+
+ 
     public function getBookDocNoAndParameters(Request $request)
     {
         try {

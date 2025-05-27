@@ -274,20 +274,19 @@
     <div class="drag-target"></div>
 @endsection
 <style>
-  .toast-success {
+    .toast-success {
         background-color: #28a745 !important;
         color: white !important;
     }
+
     .toast-error {
         background-color: #dc3545 !important;
         color: white !important;
     }
+
     .toast-message {
         font-size: 14px;
     }
-    
-
-
 </style>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -501,59 +500,6 @@
 
 
 
-                // .done(function(response) {
-                //     if (response.length > 0) {
-                //         $("#parmetersLength").val(response.length);
-
-                //         let tbody = $('#screeniningDetails');
-                //         tbody.empty(); // clear previous
-
-                //         if (response.length > 0) {
-                //             $.each(response, function(index, param) {
-
-
-                //                 let row = `<tr>
-                //                     <td>${index + 1}</td>
-                //                     <td><strong>${param.parametername}</strong>
-                //                         <input type="hidden" name="parameters[${index}][parameter]" value="${param.parametername}">
-                //                     </td>
-                //                     <td><input type="text" name="parameters[${index}][response]" class="form-control mw-100" placeholder="Enter Response"></td>
-                //                     <td><input type="text" name="parameters[${index}][comment]" class="form-control mw-100" placeholder="Enter Comments"></td>
-                //                     <td>
-                //                         <select name="parameters[${index}][rating]" class="form-select mw-100">
-                //                             <option value="">Select</option>
-                //                             <option value="5">5</option>
-                //                             <option value="4">4</option>
-                //                             <option value="3">3</option>
-                //                             <option value="2">2</option>
-                //                             <option value="1">1</option>
-                //                         </select>
-                //                     </td>
-                //                 </tr>`;
-
-
-
-                //                 // let row = `<tr>
-                //                 //     <td class="poprod-decpt">${index + 1}</td>
-                //                 //     <td class="poprod-decpt"><strong>${param.parametername}</strong>
-                //                 //         <input type="hidden"  name="parametername${index + 1}"   id="parametername${index + 1}" value="${param.parametername}">
-                //                 //                                                </td>
-                //                 // <td><input type="text" name="response${index + 1}"  id="response${index + 1}"  class="form-control mw-100" placeholder="Enter Response"></td>
-                //                 // <td><input type="text" name="comment${index + 1}" id="comment${index + 1}"  class="form-control mw-100" placeholder="Enter Comments"></td>
-                //                 // <td><select class="form-select mw-100" name="rating${index + 1}"  id="rating${index + 1}">
-                //                 // <option value="">Select</option>
-                //                 // <option value="5">5</option>
-                //                 // <option value="4">4</option>
-                //                 // <option value="3">3</option>
-                //                 // <option value="2">2</option>
-                //                 // <option value="1">1</option>
-                //                 // </select></td>
-                //                 // </tr>`;
-                //                 tbody.append(row);
-                //             });
-                //         }
-                //     }
-                // })
                 .fail(function(xhr, status, error) {
                     console.error("AJAX Error:", status, error);
                 })
@@ -563,6 +509,8 @@
         });
 
         $('#submit').on('click', function(e) {
+            // alert("111")
+            // return true;
             e.preventDefault();
 
             let isValid = true;
@@ -590,6 +538,27 @@
                 }
             });
 
+
+            $('input[name^="parameters"][name$="[rating]"]').each(function() {
+                if ($(this).val().trim() === '') {
+                    const input = $(this);
+                    // const idAttr = input.attr('id');
+                    const rating = input.val();
+
+
+                    if (!rating || rating.trim() === '') {
+                        isValid = false;
+                        input.addClass('is-invalid');
+                        $('<div>', {
+                            class: 'text-danger',
+                            text: 'rating is required.'
+                        }).insertAfter(input);
+                    }
+                }
+            });
+
+
+
             if (!isValid) return;
 
             // Serialize form data
@@ -609,189 +578,6 @@
         });
 
 
-//         $('#submit').on('click', function(e) {
-//     e.preventDefault();
-
-//     let isValid = true;
-//     const requiredFields = [
-//         'screening_date', 'batch_year', 'batch_name',
-//         'section_name', 'group_name', 'player_name',
-//         'trainer', 'screening_name'
-//     ];
-
-//     // Clear previous errors
-//     $('.is-invalid').removeClass('is-invalid');
-//     $('.text-danger').remove();
-
-//     // Validate required fields
-//     requiredFields.forEach(fieldId => {
-//         const field = $('#' + fieldId);
-//         if (field.val().trim() === '') {
-//             isValid = false;
-//             field.addClass('is-invalid');
-//             if ($('#' + fieldId + '-error').length === 0) {
-//                 $('<div>', {
-//                     id: fieldId + '-error',
-//                     class: 'text-danger',
-//                     text: 'required.'
-//                 }).insertAfter(field);
-//             }
-//         }
-//     });
-
-//     if (!isValid) return;
-
-//     const csrfToken = "{{ csrf_token() }}";
-    
-//     // Build screening form data
-//     const payload = {
-//         screening_date: $('#screening_date').val(),
-//         batch_year: $('#batch_year').val(),
-//         batch_name: $('#batch_name').val(),
-//         section_name: $('#section_name').val(),
-//         group_name: $('#group_name').val(),
-//         trainer: $('#trainer').val(),
-//         player_name: $('#player_name').val(),
-//         screening_name: $('#screening_name').val(),
-//         parameters: [],
-//         _token: csrfToken
-//     };
-
-//     // Get number of parameters from hidden input
-//     const totalParams = parseInt($('#parmetersLength').val() || "0");
-
-//     // Build parameters array
-//     for (let i = 1; i <= totalParams; i++) {
-//         const name = $(`#parametername${i}`).val();
-//         const response = $(`#response${i}`).val();
-//         const comment = $(`#comment${i}`).val();
-//         const rating = $(`#rating${i}`).val();
-
-//         if (name) {
-//             payload.parameters.push({
-//                 parameter: name,
-//                 response: response,
-//                 comment: comment,
-//                 rating: rating
-//             });
-//         }
-//     }
-
-//     // Optional: debug
-//     console.log("Submitting Payload:", payload);
-
-//     // Submit via AJAX
-//     $.post("{{ route('screening-details-add') }}", payload)
-//         .done(function(response) {
-//             toastr.success(response.message || 'Assessment added successfully');
-//             setTimeout(function () {
-//                 window.location.href = "{{ url('screening-assessment') }}";
-//             }, 3000);
-//         })
-//         .fail(function(xhr) {
-//             console.error("Submission failed:", xhr.responseText);
-//             toastr.error(xhr.responseJSON?.message || 'An error occurred.');
-//         });
-// });
-
-
-
-    //     $('#submit').on('click', function(e) {
-    //         e.preventDefault();
-
-    //         let isValid = true;
-    //         const requiredFields = [
-    //             'screening_date', 'batch_year', 'batch_name',
-    //             'section_name', 'group_name', 'player_name',
-    //             'trainer', 'screening_name'
-    //         ];
-
-    //         // Clear previous errors
-    //         $('.is-invalid').removeClass('is-invalid');
-    //         $('.text-danger').remove();
-
-    //         // Validate required fields
-    //         requiredFields.forEach(fieldId => {
-    //             const field = $('#' + fieldId);
-    //             if (field.val().trim() === '') {
-    //                 isValid = false;
-    //                 field.addClass('is-invalid');
-    //                 if ($('#' + fieldId + '-error').length === 0) {
-    //                     $('<div>', {
-    //                         id: fieldId + '-error',
-    //                         class: 'text-danger',
-    //                         text: 'required.'
-    //                     }).insertAfter(field);
-    //                 }
-    //             }
-    //         });
-
-    //         if (!isValid) return;
-    //         // Collect form data
-    //         const formData = {};
-    //         $('#form').find(':input').each(function() {
-    //             const id = $(this).attr('id');
-    //             if (id) {
-    //                 formData[id] = $(this).val();
-    //             }
-    //         });
-            
-
-    //         const parameterArray = [];
-    //         const totalParams = parseInt(formData.parmetersLength); // Default to 13 if not found
-    //         let paramValid = true;
-
-    //         for (let i = 1; i <= totalParams; i++) {
-    //             const name = formData[`parametername${i}`];
-    //             const response = formData[`response${i}`];
-    //             const comment = formData[`comment${i}`];
-    //             const rating = formData[`rating${i}`];
-
-    //             if (name) {
-    //                 parameterArray.push({
-    //                     parameter: name,
-    //                     response,
-    //                     comment,
-    //                     rating
-    //                 });
-    //             }
-    //         }
-
-    //         // Final Payload
-    //         const payload = {
-    //             ...formData,
-    //             parameters: parameterArray,
-    //             _token: csrfToken
-    //         };
-
-
-    //         // Remove the separate parameter fields from the main object
-    //         for (let i = 1; i <= formData.parmetersLength; i++) {
-    //             delete payload[`parametername${i}`];
-    //             delete payload[`response${i}`];
-    //             delete payload[`comment${i}`];
-    //             delete payload[`rating${i}`];
-    //         }
-    //         // Submit via AJAX
-    //         $.post("{{ route('screening-details-add') }}", payload)
-    //         .done(function(response) {
-    //             console.log("Submitted successfully:", response);
-
-    //             // Show the toast message
-    //             toastr.success(response.message || 'Assessment added successfully');
-
-    //             // Wait for 1.5 seconds before redirecting
-    //             setTimeout(function () {
-    //                 window.location.href = "{{ url('screening-assessment') }}";
-    //             }, 3000);  // 1.5 seconds
-    //         })
-    //         .fail(function(xhr) {
-    //     console.error("Submission failed:", xhr.responseText);
-    //     toastr.error(xhr.responseJSON?.message || 'An error occurred.');
-    // });
-
-    //     });
-
 
     });
 
@@ -806,9 +592,8 @@
             }).insertAfter(field);
         }
     }
-//     toastr.success("This is a success message");
-// toastr.error("This is an error message");
-
+    //     toastr.success("This is a success message");
+    // toastr.error("This is an error message");
 </script>
 
 {{-- <!-- In your <head> -->

@@ -28,7 +28,7 @@ class CourseModel extends Model
 
     public function programType()
 {
-    return $this->belongsTo(ProgramTypeModel::class, 'program_id');
+    return $this->belongsTo(ProgramTypeModel::class, 'program_type','id');
 }
 
     protected $dates = ['deleted_at']; 

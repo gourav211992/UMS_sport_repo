@@ -15,7 +15,7 @@
                             <h2 class="content-header-title float-start mb-0">RatingScale Master</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a  href="{{url('rating_scale')}}">Home</a></li>  
+                                    <li class="breadcrumb-item"><a  href="{{url('rating-scale')}}">Home</a></li>  
                                     <li class="breadcrumb-item active">RatingScale Master List</li>
                                 </ol>
                             </div>
@@ -24,7 +24,7 @@
                 </div>
                 <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">
-						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('rating_scale_add')}}"><i data-feather="plus-circle"></i> Add New</a> 
+						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('rating-scale-add')}}"><i data-feather="plus-circle"></i> Add New</a> 
                     </div>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                                                         @if($item->status == "active")
                                                         <span class="badge rounded-pill badge-light-success">Active</span>
                                                         @else
-                                                        <span  class="badge rounded-pill badge-light-danger">Inactive</span>
+                                                        <span  class="badge rounded-pill badge-light-danger">InActive</span>
                                                         @endif
                                                     </td>
 													<td class="tableactionnew mb-auto">
@@ -71,11 +71,11 @@
 																<i data-feather="more-vertical"></i>
 															</button>
 															<div class="dropdown-menu dropdown-menu-end">
-																<a class="dropdown-item"  href="{{ route('rating_scale.view', $item->id) }}">
+																<a class="dropdown-item"  href="{{ route('rating-scale.view', $item->id) }}">
 																	<i data-feather="edit" class="me-50"></i>
 																	<span>View Detail</span>
 																</a>
-																<a class="dropdown-item" href="{{ route('rating_scale.edit', $item->id) }}">
+																<a class="dropdown-item" href="{{ route('rating-scale.edit', $item->id) }}">
 																	<i data-feather="edit-3" class="me-50"></i>
 																	<span>Edit</span>
 																</a>
@@ -189,7 +189,7 @@
 			affiliateIdToDelete = affiliateId;
 			// affiliateNameToDelete = affiliateName;
 			document.getElementById('deleteGroupName').innerHTML =
-				`Are you sure you want to delete the affiliate ?`;
+				`Are you sure you want to delete the Rating Scale?`;
 		}
 	
 		function deleteGroup() {

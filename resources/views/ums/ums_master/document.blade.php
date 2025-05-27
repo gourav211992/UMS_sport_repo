@@ -1,4 +1,4 @@
-@extends('ums.sports.sports-meta.admin-sports-meta')
+@extends('ums.admin.admin-meta')     
 
 @section('content')
     <!-- BEGIN: Content-->
@@ -24,7 +24,7 @@
                 <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">
                         {{-- <button class="btn btn-warning btn-sm mb-50 mb-sm-0" data-bs-target="#filter" data-bs-toggle="modal"><i data-feather="filter"></i> Filter</button>  --}}
-						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{ url('document_add') }}"><i data-feather="plus-circle"></i> Add New</a> 
+						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{ url('document-add') }}"><i data-feather="plus-circle"></i> Add New</a> 
                     </div>
                 </div>
             </div>
@@ -74,17 +74,17 @@
                         <i data-feather="more-vertical"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
-                        <a class="dropdown-item" href="{{ route('document-show', $document->id) }}">
+                        <a class="dropdown-item" href="{{ route('document.show', $document->id) }}">
                                <i data-feather="edit" class="me-50"></i>
                                <span>View Detail</span>
                            </a>
-                           <a class="dropdown-item" href="{{ route('document-edit', $document->id) }}">
+                           <a class="dropdown-item" href="{{ route('document.edit', $document->id) }}">
                                <i data-feather="edit-3" class="me-50"></i>
                                <span>Edit</span>
                            </a>
 
                       
-                               <form id="deleteForm-{{ $document->id }}" action="{{ route('document-destroy', $document->id) }}" method="POST" style="display: inline;">
+                               <form id="deleteForm-{{ $document->id }}" action="{{ route('document.destroy', $document->id) }}" method="POST" style="display: inline;">
     @csrf
     @method('DELETE')
     <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop" onclick="setDeleteId('{{ $document->id }}', '{{ $document->name }}')">

@@ -31,7 +31,7 @@ class Program_branches extends Model
     // Relationships
     public function programType()
     {
-        return $this->belongsTo(Program_Types::class, 'program_type_id');
+        return $this->belongsTo(ProgramTypeModel::class, 'program_type_id');
     }
 
     public function course()

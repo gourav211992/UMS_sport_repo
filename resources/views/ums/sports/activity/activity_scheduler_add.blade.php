@@ -139,9 +139,7 @@
 
                                                     <div class="col-md-3 mb-1 mb-sm-0">
                                                         <select class="form-select" name="section" id="section">
-                                                            {{-- @foreach ($section as $name)
-                                                                    <option value="{{$name->name}}">{{ ucfirst($name->name) }}</option>
-                                                                @endforeach --}}
+
                                                         </select>
                                                     </div>
                                                     <div class="col-md-2 mb-1 mb-sm-0">
@@ -151,47 +149,48 @@
 
                                                     <div class="col-md-3">
                                                         <select class="form-select" name="group" id="group">
-                                                            {{-- @foreach ($group as $name)
-                                                                    <option value="{{$name->group_name}}">{{ ucfirst($name->group_name) }}</option>
-                                                                @endforeach --}}
+
                                                         </select>
                                                     </div>
                                                 </div>
 
-                                                <!-- Rows will appear here -->
-
-                                                <!-- <div class="row align-items-center mb-1">
+                                                <div class="row align-items-center mb-2">
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Trainer <span
+                                                        <label class="form-label">Head Trainer <span
                                                                 class="text-danger">*</span></label>
                                                     </div>
-
                                                     <div class="col-md-5">
                                                         <select class="form-select" name="trainer" id="trainer">
                                                             <option value="">-----Select Trainer-----</option>
-                                                            <option value="ankit">ankit</option>
-                                                            <option value="dhan">dhan</option>
-                                                            <option value="danish">danish</option>
-
-                                                        </select>
-                                                    </div>
-                                                </div> -->
-
-                                                <div class="row align-items-center mb-1">
-                                                    <div class="col-md-3">
-                                                        <label class="form-label">Trainer <span
-                                                                class="text-danger">*</span></label>
-                                                    </div>
-
-                                                    <div class="col-md-5">
-                                                        <select class="form-select" name="trainer" id="trainer">
-                                                            <option value="">-----Select Trainer-----</option>
-                                                            @foreach ($trainers as $item)
-                                                                <option value={{ $item['id'] }}>
-                                                                    {{ $item['name'] }}</option>
+                                                            @foreach ($trainers as $trainer)
+                                                                <option value="{{ $trainer->id }}">
+                                                                    {{ $trainer->name }}
+                                                                    @if ($trainer->designation)
+                                                                        - {{ $trainer->designation->name }}
+                                                                    @endif
+                                                                </option>
                                                             @endforeach
-
                                                         </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row align-items-center mb-2">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Support Staff <span
+                                                                class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <select name="staff[]" id="staff" class="form-select" multiple>
+                                                            @foreach ($trainers as $trainer)
+                                                                <option value="{{ $trainer->id }}">
+                                                                    {{ $trainer->name }}
+                                                                    @if ($trainer->designation)
+                                                                        - {{ $trainer->designation->name }}
+                                                                    @endif
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+
                                                     </div>
                                                 </div>
 
@@ -581,6 +580,46 @@
             });
         });
     </script>
+
+
+    <script>
+        $(document).ready(function() {
+            $('#staff').select2({
+                placeholder: "Select Support Staff",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
+    <style>
+        #staff~.select2-container--default .select2-selection--multiple {
+            font-size: 0.85rem;
+            line-height: 1.2;
+        }
+
+        #staff~.select2-container--default .select2-results__option {
+            font-size: 0.85rem;
+        }
+
+        #staff~.select2-container--default .select2-selection__choice {
+            padding-left: 22px;
+            padding-right: 8px;
+            position: relative;
+        }
+
+        #staff~.select2-container--default .select2-selection__choice__remove {
+            right: auto !important;
+            left: 5px !important;
+            top: 35%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            cursor: pointer;
+            position: absolute;
+            padding: 0;
+            background: transparent;
+            border: none;
+        }
+    </style>
 
 
 

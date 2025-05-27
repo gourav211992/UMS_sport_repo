@@ -24,7 +24,7 @@
                 </div>
                 <div class="content-header-right text-sm-end col-md-6 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">
-                        <a href="{{ route('semesters') }}" class="btn btn-secondary btn-sm">
+                        <a href="{{ url('semesters') }}" class="btn btn-secondary btn-sm">
                             <i data-feather="arrow-left-circle"></i> Back
                         </a>
                     </div>

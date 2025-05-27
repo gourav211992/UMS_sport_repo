@@ -41,7 +41,7 @@
 							<div class="card">
 								<div class="card-body customernewsection-form"> 
 									<!-- Form Starts -->
-									<form action="{{ route('institute-add') }}" method="POST" id="instituteForm">
+									<form action="{{ url('institute-add') }}" method="POST" id="instituteForm">
 										@csrf
 										<div class="row">
 											<div class="col-md-12">
@@ -51,45 +51,45 @@
 												</div>
 											</div>
 
-											<div class="col-md-8">
-												<div class="row align-items-center mb-1"> 
-													<div class="col-md-3"> 
-														<label class="form-label">Type <span class="text-danger">*</span></label>  
-													</div> 
-													<div class="col-md-8"> 
+										<div class="col-md-8">
+												<div class="row align-items-center mb-1">
+													<div class="col-md-3">
+														<label class="form-label">Type <span class="text-danger">*</span></label>
+													</div>
+													<div class="col-md-8">
 														<div class="demo-inline-spacing d-flex flex-wrap gap-1">
 															<div class="form-check form-check-primary">
 																<input type="radio" id="university" name="type" value="university" class="form-check-input" {{ old('type') == 'university' ? 'checked' : '' }}>
 																<label class="form-check-label fw-bolder" for="university">University</label>
-															</div> 
+															</div>
 															<div class="form-check form-check-primary">
 																<input type="radio" id="college" name="type" value="College" class="form-check-input" {{ old('type') == 'College' ? 'checked' : '' }}>
 																<label class="form-check-label fw-bolder" for="college">College</label>
-															</div>  
+															</div>
 															<div class="form-check form-check-primary">
 																<input type="radio" id="sports" name="type" value="Sports" class="form-check-input" {{ old('type') == 'Sports' ? 'checked' : '' }}>
 																<label class="form-check-label fw-bolder" for="sports">Sports</label>
-															</div> 
+															</div>
 															<div class="form-check form-check-primary">
 																<input type="radio" id="school" name="type" value="School" class="form-check-input" {{ old('type') == 'School' ? 'checked' : '' }}>
 																<label class="form-check-label fw-bolder" for="school">School</label>
-															</div> 
+															</div>
 														</div>
 														@error('type')
 															<small class="text-danger">{{ $message }}</small>
-
-															
 														@enderror
 													</div>
 												</div>
 
+
+												
 												<div class="row align-items-center mb-1">
-													<div class="col-md-3"> 
-														<label class="form-label">Affiliate <span class="text-danger">*</span></label>  
-													</div>  
-													<div class="col-md-5">  
-														<select class="form-select" name="affiliate_id">
-															<option value="">Select</option>  
+													<div class="col-md-3">
+														<label class="form-label">Affiliate <span class="text-danger">*</span></label>
+													</div>
+													<div class="col-md-5">
+														<select class="form-select" name="affiliate_id" id="affiliateSelect">
+															<option value="">Select</option>
 															@foreach ($affiliates as $affiliate)
 																<option value="{{ $affiliate->id }}" {{ old('affiliate_id') == $affiliate->id ? 'selected' : '' }}>
 																	{{ $affiliate->affiliate_name }}
@@ -158,4 +158,37 @@
 		</div>
 	</div>
     <!-- END: Content-->
+	<script>
+		document.querySelectorAll('input[name="type"]').forEach(function(radio) {
+			radio.addEventListener('change', function() {
+				const type = this.value;
+
+				fetch(`/get-affiliates-by-type/${type}`)
+					.then(response => response.json())
+					.then(data => {
+						const affiliateSelect = document.getElementById('affiliateSelect');
+						affiliateSelect.innerHTML = '<option value="">Select</option>';
+
+						if (data.affiliates.length > 0) {
+							data.affiliates.forEach(function(affiliate) {
+								const option = document.createElement('option');
+								option.value = affiliate.id;
+								option.textContent = affiliate.affiliate_name;
+								affiliateSelect.appendChild(option);
+							});
+						} else {
+							// Optional: No data found
+							const option = document.createElement('option');
+							option.value = "";
+							option.textContent = "No affiliates found";
+							affiliateSelect.appendChild(option);
+						}
+					})
+					.catch(error => {
+						console.error('Error fetching affiliates:', error);
+					});
+			});
+		});
+</script>
 @endsection
+

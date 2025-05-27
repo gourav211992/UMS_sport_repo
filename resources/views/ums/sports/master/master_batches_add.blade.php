@@ -15,7 +15,7 @@
                                 <div class="breadcrumb-wrapper">
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href={{ url('master-batches') }}>Home</a></li>
-                                        <li class="breadcrumb-item active">Add New</li>
+                                        <li class="breadcrumb-item active">Add Batches</li>
                                     </ol>
                                 </div>
                             </div>
@@ -25,8 +25,13 @@
                         <form action="{{ route('batches-store') }}" method="POST" id="addBatchForm">
                             @csrf
                         <div class="form-group breadcrumb-right">
-                            <a href="javascript: history.go(-1)" class="btn btn-secondary btn-sm mb-50 mb-sm-0"><i data-feather="arrow-left-circle"></i> Back</a>
-                            <button type="submit" class="btn btn-primary btn-sm mb-50 mb-sm-0" form="addBatchForm"><i data-feather="check-circle"></i> Submit</button>
+                            <button onClick="javascript: history.go(-1)" class="btn btn-secondary btn-sm mb-50 mb-sm-0">
+                                <i data-feather="arrow-left-circle"></i> Back
+                            </button>
+
+                            <button type="submit" class="btn btn-primary btn-sm mb-50 mb-sm-0">
+                                <i data-feather="check-circle"></i> Submit
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -37,6 +42,8 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body customernewsection-form">
+                                        
+
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="newheader border-bottom mb-2 pb-25">
@@ -45,13 +52,20 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Batch ID (Display only, for editing) -->
                                             <div class="col-md-8">
+                                              
+
+                                                <!-- Batch Year (Editable) -->
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
-                                                        <label class="form-label"> Batch Name <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Batch Name <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <input type="text" class="form-control" name="batch_name" required />
+                                                        <input type="text" class="form-control @error('batch_name') is-invalid @enderror" name="batch_name"  value="{{ old('batch_name')}}" />
+                                                        @error('batch_name')
+                                                            <div class="text-danger mt-25">{{ $message }}</div>
+                                                        @enderror
                                                     </div>
                                                 </div>
                                                 <div class="row align-items-center mb-1">
@@ -59,7 +73,34 @@
                                                         <label class="form-label">Batch Year <span class="text-danger">*</span></label>
                                                     </div>
                                                     <div class="col-md-5">
-                                                        <input type="text" class="form-control" name="batch_year" required />
+                                                        <input type="text" class="form-control @error('batch_year') is-invalid @enderror" name="batch_year"  value="{{ old('batch_year')}}" />
+                                                        @error('batch_year')
+                                                            <div class="text-danger mt-25">{{ $message }}</div>
+                                                        @enderror
+                                                    
+                                                    </div>
+                                                </div>
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Session_Start Date <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        {{-- <input type="date" class="form-control" name="start_date" value="{{ $batch->start_date }}" required /> --}}
+                                                        <input type="date" class="form-control" name="start_date" value="{{ old('start_date')}}" />
+                                                        @error('start_date')
+                                                            <div class="text-danger mt-25">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Session_end_date <span class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="date" class="form-control" name="end_date" value="{{ old('end_date')}}" />
+                                                        @error('end_date')
+                                                            <div class="text-danger mt-25">{{ $message }}</div>
+                                                        @enderror
                                                     </div>
                                                 </div>
                                                 <div class="row align-items-center mb-2">
@@ -69,17 +110,17 @@
                                                     <div class="col-md-5">
                                                         <div class="demo-inline-spacing">
                                                             <div class="form-check form-check-primary mt-25">
-                                                                <input type="radio" id="inactive" name="status" value="inactive" class="form-check-input">
-                                                                <label class="form-check-label fw-bolder" for="inactive">Inactive</label>
-                                                            </div>
-                                                            <div class="form-check form-check-primary mt-25">
                                                                 <input type="radio" id="active" name="status" value="active" class="form-check-input" checked>
                                                                 <label class="form-check-label fw-bolder" for="active">Active</label>
                                                             </div>
+                                                            <div class="form-check form-check-primary mt-25">
+                                                                <input type="radio" id="inactive" name="status" value="inactive" class="form-check-input">
+                                                                <label class="form-check-label fw-bolder" for="inactive">Inactive</label>
+                                                            </div>
+                                                           
                                                         </div>
                                                     </div>
                                                 </div>
-
 
                                             </div>
                                         </div>
@@ -88,7 +129,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Modal to add new record -->
                 </section>
             </div>
         </div>

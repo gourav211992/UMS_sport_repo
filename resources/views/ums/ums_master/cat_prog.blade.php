@@ -1,4 +1,5 @@
-@extends('ums.sports.sports-meta.admin-sports-meta')
+@extends('ums.admin.admin-meta')
+
 @section('content')
 <div class="app-content content">
     <div class="content-overlay"></div>

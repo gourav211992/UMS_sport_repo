@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers\ums;
 
 use App\Helpers\Helper;
@@ -16,6 +17,7 @@ use App\Models\State;
 
 use App\Models\ums\SportBatch;
 use App\Models\ums\SportQuota;
+use App\Models\ums\Sports_Fee_Refund;
 use App\Models\ums\SportSection;
 
 use App\Models\ums\sport_fee_master;
@@ -43,9 +45,66 @@ use App\Models\ums\Activity\SportActivityScheduler;
 use App\Models\ums\Activity\SportActivityDetail;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Carbon;
-
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\SportsRegisterImport;
 class SportRegisterController extends Controller
 {
+
+
+
+
+public function importSportsRegister(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+    ]);
+
+    
+    try {
+        $user = Helper::getAuthenticatedUser();
+        $organization = $user->organization_id;
+
+        $parentURL = 'sport-registration';
+        $servicesBooks = Helper::getAccessibleServicesFromMenuAlias($parentURL);
+
+        if (empty($servicesBooks['services'])) {
+            return back()->with('error', 'No services found for sport register.');
+        }
+
+        $firstService = $servicesBooks['services'][0];
+        $series = Helper::getBookSeriesNew($firstService->alias, $parentURL)->get();
+
+        if ($series->isEmpty()) {
+            return back()->with('error', 'No book series found for sport register.');
+        }
+
+        $bookId = $series->first()->id;
+
+        if (!$bookId) {
+            return back()->with('error', 'Book ID not found.');
+        }
+
+        $import = new SportsRegisterImport($organization, $bookId);
+
+        Excel::import($import, $request->file('file'));
+
+        $errors = $import->getErrors();
+        
+
+        if (!empty($errors)) {
+            return back()->withErrors($errors)->with('warning', 'Import completed with some issues.');
+        }
+
+        return back()->with('success', 'Sports register imported successfully!');
+
+    } 
+    catch (\Exception $e) {
+        return back()->with('error', 'Import failed: ' . $e->getMessage());
+    }
+}
+
+
+
     public function login(){
         return view('ums.sports.login');
     }

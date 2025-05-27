@@ -13,7 +13,7 @@
                             <h2 class="content-header-title float-start mb-0">Program Type Master</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ url('program_master') }}">Home</a></li>  
+                                    <li class="breadcrumb-item"><a href="{{ url('program-master') }}">Home</a></li>  
                                     <li class="breadcrumb-item active">Program Master List</li>
                                 </ol>
                             </div>
@@ -27,7 +27,7 @@
                         <i data-feather="refresh-cw" class="me-50"></i> Reset
                     </button> --}}
                         {{-- <button class="btn btn-warning btn-sm mb-50 mb-sm-0" data-bs-target="#filter" data-bs-toggle="modal"><i data-feather="filter"></i> Filter</button>  --}}
-						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('program_add_master')}}"><i data-feather="plus-circle"></i> Add New</a> 
+						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('program-add-master')}}"><i data-feather="plus-circle"></i> Add New</a> 
                     </div>
                 </div>
             </div>
@@ -70,13 +70,13 @@
 																	<i data-feather="more-vertical"></i>
 																</button>
 																<div class="dropdown-menu dropdown-menu-end">
-																	<a class="dropdown-item" href="{{ url('program_view_master/'.$program->id) }}">
+																	<a class="dropdown-item" href="{{ url('program-view-master/'.$program->id) }}">
 																		<i data-feather="edit" class="me-50"></i> <span>View Detail</span>
 																	</a>
-																	<a class="dropdown-item" href="{{ url('program_edit_master/'.$program->id) }}">
+																	<a class="dropdown-item" href="{{ url('program-edit-master/'.$program->id) }}">
 																		<i data-feather="edit-3" class="me-50"></i> <span>Edit</span>
 																	</a>
-																	<form id="deleteForm-{{ $program->id }}" action="{{ route('program_delete_master', $program->id) }}" method="POST" style="display: inline;">
+																	<form id="deleteForm-{{ $program->id }}" action="{{ url('program-delete-master', $program->id) }}" method="POST" style="display: inline;">
 																		@csrf
 																		@method('DELETE')
 																		<button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop" onclick="setDeleteId('{{ $program->id }}', '{{ $program->name }}')">

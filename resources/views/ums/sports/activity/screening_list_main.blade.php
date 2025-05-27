@@ -49,7 +49,7 @@
                                                 {{-- <th>Section</th>
 												<th>Group</th> --}}
                                                 <th>Assesment Type</th>
-                                                <th>Player Name</th>
+                                                <th>Group Name</th>
                                                 {{-- <th>Status</th> --}}
                                                 <th>Action</th>
                                             </tr>
@@ -63,7 +63,7 @@
                                                     {{-- <td>{{$item->firstName }} {{$item->lastName}}</td>
 													<td>{{ \Carbon\Carbon::parse($item->screening_date)->format('d-m-Y') }}</td> --}}
                                                     <td>{{ $item->screening_names }}</td>
-                                                    <td>{{ $item->player_name }}</td>
+                                                    <td>{{ $item->groupName }}</td>
                                                     {{-- <td><span class="badge rounded-pill badge-light-secondary badgeborder-radius">15</span></td>
 													<td><span class="badge rounded-pill badge-light-success badgeborder-radius">Done</span></td>  --}}
                                                     <td class="tableactionnew">
@@ -85,15 +85,11 @@
 																</a> --}}
 
                                                                 <a class="dropdown-item" href="#"
-                                                                    onClick="viewScreeningInner('{{ $item->screening_date }}','{{ $item->player_id }}')">
+                                                                    onClick="viewScreeningInner('{{ base64_encode(\Carbon\Carbon::parse($item->screening_date)->format('Y-m-d')) }}','{{ $item->sports_group_id }}')">
                                                                     <i data-feather="eye" class="me-50"></i>
                                                                     <span>View Detail</span>
                                                                 </a>
-                                                                {{-- <a class="dropdown-item" href="#"
-                                                                    onClick="editScreeiningAssesment('{{ $item->id }}')">
-                                                                    <i data-feather="edit-3" class="me-50"></i>
-                                                                    <span>Edit</span>
-                                                                </a> --}}
+
                                                             </div>
                                                         </div>
                                                     </td>
@@ -176,7 +172,9 @@
     }
 
     function viewScreeningInner(date, id) {
-        var url = "{{ url('screening-assessment-inner') }}" + "/" + date + "/" + id;
+        // let dateOnly = date.split(' ')[0]; // "2025-05-01"
+
+        var url = "{{ url('screening-assessment-inner') }}" + "/" + encodeURIComponent(date) + "/" + id;
         // alert(url);
         window.location.href = url;
     }

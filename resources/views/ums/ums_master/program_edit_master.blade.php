@@ -14,7 +14,7 @@
                                 <h2 class="content-header-title float-start mb-0">Program Type</h2>
                                 <div class="breadcrumb-wrapper">
                                     <ol class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="{{ url('program_master') }}">Home</a>
+                                        <li class="breadcrumb-item"><a href="{{ url('program-master') }}">Home</a>
                                         </li>
                                         <li class="breadcrumb-item active">Program Edit</li>
                                     </ol>
@@ -56,7 +56,7 @@
                                         <div class="col-md-8">
 
                                             <form method="POST" id="edit_submit_program"
-                                                action="{{ url('program_update_master/' . $program->id) }}">
+                                                action="{{ url('program-update-master/' . $program->id) }}">
                                                 @csrf
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">

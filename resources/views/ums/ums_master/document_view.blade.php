@@ -1,4 +1,4 @@
-@extends('ums.sports.sports-meta.admin-sports-meta')
+@extends('ums.admin.admin-meta')     
 
 @section('content')
 <!-- BEGIN: Content-->

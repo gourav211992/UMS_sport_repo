@@ -24,7 +24,7 @@
                 </div>
                 <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">
-						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('college_add')}}"><i data-feather="plus-circle"></i> Add New</a> 
+						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('college-add')}}"><i data-feather="plus-circle"></i> Add New</a> 
                     </div>
                 </div>
             </div>

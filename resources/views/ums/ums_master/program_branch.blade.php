@@ -13,7 +13,7 @@
                             <h2 class="content-header-title float-start mb-0">Programe Branch</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ url('program_branch') }}">Home</a></li>  
+                                    <li class="breadcrumb-item"><a href="{{ url('program-branch') }}">Home</a></li>  
                                     <li class="breadcrumb-item active">Programe Branch Master List</li>
                                 </ol>
                             </div>
@@ -23,7 +23,7 @@
                 <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">
                         {{-- <button class="btn btn-warning btn-sm mb-50 mb-sm-0" data-bs-target="#filter" data-bs-toggle="modal"><i data-feather="filter"></i> Filter</button>  --}}
-						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('program_branch_add')}}"><i data-feather="plus-circle"></i> Add New</a> 
+						<a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('program-branch-add')}}"><i data-feather="plus-circle"></i> Add New</a> 
                     </div>
                 </div>
             </div>
@@ -80,17 +80,17 @@
 																<i data-feather="more-vertical"></i>
 															</button>
 															<div class="dropdown-menu dropdown-menu-end">
-																<a class="dropdown-item" href="{{ route('program_branch.view', $branch->id) }}">
+																<a class="dropdown-item" href="{{ route('program.branch.view', $branch->id) }}">
 																	<i data-feather="edit" class="me-50"></i>
 																	<span>View Detail</span>
 																</a>
 																
-																<a class="dropdown-item" href="{{ route('program_branch.edit', $branch->id) }}">
+																<a class="dropdown-item" href="{{ route('program.branch.edit', $branch->id) }}">
 																	<i data-feather="edit-3" class="me-50"></i>
 																	<span>Edit</span>
 																</a>
 																
-																<form id="deleteForm-{{ $branch->id }}" action="{{ route('program_branch.destroy', $branch->id) }}" method="POST" style="display: inline;">
+																<form id="deleteForm-{{ $branch->id }}" action="{{ route('program.branch.destroy', $branch->id) }}" method="POST" style="display: inline;">
 																	@csrf
 																	@method('DELETE')
 																	<button type="button" class="dropdown-item"

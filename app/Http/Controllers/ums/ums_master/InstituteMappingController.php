@@ -50,6 +50,14 @@ class InstituteMappingController extends Controller
 
     return redirect()->route('institute')->with('success', 'Institute added successfully.');
 }
+public function getAffiliatesByType($type)
+{
+    $affiliates = Erp_Ums_Affiliates::where('type', $type)->get();
+
+    return response()->json([
+        'affiliates' => $affiliates
+    ]);
+}
 
 
    

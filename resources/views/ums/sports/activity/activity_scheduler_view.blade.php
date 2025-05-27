@@ -123,32 +123,48 @@
 
 
 
-                                            <div class="row align-items-center mb-1">
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Trainer <span
-                                                            class="text-danger">*</span></label>
+
+                                                <div class="row align-items-center mb-1">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Trainer <span
+                                                                class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <select class="form-select select2" name="trainer" id="trainer"
+                                                            required>
+                                                            <option value="" disabled>-- Select Trainer --</option>
+                                                            @foreach ($trainers as $trainer)
+                                                                <option value="{{ $trainer->id }}"
+                                                                    {{ $trainer->id == $data->trainer ? 'selected' : '' }}>
+                                                                    {{ ucfirst($trainer->name) }}
+                                                                    @if ($trainer->designation)
+                                                                        - {{ $trainer->designation->name }}
+                                                                    @endif
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
                                                 </div>
 
-                                                <div class="col-md-5">
-                                                    <select class="form-select select2" disabled>
-                                                        <option value="" disabled selected>-- Select Trainer
-                                                            --</option>
-                                                        @foreach ($trainers as $item)
-                                                            <option value={{ $item['id'] }}
-                                                                {{ $item['id'] == $data->trainer ? 'selected' : '' }}>
-                                                                {{ ucfirst($item['name']) }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
+                                                <div class="row align-items-center mb-2">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Support Staff <span
+                                                                class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <select name="staff[]" id="staff" class="form-select select2" multiple >
+                                                            @foreach ($trainers as $trainer)
+                                                                <option value="{{ $trainer->id }}"
+                                                                    {{ in_array($trainer->id, $supportStaff ?? []) ? 'selected' : '' }}>
+                                                                    {{ ucfirst($trainer->name) }}
+                                                                    @if ($trainer->designation)
+                                                                        - {{ $trainer->designation->name }}
+                                                                    @endif
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                                
-                                                <!-- <div class="col-md-5">
-                                                    <select class="form-select select2" disabled>
-                                                        <option value="{{ $data->trainer }}">{{ ucfirst($data->trainer) }}
-                                                        </option>
-                                                    </select>
-                                                </div> -->
-                                            </div>
 
                                             <div class="row align-items-center mb-1">
                                                 <div class="col-md-3">
@@ -221,81 +237,6 @@
                                                 </div>
 
                                             </div>
-
-                                            {{-- <div class="row mb-1"> 
-                                                        <div class="col-md-3"> 
-                                                            <label class="form-label">Day <span class="text-danger">*</span></label>  
-                                                        </div> 
-
-                                                        <div class="col-md-7">
-                                                            <div class="demo-inline-spacing">
-                                                                @php
-                                                                    if (is_string($data->day)) {
-                                                                        $daysArray = json_decode($data->day, true); 
-                                                                    } else {
-                                                                        $daysArray = $data->day;
-                                                                    }
-                                                                @endphp
-                                                        
-                                                                <div class="form-check form-check-primary mt-25 custom-checkbox">
-                                                                    <input type="checkbox" class="form-check-input" id="Monday" name="day[]" value="Monday" 
-                                                                        {{ in_array('Monday', $daysArray) ? 'checked' : '' }} disabled>
-                                                                    <label class="form-check-label" for="Monday">Monday</label>
-                                                                </div>
-                                                                <div class="form-check form-check-primary mt-25 custom-checkbox">
-                                                                    <input type="checkbox" class="form-check-input" id="Tuesday" name="day[]" value="Tuesday" 
-                                                                        {{ in_array('Tuesday', $daysArray) ? 'checked' : '' }} disabled>
-                                                                    <label class="form-check-label" for="Tuesday">Tuesday</label>
-                                                                </div>
-                                                                <div class="form-check form-check-primary mt-25 custom-checkbox">
-                                                                    <input type="checkbox" class="form-check-input" id="Wednesday" name="day[]" value="Wednesday" 
-                                                                        {{ in_array('Wednesday', $daysArray) ? 'checked' : '' }} disabled>
-                                                                    <label class="form-check-label" for="Wednesday">Wednesday</label>
-                                                                </div>
-                                                                <div class="form-check form-check-primary mt-25 custom-checkbox">
-                                                                    <input type="checkbox" class="form-check-input" id="Thursday" name="day[]" value="Thursday" 
-                                                                        {{ in_array('Thursday', $daysArray) ? 'checked' : '' }} disabled>
-                                                                    <label class="form-check-label" for="Thursday">Thursday</label>
-                                                                </div>
-                                                                <div class="form-check form-check-primary mt-25 custom-checkbox">
-                                                                    <input type="checkbox" class="form-check-input" id="Friday" name="day[]" value="Friday" 
-                                                                        {{ in_array('Friday', $daysArray) ? 'checked' : '' }} disabled>
-                                                                    <label class="form-check-label" for="Friday">Friday</label>
-                                                                </div>
-                                                                <div class="form-check form-check-primary mt-25 custom-checkbox">
-                                                                    <input type="checkbox" class="form-check-input" id="Saturday" name="day[]" value="Saturday" 
-                                                                        {{ in_array('Saturday', $daysArray) ? 'checked' : '' }} disabled>
-                                                                    <label class="form-check-label" for="Saturday">Saturday</label>
-                                                                </div>
-                                                                <div class="form-check form-check-primary mt-25 custom-checkbox">
-                                                                    <input type="checkbox" class="form-check-input" id="Sunday" name="day[]" value="Sunday" 
-                                                                        {{ in_array('Sunday', $daysArray) ? 'checked' : '' }} disabled>
-                                                                    <label class="form-check-label" for="Sunday">Sunday</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        
-												
-													
-                                                
-                                                    <div class="row align-items-center mb-1">
-                                                        <div class="col-md-3"> 
-                                                            <label class="form-label">Start Time <span class="text-danger">*</span></label>  
-                                                        </div>  
-
-                                                        <div class="col-md-3 mb-1 mb-sm-0"> 
-                                                            <input type="time" class="form-control" name="start_time" value="{{$data->start_time}}" readonly/>
-                                                        </div> 
-                                                        <div class="col-md-2 mb-1 mb-sm-0"> 
-                                                            <label class="form-label">End Time <span class="text-danger">*</span></label>  
-                                                        </div>
-                                                        <div class="col-md-3"> 
-                                                            <input type="time" class="form-control" name="end_time" value="{{$data->end_time}}" readonly/>
-                                                        </div> 
-                                                        
-                                                     </div> --}}
-
-
 
 
                                             <div class="row align-items-center mb-1">

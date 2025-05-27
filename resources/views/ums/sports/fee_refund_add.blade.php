@@ -1,4 +1,4 @@
-@extends('ums.sports.sports-meta.admin-sports-meta')
+@extends('ums.admin.admin-meta')
 
 @section('content')
 
@@ -16,7 +16,7 @@
 								<h2 class="content-header-title float-start mb-0">Fee Refund Master</h2>
                                 <div class="breadcrumb-wrapper">
                                     <ol class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="{{url('fee_refund')}}">Home</a></li>  
+                                        <li class="breadcrumb-item"><a href="{{url('fee-refund')}}">Home</a></li>  
                                         <li class="breadcrumb-item active">Fee Refund  add</li>
                                     </ol>
                                 </div>
@@ -36,7 +36,7 @@
             <div class="content-body">
                  
                 
-				<form id="submitData" method="POST" action="{{ route('FeeRefund_add.create') }}">
+				<form id="submitData" method="POST" action="{{ route('FeeRefund-add.create') }}">
 				<section id="basic-datatable">
                     <div class="row">
                         <div class="col-12">  

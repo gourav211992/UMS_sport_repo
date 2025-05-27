@@ -6,6 +6,8 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\ums\SportBatch;
 use App\Models\ums\batches;
+use Illuminate\Support\Facades\Validator;
+
 use App\Models\ums\SportQuota;
 use App\Models\ums\SportSection;
 use App\Models\ums\Sport_type;
@@ -601,20 +603,55 @@ function activityMaster(){
 
 
 
+    // public function store(Request $request)
+    // {
+    //     $user = Helper::getAuthenticatedUser();
+    //     SportBatch::create([
+    //         'batch_year' => $request->batch_year,
+    //         'batch_name' => $request->batch_name,
+    //         'start_date'=>$request->start_date,
+    //         'end_date'=>$request->end_date,
+    //         'status' => $request->status,
+    //         'organization_id' => $user->organization_id,
+    //         'group_id' => $user->group_id,
+    //         'company_id' => $user->company_id
+    //     ]);
+
+    //     return redirect('/master-batches')->with('success', 'Batch added successfully!');
+    // }
     public function store(Request $request)
     {
         $user = Helper::getAuthenticatedUser();
+    
+        // Step 1: Validation (format = Y-m-d because <input type="date"> use hota hai)
+        $validator = Validator::make($request->all(), [
+            'batch_name' => 'required|string|max:255',
+            'batch_year' => 'required|string|max:10',
+            'start_date' => 'required|date|date_format:Y-m-d',
+            'end_date' => 'required|date|after_or_equal:start_date|date_format:Y-m-d',
+            'status' => 'required|in:active,inactive',
+        ]);
+        
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+    
+        // Step 2: Save as Y-m-d (no conversion needed, input already Y-m-d)
         SportBatch::create([
             'batch_year' => $request->batch_year,
             'batch_name' => $request->batch_name,
+            'start_date' => $request->start_date, // already Y-m-d
+            'end_date' => $request->end_date,     // already Y-m-d
             'status' => $request->status,
             'organization_id' => $user->organization_id,
             'group_id' => $user->group_id,
             'company_id' => $user->company_id
         ]);
-
+    
         return redirect('/master-batches')->with('success', 'Batch added successfully!');
     }
+    
+    
 
 
     public function batch_edit($id)
@@ -628,16 +665,31 @@ function activityMaster(){
     {
         $batch = SportBatch::findOrFail($id);
 
-        $validated = $request->validate([
-            'batch_year' => 'required|',
-            'batch_name' => 'required|',
-            'status' => 'required|',
+        // $validated = $request->validate([
+        //     'batch_year' => 'required|',
+        //     'batch_name' => 'required|',
+        //     'status' => 'required|',
+        //     'start_date'=>'required|',
+        //     'end_date'=>'required|',
+        // ]);
+        $validator = Validator::make($request->all(), [
+            'batch_name' => 'required|string|max:255',
+            'batch_year' => 'required|string|max:10',
+            'start_date' => 'required|date|date_format:Y-m-d',
+            'end_date' => 'required|date|after_or_equal:start_date|date_format:Y-m-d',
+            'status' => 'required|in:active,inactive',
         ]);
+        
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $batch->update([
-            'batch_year' => $validated['batch_year'],
-            'batch_name' => $validated['batch_name'],
-            'status' => $validated['status'],
+            'batch_year' => $request['batch_year'],
+            'batch_name' => $request['batch_name'],
+            'start_date' => $request['start_date'],
+            'end_date' => $request['end_date'],
+            'status' => $request['status'],
         ]);
 
         return redirect('/master-batches')->with('success', 'Batch updated successfully!');
@@ -658,8 +710,8 @@ function activityMaster(){
         $batch = SportBatch::findOrFail($id);
         $isUsedInFeeMaster = DB::table('sport_fee_master')
             ->where(function ($query) use ($batch) {
-                $query->where('SportBatch', $batch->name)
-                    ->orWhere('SportBatch', $batch->id);
+                $query->where('batch', $batch->name)
+                    ->orWhere('batch_id', $batch->id);
             })
             ->exists();
 
@@ -670,10 +722,10 @@ function activityMaster(){
             })
             ->exists();
 
-        $isUsedInSection = DB::table('sections')
+        $isUsedInSection = DB::table('sport_sections')
             ->where(function ($query) use ($batch) {
-                $query->where('SportBatch', $batch->batch_name)
-                    ->orWhere('SportBatch', $batch->id);
+                $query->where('batch', $batch->batch_name)
+                    ->orWhere('batch_id', $batch->id);
             })
             ->exists();
 

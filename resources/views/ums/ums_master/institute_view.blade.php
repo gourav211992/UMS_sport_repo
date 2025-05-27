@@ -61,7 +61,7 @@
 																@endphp
 																<div class="form-check form-check-primary mt-25 mr-3">
 																	<input type="radio" id="type_{{ $typeOption }}" name="type" value="{{ $typeOption }}"
-																		class="form-check-input" {{ $selectedType === $optionValue ? 'checked' : '' }}>
+																		class="form-check-input" {{ $selectedType === $optionValue ? 'checked' : '' }}  disabled>
 																	<label class="form-check-label fw-bolder" for="type_{{ $typeOption }}">{{ $typeOption }}</label>
 																</div>
 															@endforeach

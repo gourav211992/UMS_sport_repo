@@ -45,7 +45,7 @@
                             <div class="card-body customernewsection-form"> 
 
                                 <!-- Form Starts -->
-                                <form action="{{ route('institute-update', $institute->id) }}" method="POST" id="instituteForm">
+                                <form action="{{ url('institute-update', $institute->id) }}" method="POST" id="instituteForm">
                                     @csrf
                                     @method('PUT')
                                     
@@ -88,7 +88,7 @@
                                                     <label class="form-label">Affiliate <span class="text-danger">*</span></label>  
                                                 </div>  
                                                 <div class="col-md-5">  
-                                                    <select class="form-select select2" name="affiliate_id">
+                                                    <select class="form-select select2" name="affiliate_id" id="affiliateSelect">
                                                         <option value="">Select</option>  
                                                         @foreach ($affiliates as $affiliate)
                                                             <option value="{{ $affiliate->id }}" 
@@ -159,6 +159,53 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function loadAffiliates(selectedTypeValue, selectedAffiliateId = null) {
+        fetch(`/get-affiliates-by-type/${selectedTypeValue}`)
+            .then(response => response.json())
+            .then(data => {
+                const affiliateSelect = document.getElementById('affiliateSelect');
+                affiliateSelect.innerHTML = '<option value="">Select</option>';
+
+                if (data.affiliates.length > 0) {
+                    data.affiliates.forEach(function (affiliate) {
+                        const option = document.createElement('option');
+                        option.value = affiliate.id;
+                        option.textContent = affiliate.affiliate_name;
+                        if (affiliate.id == selectedAffiliateId) {
+                            option.selected = true;
+                        }
+                        affiliateSelect.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'No affiliates found';
+                    affiliateSelect.appendChild(option);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching affiliates:', error);
+            });
+    }
+
+    document.querySelectorAll('input[name="type"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            loadAffiliates(this.value);
+        });
+    });
+
+    const selectedType = document.querySelector('input[name="type"]:checked');
+    const selectedAffiliateId = "{{ old('affiliate_id', $institute->affiliate_id) }}";
+
+    if (selectedType) {
+        loadAffiliates(selectedType.value, selectedAffiliateId);
+    }
+});
+
+</script>
+
 
 <!-- END: Content-->
 

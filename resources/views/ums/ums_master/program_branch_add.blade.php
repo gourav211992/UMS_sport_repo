@@ -13,7 +13,7 @@
                             <h2 class="content-header-title float-start mb-0">Program Branch</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ url('program_branch') }}">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url('program-branch') }}">Home</a></li>
                                     <li class="breadcrumb-item active">Add New</li>
                                 </ol>
                             </div>
@@ -28,7 +28,7 @@
 
             <div class="content-header-right text-sm-end col-md-12 mb-50 mb-sm-40">
                 <div class="form-group breadcrumb-right">
-                    <button onClick="javascript: history.go(-1)" class="btn btn-secondary btn-sm mb-50 mb-sm-0">
+                    <button type="button" onClick="javascript: history.go(-1)" class="btn btn-secondary btn-sm mb-50 mb-sm-0">
                         <i data-feather="arrow-left-circle"></i> Back
                     </button>
                     <button type="submit" class="btn btn-primary btn-sm mb-50 mb-sm-0">

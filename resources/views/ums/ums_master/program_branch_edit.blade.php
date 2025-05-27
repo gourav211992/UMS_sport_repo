@@ -13,7 +13,7 @@
                             <h2 class="content-header-title float-start mb-0">Program Branch</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ url('program_branch') }}">Home</a></li>  
+                                    <li class="breadcrumb-item"><a href="{{ url('program-branch') }}">Home</a></li>  
                                     <li class="breadcrumb-item active">Edit</li> 
                                 </ol>
                             </div>

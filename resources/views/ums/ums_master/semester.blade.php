@@ -25,7 +25,7 @@
             </div>
             <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                 <div class="form-group breadcrumb-right">
-                    <a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{ url('semesters_add') }}">
+                    <a class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{ url('semesters-add') }}">
                         <i data-feather="plus-circle"></i> Add New
                     </a>
                 </div>
@@ -67,7 +67,7 @@
                                                 @endif
                                             </td>
                                             <td class="tableactionnew">
-                                                <div class="dropdown">
+                                                <div class="dropdown dropup">
                                                     <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
                                                         <i data-feather="more-vertical"></i>
                                                     </button>
@@ -78,7 +78,7 @@
                                                         <a class="dropdown-item" href="{{ route('semesters.edit', $semester->id) }}">
                                                             <i data-feather="edit-3" class="me-50"></i> <span>Edit</span>
                                                         </a>
-                                                        <form method="POST" action="{{ route('semesters.destroy', $semester->id) }}" onsubmit="return confirm('Are you sure you want to delete this institute?');">
+                                                        <form method="POST" action="{{ url('semesters-destroy', $semester->id) }}" onsubmit="return confirm('Are you sure you want to delete this institute?');">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="setDeleteAction({{ $semester->id }})">
@@ -128,7 +128,7 @@
 <script>
     function setDeleteAction(id) {
         const form = document.getElementById('deleteForm');
-        form.action = "{{ url('semesters') }}/" + id;
+        form.action = "{{ url('semesters-delete') }}/" + id;
     }
 </script>
 @endsection

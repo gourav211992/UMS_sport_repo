@@ -25,10 +25,19 @@ class ProgramTypeModel extends Model
         'deleted_at',
     ];
 
-    public function course()
+    // public function course()
+    // {
+    //     return $this->belongsTo(CourseModel::class, 'course_id');
+    // }
+    public function programBranches()
     {
-        return $this->belongsTo(CourseModel::class, 'course_id');
+        return $this->hasMany(Program_branches::class, 'program_type_id');
     }
+
+    public function courses()
+{
+    return $this->hasMany(CourseModel::class, 'program_type', 'id');
+}
 
     protected $dates = ['deleted_at']; 
 

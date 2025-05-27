@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\ums\sports;
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
-use App\Models\ums\batch;
+use App\Models\ums\SportBatch;
 use App\Models\ums\batches;
-use App\Models\ums\Quota;
-use App\Models\ums\Section;
+use Illuminate\Support\Facades\Validator;
+
+use App\Models\ums\SportQuota;
+use App\Models\ums\SportSection;
 use App\Models\ums\Sport_type;
 use App\Models\ums\Sport_master;
 use Illuminate\Http\Request;
@@ -16,18 +19,22 @@ class SportMasterController extends Controller
 {
     public function quota_add(Request $request)
     {
+        $user = Helper::getAuthenticatedUser();
         $request->validate([
             'quota_name' => 'required|string|max:255',
             'display_name' => 'required|string|max:255',
-          
+
             'status'=> 'required'
         ]);
 
-        $quota = Quota::create([
+        $quota = SportQuota::create([
             'quota_name' => $request->quota_name,
             'display_name' => $request->display_name,
             'status'=>$request->status,
             'discount' => $request->discount,
+            'organization_id' => $user->organization_id,
+            'group_id' => $user->group_id,
+            'company_id' => $user->company_id,
         ]);
         if ($quota) {
             return response()->json(['success' => true, 'message' => 'Quota added successfully!']);
@@ -38,8 +45,7 @@ class SportMasterController extends Controller
 
     public function quota_list()
     {
-        // $quotas = Quota::all();
-        $quotas = Quota::orderBy('id', 'DESC')->get();
+        $quotas = SportQuota::orderBy('id', 'DESC')->get();
         return view('ums.sports.master.quota_master', compact('quotas'));
     }
 
@@ -48,11 +54,11 @@ class SportMasterController extends Controller
         $request->validate([
             'quota_name' => 'required|string|max:255',
             'display_name' => 'required|string|max:255',
-              'status'=> 'required',
-     
+            'status'=> 'required',
+
         ]);
 
-        $quota = Quota::find($id);
+        $quota = SportQuota::find($id);
         if ($quota) {
             $quota->quota_name = $request->quota_name;
             $quota->discount = $request->discount;
@@ -71,21 +77,15 @@ class SportMasterController extends Controller
     public function edit($id)
     {
 
-        $quota = Quota::findOrFail($id);
+        $quota = SportQuota::findOrFail($id);
         return view('ums.sports.master.quota_master_edit', compact('quota')); // Pass data to the view
     }
 
-    //     public function delete($id)
-    // {
-    //     $quota = Quota::findOrFail($id);
-    //     $quota->delete();
-    //     return redirect()->route('quota.index')->with('success', 'Quota deleted successfully.');
-    // }
 
     public function delete($id)
     {
 
-        $quota = Quota::findOrFail($id);
+        $quota = SportQuota::findOrFail($id);
 
 
         $isUsedInFeeMaster = DB::table('sport_fee_master')
@@ -115,7 +115,7 @@ class SportMasterController extends Controller
         $quota->delete();
 
 
-        return back()->with('success', 'Quota deleted successfully.');
+        return back()->with('success', 'SportQuota deleted successfully.');
     }
 
 
@@ -124,14 +124,14 @@ class SportMasterController extends Controller
 
     public function section_index()
     {
-        $batchs = batch::all();
+        $batchs = SportBatch::all();
         return view('ums.sports.master.sections_master_add', compact('batchs'));
     }
 
     public function sec_edits($id)
     {
-        $section = Section::findOrFail($id);
-        $batchs = batch::all();
+        $section = SportSection::findOrFail($id);
+        $batchs = SportBatch::all();
         return view('ums.sports.master.sections_master_edit', compact('section', 'batchs'));
     }
 
@@ -140,7 +140,7 @@ class SportMasterController extends Controller
     public function getBatchesName(Request $request)
     {
         $batch_year = $request->batch_year;
-        $batches = Batch::where('batch_year', $batch_year)->where('status','active')->get(['batch_name']);
+        $batches = SportBatch::where('batch_year', $batch_year)->get(['batch_name']);
 
         if ($batches->isEmpty()) {
             return response()->json(['error' => 'No batches found'], 404);
@@ -151,7 +151,7 @@ class SportMasterController extends Controller
 
     public function get_batch_name(Request $request)
     {
-        $batches = batch::where('batch_year', $request->batch_year)->where('status','active')->get();
+        $batches = SportBatch::where('batch_year', $request->batch_year)->get();
         return response()->json($batches);
     }
 
@@ -168,9 +168,9 @@ class SportMasterController extends Controller
     //     ]);
     //     // dd($request->all());
 
-    //     $section = Section::create([
+    //     $section = SportSection::create([
     //         'name' => $request->name,
-    //         'batch'=>$request->batch_name,
+    //         'SportBatch'=>$request->batch_name,
     //         'year'=>$request->batch_year,
     //         'status'=>$request->status
 
@@ -185,6 +185,8 @@ class SportMasterController extends Controller
 
     public function section_add(Request $request)
     {
+        // dd($request->all());
+        $user = Helper::getAuthenticatedUser();
         $request->validate([
             'name' => 'required|string|max:255',
             'batch_name' => 'required',
@@ -192,19 +194,21 @@ class SportMasterController extends Controller
             'status' => 'required',
 
         ]);
+   
+        // get SportBatch id
+        $batch_id = SportBatch::where('batch_year', $request->batch_year)->where('batch_name', $request->batch_name)->first()->id;
 
-        // get batch id 
-        $batch_id = batch::where('batch_year', $request->batch_year)->where('batch_name', $request->batch_name)->first()->id;
 
 
-
-        $section = Section::create([
+        $section = SportSection::create([
             'name' => $request->name,
             'batch' => $request->batch_name,
             'batch_id' => $batch_id,
             'year' => $request->batch_year,
-            'status' => $request->status
-
+            'status' => $request->status,
+            'organization_id' => $user->organization_id,
+            'group_id' => $user->group_id,
+            'company_id' => $user->company_id
         ]);
         if ($section) {
             return response()->json(['success' => true, 'message' => 'section added successfully!']);
@@ -224,20 +228,20 @@ class SportMasterController extends Controller
 
     //     ]);
 
-    //     $section = Section::find($id);
+    //     $section = SportSection::find($id);
     //     if ($section) {
     //         $section->name = $request->name;
-    //         $section->batch=$request->batch_name;
+    //         $section->SportBatch=$request->batch_name;
     //         $section->year=$request->batch_year;
     //         $section->status=$request->status;
 
     //         if ($section->save()) {
-    //             return response()->json(['success' => true, 'message' => 'Section updated successfully!']);
+    //             return response()->json(['success' => true, 'message' => 'SportSection updated successfully!']);
     //         } else {
     //             return response()->json(['success' => false, 'message' => 'Something went wrong!']);
     //         }
     //     } else {
-    //         return response()->json(['success' => false, 'message' => 'Section not found!']);
+    //         return response()->json(['success' => false, 'message' => 'SportSection not found!']);
     //     }
     // }
 
@@ -248,12 +252,11 @@ class SportMasterController extends Controller
             'name' => 'required|string|max:255',
             'batch_name' => 'required',
             'batch_year' => 'required',
-            'status' => 'required',
-
+            'status' => 'required'
         ]);
-        $batch_id = batch::where('batch_year', $request->batch_year)->where('batch_name', $request->batch_name)->first()->id;
+        $batch_id = SportBatch::where('batch_year', $request->batch_year)->where('batch_name', $request->batch_name)->first()->id;
 
-        $section = Section::find($id);
+        $section = SportSection::find($id);
         if ($section) {
             $section->name = $request->name;
             $section->batch = $request->batch_name;
@@ -262,19 +265,19 @@ class SportMasterController extends Controller
             $section->status = $request->status;
 
             if ($section->save()) {
-                return response()->json(['success' => true, 'message' => 'Section updated successfully!']);
+                return response()->json(['success' => true, 'message' => 'SportSection updated successfully!']);
             } else {
                 return response()->json(['success' => false, 'message' => 'Something went wrong!']);
             }
         } else {
-            return response()->json(['success' => false, 'message' => 'Section not found!']);
+            return response()->json(['success' => false, 'message' => 'SportSection not found!']);
         }
     }
 
     public function section_list()
     {
 
-        $section = Section::orderby('id', 'DESC')->get();
+        $section = SportSection::orderby('id', 'DESC')->get();
         return view('ums.sports.master.sections_master', compact('section'));
     }
 
@@ -283,7 +286,7 @@ class SportMasterController extends Controller
 
     public function sec_delete($id)
     {
-        $section = Section::findOrFail($id);
+        $section = SportSection::findOrFail($id);
 
         $isUsedInFeeMaster = DB::table('sport_fee_master')
             ->where(function ($query) use ($section) {
@@ -302,140 +305,390 @@ class SportMasterController extends Controller
 
         if ($isUsedInFeeMaster || $isUsedInRegistration) {
 
-            return back()->with('error', 'This Section is in use and cannot be deleted.');
+            return back()->with('error', 'This SportSection is in use and cannot be deleted.');
         } else {
             $section->delete();
-            return redirect('section-master')->with('success', 'Section deleted successfully.');
+            return redirect('section-master')->with('success', 'SportSection deleted successfully.');
         }
     }
 
 
-    //sports master 
-    public function index()
+    //sports master
+    // public function index()
+    // {
+    //     $Sportmaster = Sport_master::all();
+
+
+    //     return view('ums.sports.sport_master', compact('Sportmaster'));
+    // }
+    // public function SportType()
+    // {
+    //     $SportType = Sport_type::all();
+
+
+    //     return view('ums.sports.sport_master_add', compact('SportType'));
+    // }
+
+    // public function SportTypeAdd(Request $request)
+    // {
+    //     // Validate the form data
+    //     $validatedData = $request->validate([
+    //         'sport_type' => 'required|exists:sports_type,id',  // Ensure the sport type exists
+    //         'sport_name' => 'required|string|max:255',  // Ensure the sport name is provided
+    //         'status' => 'required|in:active,inactive',  // Ensure the status is either active or inactive
+    //     ]);
+
+    //     // Create a new sport entry
+    //     Sport_master::create([
+    //         'sport_type' => $validatedData['sport_type'],  // Assuming `sport_type_id` is the foreign key in the sports table
+    //         'sport_name' => $validatedData['sport_name'],
+    //         'status' => $validatedData['status'],
+    //         'organization_id' => $user->organization_id,
+    //         'group_id' => $user->group_id,
+    //         'company_id' => $user->company_id
+    //     ]);
+
+    //     // Redirect back with a success message
+    //     return redirect()->route('sport-master')->with('success', 'Sport type has been added successfully!');
+    // }
+
+
+    // public function SportTypeEdit($id)
+    // {
+    //     $sportMaster = Sport_master::findOrFail($id);
+
+    //     $SportType = Sport_type::all();
+
+    //     return view('ums.sports.sport_master_edit', compact('sportMaster', 'SportType'));
+    // }
+
+    // public function SportTypeUpdate(Request $request, $id)
+    // {
+    //     // Validate the form data
+    //     $validatedData = $request->validate([
+    //         'sport_type' => 'required|exists:sports_type,id',  // Ensure the sport type exists
+    //         'sport_name' => 'required|string|max:255',  // Ensure the sport name is provided
+    //         'status' => 'required|in:active,inactive',  // Ensure the status is either active or inactive
+    //     ]);
+
+    //     // Fetch the existing sport master record
+    //     $sportMaster = Sport_master::findOrFail($id);
+
+    //     // Update the record
+    //     $sportMaster->update([
+    //         'sport_type' => $validatedData['sport_type'],
+    //         'sport_name' => $validatedData['sport_name'],
+    //         'status' => $validatedData['status'],
+    //     ]);
+
+    //     // Redirect back with a success message
+    //     return redirect()->route('sport-master')->with('success', 'Sport type has been updated successfully!');
+    // }
+    // public function softDelete(Request $request, $slug)
+    // {
+
+    //     Sport_master::where('id', $slug)->delete();
+    //     return redirect()->route('sport-master')->with('success', 'Deleted Successfully');
+    // }
+
+
+     public function indexSportMaster(Request $request)
     {
-        $Sportmaster = Sport_master::all();
-
-
+        
+        $Sportmaster = Sport_master::orderBy('id', 'DESC');
+     if (!empty($request->sport_name)) {
+            $Sportmaster->where('sport_name', 'LIKE', '%' . $request->sport_name . '%');
+        }
+     $recordsPerPage = $request->per_page ?: 7; 
+        $Sportmaster = $Sportmaster->paginate($recordsPerPage);
+        
         return view('ums.sports.sport_master', compact('Sportmaster'));
     }
-    public function SportType()
+
+
+    public function SportMasterAdd(Request $request)
     {
-        $SportType = Sport_type::all();
-
-
-        return view('ums.sports.sport_master_add', compact('SportType'));
-    }
-
-    public function SportTypeAdd(Request $request)
-    {
-        // Validate the form data
+        $user = Helper::getAuthenticatedUser();
         $validatedData = $request->validate([
-            'sport_type' => 'required|exists:sports_type,id',  // Ensure the sport type exists
-            'sport_name' => 'required|string|max:255',  // Ensure the sport name is provided
-            'status' => 'required|in:active,inactive',  // Ensure the status is either active or inactive
+            'sport_type' => 'required|exists:sports_type,id',  
+            'sport_name' => 'required|string|max:255',
+            'status' => 'required|in:active,inactive',  
         ]);
-
-        // Create a new sport entry
+    
+        
         Sport_master::create([
-            'sport_type' => $validatedData['sport_type'],  // Assuming `sport_type_id` is the foreign key in the sports table
+            'sport_type' => $validatedData['sport_type'],  
             'sport_name' => $validatedData['sport_name'],
             'status' => $validatedData['status'],
+            'organization_id' => $user->organization_id,
+            'group_id' => $user->group_id,
+            'company_id' => $user->company_id,
         ]);
-
-        // Redirect back with a success message
+    
+        
         return redirect()->route('sport-master')->with('success', 'Sport type has been added successfully!');
     }
 
-
-    public function SportTypeEdit($id)
-    {
-        $sportMaster = Sport_master::findOrFail($id);
-
-        $SportType = Sport_type::all();
-
-        return view('ums.sports.sport_master_edit', compact('sportMaster', 'SportType'));
-    }
-
-    public function SportTypeUpdate(Request $request, $id)
-    {
-        // Validate the form data
-        $validatedData = $request->validate([
-            'sport_type' => 'required|exists:sports_type,id',  // Ensure the sport type exists
-            'sport_name' => 'required|string|max:255',  // Ensure the sport name is provided
-            'status' => 'required|in:active,inactive',  // Ensure the status is either active or inactive
-        ]);
-
-        // Fetch the existing sport master record
-        $sportMaster = Sport_master::findOrFail($id);
-
-        // Update the record
-        $sportMaster->update([
-            'sport_type' => $validatedData['sport_type'],
-            'sport_name' => $validatedData['sport_name'],
-            'status' => $validatedData['status'],
-        ]);
-
-        // Redirect back with a success message
-        return redirect()->route('sport-master')->with('success', 'Sport type has been updated successfully!');
-    }
-    public function softDelete(Request $request, $slug)
-    {
-
+    public function softDelete(Request $request,$slug) {
+        
         Sport_master::where('id', $slug)->delete();
-        return redirect()->route('sport-master')->with('success', 'Deleted Successfully');
+        return redirect()->route('sport-master')->with('success','Deleted Successfully');
+        
     }
 
 
-    // batch master 
+    public function SportMasterEdit($id)
+{
+    $sportMaster = Sport_master::findOrFail($id);
+    
+    $SportType = Sport_type::all();
+
+    return view('ums.sports.sport_master_edit', compact('sportMaster', 'SportType'));
+}
+
+public function SportMasterUpdate(Request $request, $id)
+{
+    $user = Helper::getAuthenticatedUser();
+    $validatedData = $request->validate([
+        'sport_type' => 'required|exists:sports_type,id',  
+        'sport_name' => 'required|string|max:255', 
+        'status' => 'required|in:active,inactive',  
+    ]);
+
+    
+    $sportMaster = Sport_master::findOrFail($id);
+
+   
+    $sportMaster->update([
+        'sport_type' => $validatedData['sport_type'],
+        'sport_name' => $validatedData['sport_name'],
+        'status' => $validatedData['status'],
+        'organization_id' => $user->organization_id,
+        'group_id' => $user->group_id,
+        'company_id' => $user->company_id
+    ]);
+
+    
+    return redirect()->route('sport-master')->with('success', 'Sport type has been updated successfully!');
+}
+
+public function SportType()
+{
+    $SportType = Sport_type::all();
+
+    
+    return view('ums.sports.sport_master_add', compact('SportType'));
+}
+public function SportMasterView($id)
+{
+    $sportMaster = Sport_master::findOrFail($id);
+    
+    $SportType = Sport_type::all();
+
+    return view('ums.sports.sport_master_view', compact('sportMaster', 'SportType'));
+}
+
+
+// SportType
+    public function indexSportType(Request $request)
+    {
+        // Start the query on Sport_master
+        $Sporttype = Sport_type::orderBy('id', 'DESC');
+     if (!empty($request->type)) {
+            $Sporttype->where('type', 'LIKE', '%' . $request->type . '%');
+        }
+     $recordsPerPage = $request->per_page ?: 7; 
+        $Sporttype = $Sporttype->paginate($recordsPerPage);
+        // Return the view with the paginated results
+        return view('ums.sports.sport_type', compact('Sporttype'));
+    }
+    
+    
+
+
+
+
+public function showSportTypeAddForm()
+{
+    
+    return view('ums.sports.sport_type_add'); 
+}
+
+public function SportTypeAdd(Request $request)
+
+{
+    $user = Helper::getAuthenticatedUser();
+    // dd($request->all());
+    $validatedData = $request->validate([
+        'type' => 'required|string|max:255', 
+    ]);
+
+    
+    Sport_Type::create([
+        'type' => $validatedData['type'],
+        'organization_id' => $user->organization_id,
+        'group_id' => $user->group_id,
+        'company_id' => $user->company_id  
+    ]);
+
+    
+    return redirect()->route('sport-type')->with('success', 'Sport type has been added successfully!');
+}
+
+
+
+
+public function SportTypeEdit($id)
+{
+    
+    $sporttype = Sport_type::findOrFail($id);
+
+    
+    return view('ums.sports.sport_type_edit', compact('sporttype'));
+}
+
+
+public function SportTypeUpdate(Request $request, $id)
+{
+    
+    $validatedData = $request->validate([
+         
+        'type' => 'required|string|max:255', 
+        
+    ]);
+
+    
+    $sportType = Sport_type::findOrFail($id);
+
+    
+    $sportType->update([
+        'type' => $validatedData['type'],
+        
+    ]);
+
+   
+    return redirect()->route('sport-type')->with('success', 'Sport type has been updated successfully!');
+}
+
+
+
+
+public function sportTypeDelete(Request $request,$slug) {
+        
+    Sport_type::where('id', $slug)->delete();
+    return redirect()->route('sport-type')->with('success','Deleted Successfully');
+    
+}
+
+function activityMaster(){
+    $sportName=Sport_master::all();
+    return view('ums.sports.activity_master_add', compact('sportName'));
+}
+
+    // SportBatch master
 
     public function batch()
     {
-        $data = Batch::orderBy('id', 'DESC')->get();
+        $data = SportBatch::orderBy('id', 'DESC')->get();
         return view('ums.sports.master.master_batches', compact('data'));
     }
 
 
-    // public function batch() {
+    // public function SportBatch() {
 
-    //     $data = batch::all();
-    //     // $data = batch::orderby('id','DESC')->get();
+    //     $data = SportBatch::all();
+    //     // $data = SportBatch::orderby('id','DESC')->get();
     //     return view('ums.sports.master.master_batches', compact('data'));
     // }
 
 
 
+    // public function store(Request $request)
+    // {
+    //     $user = Helper::getAuthenticatedUser();
+    //     SportBatch::create([
+    //         'batch_year' => $request->batch_year,
+    //         'batch_name' => $request->batch_name,
+    //         'start_date'=>$request->start_date,
+    //         'end_date'=>$request->end_date,
+    //         'status' => $request->status,
+    //         'organization_id' => $user->organization_id,
+    //         'group_id' => $user->group_id,
+    //         'company_id' => $user->company_id
+    //     ]);
+
+    //     return redirect('/master-batches')->with('success', 'Batch added successfully!');
+    // }
     public function store(Request $request)
     {
-        batch::create([
+        $user = Helper::getAuthenticatedUser();
+    
+        // Step 1: Validation (format = Y-m-d because <input type="date"> use hota hai)
+        $validator = Validator::make($request->all(), [
+            'batch_name' => 'required|string|max:255',
+            'batch_year' => 'required|string|max:10',
+            'start_date' => 'required|date|date_format:Y-m-d',
+            'end_date' => 'required|date|after_or_equal:start_date|date_format:Y-m-d',
+            'status' => 'required|in:active,inactive',
+        ]);
+        
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+    
+        // Step 2: Save as Y-m-d (no conversion needed, input already Y-m-d)
+        SportBatch::create([
             'batch_year' => $request->batch_year,
             'batch_name' => $request->batch_name,
+            'start_date' => $request->start_date, // already Y-m-d
+            'end_date' => $request->end_date,     // already Y-m-d
             'status' => $request->status,
+            'organization_id' => $user->organization_id,
+            'group_id' => $user->group_id,
+            'company_id' => $user->company_id
         ]);
-
+    
         return redirect('/master-batches')->with('success', 'Batch added successfully!');
     }
+    
+    
 
 
     public function batch_edit($id)
     {
-        $batch = batch::findOrFail($id);
+        $batch = SportBatch::findOrFail($id);
         return view('ums.sports.master.master_batches_edit', compact('batch'));
     }
 
 
     public function update(Request $request, $id)
     {
-        $batch = batch::findOrFail($id);
+        $batch = SportBatch::findOrFail($id);
 
-        $validated = $request->validate([
-            'batch_year' => 'required|',
-            'batch_name' => 'required|',
-            'status' => 'required|',
+        // $validated = $request->validate([
+        //     'batch_year' => 'required|',
+        //     'batch_name' => 'required|',
+        //     'status' => 'required|',
+        //     'start_date'=>'required|',
+        //     'end_date'=>'required|',
+        // ]);
+        $validator = Validator::make($request->all(), [
+            'batch_name' => 'required|string|max:255',
+            'batch_year' => 'required|string|max:10',
+            'start_date' => 'required|date|date_format:Y-m-d',
+            'end_date' => 'required|date|after_or_equal:start_date|date_format:Y-m-d',
+            'status' => 'required|in:active,inactive',
         ]);
+        
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $batch->update([
             'batch_year' => $validated['batch_year'],
             'batch_name' => $validated['batch_name'],
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
             'status' => $validated['status'],
         ]);
 
@@ -444,9 +697,9 @@ class SportMasterController extends Controller
 
     // public function destroy($id)
     // {
-    // $batch = batch::findOrFail($id);
+    // $SportBatch = SportBatch::findOrFail($id);
 
-    // $batch->delete();
+    // $SportBatch->delete();
 
     // return redirect('/master-batches')->with('success', 'Batch deleted successfully!');
     // }
@@ -454,11 +707,11 @@ class SportMasterController extends Controller
 
     public function destroy($id)
     {
-        $batch = batch::findOrFail($id);
+        $batch = SportBatch::findOrFail($id);
         $isUsedInFeeMaster = DB::table('sport_fee_master')
             ->where(function ($query) use ($batch) {
                 $query->where('batch', $batch->name)
-                    ->orWhere('batch', $batch->id);
+                    ->orWhere('batch_id', $batch->id);
             })
             ->exists();
 
@@ -469,10 +722,10 @@ class SportMasterController extends Controller
             })
             ->exists();
 
-        $isUsedInSection = DB::table('sections')
+        $isUsedInSection = DB::table('sport_sections')
             ->where(function ($query) use ($batch) {
                 $query->where('batch', $batch->batch_name)
-                    ->orWhere('batch', $batch->id);
+                    ->orWhere('batch_id', $batch->id);
             })
             ->exists();
 

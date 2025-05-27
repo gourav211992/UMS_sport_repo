@@ -345,20 +345,19 @@
 @endsection
 <style>
     .toast-success {
-          background-color: #28a745 !important;
-          color: white !important;
-      }
-      .toast-error {
-          background-color: #dc3545 !important;
-          color: white !important;
-      }
-      .toast-message {
-          font-size: 14px;
-      }
-      
-  
-  
-  </style>
+        background-color: #28a745 !important;
+        color: white !important;
+    }
+
+    .toast-error {
+        background-color: #dc3545 !important;
+        color: white !important;
+    }
+
+    .toast-message {
+        font-size: 14px;
+    }
+</style>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -613,6 +612,20 @@
                     }
                 }
             });
+
+            $('select[id^="rating"]').each(function() {
+                if ($(this).val() === '') {
+                    $(this).addClass('is-invalid');
+
+                    // Add error message if needed
+                    if (!$(this).next('.text-danger').length) {
+                        $(this).after('<div class="text-danger">Rating is required.</div>');
+                    }
+
+                    isValid = false;
+                }
+            });
+
 
             if (!isValid) return;
             // Collect form data

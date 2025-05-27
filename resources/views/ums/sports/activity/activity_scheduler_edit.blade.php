@@ -123,15 +123,18 @@
 
                                                 </div>
 
-                                                <div class="row align-items-center mb-1"> 
+                                                <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
-                                                        <label class="form-label">Batch Yr. <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Batch Yr. <span
+                                                                class="text-danger">*</span></label>
                                                     </div>
-                                                
+
                                                     <div class="col-md-3 mb-1 mb-sm-0">
 
                                                         <select class="form-select" name="batch" id="batch_year">
-                                                            <option value="" disabled {{ !$data->batch_year ? 'selected' : '' }}>-- Select Batch Year --</option>
+                                                            <option value="" disabled
+                                                                {{ !$data->batch_year ? 'selected' : '' }}>-- Select Batch
+                                                                Year --</option>
                                                             @foreach ($batch->pluck('batch_year')->unique() as $batch_year)
                                                                 <option value="{{ $batch_year }}"
                                                                     {{ old('batch', $data->batch_year) == $batch_year ? 'selected' : '' }}>
@@ -139,13 +142,14 @@
                                                                 </option>
                                                             @endforeach
                                                         </select>
-                                                        
+
                                                     </div>
-                                                
+
                                                     <div class="col-md-2 mb-1 mb-sm-0">
-                                                        <label class="form-label">Batch <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Batch <span
+                                                                class="text-danger">*</span></label>
                                                     </div>
-                                                
+
                                                     <div class="col-md-3">
                                                         <select class="form-select" name="batch_name" id="batch_name">
                                                             @if ($data->batchRelation)
@@ -153,18 +157,20 @@
                                                                     {{ ucfirst($data->batchRelation->batch_name) }}
                                                                 </option>
                                                             @else
-                                                                <option value="" disabled selected>-- Select Batch --</option>
+                                                                <option value="" disabled selected>-- Select Batch --
+                                                                </option>
                                                             @endif
-                                                
+
                                                             @foreach ($batch as $b)
-                                                                <option value="{{ $b->id }}" {{ old('batch_name', $data->batch_name) == $b->id ? 'selected' : '' }}>
+                                                                <option value="{{ $b->id }}"
+                                                                    {{ old('batch_name', $data->batch_name) == $b->id ? 'selected' : '' }}>
                                                                     {{ ucfirst($b->batch_name) }}
                                                                 </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
                                                 </div>
-                                                
+
 
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
@@ -209,31 +215,45 @@
                                                     </div>
                                                 </div>
 
-
                                                 <div class="row align-items-center mb-1">
                                                     <div class="col-md-3">
                                                         <label class="form-label">Trainer <span
                                                                 class="text-danger">*</span></label>
                                                     </div>
-
                                                     <div class="col-md-5">
                                                         <select class="form-select select2" name="trainer" id="trainer">
-                                                            <option value="" disabled selected>-- Select Trainer
-                                                                --</option>
-                                                            @foreach ($trainers as $item)
-                                                                <option value={{ $item['id'] }}
-                                                                    {{ $item['id'] == $data->trainer ? 'selected' : '' }}>
-                                                                    {{ ucfirst($item['name']) }}
+                                                            <option value="" disabled>-- Select Trainer --</option>
+                                                            @foreach ($trainers as $trainer)
+                                                                <option value="{{ $trainer->id }}"
+                                                                    {{ $trainer->id == $data->trainer ? 'selected' : '' }}>
+                                                                    {{ ucfirst($trainer->name) }}
+                                                                    @if ($trainer->designation)
+                                                                        - {{ $trainer->designation->name }}
+                                                                    @endif
                                                                 </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                    <!-- <div class="col-md-5">
-                                                        <select class="form-select select2" name="trainer" id="trainer">
-                                                            <option value="{{ $data->trainer }}">
-                                                                {{ ucfirst($data->trainer) }}</option>
+                                                </div>
+
+                                                <div class="row align-items-center mb-2">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Support Staff <span
+                                                                class="text-danger">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <select name="staff[]" id="staff" class="form-select select2" multiple >
+                                                            @foreach ($trainers as $trainer)
+                                                                <option value="{{ $trainer->id }}"
+                                                                    {{ in_array($trainer->id, $supportStaff ?? []) ? 'selected' : '' }}>
+                                                                    {{ ucfirst($trainer->name) }}
+                                                                    @if ($trainer->designation)
+                                                                        - {{ $trainer->designation->name }}
+                                                                    @endif
+                                                                </option>
+                                                            @endforeach
                                                         </select>
-                                                    </div> -->
+                                                    </div>
                                                 </div>
 
                                                 <div class="row align-items-center mb-1">
@@ -244,7 +264,9 @@
 
                                                     <div class="col-md-5">
                                                         <select class="form-select" name="activity" id="activity">
-                                                            <option value="" disabled {{ !$data->activity ? 'selected' : '' }}>-- Select Activity --</option>
+                                                            <option value="" disabled
+                                                                {{ !$data->activity ? 'selected' : '' }}>-- Select Activity
+                                                                --</option>
                                                             @foreach ($activity as $name)
                                                                 <option value="{{ $name->activity_name }}"
                                                                     {{ old('activity', $data->activity ?? '') == $name->activity_name ? 'selected' : '' }}>
@@ -252,7 +274,7 @@
                                                                 </option>
                                                             @endforeach
                                                         </select>
-                                                        
+
 
                                                     </div>
                                                 </div>
@@ -509,6 +531,8 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+
+
     <script>
         $(document).ready(function() {
             $('.clear-time').on('click', function() {
@@ -576,165 +600,171 @@
             $('#activity').trigger('change');
         });
     </script>
-    
+
     <script>
-    $(document).ready(function() {
-        const preselectedBatchId = "{{ $data->batch_name }}";
-        const preselectedBatchYear = "{{ $data->batch_year }}"; 
+        $(document).ready(function() {
+            const preselectedBatchId = "{{ $data->batch_name }}";
+            const preselectedBatchYear = "{{ $data->batch_year }}";
 
-        $('#batch_year').change(function() {
-            var batchYear = $(this).val();
-            $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
+            $('#batch_year').change(function() {
+                var batchYear = $(this).val();
+                $('#batch_name').html('<option value="" selected>-----Select Batch-----</option>');
 
-            if (batchYear) {
-                $.ajax({
-                    url: "{{ route('get.batch.names.activity') }}",
-                    type: "POST",
-                    data: {
-                        batch_year: batchYear,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if (response.length > 0) {
-                            $.each(response, function(index, item) {
-                                if ($('#batch_name option[value="' + item.id + '"]').length === 0) {
-                                    $('#batch_name').append('<option value="' + item.id + '">' + item.batch_name + '</option>');
+                if (batchYear) {
+                    $.ajax({
+                        url: "{{ route('get.batch.names.activity') }}",
+                        type: "POST",
+                        data: {
+                            batch_year: batchYear,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.length > 0) {
+                                $.each(response, function(index, item) {
+                                    if ($('#batch_name option[value="' + item.id + '"]')
+                                        .length === 0) {
+                                        $('#batch_name').append('<option value="' + item
+                                            .id + '">' + item.batch_name +
+                                            '</option>');
+                                    }
+                                });
+                                $('#batch_name').prop('disabled', false);
+
+                                if (preselectedBatchId) {
+                                    $('#batch_name').val(preselectedBatchId).trigger('change');
                                 }
-                            });
-                            $('#batch_name').prop('disabled', false);
-
-                            if (preselectedBatchId) {
-                                $('#batch_name').val(preselectedBatchId).trigger('change');
+                            } else {
+                                $('#batch_name').prop('disabled', true);
                             }
-                        } else {
-                            $('#batch_name').prop('disabled', true);
                         }
-                    }
-                });
+                    });
+                } else {
+                    $('#batch_name').prop('disabled', true);
+                }
+            });
+
+            const batchYear = $('#batch_year').val();
+            if (batchYear) {
+                $('#batch_year').trigger('change');
             } else {
                 $('#batch_name').prop('disabled', true);
             }
-        });
 
-        const batchYear = $('#batch_year').val();
-        if (batchYear) {
-            $('#batch_year').trigger('change');
-        } else {
-            $('#batch_name').prop('disabled', true);
-        }
+            if (preselectedBatchId) {
+                $('#batch_name').val(preselectedBatchId);
+            }
 
-        if (preselectedBatchId) {
-            $('#batch_name').val(preselectedBatchId);
-        }
-
-        if (preselectedBatchYear) {
-            $('#batch_year').val(preselectedBatchYear);
-        }
-    });
-    </script>
-
-    <script>
-    $(document).ready(function () {
-        const preselectedSectionId = "{{ $data->section }}"; 
-
-        $('#batch_name').change(function () {
-            const batchName = $(this).val();
-            $('#section').html('<option value="" selected>-----Select Section-----</option>');
-
-            if (batchName) {
-                $.ajax({
-                    url: "{{ route('get.batch.section.activity') }}",
-                    type: "POST",
-                    data: {
-                        batch_name: batchName,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function (response) {
-                        if (response.length > 0) {
-                            $.each(response, function (index, item) {
-                                $('#section').append('<option value="' + item.id + '">' + item.name + '</option>');
-                            });
-
-                            $('#section').prop('disabled', false);
-
-                            if (preselectedSectionId) {
-                                $('#section').val(preselectedSectionId).trigger('change');
-                            }
-                        } else {
-                            $('#section').prop('disabled', true);
-                        }
-                    }
-                });
-            } else {
-                $('#section').prop('disabled', true);
+            if (preselectedBatchYear) {
+                $('#batch_year').val(preselectedBatchYear);
             }
         });
-
-        const currentBatchName = $('#batch_name').val();
-        if (currentBatchName) {
-            $('#batch_name').trigger('change');
-        }
-    });
     </script>
-    
+
     <script>
-    $(document).ready(function() {
-        const selectedGroup = "{{ $data->group }}"; 
+        $(document).ready(function() {
+            const preselectedSectionId = "{{ $data->section }}";
 
-        $('#section').change(function() {
-            var section = $(this).val();
-            $('#group').html('<option value="" selected disabled>-----Select Group-----</option>');
+            $('#batch_name').change(function() {
+                const batchName = $(this).val();
+                $('#section').html('<option value="" selected>-----Select Section-----</option>');
 
-            if (section) {
-                $.ajax({
-                    url: "{{ route('get.section.group.activity') }}",
-                    type: "POST",
-                    data: {
-                        section: section,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if (response.length > 0) {
-                            let groupAdded = false;
+                if (batchName) {
+                    $.ajax({
+                        url: "{{ route('get.batch.section.activity') }}",
+                        type: "POST",
+                        data: {
+                            batch_name: batchName,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.length > 0) {
+                                $.each(response, function(index, item) {
+                                    $('#section').append('<option value="' + item.id +
+                                        '">' + item.name + '</option>');
+                                });
 
-                            $.each(response, function(index, item) {
-                                if (item.id == selectedGroup && !groupAdded) {
-                                    $('#group').append(
-                                        `<option value="${item.id}" selected>${item.name}</option>`
-                                    );
-                                    groupAdded = true;
-                                } else if (item.id != selectedGroup) {
-                                    $('#group').append(
-                                        `<option value="${item.id}">${item.name}</option>`
-                                    );
+                                $('#section').prop('disabled', false);
+
+                                if (preselectedSectionId) {
+                                    $('#section').val(preselectedSectionId).trigger('change');
                                 }
-                            });
-
-                            $('#group').prop('disabled', false);
-
-                            if (selectedGroup && groupAdded) {
-                                $('#group').val(selectedGroup).trigger('change');
+                            } else {
+                                $('#section').prop('disabled', true);
                             }
-
-                        } else {
-                            $('#group').prop('disabled', true);
                         }
-                    },
-                    error: function(xhr) {
-                        console.error('Error fetching groups:', xhr.responseText);
-                        $('#group').html('<option value="" disabled>Failed to load groups</option>').prop('disabled', true);
-                    }
-                });
-            } else {
-                $('#group').prop('disabled', true);
+                    });
+                } else {
+                    $('#section').prop('disabled', true);
+                }
+            });
+
+            const currentBatchName = $('#batch_name').val();
+            if (currentBatchName) {
+                $('#batch_name').trigger('change');
             }
         });
+    </script>
 
-        const sectionVal = $('#section').val();
-        if (sectionVal) {
-            $('#section').trigger('change');
-        }
-    });
+    <script>
+        $(document).ready(function() {
+            const selectedGroup = "{{ $data->group }}";
+
+            $('#section').change(function() {
+                var section = $(this).val();
+                $('#group').html('<option value="" selected disabled>-----Select Group-----</option>');
+
+                if (section) {
+                    $.ajax({
+                        url: "{{ route('get.section.group.activity') }}",
+                        type: "POST",
+                        data: {
+                            section: section,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.length > 0) {
+                                let groupAdded = false;
+
+                                $.each(response, function(index, item) {
+                                    if (item.id == selectedGroup && !groupAdded) {
+                                        $('#group').append(
+                                            `<option value="${item.id}" selected>${item.name}</option>`
+                                        );
+                                        groupAdded = true;
+                                    } else if (item.id != selectedGroup) {
+                                        $('#group').append(
+                                            `<option value="${item.id}">${item.name}</option>`
+                                        );
+                                    }
+                                });
+
+                                $('#group').prop('disabled', false);
+
+                                if (selectedGroup && groupAdded) {
+                                    $('#group').val(selectedGroup).trigger('change');
+                                }
+
+                            } else {
+                                $('#group').prop('disabled', true);
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error fetching groups:', xhr.responseText);
+                            $('#group').html(
+                                    '<option value="" disabled>Failed to load groups</option>')
+                                .prop('disabled', true);
+                        }
+                    });
+                } else {
+                    $('#group').prop('disabled', true);
+                }
+            });
+
+            const sectionVal = $('#section').val();
+            if (sectionVal) {
+                $('#section').trigger('change');
+            }
+        });
     </script>
 
     <script>
@@ -744,7 +774,7 @@
 
     <script>
         $(document).ready(function() {
-            let lastGroupId = null; 
+            let lastGroupId = null;
 
             $('#group').on('change', function() {
                 let GroupId = $(this).val();
@@ -917,5 +947,4 @@
             }
         });
     </script>
-
 @endsection
