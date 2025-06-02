@@ -401,8 +401,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('my-activity', [MyActivityController::class, 'index'])->name('my-activity');
     Route::get('my-activity-view/{id}/{date}', [MyActivityController::class, 'ActivityView'])->name('activity-view');
     Route::post('save-activity-details', [MyActivityController::class, 'saveActivityDetails'])->name('save-activity-details');
+    Route::get('/get-sections', [MyActivityController::class, 'getSections']);
+    Route::get('/get-groups', [MyActivityController::class, 'getGroups']);
 
     //player Review
+    Route::get('/get_sectionsByBatch', [MyActivityController::class, 'getSectionsByBatch'])->name('get.sectionsByBatch');
+    Route::get('/get_groupsByBatchAndSections', [MyActivityController::class, 'getGroupsBySectionAndBatch'])->name('get.groupsByBatchAndSections');
     Route::get('player-review', [MyActivityController::class, 'review'])->name('player-review');
     Route::get('player-review-view/{id}/{date}', [MyActivityController::class, 'playerView'])->name('player-review-view');
     Route::get('player-review-edit/{id}/{date}', [MyActivityController::class, 'playerEdit'])->name('player-review-edit');

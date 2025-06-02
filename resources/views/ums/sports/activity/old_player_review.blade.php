@@ -13,7 +13,7 @@
                             <h2 class="content-header-title float-start mb-0">Player Review</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ url('player-review') }}">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                                     <li class="breadcrumb-item active">Add New</li>
                                 </ol>
                             </div>
@@ -147,164 +147,58 @@
 
 
     @include('ums.admin.search-model', ['searchTitle' => 'sport List Search'])
-
-<div class="modal modal-slide-in fade filterpopuplabel" id="filter">
-    <div class="modal-dialog sidebar-sm">
-        <form class="add-new-record modal-content pt-0" id="approveds-form" method="GET" novalidate
-            action="{{ url('player-review') }}">
-            @csrf
-            <div class="modal-header mb-1">
-                <h5 class="modal-title" id="exampleModalLabel">List of Activity</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
-            </div>
-            <div class="modal-body flex-grow-1">
-                
-
-                <div class="mb-1">
-                    <label class="form-label">Start Date</label>
-                    <input type="date" class="form-control" name="start_date" value="{{ request()->start_date }}">
+    <div class="modal modal-slide-in fade filterpopuplabel" id="filter">
+        <div class="modal-dialog sidebar-sm">
+            <form class="add-new-record modal-content pt-0" id="approveds-form" method="GET" novalidate
+                action="{{ url('player-review') }}">
+                @csrf
+                <div class="modal-header mb-1">
+                    <h5 class="modal-title" id="exampleModalLabel">List of Activity</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
                 </div>
+                <div class="modal-body flex-grow-1">
 
-                <div class="mb-1">
-                    <label class="form-label">End Date</label>
-                    <input type="date" class="form-control" name="end_date" value="{{ request()->end_date }}">
+                    <div class="mb-1">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" class="form-control" name="start_date" value="{{ request()->start_date }}">
+                    </div>
+
+                    <div class="mb-1">
+                        <label class="form-label">End Date</label>
+                        <input type="date" class="form-control" name="end_date" value="{{ request()->end_date }}">
+                    </div>
+
+                    <div class="mb-1">
+                        <label class="form-label">Activity</label>
+                        <select class="form-select select2" name="activity" id="activity">
+                            <option value="Select">Select</option>
+                            @foreach ($allActivities as $activity)
+                                <option value="{{ $activity }}"
+                                    {{ request()->activity == $activity ? 'selected' : '' }}>
+                                    {{ $activity }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-1">
+                        <label class="form-label">Trainer</label>
+                        <select class="form-select select2" name="trainer" id="trainer">
+                            <option value="Select"> Select </option>
+                            @foreach ($allTrainers as $trainer)
+                                <option value="{{ $trainer }}"
+                                    {{ request()->trainer == $trainer ? 'selected' : '' }}>
+                                    {{ $trainer }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                 </div>
-
-                <div class="mb-1">
-                    <label class="form-label">Activity</label>
-                    <select class="form-select select2" name="activity" id="activity">
-                        <option value="Select">Select</option>
-                        @foreach ($allActivities as $activity)
-                            <option value="{{ $activity }}" {{ request()->activity == $activity ? 'selected' : '' }}>
-                                {{ $activity }}
-                            </option>
-                        @endforeach
-                    </select>
+                <div class="modal-footer justify-content-start">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
                 </div>
-
-                <div class="mb-1">
-                    <label class="form-label">Batch</label>
-                    <select class="form-select" name="batch" id="batch">
-                        <option value="Select">Select</option>
-                        @foreach ($allBatches as $batch)
-                            <option value="{{ $batch->id }}" {{ request()->batch == $batch->id ? 'selected' : '' }}>
-                                {{ $batch->batch_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="mb-1">
-                    <label class="form-label">Section</label>
-                    <select class="form-select" name="section" id="section" data-selected="{{ request()->section }}">
-                        <option value="Select">Select</option>
-                    </select>
-                </div>
-
-                <div class="mb-1">
-                    <label class="form-label">Group</label>
-                    <select class="form-select" name="group" id="group" data-selected="{{ request()->group }}">
-                        <option value="Select">Select</option>
-                    </select>
-                </div>
-
-                <div class="mb-1">
-                    <label class="form-label">Trainer</label>
-                    <select class="form-select select2" name="trainer" id="trainer">
-                        <option value="Select">Select</option>
-                        @foreach ($allTrainers as $trainer)
-                            <option value="{{ $trainer }}" {{ request()->trainer == $trainer ? 'selected' : '' }}>
-                                {{ $trainer }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-            </div>
-            <div class="modal-footer justify-content-start">
-                <button type="submit" class="btn btn-primary">Apply Filters</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
-
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            const $batchSelect = $('#batch');
-            const $sectionSelect = $('#section');
-            const $groupSelect = $('#group');
-    
-            const oldSection = $sectionSelect.data('selected');
-            const oldGroup = $groupSelect.data('selected');
-    
-            $batchSelect.on('change', function () {
-                const batch = $(this).val();
-    
-                $sectionSelect.html('<option value="Select">Select section</option>');
-                $groupSelect.html('<option value="Select">Select group</option>');
-    
-                if (batch && batch !== 'Select') {
-                    $.ajax({
-                        url: '/get_sectionsByBatch',
-                        type: 'GET',
-                        data: { batch: batch },
-                        success: function (data) {
-                            $.each(data, function (index, section) {
-                                $sectionSelect.append(
-                                    $('<option>', { value: section.id, text: section.name })
-                                );
-                            });
-    
-                            if (oldSection) {
-                                $sectionSelect.val(oldSection).trigger('change');
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error('Error fetching sections:', xhr.responseText);
-                        }
-                    });
-                }
-            });
-    
-            $sectionSelect.on('change', function () {
-                const batch = $batchSelect.val();
-                const sectionId = $(this).val();
-    
-                $groupSelect.html('<option value="Select">Select group</option>');
-    
-                if (batch && sectionId && batch !== 'Select' && sectionId !== 'Select') {
-                    $.ajax({
-                        url: '/get_groupsByBatchAndSections',
-                        type: 'GET',
-                        data: {
-                            batch: batch,
-                            section: sectionId
-                        },
-                        success: function (data) {
-                            $.each(data, function (index, group) {
-                                $groupSelect.append(
-                                    $('<option>', { value: group.id, text: group.name })
-                                );
-                            });
-    
-                            if (oldGroup) {
-                                $groupSelect.val(oldGroup);
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error('Error fetching groups:', xhr.responseText);
-                        }
-                    });
-                }
-            });
-    
-            // Trigger batch change on page load if old values exist
-            if ($batchSelect.val() !== 'Select' && oldSection) {
-                $batchSelect.trigger('change');
-            }
-        });
-    </script>
-@endsection    
+@endsection

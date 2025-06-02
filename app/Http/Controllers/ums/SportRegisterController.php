@@ -47,8 +47,10 @@ use Carbon\CarbonPeriod;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\SportsRegisterImport;
+use Maatwebsite\Excel\Validators\ValidationException;
 class SportRegisterController extends Controller
 {
+
 
 
 
@@ -56,10 +58,9 @@ class SportRegisterController extends Controller
 public function importSportsRegister(Request $request)
 {
     $request->validate([
-        'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+        'file' => 'required|file|mimes:xlsx,xls,csv',
     ]);
 
-    
     try {
         $user = Helper::getAuthenticatedUser();
         $organization = $user->organization_id;
@@ -79,26 +80,36 @@ public function importSportsRegister(Request $request)
         }
 
         $bookId = $series->first()->id;
-
-        if (!$bookId) {
-            return back()->with('error', 'Book ID not found.');
-        }
-
         $import = new SportsRegisterImport($organization, $bookId);
 
         Excel::import($import, $request->file('file'));
 
         $errors = $import->getErrors();
-        
 
         if (!empty($errors)) {
-            return back()->withErrors($errors)->with('warning', 'Import completed with some issues.');
+ 
+            return back()
+                ->with('import_errors', $errors)
+                ->with('error', 'Import completed with some issues.');
         }
 
         return back()->with('success', 'Sports register imported successfully!');
+    } catch (ValidationException $e) {
+        $failures = $e->failures();
+        $messages = [];
 
-    } 
-    catch (\Exception $e) {
+        foreach ($failures as $failure) {
+            $row = $failure->row(); 
+            $attribute = $failure->attribute(); // which column
+            $errors = implode(', ', $failure->errors()); // actual error message(s)
+            $messages[] = "Row $row: $attribute - $errors";
+        }
+
+        return back()
+            ->with('import_errors', $messages)
+            ->with('error', 'Import failed due to validation errors.');
+    } catch (\Exception $e) {
+        \Log::error('Excel Import Error:', ['error' => $e]);
         return back()->with('error', 'Import failed: ' . $e->getMessage());
     }
 }

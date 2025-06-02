@@ -13,7 +13,7 @@
                             <h2 class="content-header-title float-start mb-0">My Schedule</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ url('my-activity') }}">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                                     <li class="breadcrumb-item active">Schedule List</li>
                                 </ol>
                             </div>
@@ -165,8 +165,8 @@
                         <select class="form-select" name="batch" id="batch">
                             <option value="Select">Select</option>
                             @foreach ($allBatches as $batch)
-                                <option value="{{ $batch->id }}"
-                                    {{ request()->batch == $batch->id ? 'selected' : '' }}>
+                                <option value="{{ $batch->batch_name }}"
+                                    {{ request()->batch == $batch->batch_name ? 'selected' : '' }}>
                                     {{ $batch->batch_name }}
                                 </option>
                             @endforeach
@@ -175,17 +175,21 @@
 
                     <div class="mb-1">
                         <label class="form-label">Section</label>
-                        <select class="form-select" name="section" id="section" data-selected="{{request()->section}}">
+                        <select class="form-select" name="section" id="section">
                             <option value="Select">Select</option>
-                           
+                            @if (request()->filled('section') && request()->section !== 'Select')
+                                <option value="{{ request()->section }}" selected>{{ request()->section }}</option>
+                            @endif
                         </select>
                     </div>
 
                     <div class="mb-1">
                         <label class="form-label">Group</label>
-                        <select class="form-select" name="group" id="group" data-selected="{{request()->group}}">
+                        <select class="form-select" name="group" id="group">
                             <option value="Select">Select</option>
-                           
+                            @if (request()->filled('group') && request()->group !== 'Select')
+                                <option value="{{ request()->group }}" selected>{{ request()->group }}</option>
+                            @endif
                         </select>
                     </div>
 
@@ -199,82 +203,50 @@
     </div>
 
 
-   
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             const $batchSelect = $('#batch');
             const $sectionSelect = $('#section');
             const $groupSelect = $('#group');
-    
-            const oldSection = $sectionSelect.data('selected');
-            const oldGroup = $groupSelect.data('selected');
-    
-            $batchSelect.on('change', function () {
+
+            $batchSelect.on('change', function() {
                 const batch = $(this).val();
-    
-                $sectionSelect.html('<option value="Select">Select section</option>');
-                $groupSelect.html('<option value="Select">Select group</option>');
-    
+
+                $sectionSelect.html('<option value="Select">Select</option>');
+                $groupSelect.html('<option value="Select">Select</option>');
+
                 if (batch && batch !== 'Select') {
-                    $.ajax({
-                        url: '/get_sectionsByBatch',
-                        type: 'GET',
-                        data: { batch: batch },
-                        success: function (data) {
-                            $.each(data, function (index, section) {
-                                $sectionSelect.append(
-                                    $('<option>', { value: section.id, text: section.name })
+                    $.get(`/get-sections`, {
+                        batch: batch
+                    }, function(data) {
+                        data.forEach(function(section) {
+                            $sectionSelect.append(
+                                `<option value="${section.name}">${section.name}</option>`
                                 );
-                            });
-    
-                            if (oldSection) {
-                                $sectionSelect.val(oldSection).trigger('change');
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error('Error fetching sections:', xhr.responseText);
-                        }
+                        });
                     });
                 }
             });
-    
-            $sectionSelect.on('change', function () {
+
+            $sectionSelect.on('change', function() {
                 const batch = $batchSelect.val();
-                const sectionId = $(this).val();
-    
-                $groupSelect.html('<option value="Select">Select group</option>');
-    
-                if (batch && sectionId && batch !== 'Select' && sectionId !== 'Select') {
-                    $.ajax({
-                        url: '/get_groupsByBatchAndSections',
-                        type: 'GET',
-                        data: {
-                            batch: batch,
-                            section: sectionId
-                        },
-                        success: function (data) {
-                            $.each(data, function (index, group) {
-                                $groupSelect.append(
-                                    $('<option>', { value: group.id, text: group.name })
-                                );
-                            });
-    
-                            if (oldGroup) {
-                                $groupSelect.val(oldGroup);
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error('Error fetching groups:', xhr.responseText);
-                        }
+                const section = $(this).val();
+
+                $groupSelect.html('<option value="Select">Select</option>');
+
+                if (batch && section && batch !== 'Select' && section !== 'Select') {
+                    $.get(`/get-groups`, {
+                        batch: batch,
+                        section: section
+                    }, function(data) {
+                        data.forEach(function(group) {
+                            $groupSelect.append(
+                                `<option value="${group}">${group}</option>`);
+                        });
                     });
                 }
             });
-    
-            if ($batchSelect.val() !== 'Select' && oldSection) {
-                $batchSelect.trigger('change');
-            }
         });
     </script>
 @endsection

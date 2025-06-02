@@ -10,11 +10,11 @@
                 <div class="content-header-left col-md-5 mb-2">
                     <div class="row breadcrumbs-top">
                         <div class="col-12">
-                            <h2 class="content-header-title float-start mb-0">Player Review</h2>
+                            <h2 class="content-header-title float-start mb-0">My Schedule</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="{{ url('player-review') }}">Home</a></li>
-                                    <li class="breadcrumb-item active">Add New</li>
+                                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                                    <li class="breadcrumb-item active">Schedule List</li>
                                 </ol>
                             </div>
                         </div>
@@ -22,7 +22,7 @@
                 </div>
                 <div class="content-header-right text-sm-end col-md-7 mb-50 mb-sm-0">
                     <div class="form-group breadcrumb-right">
-                        <button class="btn btn-dark btn-sm mb-50 mb-sm-0" onclick="window.location.href='player-review'">
+                        <button class="btn btn-dark btn-sm mb-50 mb-sm-0" onclick="window.location.href='my-activity'">
                             <i data-feather="refresh-cw" class="me-50"></i> Reset
                         </button>
                         <button class="btn btn-warning btn-sm mb-50 mb-sm-0" data-bs-target="#filter"
@@ -52,12 +52,9 @@
                                         <thead>
                                             <tr class="text-center">
                                                 <th>#</th>
-                                                <th>Date</th>
                                                 <th>Activity</th>
-                                                <th>Trainer</th>
-                                                <th>Start Date</th>
+                                                <th>Date</th>
                                                 <th>Start Time</th>
-                                                <th>End Date</th>
                                                 <th>End Time</th>
                                                 <th>Section</th>
                                                 <th>Group</th>
@@ -71,12 +68,9 @@
                                             @foreach ($finalActivities as $index => $item)
                                                 <tr class="text-center">
                                                     <td>{{ $index + 1 }}</td>
-                                                    <td>{{ $item->activity_date }}</td>
                                                     <td>{{ $item->activity }}</td>
-                                                    <td>{{ $item->trainer }}</td>
-                                                    <td>{{ $item->start_date }}</td>
+                                                    <td>{{ $item->activity_date }}</td>
                                                     <td>{{ $item->start_time }}</td>
-                                                    <td>{{ $item->end_date }}</td>
                                                     <td>{{ $item->end_time }}</td>
                                                     <td>{{ $item->section }}</td>
                                                     <td>{{ $item->group }}</td>
@@ -85,45 +79,30 @@
                                                             class="badge rounded-pill badge-light-secondary badgeborder-radius">{{ $item->student_count }}</span>
                                                     </td>
                                                     <td>
-                                                        @if ($item->marked_status === 'Marked')
+                                                        @if ($item->status == 'inactive')
                                                             <span
-                                                                class="badge rounded-pill badge-light-success">Marked</span>
+                                                                class="badge rounded-pill badge-light-danger">Inactive</span>
                                                         @else
                                                             <span
-                                                                class="badge rounded-pill badge-light-danger">Unmarked</span>
+                                                                class="badge rounded-pill badge-light-success">Active</span>
                                                         @endif
                                                     </td>
-
                                                     <td class="tableactionnew">
-                                                        <div class="dropdown dropup">
+                                                        <div class="dropdown">
                                                             <button type="button"
                                                                 class="btn btn-sm dropdown-toggle hide-arrow py-0"
                                                                 data-bs-toggle="dropdown">
                                                                 <i data-feather="more-vertical"></i>
                                                             </button>
                                                             <div class="dropdown-menu dropdown-menu-end">
-                                                                @if ($item->marked_status === 'Marked')
-                                                                    <a class="dropdown-item"
-                                                                        href="{{ route('player-review-view', ['id' => $item->id, 'date' => $item->activity_date]) }}">
-                                                                        <i data-feather="eye" class="me-50"></i>
-                                                                        <span>View</span>
-                                                                    </a>
-                                                                    <a class="dropdown-item"
-                                                                        href="{{ route('player-review-edit', ['id' => $item->id, 'date' => $item->activity_date]) }}">
-                                                                        <i data-feather="edit" class="me-50"></i>
-                                                                        <span>Edit</span>
-                                                                    </a>
-                                                                @else
-                                                                    <a class="dropdown-item"
-                                                                        href="{{ route('player-review-edit', ['id' => $item->id, 'date' => $item->activity_date]) }}">
-                                                                        <i data-feather="check-circle" class="me-50"></i>
-                                                                        <span>Mark</span>
-                                                                    </a>
-                                                                @endif
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('activity-view', ['id' => $item->id, 'date' => $item->activity_date]) }}">
+                                                                    <i data-feather="eye" class="me-50"></i>
+                                                                    <span>View Detail</span>
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     </td>
-
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -147,18 +126,15 @@
 
 
     @include('ums.admin.search-model', ['searchTitle' => 'sport List Search'])
-
-<div class="modal modal-slide-in fade filterpopuplabel" id="filter">
+    <div class="modal modal-slide-in fade filterpopuplabel" id="filter">
     <div class="modal-dialog sidebar-sm">
-        <form class="add-new-record modal-content pt-0" id="approveds-form" method="GET" novalidate
-            action="{{ url('player-review') }}">
+        <form class="add-new-record modal-content pt-0" id="approveds-form" method="GET" action="{{ url('my-activity') }}">
             @csrf
             <div class="modal-header mb-1">
-                <h5 class="modal-title" id="exampleModalLabel">List of Activity</h5>
+                <h5 class="modal-title">List of Activity</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">×</button>
             </div>
             <div class="modal-body flex-grow-1">
-                
 
                 <div class="mb-1">
                     <label class="form-label">Start Date</label>
@@ -175,8 +151,9 @@
                     <select class="form-select select2" name="activity" id="activity">
                         <option value="Select">Select</option>
                         @foreach ($allActivities as $activity)
-                            <option value="{{ $activity }}" {{ request()->activity == $activity ? 'selected' : '' }}>
-                                {{ $activity }}
+                            <option value="{{ $activity->activity_name }}"
+                                {{ request()->activity == $activity->activity_name ? 'selected' : '' }}>
+                                {{ $activity->activity_name }}
                             </option>
                         @endforeach
                     </select>
@@ -187,7 +164,8 @@
                     <select class="form-select" name="batch" id="batch">
                         <option value="Select">Select</option>
                         @foreach ($allBatches as $batch)
-                            <option value="{{ $batch->id }}" {{ request()->batch == $batch->id ? 'selected' : '' }}>
+                            <option value="{{ $batch->batch_name }}"
+                                {{ request()->batch == $batch->batch_name ? 'selected' : '' }}>
                                 {{ $batch->batch_name }}
                             </option>
                         @endforeach
@@ -196,31 +174,21 @@
 
                 <div class="mb-1">
                     <label class="form-label">Section</label>
-                    <select class="form-select" name="section" id="section" data-selected="{{ request()->section }}">
+                    <select class="form-select" name="section" id="section">
                         <option value="Select">Select</option>
+                        {{-- Populate dynamically or from controller if needed --}}
                     </select>
                 </div>
 
                 <div class="mb-1">
                     <label class="form-label">Group</label>
-                    <select class="form-select" name="group" id="group" data-selected="{{ request()->group }}">
+                    <select class="form-select" name="group" id="group">
                         <option value="Select">Select</option>
+                        {{-- Populate dynamically or from controller if needed --}}
                     </select>
                 </div>
-
-                <div class="mb-1">
-                    <label class="form-label">Trainer</label>
-                    <select class="form-select select2" name="trainer" id="trainer">
-                        <option value="Select">Select</option>
-                        @foreach ($allTrainers as $trainer)
-                            <option value="{{ $trainer }}" {{ request()->trainer == $trainer ? 'selected' : '' }}>
-                                {{ $trainer }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
             </div>
+
             <div class="modal-footer justify-content-start">
                 <button type="submit" class="btn btn-primary">Apply Filters</button>
             </div>
@@ -229,82 +197,52 @@
 </div>
 
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script>
-        $(document).ready(function () {
-            const $batchSelect = $('#batch');
-            const $sectionSelect = $('#section');
-            const $groupSelect = $('#group');
-    
-            const oldSection = $sectionSelect.data('selected');
-            const oldGroup = $groupSelect.data('selected');
-    
-            $batchSelect.on('change', function () {
-                const batch = $(this).val();
-    
-                $sectionSelect.html('<option value="Select">Select section</option>');
-                $groupSelect.html('<option value="Select">Select group</option>');
-    
+        document.addEventListener("DOMContentLoaded", function() {
+            const batchSelect = document.getElementById("batch");
+            const sectionSelect = document.getElementById("section");
+            const groupSelect = document.getElementById("group");
+
+            batchSelect.addEventListener("change", function() {
+                const batch = batchSelect.value;
+
+                // Clear existing options
+                sectionSelect.innerHTML = '<option value="Select">Select</option>';
+                groupSelect.innerHTML = '<option value="Select">Select</option>';
+
                 if (batch && batch !== 'Select') {
-                    $.ajax({
-                        url: '/get_sectionsByBatch',
-                        type: 'GET',
-                        data: { batch: batch },
-                        success: function (data) {
-                            $.each(data, function (index, section) {
-                                $sectionSelect.append(
-                                    $('<option>', { value: section.id, text: section.name })
-                                );
+                    fetch(`/get-sections?batch=${batch}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            data.forEach(section => {
+                                const option = document.createElement("option");
+                                option.value = section;
+                                option.text = section;
+                                sectionSelect.appendChild(option);
                             });
-    
-                            if (oldSection) {
-                                $sectionSelect.val(oldSection).trigger('change');
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error('Error fetching sections:', xhr.responseText);
-                        }
-                    });
+                        });
                 }
             });
-    
-            $sectionSelect.on('change', function () {
-                const batch = $batchSelect.val();
-                const sectionId = $(this).val();
-    
-                $groupSelect.html('<option value="Select">Select group</option>');
-    
-                if (batch && sectionId && batch !== 'Select' && sectionId !== 'Select') {
-                    $.ajax({
-                        url: '/get_groupsByBatchAndSections',
-                        type: 'GET',
-                        data: {
-                            batch: batch,
-                            section: sectionId
-                        },
-                        success: function (data) {
-                            $.each(data, function (index, group) {
-                                $groupSelect.append(
-                                    $('<option>', { value: group.id, text: group.name })
-                                );
+
+            sectionSelect.addEventListener("change", function() {
+                const batch = batchSelect.value;
+                const section = sectionSelect.value;
+
+                groupSelect.innerHTML = '<option value="Select">Select</option>';
+
+                if (batch && section && batch !== 'Select' && section !== 'Select') {
+                    fetch(`/get-groups?batch=${batch}&section=${section}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            data.forEach(group => {
+                                const option = document.createElement("option");
+                                option.value = group;
+                                option.text = group;
+                                groupSelect.appendChild(option);
                             });
-    
-                            if (oldGroup) {
-                                $groupSelect.val(oldGroup);
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error('Error fetching groups:', xhr.responseText);
-                        }
-                    });
+                        });
                 }
             });
-    
-            // Trigger batch change on page load if old values exist
-            if ($batchSelect.val() !== 'Select' && oldSection) {
-                $batchSelect.trigger('change');
-            }
         });
     </script>
-@endsection    
+@endsection

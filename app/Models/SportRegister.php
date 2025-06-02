@@ -67,6 +67,7 @@ class SportRegister extends Model
         'hostel_absence_reason',
         'gender',
         'remarks',
+        'fee_details',
         'registration_number',
         'payment_reason',
         'fee_batch_id',

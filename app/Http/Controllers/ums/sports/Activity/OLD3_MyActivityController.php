@@ -10,30 +10,27 @@ use App\Models\ums\Activity\SportActivityDetail;
 use App\Models\ums\Activity\Sport_Rating_Scale;
 use App\Models\ums\ActivityMaster;
 use App\Models\ums\batch;
-use App\Models\ums\SportSection;
+use App\Models\ums\Section;
 use App\Models\ums\Sport_master;
-use App\Models\ums\SportBatch;
 use App\Models\SportRegister;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use App\Models\ums\Activity\SportActivityMaster;
-use App\Models\ums\SportGroupMaster;
 
 class MyActivityController extends Controller
 {
-public function index(Request $request)
+
+    public function index(Request $request)
     {
         $activities = SportActivityScheduler::where('trainer', '409')
             ->with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation', 'trainerRelation'])
             ->orderBy('id', 'DESC')
             ->get();
 
-        $allActivities = SportActivityMaster::select('activity_name')->get()->unique('activity_name')->values();
-        $allBatches = batch::all();
-
+        $allActivities = $activities->pluck('activity')->unique()->values();
         $finalActivities = collect();
-        
+        $allBatches = $activities->pluck('batchRelation.batch_name')->filter()->unique()->values();
+
         foreach ($activities as $activity) {
             $days = json_decode($activity->day, true);
             $startDate = Carbon::parse($activity->start_date);
@@ -60,9 +57,6 @@ public function index(Request $request)
                             'trainer' => $activity->trainerRelation->name ?? '',
                             'status' => $activity->status,
                             'student_count' => $studentCount,
-                            'section_id' => $activity->sectionRelation->id ?? null,
-                            'group_id' => $activity->groupRelation->id ?? null,
-                            'batch_id' => $activity->batchRelation->id ?? null,
                         ]);
                     }
                 }
@@ -72,36 +66,45 @@ public function index(Request $request)
         }
 
         if ($request->filled('activity') && $request->activity !== 'Select') {
-            $finalActivities = $finalActivities->filter(fn($item) => $item->activity === $request->activity);
+            $finalActivities = $finalActivities->filter(function ($item) use ($request) {
+                return $item->activity === $request->activity;
+            });
         }
 
         if ($request->filled('start_date')) {
             $start = Carbon::parse($request->start_date)->format('Y-m-d');
-            $finalActivities = $finalActivities->filter(fn($item) => $item->activity_date >= $start);
+            $finalActivities = $finalActivities->filter(function ($item) use ($start) {
+                return $item->activity_date >= $start;
+            });
         }
 
         if ($request->filled('end_date')) {
             $end = Carbon::parse($request->end_date)->format('Y-m-d');
-            $finalActivities = $finalActivities->filter(fn($item) => $item->activity_date <= $end);
+            $finalActivities = $finalActivities->filter(function ($item) use ($end) {
+                return $item->activity_date <= $end;
+            });
         }
 
         if ($request->filled('batch') && $request->batch !== 'Select') {
             $finalActivities = $finalActivities->filter(function ($item) use ($request) {
-                return $item->batch_id == $request->batch;
+                return $item->batch === $request->batch;
             });
         }
 
         if ($request->filled('section') && $request->section !== 'Select') {
             $finalActivities = $finalActivities->filter(function ($item) use ($request) {
-                return $item->section_id == $request->section;
+                return $item->section === $request->section;
             });
         }
 
         if ($request->filled('group') && $request->group !== 'Select') {
             $finalActivities = $finalActivities->filter(function ($item) use ($request) {
-                return $item->group_id == $request->group;
+                return $item->group === $request->group;
             });
         }
+
+
+
 
         return view('ums.sports.activity.my_activity', [
             'finalActivities' => $finalActivities,
@@ -110,36 +113,40 @@ public function index(Request $request)
         ]);
     }
 
-    
+    public function getSections(Request $request)
+    {
+        $batch = $request->batch;
+        $sections = SportActivityScheduler::with('sectionRelation')
+            ->whereHas('batchRelation', function ($q) use ($batch) {
+                $q->where('batch_name', $batch);
+            })
+            ->get()
+            ->pluck('sectionRelation.name')
+            ->unique()
+            ->values();
 
-// public function getSections(Request $request)
-// {
-//     $batch = $request->batch;
+        return response()->json($sections);
+    }
 
-//     $sections = SportSection::where('batch', $batch)->get();
+    public function getGroups(Request $request)
+    {
+        $batch = $request->batch;
+        $section = $request->section;
 
-//     return response()->json($sections);
-// }   
+        $groups = SportActivityScheduler::with('groupRelation')
+            ->whereHas('batchRelation', function ($q) use ($batch) {
+                $q->where('batch_name', $batch);
+            })
+            ->whereHas('sectionRelation', function ($q) use ($section) {
+                $q->where('name', $section);
+            })
+            ->get()
+            ->pluck('groupRelation.name')
+            ->unique()
+            ->values();
 
-// public function getGroups(Request $request)
-// {
-//     $batch = $request->batch;
-//     $section = $request->section;
-
-//     if (!$batch || !$section) {
-//         return response()->json(['error' => 'Missing batch or section'], 400);
-//     }
-
-//     $groups = SportGroupMaster::where('batch_name', $batch)
-//         ->where('section_name', $section)
-//         ->where('status', 'active') 
-//         ->select('name')
-//         ->distinct()
-//         ->pluck('name');
-
-//     return response()->json($groups);
-// }
-
+        return response()->json($groups);
+    }
 
 
 
@@ -245,166 +252,114 @@ public function index(Request $request)
 
 
 
-  
-public function getSectionsByBatch(Request $request)
-{
-    $batchId = $request->query('batch');
+    public function review(Request $request)
+    {
+        $activities = SportActivityScheduler::with(['sectionRelation', 'groupRelation', 'batchRelation', 'sportRelation', 'trainerRelation'])
+            ->orderBy('id', 'DESC')
+            ->get();
 
-    $sections = SportSection::where('batch_id', $batchId)
-        ->select('id', 'name')
-        ->distinct()
-        ->get();
+        $allActivities = $activities->pluck('activity')->unique()->values();
+        $allTrainers = $activities->pluck('trainerRelation.name')->unique()->values();
+        $allBatches = $activities->pluck('batchRelation.batch_name')->unique()->values();
+        $allSections = $activities->pluck('sectionRelation.name')->unique()->values();
+        $allGroups = $activities->pluck('groupRelation.name')->unique()->values();
+        $finalActivities = collect();
 
-    return response()->json($sections);
-}
+        foreach ($activities as $activity) {
+            $days = json_decode($activity->day, true);
+            $startDate = Carbon::parse($activity->start_date);
+            $endDate = Carbon::parse($activity->end_date);
+            $studentList = json_decode($activity->batch_student, true);
+            $studentCount = is_array($studentList) ? count($studentList) : 0;
 
+            while ($startDate->lte($endDate)) {
+                $dayName = $startDate->format('l');
 
+                if (array_key_exists($dayName, $days)) {
+                    $dayData = $days[$dayName] ?? null;
 
-public function getGroupsBySectionAndBatch(Request $request)
-{
-    $batchId = $request->query('batch');
-    $sectionId = $request->query('section'); // Now this will be the ID
+                    if ($dayData && isset($dayData['start_time'], $dayData['end_time'])) {
+                        $formattedDate = $startDate->format('Y-m-d');
 
-    $groups = SportGroupMaster::where('batch_id', $batchId)
-        ->where('section_id', $sectionId)
-        ->select('id', 'name')
-        ->distinct()
-        ->get();
+                        $isMarked = SportActivityDetail::where('scheduler_id', $activity->id)
+                            ->where('date', $formattedDate)
+                            ->exists();
 
-    return response()->json($groups);
-}
-
-
-
-
-
-
-
-
-public function review(Request $request)
-{
-    $activities = SportActivityScheduler::with([
-        'sectionRelation',
-        'groupRelation',
-        'batchRelation',
-        'sportRelation',
-        'trainerRelation'
-    ])->orderBy('id', 'DESC')->get();
-
-    $allActivities = $activities->pluck('activity')->unique()->values();
-    $allTrainers = $activities->pluck('trainerRelation.name')->unique()->values();
-    $allBatches = SportBatch::all();
-    $allSections = $activities->pluck('sectionRelation.name')->unique()->values();
-    $allGroups = $activities->pluck('groupRelation.name')->unique()->values();
-
-    $finalActivities = collect();
-
-    foreach ($activities as $activity) {
-        $days = json_decode($activity->day, true);
-        $startDate = Carbon::parse($activity->start_date);
-        $endDate = Carbon::parse($activity->end_date);
-        $studentList = json_decode($activity->batch_student, true);
-        $studentCount = is_array($studentList) ? count($studentList) : 0;
-
-        while ($startDate->lte($endDate)) {
-            $dayName = $startDate->format('l');
-
-            if (array_key_exists($dayName, $days)) {
-                $dayData = $days[$dayName] ?? null;
-
-                if ($dayData && isset($dayData['start_time'], $dayData['end_time'])) {
-                    $formattedDate = $startDate->format('Y-m-d');
-
-                    $isMarked = SportActivityDetail::where('scheduler_id', $activity->id)
-                        ->where('date', $formattedDate)
-                        ->exists();
-
-                    $finalActivities->push((object)[
-                        'id' => $activity->id,
-                        'activity' => $activity->activity,
-                        'trainer' => $activity->trainerRelation->name ?? '',
-                        'activity_date' => $formattedDate,
-                        'start_time' => Carbon::parse($dayData['start_time'])->format('h:i A'),
-                        'end_time' => Carbon::parse($dayData['end_time'])->format('h:i A'),
-                        'start_date' => $activity->start_date,
-                        'end_date' => $activity->end_date,
-                        'section' => $activity->sectionRelation->name ?? '',
-                        'group' => $activity->groupRelation->name ?? '',
-                        'batch' => $activity->batchRelation->batch_name ?? '',
-                        'section_id' => $activity->sectionRelation->id ?? null,
-                        'group_id' => $activity->groupRelation->id ?? null,
-                        'batch_id' => $activity->batchRelation->id ?? null,
-                        'status' => $activity->status,
-                        'student_count' => $studentCount,
-                        'marked_status' => $isMarked ? 'Marked' : 'Unmarked',
-                    ]);
+                        $finalActivities->push((object)[
+                            'id' => $activity->id,
+                            'activity' => $activity->activity,
+                            'trainer' => $activity->trainer,
+                            'activity_date' => $formattedDate,
+                            'start_time' => Carbon::parse($dayData['start_time'])->format('h:i A'),
+                            'end_time' => Carbon::parse($dayData['end_time'])->format('h:i A'),
+                            'start_date' => $activity->start_date,
+                            'end_date' => $activity->end_date,
+                            'section' => $activity->sectionRelation->name ?? '',
+                            'group' => $activity->groupRelation->name ?? '',
+                            'trainer' => $activity->trainerRelation->name ?? '',
+                            'batch' => $activity->batchRelation->batch_name ?? '',
+                            'status' => $activity->status,
+                            'student_count' => $studentCount,
+                            'marked_status' => $isMarked ? 'Marked' : 'Unmarked',
+                        ]);
+                    }
                 }
+
+                $startDate->addDay();
             }
-
-            $startDate->addDay();
         }
+
+        if ($request->filled('batch') && $request->batch !== 'Select') {
+            $finalActivities = $finalActivities->filter(function ($item) use ($request) {
+                return $item->batch === $request->batch;
+            });
+        }
+        if ($request->filled('section') && $request->section !== 'Select') {
+            $finalActivities = $finalActivities->filter(function ($item) use ($request) {
+                return $item->section === $request->section;
+            });
+        }
+
+        if ($request->filled('group') && $request->group !== 'Select') {
+            $finalActivities = $finalActivities->filter(function ($item) use ($request) {
+                return $item->group === $request->group;
+            });
+        }
+        if ($request->filled('activity') && $request->activity !== 'Select') {
+            $finalActivities = $finalActivities->filter(function ($item) use ($request) {
+                return $item->activity === $request->activity;
+            });
+        }
+
+        if ($request->filled('trainer') && $request->trainer !== 'Select') {
+            $finalActivities = $finalActivities->filter(function ($item) use ($request) {
+                return $item->trainer === $request->trainer;
+            });
+        }
+
+        if ($request->filled('start_date')) {
+            $start = Carbon::parse($request->start_date)->format('Y-m-d');
+            $finalActivities = $finalActivities->filter(function ($item) use ($start) {
+                return $item->activity_date >= $start;
+            });
+        }
+
+        if ($request->filled('end_date')) {
+            $end = Carbon::parse($request->end_date)->format('Y-m-d');
+            $finalActivities = $finalActivities->filter(function ($item) use ($end) {
+                return $item->activity_date <= $end;
+            });
+        }
+
+        return view('ums.sports.activity.player_review', [
+            'finalActivities' => $finalActivities,
+            'allActivities' => $allActivities,
+            'allTrainers' => $allTrainers,
+            'allBatches' => $allBatches,
+            'allSections' => $allSections,
+            'allGroups' => $allGroups,
+        ]);
     }
-
-    // 🔎 Batch Filter with validation
-   // ✅ Batch Filter (no need to check SportRegister)
-// ✅ Batch Filter
-if ($request->filled('batch') && $request->batch !== 'Select') {
-    $finalActivities = $finalActivities->filter(function ($item) use ($request) {
-        return $item->batch_id == $request->batch;
-    });
-}
-
-// ✅ Section Filter
-if ($request->filled('section') && $request->section !== 'Select') {
-    $finalActivities = $finalActivities->filter(function ($item) use ($request) {
-        return $item->section_id == $request->section;
-    });
-}
-
-// ✅ Group Filter
-if ($request->filled('group') && $request->group !== 'Select') {
-    $finalActivities = $finalActivities->filter(function ($item) use ($request) {
-        return $item->group_id == $request->group;
-    });
-}
-
-
-
-    // 🔎 Other Filters
-    if ($request->filled('activity') && $request->activity !== 'Select') {
-        $finalActivities = $finalActivities->filter(function ($item) use ($request) {
-            return $item->activity === $request->activity;
-        });
-    }
-
-    if ($request->filled('trainer') && $request->trainer !== 'Select') {
-        $finalActivities = $finalActivities->filter(function ($item) use ($request) {
-            return $item->trainer === $request->trainer;
-        });
-    }
-
-    if ($request->filled('start_date')) {
-        $start = Carbon::parse($request->start_date)->format('Y-m-d');
-        $finalActivities = $finalActivities->filter(function ($item) use ($start) {
-            return $item->activity_date >= $start;
-        });
-    }
-
-    if ($request->filled('end_date')) {
-        $end = Carbon::parse($request->end_date)->format('Y-m-d');
-        $finalActivities = $finalActivities->filter(function ($item) use ($end) {
-            return $item->activity_date <= $end;
-        });
-    }
-
-    return view('ums.sports.activity.player_review', [
-        'finalActivities' => $finalActivities,
-        'allActivities' => $allActivities,
-        'allTrainers' => $allTrainers,
-        'allBatches' => $allBatches,
-       
-    ]);
-}
 
 
 

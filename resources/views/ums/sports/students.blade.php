@@ -13,7 +13,7 @@
                         <h2 class="content-header-title float-start mb-0">Candidate Master</h2>
                         <div class="breadcrumb-wrapper">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{{ url('sports-students') }}">Home</a></li>
                                 <li class="breadcrumb-item active">Candidate Master List</li>
                             </ol>
                         </div>
@@ -34,6 +34,19 @@
         <div class="content-body">
 
             @include('ums.admin.notifications')
+            @if(session('import_errors'))
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>{{ session('warning') ?? session('error') }}</strong>
+        <ul class="mb-0">
+            @foreach(session('import_errors') as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+            
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">

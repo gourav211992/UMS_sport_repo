@@ -11,7 +11,7 @@
                         <h2 class="content-header-title float-start mb-0">Fee Master</h2>
                         <div class="breadcrumb-wrapper">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="index">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{{ url('sports-fee-schedule') }}">Home</a></li>
                                 <li class="breadcrumb-item active">Fee Master List</li>
                             </ol>
                         </div>

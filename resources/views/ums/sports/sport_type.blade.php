@@ -14,7 +14,7 @@
                         <h2 class="content-header-title float-start mb-0">Sport Type Master</h2>
                         <div class="breadcrumb-wrapper">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="index.html">Home</a></li>  
+                                <li class="breadcrumb-item"><a href="{{ url('sport-type') }}">Home</a></li>  
                                 <li class="breadcrumb-item active">Sport Master List</li>
                             </ol>
                         </div>

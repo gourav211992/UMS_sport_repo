@@ -523,7 +523,8 @@
                         </td>
                         <td
                             style="border: 1px solid #000; padding: 5px 5px; border-left: none; border-top: none; text-align: center;">
-                            {{ $ratingScaleArray[floor($activityTotalScore / 10)] }}
+                            {{-- {{ $ratingScaleArray[floor($activityTotalScore / 10)] }} --}}
+                            {{ $ratingScaleArray[floor($activityTotalScore / 10)] ?? 'N/A' }}
                         </td>
                     </tr>
 

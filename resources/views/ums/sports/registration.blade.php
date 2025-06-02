@@ -2105,13 +2105,20 @@ function loadCountries() {
                         batch_id: batchId,
                         _token: "{{ csrf_token() }}"
                     },
-                    success: function(response) {
-                        if (response.length > 0) {
-                            $.each(response, function(index, section) {
-                                $('#section').append('<option value="' + section.id + '">' + section.section + '</option>');
-                            });
+
+                             success: function(response) {
+                            if (response.sections && response.sections.length > 0) {
+                                $.each(response.sections, function(index, section) {
+                                    $('#section').append('<option value="' + section.id + '">' +
+                                        section.section + '</option>');
+                                });
+
+
+                                if (selectedSection) {
+                                    $('#section').val(selectedSection).trigger('change');
+                                }
+                            }
                         }
-                    }
                 });
             }
         });

@@ -402,12 +402,40 @@
             
             let badgeClass = 'bg-secondary';
             switch (parseInt(rating)) {
-                case 5: badgeClass = 'bg-success'; break;
-                case 4: badgeClass = 'bg-primary'; break;
-                case 3: badgeClass = 'bg-info'; break;
-                case 2: badgeClass = 'bg-warning'; break;
-                case 1: badgeClass = 'bg-danger'; break;
-            }
+                    case 1:
+                        badgeClass = 'bg-danger';
+                        break;
+                    case 2:
+                        badgeClass = 'bg-danger';
+                        break;
+                    case 3:
+                        badgeClass = 'bg-warning';
+                        break;
+                    case 4:
+                        badgeClass = 'bg-warning';
+                        break;
+                    case 5:
+                        badgeClass = 'bg-info';
+                        break;
+                    case 6:
+                        badgeClass = 'bg-info';
+                        break;
+                    case 7:
+                        badgeClass = 'bg-primary';
+                        break;
+                    case 8:
+                        badgeClass = 'bg-primary';
+                        break;
+                    case 9:
+                        badgeClass = 'bg-success';
+                        break;
+                    case 10:
+                        badgeClass = 'bg-success';
+                        break;
+                    default:
+                        $badgeClass = 'bg-secondary';
+
+                }
 
             badge.removeClass(function (index, className) {
                 return (className.match(/(^|\s)bg-\S+/g) || []).join(' ');
@@ -418,6 +446,8 @@
         });
     });
 </script>
+
+
 
     <script>
         $('#checkAll').on('change', function() {

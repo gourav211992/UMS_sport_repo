@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class batch extends Model
 {
     use HasFactory;
-    public $table='batches';
+    public $table='sport_batches';
     protected $fillable=['batch_name','batch_year','status'];
     protected $guarded=[];
 

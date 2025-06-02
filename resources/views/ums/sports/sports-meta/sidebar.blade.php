@@ -62,7 +62,7 @@ data-scroll-to-active="true">
             <li class="nav-item"><a class="d-flex align-items-center" href="{{url('sports-students')}}"><i
                         data-feather="users"></i><span class="menu-title text-truncate">Candidates Master</span></a>
             </li>
-            <li class="nav-item"><a class="d-flex align-items-center" href="{{url('/fee_refund')}}"><i data-feather="arrow-left-circle"></i>
+            <li class="nav-item"><a class="d-flex align-items-center" href="{{url('/fee-refund')}}"><i data-feather="arrow-left-circle"></i>
 <span class="menu-title text-truncate">Fee Refund</span></a>
             </li>
 

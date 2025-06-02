@@ -13,7 +13,7 @@
                             <h2 class="content-header-title float-start mb-0">Activity Master</h2>
                             <div class="breadcrumb-wrapper">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url('activity-master') }}">Home</a></li>
                                     <li class="breadcrumb-item active">Activity List</li>
                                 </ol>
                             </div>
