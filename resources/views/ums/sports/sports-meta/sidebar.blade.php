@@ -70,27 +70,6 @@ data-scroll-to-active="true">
                         data-feather="circle"></i><span class="menu-item text-truncate">Series</span></a>
             </li>
 
-
-            <!-- <li class="nav-item"><a class="d-flex align-items-center" href=""><i
-                    data-feather="activity"></i><span class="menu-title text-truncate"
-                    data-i18n="Dashboards">Activity</span></a>
-            <ul class="menu-content">
-                <li><a class="d-flex align-items-center" href="{{url('activity-master')}}"><i
-                            data-feather="circle"></i><span class="menu-item text-truncate">Master</span></a>
-                </li>
-                <li><a class="d-flex align-items-center" href="{{url('activity-scheduler')}}"><i
-                            data-feather="circle"></i><span
-                            class="menu-item text-truncate">Scheduler</span></a></li>
-                <li><a class="d-flex align-items-center" href="#"><i
-                            data-feather="circle"></i><span
-                            class="menu-item text-truncate">Attendance</span></a></li>
-                <li><a class="d-flex align-items-center" href="#"><i
-                            data-feather="circle"></i><span
-                            class="menu-item text-truncate">Assessment</span></a></li>
-            </ul>
-        </li> -->
-
-
             <li class="nav-item">
                 <a class="d-flex align-items-center" href="">
                     <i data-feather="activity"></i>
@@ -131,8 +110,6 @@ data-scroll-to-active="true">
                 </ul>
             </li>
 
-
-
             <li class="nav-item"><a class="d-flex align-items-center" href="index.html"><i
                         data-feather="file-text"></i><span class="menu-title text-truncate"
                         data-i18n="Dashboards">Master</span></a>
@@ -172,6 +149,26 @@ data-scroll-to-active="true">
                    
                 </ul>
 
+            </li>
+
+            <li class="nav-item">
+                <a class="d-flex align-items-center" href="">
+                    <i data-feather="file-text"></i>
+                    <span class="menu-title text-truncate"
+                        data-i18n="Dashboards">Report</span>
+                </a>
+                <ul class="menu-content">
+                    <li><a class="d-flex align-items-center" href="{{url('student-report')}}"><i
+                                data-feather="circle"></i><span class="menu-item text-truncate">Student Report</span></a>
+                    </li>
+                    <li><a class="d-flex align-items-center" href="{{url('fee-report')}}"><i
+                                data-feather="circle"></i><span class="menu-item text-truncate">Fee Report</span></a>
+                    </li>
+                    <li><a class="d-flex align-items-center" href="{{url('attendance')}}"><i
+                                data-feather="circle"></i><span class="menu-item text-truncate">Attendance</span></a>
+                    </li>
+
+                </ul>
             </li>
         </ul>
     </div>

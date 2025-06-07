@@ -6,6 +6,10 @@ use App\Traits\DefaultGroupCompanyOrg;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ums\SportBatch;
+use App\Models\ums\SportQuota;
+use App\Models\ums\SportRegistrationDetail;
+use App\Models\ums\SportTrainingDetail;
+use App\Models\ums\SportSection;
 
 class SportRegister extends Model
 {
@@ -83,7 +87,8 @@ class SportRegister extends Model
     {
         return $this->hasOne(SportRegistrationDetail::class, 'registration_id');
     }
-    public function registration(){
+    public function registration()
+    {
         return $this->hasOne(\App\models\ums\User::class, 'userable_id');
     }
     public function user()
@@ -101,6 +106,15 @@ class SportRegister extends Model
 
     public function section()
     {
-        return $this->belongsTo(SportSection::class,'section_id');
+        return $this->belongsTo(SportSection::class, 'section_id');
     }
+
+    public function quota()
+    {
+        return $this->belongsTo(SportQuota::class, 'quota_id');
+    }
+
+    protected $casts = [
+        'fee_details' => 'array',
+    ];
 }

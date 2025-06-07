@@ -21,6 +21,10 @@ class Kernel extends ConsoleKernel
             });
         })->daily();
 
+                //  $schedule->command('update:user-payment-status')->daily(); // Run daily
+                 $schedule->command('update:user-payment-status')->everyMinute();
+
+
         // Reset Patterns Monthly
         $schedule->call(function () {
             NumberPattern::where('series_numbering','Auto')->where('reset_pattern','Monthly')->each(function (NumberPattern $pattern) {  

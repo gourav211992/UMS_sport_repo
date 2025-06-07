@@ -1,6 +1,6 @@
 <?php
 
-namespace App\models\ums;
+namespace App\Models\ums;
 
 // use Laravel\Passport\HasApiTokens;
 use App\Models\SportRegister;

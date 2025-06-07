@@ -45,7 +45,7 @@
                 <section class="app-user-view-billing">
                     <div class="row">
                         <!-- User Sidebar -->
-                        <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
+                        <div class="col-xl-4 col-lg-5 col-md-5 col  order-md-0">
                             <!-- User Card -->
                             {{-- <div class="card">
                                 <div class="card-body">
@@ -130,18 +130,43 @@
                                                 <span class="fw-bolder me-25">Status:</span>
                                                 <span class="badge {{ ($student->registration->status == 'submitted' || $student->registration->status == 'approved') ? 'badge-light-success' : ($student->registration->status == 'rejected' ? 'badge-light-danger' : 'badge-light-warning') }}">{{ ucfirst($student->registration->status) }}</span>
                                             </li>
-                                            <li class="mb-75">
-                                                <span class="fw-bolder me-25">Guardian Name:</span>
-                                                <span>{{ $familyDetails->name ?? 'N/A' }}</span>
-                                            </li>
-                                            <li class="mb-75">
-                                                <span class="fw-bolder me-25">Guardian No.:</span>
-                                                <span>{{ $student->mobile ?? 'N/A' }}</span>
-                                            </li>
-                                            <li class="mb-75">
-                                                <span class="fw-bolder me-25">Guardian Email:</span>
-                                                <span>{{ $student->email ?? 'N/A' }}</span>
-                                            </li>
+                                           @php
+    $guardian = null;
+    $nameToShow = 'N/A';
+    $emailToShow = 'N/A';
+    $contactToShow = 'N/A';
+
+    if ($familyDetails instanceof \Illuminate\Support\Collection) {
+        $guardian = $familyDetails->first(function ($item) {
+            return $item->is_guardian == 1;
+        });
+
+        $firstMember = $familyDetails->first();
+
+        $nameToShow = $guardian->name ?? ($firstMember->name ?? 'N/A');
+        $emailToShow = $guardian->email ?? ($firstMember->email ?? 'N/A');
+        $contactToShow = $guardian->contact_no ?? ($firstMember->contact_no ?? 'N/A');
+
+    } elseif (is_object($familyDetails)) {
+        $nameToShow = $familyDetails->name ?? 'N/A';
+        $emailToShow = $familyDetails->email ?? 'N/A';
+        $contactToShow = $familyDetails->contact_no ?? 'N/A';
+    }
+@endphp
+
+<li class="mb-75">
+    <span class="fw-bolder me-25">Guardian Name:</span>
+    <span>{{ $nameToShow }}</span>
+</li>
+<li class="mb-75">
+    <span class="fw-bolder me-25">Guardian No.:</span>
+    <span>{{ $contactToShow }}</span>
+</li>
+<li class="mb-75">
+    <span class="fw-bolder me-25">Guardian Email:</span>
+    <span>{{ $emailToShow }}</span>
+</li>
+
                                             <!-- <li class="mb-75">
                                                 <span class="fw-bolder me-25">Country:</span>
                                                 <span>{{ $student->registration->country ?? 'N/A' }}</span>
@@ -157,59 +182,6 @@
 
                         <!-- User Content -->
                         <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
-
-                            {{-- <div class="card">
-                                <div class="card-header">
-                                    <h4 class="card-title">My Profile</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-2 pb-50">
-                                                <h5>Registration No</h5>
-                                                <span>98765434567 <i data-feather="alert-triangle"
-                                                        class="text-warning"></i></span>
-                                            </div>
-                                            <div class="mb-2 pb-50">
-                                                <h5>Date of Joining</h5>
-                                                <span>25-01-2025 <i data-feather="check-circle"
-                                                        class="text-success"></i></span>
-                                            </div>
-                                            <div class="mb-2 mb-md-1">
-                                                <h5>Address <span
-                                                        class="badge badge-light-primary ms-50">Primary</span></h5>
-                                                <span>Plot No 4, Sector 135, Noida 201301</span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="alert alert-warning mb-2" role="alert">
-                                                <div class="alert-body fw-normal font-small-3"><i
-                                                        data-feather='alert-triangle'></i> Your Account is pending for
-                                                    Verification.</div>
-                                            </div>
-                                            <div class="plan-statistics pt-1">
-                                                <div class="d-flex justify-content-between">
-                                                    <h5 class="fw-bolder">Profile Completed</h5>
-                                                    <h6 class="fw-bold font-small-3">40% of 100%</h6>
-                                                </div>
-                                                <div class="progress">
-                                                    <div class="progress-bar w-25" role="progressbar"
-                                                        aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
-                                                    </div>
-                                                </div>
-                                                <p class="mt-50">Atlease 80% Registration complete to verify your
-                                                    account.</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <a class="btn btn-primary me-1 mt-1" href="registration.html">
-                                                Update Profile
-                                            </a>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> --}}
 
 
                             <div class="card">
@@ -259,17 +231,7 @@
                                                         data-feather='alert-triangle'></i>  Admin has reviewed your profile, so you can now pay your fees and submit your profile.</div>
                                             </div>
                                             @endif
-                                            <!-- <div class="plan-statistics pt-1">
-                                                <div class="d-flex justify-content-between">
-                                                    <h5 class="fw-bolder">Profile Completed</h5>
-                                                    <h6 class="fw-bold font-small-3">80% of 100%</h6>
-                                                </div>
-                                                <div class="progress">
-                                                    <div class="progress-bar w-75" role="progressbar"
-                                                         aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                                <p class="mt-50">Atleast 80% Registration complete to verify your account.</p>
-                                            </div> -->
+                                           
                                         </div>
                                         @if($student->registration->status == 'draft' || $student->registration->status == 'rejected' || $student->registration->status == 'on-hold')
                                         <div class="col-12">
@@ -313,84 +275,7 @@
                                         <div class="col-md-12">
 
 
-                                            {{-- <div class="table-responsive pomrnheadtffotsticky">
-                                                <table
-                                                    class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad">
-                                                    <thead>
-                                                        <tr>
-                                                            <th width="69">S.NO </th>
-                                                            <th width="202">Due Date</th>
-                                                            <th width="141">Amount</th>
-                                                            <th width="141">Paid Amount</th>
-                                                            <th width="141">Remaining Amount</th>
-                                                            <th width="226">Status</th>
-                                                            <th width="108">Action</th>
-                                                        </tr>
-                                                    </thead>
-
-                                                        <tr>
-                                                            <td class="poprod-decpt">1</td>
-                                                            <td class="poprod-decpt">{{$date}}</td>
-                                                            <td>{{number_format($totalFees,2)}}</td>
-                                                            <td>{{ number_format($paid_amount, 2)}}</td>
-                                                           <td>{{number_format(intval($totalFees)- intval( $paid_amount),2)}}</td>
-                                                       
-                                                            <td><span
-                                                                    class="badge rounded-pill @if($student->payment_status == 'paid') badge-light-success @else badge-light-warning @endif  badgeborder-radius">{{$student->payment_status??'Pending'}}</span>
-                                                            </td>
-                                                            <td><a href="#sponsor" data-bs-toggle="modal"type="button"
-                                                                    class="text-primary add-contact-row btn btn-sm   btn-success px-25 font-small-2 py-25">
-                                                                        Pay Now</a>
-                                                               
-                                                                @if($student->payment_status == 'paid')
-                                                                <span class="badge bg-success badge rounded-pill">Paid</span>
-                                                                @else
-                                                             
-                                                                @endif
-                                                             
-                                                                <button
-                                                                    data-bs-toggle="modal" data-bs-target="#update-payment" class="btn btn-primary btn-sm px-25 font-small-2 py-25">Payment Details</button>
-                                                                
-                                                            </td>
-                                                        </tr>
-
-
-                                                    </tbody>
-
-                                                </table>
-                                            </div>
-
-
-                                            <div class="modal fade" id="pay_now" tabindex="-1" aria-labelledby="pay_now" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h4 class="modal-title fs-2" id="pay_now">Payment </h4>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <form id="">
-                                                                @csrf
-                                                                <div class="mb-3 text-center">
-
-                                                                    <p class="">Are you sure you're paying under the correct quota? If not, please contact the admin on ......... before proceeding with payment.</p>
-
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                                    <button type="button" class="btn btn-success pay-now-btn" data-user-id="{{ $student->id }}" >Submit</button>
-                                                                </div>
-                                                                <!-- <button type="button" class="btn btn-success pay-now-btn" data-user-id="{{ $student->id }}" >Submit</button> -->
-                                                            </form>
-                                                        </div>
-                                                        <!-- <div class="modal-footer"> -->
-                                                            <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
-                                                            <!-- <button type="button" class="btn btn-success" data-user-id="{{ $student->id }}" >Submit</button>  -->
-                                                            <!-- // <button type="button" class="btn btn-danger" onclick="submitRejectForm()">Submit</button> -->
-                                                         <!-- </div> -->
-                                                    </div>
-                                                </div>
-                                            </div> --}}
+                                          
                                             @php
 use Carbon\Carbon;
 
@@ -398,11 +283,10 @@ $feeItems = $feeDetails;
 $monthlyGrouped = [];
 $startDate = Carbon::parse($student->registration->doj);
 
-$paidData = $existingData;     // From DB: 'Paid'
-$unpaidData = $UsersideData;   // From DB: 'notconfirm'
+$paidData = $existingData;     
+$unpaidData = $UsersideData;   
 
 
-// Define intervals for each payment mode
 $intervalMap = [
     'Monthly' => 1,
     'Quarterly' => 3,
@@ -542,6 +426,7 @@ ksort($monthlyGrouped);
 
 
 <h4>Monthly Fee Due Schedule</h4>
+   <div class="table-responsive ">
 <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad ">
     <thead>
         <tr>
@@ -587,22 +472,26 @@ ksort($monthlyGrouped);
                         {{ $status }}
                     </span>
                 </td>
-                <td>
-    <input type="checkbox" class="due-check" 
-        data-date="{{ $dueDate }}"
-        data-items='@json($items)'
-        data-total="{{ $total }}"
-        {{ $isDisabled ? 'checked disabled' : '' }}>
+   <td>
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center">
+        <input type="checkbox" class="due-check"
+            data-date="{{ $dueDate }}"
+            data-items='@json($items)'
+            data-total="{{ $total }}"
+            {{ $isDisabled ? 'checked disabled' : '' }}>
 
-    <i class="fa fa-eye text-primary ms-2 view-schedule" style="cursor:pointer"
-       data-bs-toggle="modal"
-       data-bs-target="#feeDetailModal"
-       data-date="{{ $dueDate }}"
-       data-items='@json($items)'
-        data-remaining="{{ $remaining }}"
-       title="View Fee Schedule">
-    </i>
+        <i class="fa fa-eye text-primary mt-1 mt-md-0 ms-md-2 view-schedule"
+            style="cursor:pointer"
+            data-bs-toggle="modal"
+            data-bs-target="#feeDetailModal"
+            data-date="{{ $dueDate }}"
+            data-items='@json($items)'
+            data-remaining="{{ $remaining }}"
+            title="View Fee Schedule">
+        </i>
+    </div>
 </td>
+
             </tr>
         @endforeach
     </tbody>
@@ -610,7 +499,7 @@ ksort($monthlyGrouped);
         <tr>
             <td></td>
             <td colspan="2"><strong>Total Amount: ₹{{ number_format($total_amount, 2) }}</strong></td>
-            <td colspan="2"><strong>Payable Amount: ₹{{ number_format($paidAmount, 2) }}</strong></td>
+            <td colspan="2"><strong>Paid Amount: ₹{{ number_format($paidAmount, 2) }}</strong></td>
             <td></td>
             <td>
                <button class="btn btn-primary btn-sm px-25 font-small-2 py-25 pay-now-btn" 
@@ -623,8 +512,13 @@ ksort($monthlyGrouped);
         </tr>
     </tfoot>
 </table> 
+</div>
+</div>
+</div>
+
+
 <!-- Confirm Payment Modal -->
-<div class="modal fade" id="confirmPayModal" tabindex="-1" aria-labelledby="confirmPayModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="confirmPayModal" tabindex="-1" aria-labelledby="confirmPayModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -632,6 +526,33 @@ ksort($monthlyGrouped);
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+
+       <div class="col-md-12 mb-1">
+                                                                                    <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
+                                                                                    <select class="form-control select2" name="pay_mode" required>
+                                                                                        <option value="">Select</option>
+                                                                                        <option value="IMPS/RTGS">IMPS/RTGS</option>
+                                                                                        <option value="NEFT">NEFT</option>
+                                                                                        <option value="By Cheque">By Cheque</option>
+                                                                                        <option value="Cash">Cash</option>
+                                                                                    </select>
+                                                                                </div>
+          <div class="col-md-12 mb-1" id="bankNameDiv">
+                                                                                    <label class="form-label">Bank name <span class="text-danger">*</span></label>
+                                                                                    <select class="form-control select2" name="bank_name" id="bank_name" required>
+                                                                                        <option value="">Select</option>
+                                                                                        <option value="HDFC Bank">HDFC Bank</option>
+                                                                                        <option value="ICICI Bank">ICICI Bank</option>
+                                                                                        <option value="Axis Bank">Axis Bank</option>
+                                                                                        <option value="State Bank of India">State Bank of India</option>
+                                                                                        <option value="Bank of Baroda">Bank of Baroda</option>
+                                                                                    </select>
+                                                                                </div>
+
+                                                                                 <div class="col-md-12 mb-1" id="refNoDiv">
+                                                                                    <label class="form-label">Ref No. <span class="text-danger">*</span></label>
+                                                                                    <input type="text" class="form-control" name="ref_no" id="ref_no" required />
+                                                                                </div>
         Are you sure you want to proceed with the payment?
       </div>
       <div class="modal-footer">
@@ -640,7 +561,176 @@ ksort($monthlyGrouped);
       </div>
     </div>
   </div>
+</div> -->
+<!-- <div class="modal fade" id="confirmPayModal" tabindex="-1" aria-labelledby="confirmPayModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmPayModalLabel">Confirm Payment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12 mb-1">
+          <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
+          <select class="form-control select2" name="pay_mode" id="pay_mode" required>
+            <option value="">Select</option>
+            <option value="IMPS/RTGS">IMPS/RTGS</option>
+            <option value="NEFT">NEFT</option>
+            <option value="By Cheque">By Cheque</option>
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+          </select>
+        </div>
+
+        <div class="col-md-12 mb-1" id="bankNameDiv">
+          <label class="form-label">Bank name <span class="text-danger">*</span></label>
+          <select class="form-control select2" name="bank_name" id="bank_name" required>
+            <option value="">Select</option>
+            <option value="HDFC Bank">HDFC Bank</option>
+            <option value="ICICI Bank">ICICI Bank</option>
+            <option value="Axis Bank">Axis Bank</option>
+            <option value="State Bank of India">State Bank of India</option>
+            <option value="Bank of Baroda">Bank of Baroda</option>
+          </select>
+        </div>
+
+        <div class="col-md-12 mb-1" id="refNoDiv">
+          <label class="form-label">Ref No. <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" name="ref_no" id="ref_no" required />
+        </div>
+
+        <div class="col-md-12 mb-1" id="qrCodeDiv" style="display: none;">
+          <label class="form-label">Scan QR Code</label><br>
+<img src="{{asset('sports/img/sampleqr.jpeg')}}"
+                                     alt="UPI QR Code" class="img-fluid">        </div>
+
+        Are you sure you want to proceed with the payment?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="confirmPaymentBtn" disabled>Yes, Pay Now</button>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+<!-- <div class="modal fade" id="confirmPayModal" tabindex="-1" aria-labelledby="confirmPayModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="paymentForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmPayModalLabel">Confirm Payment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+                      <p class="text-center fw-bold text-danger">Are you sure you want to proceed with the payment?</p>
+
+          <div class="mb-3">
+            <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
+            <select class="form-select" id="paymentMode" name="pay_mode" required>
+              <option value="">Select</option>
+              <option value="IMPS/RTGS">IMPS/RTGS</option>
+              <option value="NEFT">NEFT</option>
+              <option value="By Cheque">By Cheque</option>
+              <option value="UPI">UPI</option>
+            </select>
+          </div>
+
+          <div class="mb-3" id="bankNameDiv" style="display:none;">
+            <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+            <select class="form-select" name="bank_name" id="bank_name">
+              <option value="">Select</option>
+              <option value="HDFC Bank">HDFC Bank</option>
+              <option value="ICICI Bank">ICICI Bank</option>
+              <option value="Axis Bank">Axis Bank</option>
+              <option value="State Bank of India">State Bank of India</option>
+              <option value="Bank of Baroda">Bank of Baroda</option>
+            </select>
+          </div>
+
+          <div class="mb-3" id="refNoDiv" style="display:none;">
+            <label class="form-label">Reference No. <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="ref_no" id="ref_no">
+          </div>
+
+          <div id="upiSection" style="display:none;">
+            <div class="text-center mb-3">
+              <p>Scan the QR code to make payment</p>
+              <img src="{{ asset('sports/img/sampleqr.jpeg') }}" alt="UPI QR Code" class="img-fluid" style="max-width:200px;">
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="confirmPaymentBtn">Yes, Pay Now</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> -->
+<div class="modal fade" id="confirmPayModal" tabindex="-1" aria-labelledby="confirmPayModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-3">
+      <form id="paymentForm">
+        <div class="modal-header bg-primary text-white rounded-top">
+          <h5 class="modal-title text-white"  id="confirmPayModalLabel">Confirm Payment</h5>
+          <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <p class="text-center fw-semibold text-danger mb-2 p-1">
+            Are you sure you want to proceed with the payment?
+          </p>
+
+          <div class="mb-2">
+            <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
+            <select class="form-select" id="paymentMode" name="pay_mode" required>
+              <option value="">Select</option>
+              <option value="IMPS/RTGS">IMPS/RTGS</option>
+              <option value="NEFT">NEFT</option>
+              <option value="By Cheque">By Cheque</option>
+              <option value="UPI">UPI</option>
+            </select>
+          </div>
+
+          <div class="mb-2" id="bankNameDiv" style="display:none;">
+            <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+            <select class="form-select" name="bank_name" id="bank_name">
+              <option value="">Select</option>
+              <option value="HDFC Bank">HDFC Bank</option>
+              <option value="ICICI Bank">ICICI Bank</option>
+              <option value="Axis Bank">Axis Bank</option>
+              <option value="State Bank of India">State Bank of India</option>
+              <option value="Bank of Baroda">Bank of Baroda</option>
+            </select>
+          </div>
+
+          <div class="mb-2" id="refNoDiv" style="display:none;">
+            <label class="form-label">Reference No. <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="ref_no" id="ref_no" placeholder="Enter reference number">
+          </div>
+
+          <div id="upiSection" style="display:none;" class="text-center">
+            <p class="mb-2 fw-semibold">Scan the QR code to make payment</p>
+            <img src="{{ asset('sports/img/sampleqr.jpeg') }}" alt="UPI QR Code" class="img-fluid rounded shadow" style="max-width: 200px;">
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light rounded-bottom">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success btn-sm" id="confirmPaymentBtn">Yes, Pay Now</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
+
+<!-- jQuery Script -->
+
 
 <!-- Modal -->
 <div class="modal fade" id="feeDetailModal" tabindex="-1" aria-labelledby="feeDetailModalLabel" aria-hidden="true">
@@ -681,8 +771,12 @@ ksort($monthlyGrouped);
 
 
                                         </div>
+                                        </div>
 
-                                    </div>
+
+                        </div>
+
+
                                 </div>
                             </div>
                             <!--/ Billing Address -->
@@ -2027,9 +2121,87 @@ $(document).ready(function () {
         $('#confirmPayModal').modal('show');
     });
 
-    // Handle confirmation modal's "Yes, Pay Now" button
+    const $confirmBtn = $('#confirmPaymentBtn');
+  const $paymentMode = $('#paymentMode');
+  const $bankNameDiv = $('#bankNameDiv');
+  const $refNoDiv = $('#refNoDiv');
+  const $bankName = $('#bank_name');
+  const $refNo = $('#ref_no');
+
+  // Initially disable the confirm button
+  $confirmBtn.prop('disabled', true);
+
+  function validateForm() {
+    const mode = $paymentMode.val();
+
+    if (!mode) {
+      return false; // payment mode required
+    }
+
+    if (['IMPS/RTGS', 'NEFT', 'By Cheque'].includes(mode)) {
+      if (!$bankName.val() || !$refNo.val().trim()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  $paymentMode.on('change', function () {
+    const mode = $(this).val();
+
+    $bankNameDiv.hide();
+    $refNoDiv.hide();
+
+    $bankName.prop('required', false);
+    $refNo.prop('required', false);
+
+    if (mode === 'UPI') {
+      $('#upiSection').show();
+    } else {
+      $('#upiSection').hide();
+    }
+
+    if (['IMPS/RTGS', 'NEFT', 'By Cheque'].includes(mode)) {
+      $bankNameDiv.show();
+      $refNoDiv.show();
+
+      $bankName.prop('required', true);
+      $refNo.prop('required', true);
+    }
+
+    $confirmBtn.prop('disabled', !validateForm());
+  });
+
+  $bankName.on('input change', function () {
+    $confirmBtn.prop('disabled', !validateForm());
+  });
+
+  $refNo.on('input change', function () {
+    $confirmBtn.prop('disabled', !validateForm());
+  });
+
+  $('#confirmPayModal').on('shown.bs.modal', function () {
+    $confirmBtn.prop('disabled', true);
+    $paymentMode.val('');
+    $bankNameDiv.hide();
+    $refNoDiv.hide();
+    $('#upiSection').hide();
+    $bankName.val('');
+    $refNo.val('');
+  });
+
+  
+
+
     $('#confirmPaymentBtn').on('click', function () {
+         if (!validateForm()) {
+      alert('Please fill all required fields correctly.');
+      return;}
         $('#confirmPayModal').modal('hide');
+           let payMode = $('#paymentMode').val();
+          let bankName = $('#bank_name').val();
+           let refNo = $('#ref_no').val();
 
         $.ajax({
             url: "{{ url('update-payment-status') }}",
@@ -2040,6 +2212,9 @@ $(document).ready(function () {
             },
             data: JSON.stringify({
                 user_id: userId,
+                 pay_mode: payMode,
+                bank_name: bankName,
+             ref_no: refNo,
                 payments: selectedPayments
             }),
             success: function (response) {
@@ -2073,8 +2248,9 @@ $(document).ready(function () {
         });
     });
 });
+  });
 
-});
+
 
 toastr.options = {
     "closeButton": true,
@@ -2088,7 +2264,6 @@ toastr.options = {
 
 <script>
     $(document).ready(function() {
-        // Handle form submission
         function toggleBankName() {
             var payMode = $('select[name="pay_mode"]').val();
 
@@ -2161,5 +2336,31 @@ toastr.options = {
         });
     });
 </script>
+
+<script>
+$(document).ready(function () {
+  $('#paymentMode').on('change', function () {
+    const mode = $(this).val();
+
+    $('#bankNameDiv, #refNoDiv, #upiSection').hide();
+    $('#bank_name, #ref_no').prop('required', false);
+
+    if (mode === 'UPI') {
+      $('#upiSection').show();
+    } else if (['IMPS/RTGS', 'NEFT', 'By Cheque'].includes(mode)) {
+      $('#bankNameDiv, #refNoDiv').show();
+      $('#bank_name, #ref_no').prop('required', true);
+    }
+  });
+
+  $('#paymentForm').submit(function (e) {
+    e.preventDefault();
+    let payMode = $('#paymentMode').val();
+    alert('Payment confirmed via ' + payMode);
+    $('#confirmPayModal').modal('hide');
+  });
+});
+</script>
+
 @endsection
 

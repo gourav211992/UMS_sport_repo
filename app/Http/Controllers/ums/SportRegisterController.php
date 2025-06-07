@@ -719,10 +719,11 @@ public function confirm(  Request $request, $id){
         $quota = SportQuota::find($registration->quota_id);
         $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
         if ($registration->fee_details){
-            $feeDetails = json_decode($registration->fee_details, true);
+            $feeDetails = $registration->fee_details;
         }else{
-            $feeDetails = json_decode($sportFeeMaster->fee_details, true);
+            $feeDetails = $sportFeeMaster->fee_details;
         }
+
         $groups = SportGroupMaster::where('status', 'active')->get();
 
         // Handle missing family details
@@ -1822,9 +1823,9 @@ if ($sportRegister) {
         $sportFeeMaster = SportRegister::where('userable_id', $id)->first();
         // $feeDetails = $sportFeeMaster && !empty($sportFeeMaster->fee_details) ? json_decode($sportFeeMaster->fee_details, true) : [];
         if ($student->registration->fee_details){
-            $feeDetails = json_decode($student->registration->fee_details, true);
+            $feeDetails = $student->registration->fee_details;
         }else{
-            $feeDetails = json_decode($sportFeeMaster->fee_details, true);
+            $feeDetails = $sportFeeMaster->fee_details;
         }
 
        
@@ -2422,7 +2423,6 @@ if ($sportRegister) {
 
 public function update_payment(Request $request)
 {
-    //  dd($request->all());
     try {
         $payment = SportPayment::firstOrNew(['user_id' => $request->user_id]);
 
@@ -2432,46 +2432,65 @@ public function update_payment(Request $request)
 
         foreach ($request->payments as $item) {
             $feeHead = $item['feeHead'];
-            
+
             if (!isset($groupedPayments[$feeHead])) {
                 $groupedPayments[$feeHead] = [
                     'duration' => 0,
                     'schedule' => []
                 ];
             }
-$dueDateParts = explode('/', $item['due_date']);
-$reformattedDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
-$selectedAtParts = explode(',', $item['selected_at']);
-$selectedDateParts = explode('/', trim($selectedAtParts[0]));
-$selectedDateFormatted = $selectedDateParts[2] . '-' . $selectedDateParts[1] . '-' . $selectedDateParts[0];
-$selectedDateTime = $selectedDateFormatted . ' ' . trim($selectedAtParts[1]);
+
+            $dueDateParts = explode('/', $item['due_date']);
+            $reformattedDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+
+            $selectedAtParts = explode(',', $item['selected_at']);
+            $selectedDateParts = explode('/', trim($selectedAtParts[0]));
+            $selectedDateFormatted = $selectedDateParts[2] . '-' . $selectedDateParts[1] . '-' . $selectedDateParts[0];
+            $selectedDateTime = $selectedDateFormatted . ' ' . trim($selectedAtParts[1]);
+
             $scheduleEntry = [
-                'type'=> $item['type'],
+                'type' => $item['type'],
                 'index' => $item['index'],
                 'amount' => $item['amount'],
                 'month' => date('F', strtotime($reformattedDate)),
-
-                'status' => $item['status'],
-                'due_date' => date('d/m/Y', strtotime($reformattedDate)), 
-'payment_date' => date('d/m/Y', strtotime($selectedDateTime)),
-'payment_time' => date('h:i a', strtotime($selectedDateTime))
+                'status' => 'paid', 
+                'isDisabled'=>true,  
+                'due_date' => date('d/m/Y', strtotime($reformattedDate)),
+                'payment_date' => date('d/m/Y', strtotime($selectedDateTime)),
+                'payment_time' => date('h:i a', strtotime($selectedDateTime))
             ];
 
             $groupedPayments[$feeHead]['schedule'][] = $scheduleEntry;
-
             $groupedPayments[$feeHead]['duration']++;
         }
+           
 
         foreach ($groupedPayments as $feeHead => $data) {
             if (isset($existingData[$feeHead])) {
                 $existingData[$feeHead]['schedule'] = array_merge($existingData[$feeHead]['schedule'], $data['schedule']);
                 $existingData[$feeHead]['duration'] += $data['duration'];
+               
             } else {
                 $existingData[$feeHead] = $data;
             }
         }
 
-       $payment->fee_heads_durations = json_encode($existingData);
+          $totalPaidAmount = 0;
+          foreach ($existingData as $feeHead => $feeData) {
+            foreach ($feeData['schedule'] as $schedule) {
+                   $totalPaidAmount += $schedule['amount'];
+                
+                }
+            }
+        
+
+
+        $payment->fee_heads_durations = json_encode($existingData);
+
+       
+        $payment->paid_amount = $totalPaidAmount;
+       
+
         $payment->save();
 
         return response()->json([
@@ -2491,6 +2510,9 @@ public function update_payment_status(Request $request)
     //  dd($request->all());
     try {
         $payment = SportPayment::firstOrNew(['user_id' => $request->user_id]);
+        $payment->ref_no = $request->ref_no;
+        $payment->pay_mode= $request->pay_mode; 
+        $payment->bank_name=$request->bank_name;                                                                                        
 
         $existingData = json_decode($payment->user_side_data ?? '{}', true);
 
@@ -2551,6 +2573,7 @@ $selectedDateTime = $selectedDateFormatted . ' ' . trim($selectedAtParts[1]);
         ], 500);
     }
 }
+
 
     
     

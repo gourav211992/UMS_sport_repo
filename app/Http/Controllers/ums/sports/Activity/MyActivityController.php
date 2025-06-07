@@ -345,23 +345,18 @@ public function review(Request $request)
         }
     }
 
-    // 🔎 Batch Filter with validation
-   // ✅ Batch Filter (no need to check SportRegister)
-// ✅ Batch Filter
 if ($request->filled('batch') && $request->batch !== 'Select') {
     $finalActivities = $finalActivities->filter(function ($item) use ($request) {
         return $item->batch_id == $request->batch;
     });
 }
 
-// ✅ Section Filter
 if ($request->filled('section') && $request->section !== 'Select') {
     $finalActivities = $finalActivities->filter(function ($item) use ($request) {
         return $item->section_id == $request->section;
     });
 }
 
-// ✅ Group Filter
 if ($request->filled('group') && $request->group !== 'Select') {
     $finalActivities = $finalActivities->filter(function ($item) use ($request) {
         return $item->group_id == $request->group;
@@ -369,8 +364,6 @@ if ($request->filled('group') && $request->group !== 'Select') {
 }
 
 
-
-    // 🔎 Other Filters
     if ($request->filled('activity') && $request->activity !== 'Select') {
         $finalActivities = $finalActivities->filter(function ($item) use ($request) {
             return $item->activity === $request->activity;
@@ -562,6 +555,7 @@ if ($request->filled('group') && $request->group !== 'Select') {
         if (!$activityDate) {
             return redirect('player-review')->with('error', 'No activity found for this date.');
         }
+
 
         return view('ums.sports.activity.player_review_view', compact(
             'data',

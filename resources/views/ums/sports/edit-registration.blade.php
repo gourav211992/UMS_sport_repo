@@ -2566,6 +2566,7 @@
 
 
                                                     <h4>Monthly Fee Due Schedule</h4>
+                                                    <div class="table-responsive">
                                                     <table
                                                         class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad">
                                                         <thead>
@@ -2632,34 +2633,36 @@
                                                                             {{ $status }}
                                                                         </span>
                                                                     </td>
-                                                                    <td>
-                                                                        @if ($status === 'Paid')
-                                                                            <input type="checkbox" checked disabled>
-                                                                        @elseif ($status === 'Confirmation required')
-                                                                            <input type="checkbox" checked disabled>
-                                                                            <button
-                                                                                class="btn btn-sm btn-info ms-2 confirm-btn"
-                                                                                data-date="{{ $dueDate }}"
-                                                                                data-items='@json($items)'>
-                                                                                Confirm
-                                                                            </button>
-                                                                        @else
-                                                                            <input type="checkbox" class="due-check"
-                                                                                data-date="{{ $dueDate }}"
-                                                                                data-items='@json($items)'
-                                                                                data-total="{{ $total }}">
-                                                                        @endif
+                                                                   <td>
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center">
+        @if ($status === 'Paid')
+            <input type="checkbox" checked disabled>
+        @elseif ($status === 'Confirmation required')
+            <input type="checkbox" checked disabled>
+            <button type="button"
+                class="btn btn-sm btn-outline-primary fw-bold mt-1 mt-md-0 ms-md-2 px-25 py-25 confirm-btn"
+                data-date="{{ $dueDate }}"
+                data-items='@json($items)'>
+                Confirm
+            </button>
+        @else
+            <input type="checkbox" class="due-check"
+                data-date="{{ $dueDate }}"
+                data-items='@json($items)'
+                data-total="{{ $total }}">
+        @endif
 
-                                                                        <i class="fa fa-eye text-primary ms-2 view-schedule"
-                                                                            style="cursor:pointer"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#feeDetailModal"
-                                                                            data-date="{{ $dueDate }}"
-                                                                            data-items='@json($items)'
-                                                                            data-remaining="{{ $remaining }}"
-                                                                            title="View Fee Schedule">
-                                                                        </i>
-                                                                    </td>
+        <i class="fa fa-eye text-primary mt-1 mt-md-0 ms-md-2 view-schedule"
+            style="cursor:pointer"
+            data-bs-toggle="modal"
+            data-bs-target="#feeDetailModal"
+            data-date="{{ $dueDate }}"
+            data-items='@json($items)'
+            data-remaining="{{ $remaining }}"
+            title="View Fee Schedule">
+        </i>
+    </div>
+</td>
 
                                                                 </tr>
                                                             @endforeach
@@ -2670,7 +2673,7 @@
                                                                 <td colspan="2"><strong>Total Amount:
                                                                         ₹{{ number_format($total_amount, 2) }}</strong>
                                                                 </td>
-                                                                <td colspan="2"><strong>Payable Amount:
+                                                                <td colspan="2"><strong>Paid Amount:
                                                                         ₹{{ number_format($paidAmount, 2) }}</strong></td>
                                                                 <td></td>
                                                                 <td>
@@ -2686,6 +2689,7 @@
                                                             </tr>
                                                         </tfoot>
                                                     </table>
+                                                    </div>
 
                                                     <!-- Modal -->
                                                     <div class="modal fade" id="feeDetailModal" tabindex="-1"
@@ -3332,8 +3336,11 @@
 
                             // Remove Confirm Button
                             row.find('.confirm-btn').remove();
-                            window.location.reload();
+                           
                         });
+                         setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
                     } else {
                         toastr.error("Confirmation failed.");
                     }

@@ -31,6 +31,7 @@ use App\Http\Controllers\ums\Admin\Master\CampusController;
 use App\Http\Controllers\ums\Admin\InternalMarksMappingController;
 use App\Http\Controllers\ums\Admin\Master\CategoryController;
 use App\Http\Controllers\ums\Admin\Master\CourseController;
+use App\Http\Controllers\ums\sports\report\AttendanceReportController;
 use App\Http\Controllers\ums\Admin\Master\DepartmentController;
 use App\Http\Controllers\ums\SettingController;
 use App\Http\Controllers\ums\Admin\BackPaperController;
@@ -102,6 +103,8 @@ use App\Http\Controllers\ums\Student\SemesterFeeController as studentformsemeste
 use App\Http\Controllers\ums\Student\AdmitCardController as StudentAdmitCardController;
 
 use App\Http\Controllers\ums\sports\StudentReportController;
+use App\Http\Controllers\ums\sports\report\SportStudentReportController;
+use App\Http\Controllers\ums\sports\report\FeeReportController;
 
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\AuthController;
@@ -451,6 +454,32 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/get-activity-subactivity', [ActivitySchedulerController::class, 'get_activity_subactivity'])->name('get.activity.subactivities.activity');
     Route::post('/get_batch_student', [ActivitySchedulerController::class, 'get_batch_student'])->name('get_batch_student');
     Route::post('/get-feesection', [SportRegisterController::class, 'get_Feesection_group']);
+
+
+   //Student Report start
+    Route::get('/student-detail-report/{userable_id}', [SportStudentReportController::class, 'StudentReportView'])->name('get.report');
+    Route::get('student-report', [SportStudentReportController::class, 'StudentReport'])->name('student-report');
+    Route::get('stu-report', [SportStudentReportController::class, 'StudentReportView'])->name('student-report-post');
+    Route::post('/get-batch-section-report', [SportStudentReportController::class, 'get_batch_section'])->name('get.batch.section.report');
+    Route::post('/get-student-by-section', [SportStudentReportController::class, 'getStudentBySection'])->name('get.student.by.section');
+    Route::get('/get-student-by-section-quota', [SportStudentReportController::class, 'getStudentBySectionQuota'])->name('get.student.by.section.quota');
+   //Student Report end
+
+    //Fee report start
+   Route::get('/get-fee-report/{userable_id}', [FeeReportController::class, 'StudentReportView'])->name('get.fee.report');
+   Route::get('fee-report', [FeeReportController::class, 'showFeeReportFilters'])->name('fee.report.show');
+   Route::post('fee-report/print', [FeeReportController::class, 'printfeeReport'])->name('fee.report.print');
+   Route::post('fee-report/section', [FeeReportController::class, 'get_batch_section'])->name('get.batch.section.fee.report');
+   Route::get('/get-report', [FeeReportController::class, 'getStudentBySectionQuota'])->name('get.report.by.section.quota');
+   Route::post('get-batch-section', [FeeReportController::class, 'get_batch_section'])->name('get.batch.section');
+    //Fee report end
+
+
+   //attendance report start
+    Route::get('attendance-report', function () {
+        return view('ums.sports.report.attendance_report');
+    });
+   //attendance report end
 
 
 
@@ -3496,3 +3525,13 @@ Route::get('/md_marksheet', [MdResultController::class, 'mdMarksheet'])->name('m
 
 Route::get('md_marksheet_list', [MdResultController::class, 'mdMarksheetList'])->name('md-marksheet-list');
 //report
+
+
+// start attendance
+Route::get('attendance',[AttendanceReportController::class,'index']);
+
+Route::get('/get-sections/{batch_id}', [AttendanceReportController::class, 'getSections']);
+Route::get('/get-groups/{batch_id}/{section_id}', [AttendanceReportController::class, 'getGroups']);
+Route::get('/get-dates/{batch_id}/{section_id}', [AttendanceReportController::class, 'getDates']);
+Route::get('/attendance_report', [AttendanceReportController::class, 'getAttendanceReport']);
+// end attendance
