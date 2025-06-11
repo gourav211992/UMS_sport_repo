@@ -325,7 +325,7 @@
                 <tbody>
                     @foreach ($students as $index => $student)
                         @php
-                            $feeHeadsRaw = $student->fee_details ?? [];
+                            $feeHeadsRaw = is_array($student->fee_details)?$student->fee_details:json_decode($student->fee_details,true);
                             $feeHeads = [];
                             $totalPayable = 0;
 

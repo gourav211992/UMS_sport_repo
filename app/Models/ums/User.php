@@ -31,6 +31,8 @@ class User extends Authenticatable
         'is_primary_user',
         'date_of_birth',
         'gender',
+        'password',
+        'status'
     ];
 
     /**

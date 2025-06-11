@@ -1167,6 +1167,9 @@
                                                             </thead>
                                                             <tbody>
                                                             {{--                                                            @dump($feeDetails)--}}
+                                                            <!-- @php
+                                                            $feeDetails = is_array($feeDetails) ? $feeDetails:[];
+                                                            @endphp -->
                                                             @foreach ($feeDetails as $key => $fees)
                                                                 @php
                                                                     $totalFees = $fees['total_fees'] ?? 0;

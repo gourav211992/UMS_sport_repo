@@ -323,7 +323,7 @@ foreach ($feeItems as $item) {
                     if ($paidItem['index'] == $index) {
                         $paid_amount = $paidItem['amount'];
                         $status = $paidItem['status'];
-                        $isDisabled = $status === 'Paid';
+                        $isDisabled =$paidItem['isDisabled'] ;
                         break;
                     }
                 }
@@ -366,7 +366,7 @@ foreach ($feeItems as $item) {
             foreach ($paidData[$feeHead]['schedule'] as $paidItem) {
                 $paid_amount = $paidItem['amount'];
                 $status = $paidItem['status'];
-                $isDisabled = $status === 'Paid';
+                $isDisabled = $paidItem['isDisabled'] ;
                 break;
             }
         }
@@ -675,7 +675,7 @@ ksort($monthlyGrouped);
 <div class="modal fade" id="confirmPayModal" tabindex="-1" aria-labelledby="confirmPayModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg rounded-3">
-      <form id="paymentForm">
+      <form id="paymentForm" enctype="multipart/form-data" method="POST">
         <div class="modal-header bg-primary text-white rounded-top">
           <h5 class="modal-title text-white"  id="confirmPayModalLabel">Confirm Payment</h5>
           <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -708,6 +708,10 @@ ksort($monthlyGrouped);
               <option value="Bank of Baroda">Bank of Baroda</option>
             </select>
           </div>
+          {{-- <div class= "mb-2">
+              <label class="form-label">Payment Document</label>
+              <input type="file" class="form-control" name="pay_doc" id="pay_doc" accept="image*/" />
+            </div> --}}
 
           <div class="mb-2" id="refNoDiv" style="display:none;">
             <label class="form-label">Reference No. <span class="text-danger">*</span></label>
@@ -1246,132 +1250,7 @@ ksort($monthlyGrouped);
     <!-- END: Footer-->
 
 
-    <div class="modal fade" id="update-payment" tabindex="-1" aria-labelledby="shareProjectTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            @if(!empty($user->payments))
-            <div class="modal-content p-3">
-                <h2 class="mb-3">Payment Details</h2>
-
-                <table class="table table-bordered bg-white" style="border-collapse: collapse; background-color: white;">
-                    <tr>
-                     <th>User Name</th>
-                        <td>{{ $user->first_name . ' '. ($user->middle_name ?? ''). ' '. $user->last_name }}</td>
-                    </tr>
-
-                    @if($user->payments)
-                    <tr>
-                        <th>Payment Status</th>
-                        <td>{{ $user->payments->status ?? 'Pending' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Bank Name</th>
-                        <td>{{ $user->payments->bank_name ?? 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Payment Mode</th>
-                        <td>{{ $user->payments->pay_mode ?? 'N/A' }}</td>
-                    </tr>
-                     <tr>
-                        <th>Paid Amount</th>
-                        <td>{{ $user->payments->paid_amount ?? 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Reference No.</th>
-                        <td>{{ $user->payments->ref_no ?? 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Payment Document</th>
-                        <td>
-                            @if(!empty($user->payments->pay_doc))
-                            <a href="{{ $user->payments->pay_doc }}" target="_blank">View Document</a>
-                            @else
-                            No document uploaded
-                            @endif
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Remarks</th>
-                        <td>{{ $user->payments->remarks ?? 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Transaction Date</th>
-                        <td>{{ $user->payments->created_at ?? 'N/A' }}</td>
-                    </tr>
-                    @else
-                    <tr>
-                        <th colspan="2" class="text-center">No payment information available</th>
-                    </tr>
-                    @endif
-                </table>
-            </div>
-            @else
-            <form id="paymentForm" method="post" enctype="multipart/form-data">
-                @csrf
-                <input type="hidden" name="user_id" value="{{ $student->id }}">
-                <div class="modal-content">
-                    <div class="modal-header p-0 bg-transparent">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body px-sm-4 mx-50 pb-2">
-                        <h1 class="text-center mb-1" id="shareProjectTitle">Payment Details</h1>
-                        <p class="text-center">Enter the details below.</p>
-
-                        <div class="row mt-2">
-                            <div class="col-md-12 mb-1" id="bankNameDiv">
-                                <label class="form-label">Bank name <span class="text-danger">*</span></label>
-                                <select class="form-control select2" name="bank_name" id="bank_name" required>
-                                    <option value="">Select</option>
-                                    <option value="HDFC Bank">HDFC Bank</option>
-                                    <option value="ICICI Bank">ICICI Bank</option>
-                                    <option value="Axis Bank">Axis Bank</option>
-                                    <option value="State Bank of India">State Bank of India</option>
-                                    <option value="Bank of Baroda">Bank of Baroda</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
-                                <select class="form-control select2" name="pay_mode" required>
-                                    <option value="">Select</option>
-                                    <option value="IMPS/RTGS">IMPS/RTGS</option>
-                                    <option value="NEFT">NEFT</option>
-                                    <option value="By Cheque">By Cheque</option>
-                                    <option value="Cash">Cash</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-12 mb-1" id="refNoDiv">
-                                <label class="form-label">Ref No. <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" name="ref_no" id="ref_no" required />
-                            </div>
-
-                               <div class="col-md-12 mb-1">
-                                <label class="form-label">Paid Amount <span class="text-danger"></span></label>
-                                <input type="text" class="form-control" name="paid_amount" />
-                            </div>
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Payment Document <span class="text-danger"></span></label>
-                                <input type="file" class="form-control" name="pay_doc" />
-                            </div>
-
-                            <div class="col-md-12 mb-1">
-                                <label class="form-label">Remarks</label>
-                                <textarea class="form-control" name="pay_remark"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-outline-secondary me-1" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary" id="submitPayment">Submit</button>
-                    </div>
-                </div>
-            </form>
-            @endif
-        </div>
-    </div>
-
+   
 
 <!-- Main Fee Modal -->
 {{-- <div class="modal fade" id="sponsor" tabindex="-1" aria-labelledby="shareProjectTitle" aria-hidden="true">
@@ -1500,7 +1379,7 @@ ksort($monthlyGrouped);
 
 
     <!-- Payment Modal -->
-    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    {{-- <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1547,7 +1426,7 @@ ksort($monthlyGrouped);
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -2127,6 +2006,7 @@ $(document).ready(function () {
   const $refNoDiv = $('#refNoDiv');
   const $bankName = $('#bank_name');
   const $refNo = $('#ref_no');
+ 
 
   // Initially disable the confirm button
   $confirmBtn.prop('disabled', true);
@@ -2202,6 +2082,7 @@ $(document).ready(function () {
            let payMode = $('#paymentMode').val();
           let bankName = $('#bank_name').val();
            let refNo = $('#ref_no').val();
+           let pay_doc=$('#pay_doc').val();
 
         $.ajax({
             url: "{{ url('update-payment-status') }}",
@@ -2215,6 +2096,7 @@ $(document).ready(function () {
                  pay_mode: payMode,
                 bank_name: bankName,
              ref_no: refNo,
+             pay_doc:pay_doc,
                 payments: selectedPayments
             }),
             success: function (response) {
@@ -2262,7 +2144,7 @@ toastr.options = {
 
 
 
-<script>
+{{-- <script>
     $(document).ready(function() {
         function toggleBankName() {
             var payMode = $('select[name="pay_mode"]').val();
@@ -2335,7 +2217,7 @@ toastr.options = {
             $('#paymentForm')[0].reset();
         });
     });
-</script>
+</script> --}}
 
 <script>
 $(document).ready(function () {

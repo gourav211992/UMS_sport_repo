@@ -63,48 +63,33 @@ public function getGroups($batch_id, $section_id)
     return response()->json($groups);
 }
 
-public function getAllSections()
-{
-    // Return all sections used in scheduler
-    $sectionIds = SportActivityScheduler::pluck('section')->unique();
-    $sections = SportSection::whereIn('id', $sectionIds)->get();
-    return response()->json($sections);
-}
-
-public function getAllGroups($sectionId)
-{
-   
-    $groupIds = SportActivityScheduler::where('section', $sectionId)
-        ->pluck('group')
-        ->unique();
-
-    $groups = SportGroupMaster::whereIn('id', $groupIds)->get();
-    return response()->json($groups);
-}
 
 
 
 public function getAttendanceReport(Request $request)
+
 {
+
     $validation = $request->validate([
         'start_date' => 'required|date',
         'end_date' => 'required|date|after_or_equal:start_date',
         'batch' => 'required',
-        'section' => 'nullable',
+        'section' => 'required',
         'group' => 'nullable',
     ]);
-
+    
     $batch = $validation['batch'];
-    $section = $validation['section'] ?? null;
+    $section = $validation['section'];
     $group = $validation['group'] ?? null;
     $startDate = $validation['start_date'];
     $endDate = $validation['end_date'];
+    
 
-    // 1. Fetch schedulers
+    // 1. Fetch schedulers with relationships
     $schedulerQuery = SportActivityScheduler::with(['batchRelation', 'sectionRelation', 'groupRelation'])
         ->whereNull('deleted_at');
 
-    if ($batch !== 'all') {
+    if (!empty($batch)) {
         $schedulerQuery->where('batch_name', $batch);
     }
     if (!empty($section)) {
@@ -127,13 +112,59 @@ public function getAttendanceReport(Request $request)
 
     $schedulerIds = $schedulers->pluck('id');
 
-    // 2. Get attendance records
+    // 2. Attendance records
     $attendanceDetails = DB::table('sport_activity_details')
         ->whereIn('scheduler_id', $schedulerIds)
         ->whereBetween('date', [$startDate, $endDate])
         ->get();
 
-    // 3. Prepare month-wise student IDs
+    // 3. Collect all student IDs
+    $allStudents = [];
+    foreach ($attendanceDetails as $detail) {
+        $studentData = json_decode($detail->students, true);
+        if (is_array($studentData)) {
+            $allStudents = array_merge($allStudents, array_keys($studentData));
+        }
+    }
+    $uniqueStudentIds = array_unique($allStudents);
+
+    // 4. Get student details
+    $studentDetails = SportRegister::whereIn('id', $uniqueStudentIds)
+        ->get(['id', 'name', 'registration_number'])
+        ->keyBy('id');
+
+    // 5. Prepare date list
+    $period = CarbonPeriod::create($startDate, $endDate);
+    $dateList = [];
+    foreach ($period as $date) {
+        $dateList[] = $date->format('Y-m-d');
+    }
+
+    // 6. Prepare report data (default: absent)
+    $reportData = [];
+    foreach ($uniqueStudentIds as $studentId) {
+        foreach ($dateList as $date) {
+            $reportData[$studentId][$date] = 'absent';
+        }
+    }
+
+    // 7. Overwrite with actual attendance
+    foreach ($attendanceDetails as $detail) {
+        $students = json_decode($detail->students, true);
+        $date = $detail->date;
+
+        if (is_array($students)) {
+            foreach ($students as $studentId => $info) {
+                if (isset($info['attendance']) && $info['attendance'] === 'present') {
+                    $reportData[$studentId][$date] = 'present';
+                } else {
+                    $reportData[$studentId][$date] = 'absent';
+                }
+            }
+        }
+    }
+
+    // 8. Group student IDs by month
     $monthWiseStudentIds = [];
     foreach ($attendanceDetails as $detail) {
         $date = \Carbon\Carbon::parse($detail->date);
@@ -147,60 +178,12 @@ public function getAttendanceReport(Request $request)
         }
     }
 
-    // Remove duplicates
+    // 9. Remove duplicates per month
     foreach ($monthWiseStudentIds as $month => $ids) {
         $monthWiseStudentIds[$month] = array_unique($ids);
     }
 
-    // 4. Flatten all student IDs from all months
-    $allStudentIds = collect($monthWiseStudentIds)->flatten()->unique()->values()->all();
-
-    // 5. Get student details
-    $studentDetails = SportRegister::whereIn('id', $allStudentIds)
-        ->get(['id', 'name', 'registration_number'])
-        ->keyBy('id');
-
-    // 6. Prepare date list
-    $period = CarbonPeriod::create($startDate, $endDate);
-    $dateList = [];
-    foreach ($period as $date) {
-        $dateList[] = $date->format('Y-m-d');
-    }
-
-    // 7. Prepare reportData (month-specific students only)
-    $reportData = [];
-
-    foreach ($monthWiseStudentIds as $month => $studentIds) {
-        foreach ($studentIds as $studentId) {
-            foreach ($dateList as $date) {
-                if (str_starts_with($date, $month)) {
-                    $reportData[$studentId][$date] = 'absent'; // default
-                }
-            }
-        }
-    }
-
-    // 8. Overwrite with actual attendance
-    foreach ($attendanceDetails as $detail) {
-        $students = json_decode($detail->students, true);
-        $date = $detail->date;
-        $month = \Carbon\Carbon::parse($date)->format('Y-m');
-
-        if (is_array($students)) {
-            foreach ($students as $studentId => $info) {
-                // Only allow students who belong to this month
-                if (!in_array($studentId, $monthWiseStudentIds[$month] ?? [])) continue;
-
-                if (isset($info['attendance']) && $info['attendance'] === 'present') {
-                    $reportData[$studentId][$date] = 'present';
-                } else {
-                    $reportData[$studentId][$date] = 'absent';
-                }
-            }
-        }
-    }
-
-    // 9. Return view
+    // 10. Return view
     return view('ums.sports.report.attendance_report', [
         'attendanceDetails' => $attendanceDetails,
         'schedulers' => $schedulers,
@@ -208,12 +191,11 @@ public function getAttendanceReport(Request $request)
         'endDate' => $endDate,
         'reportData' => $reportData,
         'dateList' => $dateList,
-        'studentIds' => $allStudentIds,
+        'studentIds' => $uniqueStudentIds,
         'studentDetails' => $studentDetails,
         'monthWiseStudentIds' => $monthWiseStudentIds,
     ]);
 }
-
 
 
 }

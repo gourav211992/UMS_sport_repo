@@ -16,6 +16,7 @@ use App\Models\State;
 // use App\Models\ums\Section;
 
 use App\Models\ums\SportBatch;
+use App\Models\ums\SportPaymentDetail;
 use App\Models\ums\SportQuota;
 use App\Models\ums\Sports_Fee_Refund;
 use App\Models\ums\SportSection;
@@ -152,7 +153,7 @@ public function importSportsRegister(Request $request)
     $batches = sport_fee_master::all()->unique('batch');
     $sections = SportSection::all()->unique('name');
     $sportFeeMaster = sport_fee_master::where('quota','General')->first();
-    $feeDetails = json_decode($sportFeeMaster->fee_details, true);
+    $feeDetails =$sportFeeMaster->fee_details;
         $countries  = Country::all();
         $user = User::with('payments')->findOrFail($User->id);
         $batchYears = SportBatch::select('batch_year')->distinct()->get();
@@ -686,10 +687,12 @@ public function confirm(  Request $request, $id){
 
     public function edit($id)
     {
+
         $registration = SportRegister::findOrFail($id);
         $userId=User::find($registration->userable_id);
 
-    
+            $sportPaymentDetail=SportPaymentDetail::where('user_id', $userId->id)->get();
+
         $RecivedPayment=SportPayment::where('user_id',$userId->id)->first();
         $user = Helper::getAuthenticatedUser();
         $parentURL = request()->segments()[0];
@@ -770,6 +773,7 @@ public function confirm(  Request $request, $id){
             'sportSponsor',
             'sportDocuments',
             'groups',
+            'sportPaymentDetail',
             'selectedBatch',
             'countries',
             'cities',
@@ -818,9 +822,9 @@ public function confirm(  Request $request, $id){
         $quota = SportQuota::find($registration->quota_id);
         $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
         if ($registration->fee_details){
-            $feeDetails = json_decode($registration->fee_details, true);
+            $feeDetails = $registration->fee_details;
         }else{
-            $feeDetails = json_decode($sportFeeMaster->fee_details, true);
+            $feeDetails = $sportFeeMaster->fee_details;
         }
         $groups = SportGroupMaster::where('status', 'active')->get();
 //        $selectedCountry = Country::where('id', $familyDetails[0]->permanent_country)->first();
@@ -913,10 +917,11 @@ public function confirm(  Request $request, $id){
         $quota = SportQuota::find($registration->quota_id);
         $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
         if ($registration->fee_details){
-            $feeDetails = json_decode($registration->fee_details, true);
+            $feeDetails = $registration->fee_details;
         }else{
-            $feeDetails = json_decode($sportFeeMaster->fee_details, true);
+            $feeDetails = $sportFeeMaster->fee_details;
         }
+        // dd( $feeDetails);
         $groups = SportGroupMaster::where('status', 'active')->get();
 //        $selectedCountry = Country::where('id', $familyDetails[0]->permanent_country)->first();
 //        $selectedState = State::where('id', $familyDetails[0]->permanent_state)->first();
@@ -984,7 +989,7 @@ public function confirm(  Request $request, $id){
 
     public function postRegistrationUpdate(Request $request, $id)
     {
-//        dd($request->all());
+    //    dd($request->all());
         // Fetch the existing registration record
         $registration = SportRegister::findOrFail($id);
         $user = \App\Models\User::find($registration->userable_id);
@@ -1110,7 +1115,7 @@ public function confirm(  Request $request, $id){
         $batch = sport_fee_master::find($request->fee_batch_id);
         $batch_id = SportBatch::where('batch_name',$batch->batch)->first();
         $section = sport_fee_master::find($request->fee_section_id);
-        $section_id = SportSection::where('name',$section->section)->first();
+        $section_id = SportSection::find($section->section_id);
         $validated = array_merge($validated, [
             'batch_id'        => $batch_id->id,
             'section_id'      => $section_id->id
@@ -1289,7 +1294,7 @@ public function confirm(  Request $request, $id){
                 }
 
                 // Check if fee_details changed
-                $oldFeeDetails = json_decode($registration->getOriginal('fee_details'), true);
+                $oldFeeDetails = $registration->getOriginal('fee_details');
                 $newFeeDetails = $request->input('fee_details');
                 if ($newFeeDetails && $oldFeeDetails !== $newFeeDetails) {
                     $sendOnHoldEmail = true;
@@ -1857,7 +1862,7 @@ if ($sportRegister) {
 
 
     public function profileRegistration($id)
-    {
+    { 
         $registration = SportRegister::findOrFail($id);
 
         $user = Helper::getAuthenticatedUser();
@@ -1886,9 +1891,9 @@ if ($sportRegister) {
         $quota = SportQuota::find($registration->quota_id);
         $sportFeeMaster = sport_fee_master::where('quota', $quota->quota_name)->first();
         if ($registration->fee_details){
-            $feeDetails = json_decode($registration->fee_details, true);
+            $feeDetails = $registration->fee_details;
         }else{
-            $feeDetails = json_decode($sportFeeMaster->fee_details, true);
+            $feeDetails = $sportFeeMaster->fee_details;
         }
         $groups = SportGroupMaster::where('status', 'active')->get();
         if ($familyDetails->isNotEmpty()) {
@@ -2421,16 +2426,174 @@ if ($sportRegister) {
 // }
 
 
-public function update_payment(Request $request)
+// public function update_payment(Request $request)
+// {
+//     try {
+//         $payment = SportPayment::firstOrNew(['user_id' => $request->user_id]);
+
+//         $existingData = json_decode($payment->fee_heads_durations ?? '{}', true);
+
+//         $groupedPayments = [];
+
+//         foreach ($request->payments as $item) {
+//             $feeHead = $item['feeHead'];
+
+//             if (!isset($groupedPayments[$feeHead])) {
+//                 $groupedPayments[$feeHead] = [
+//                     'duration' => 0,
+//                     'schedule' => []
+//                 ];
+//             }
+
+//             $dueDateParts = explode('/', $item['due_date']);
+//             $reformattedDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+
+//             $selectedAtParts = explode(',', $item['selected_at']);
+//             $selectedDateParts = explode('/', trim($selectedAtParts[0]));
+//             $selectedDateFormatted = $selectedDateParts[2] . '-' . $selectedDateParts[1] . '-' . $selectedDateParts[0];
+//             $selectedDateTime = $selectedDateFormatted . ' ' . trim($selectedAtParts[1]);
+
+//             $scheduleEntry = [
+//                 'type' => $item['type'],
+//                 'index' => $item['index'],
+//                 'amount' => $item['amount'],
+//                 'month' => date('F', strtotime($reformattedDate)),
+//                 'status' => 'paid', 
+//                 'isDisabled'=>true,  
+//                 'due_date' => date('d/m/Y', strtotime($reformattedDate)),
+//                 'payment_date' => date('d/m/Y', strtotime($selectedDateTime)),
+//                 'payment_time' => date('h:i a', strtotime($selectedDateTime))
+//             ];
+
+//             $groupedPayments[$feeHead]['schedule'][] = $scheduleEntry;
+//             $groupedPayments[$feeHead]['duration']++;
+//         }
+           
+
+//         foreach ($groupedPayments as $feeHead => $data) {
+//             if (isset($existingData[$feeHead])) {
+//                 $existingData[$feeHead]['schedule'] = array_merge($existingData[$feeHead]['schedule'], $data['schedule']);
+//                 $existingData[$feeHead]['duration'] += $data['duration'];
+               
+//             } else {
+//                 $existingData[$feeHead] = $data;
+//             }
+//         }
+
+//           $totalPaidAmount = 0;
+//           foreach ($existingData as $feeHead => $feeData) {
+//             foreach ($feeData['schedule'] as $schedule) {
+//                    $totalPaidAmount += $schedule['amount'];
+                
+//                 }
+//             }
+        
+
+
+//         $payment->fee_heads_durations = json_encode($existingData);
+
+       
+//         $payment->paid_amount = $totalPaidAmount;
+       
+
+//         $payment->save();
+
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Payment status updated successfully!'
+//         ]);
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => $e->getMessage()
+//         ], 500);
+//     }
+// }
+
+// public function update_payment_status(Request $request)
+// {
+//     //  dd($request->all());
+//     try {
+//         $payment = SportPayment::firstOrNew(['user_id' => $request->user_id]);
+//         $payment->ref_no = $request->ref_no;
+//         $payment->pay_mode= $request->pay_mode; 
+//         $payment->bank_name=$request->bank_name;                                                                                        
+
+//         $existingData = json_decode($payment->user_side_data ?? '{}', true);
+
+//         $groupedPayments = [];
+
+//         foreach ($request->payments as $item) {
+//             $feeHead = $item['feeHead'];
+            
+//             if (!isset($groupedPayments[$feeHead])) {
+//                 $groupedPayments[$feeHead] = [
+//                     'duration' => 0,
+//                     'schedule' => []
+//                 ];
+//             }
+// $dueDateParts = explode('/', $item['due_date']);
+// $reformattedDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+// $selectedAtParts = explode(',', $item['selected_at']);
+// $selectedDateParts = explode('/', trim($selectedAtParts[0]));
+// $selectedDateFormatted = $selectedDateParts[2] . '-' . $selectedDateParts[1] . '-' . $selectedDateParts[0];
+// $selectedDateTime = $selectedDateFormatted . ' ' . trim($selectedAtParts[1]);
+//             $scheduleEntry = [
+//                 'type'=> $item['type'],
+//                 'index' => $item['index'],
+//                 'amount' => $item['amount'],
+//                 'month' => date('F', strtotime($reformattedDate)),
+
+//                 'status' => $item['status'],
+//                 'due_date' => date('d/m/Y', strtotime($reformattedDate)), 
+// 'payment_date' => date('d/m/Y', strtotime($selectedDateTime)),
+// 'payment_time' => date('h:i a', strtotime($selectedDateTime))
+//             ];
+
+//             $groupedPayments[$feeHead]['schedule'][] = $scheduleEntry;
+
+//             $groupedPayments[$feeHead]['duration']++;
+//         }
+
+//         foreach ($groupedPayments as $feeHead => $data) {
+//             if (isset($existingData[$feeHead])) {
+//                 $existingData[$feeHead]['schedule'] = array_merge($existingData[$feeHead]['schedule'], $data['schedule']);
+//                 $existingData[$feeHead]['duration'] += $data['duration'];
+//             } else {
+//                 $existingData[$feeHead] = $data;
+//             }
+//         }
+
+//         $payment->user_side_data = json_encode($existingData);
+//         $payment->save();
+
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Payment status updated successfully!'
+//         ]);
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => $e->getMessage()
+//         ], 500);
+//     }
+// }
+
+
+ public function AdminSideData(Request $request)
 {
     try {
         $payment = SportPayment::firstOrNew(['user_id' => $request->user_id]);
-
         $existingData = json_decode($payment->fee_heads_durations ?? '{}', true);
 
         $groupedPayments = [];
-
-        foreach ($request->payments as $item) {
+         
+if (is_string($request->payments)) {
+    $requestPayments = json_decode($request->payments, true);
+} else {
+    $requestPayments = $request->payments; 
+}
+        foreach ($requestPayments as $item) {
             $feeHead = $item['feeHead'];
 
             if (!isset($groupedPayments[$feeHead])) {
@@ -2453,8 +2616,8 @@ public function update_payment(Request $request)
                 'index' => $item['index'],
                 'amount' => $item['amount'],
                 'month' => date('F', strtotime($reformattedDate)),
-                'status' => 'paid', 
-                'isDisabled'=>true,  
+                'status' => 'paid',
+                'isDisabled' => true,
                 'due_date' => date('d/m/Y', strtotime($reformattedDate)),
                 'payment_date' => date('d/m/Y', strtotime($selectedDateTime)),
                 'payment_time' => date('h:i a', strtotime($selectedDateTime))
@@ -2463,39 +2626,103 @@ public function update_payment(Request $request)
             $groupedPayments[$feeHead]['schedule'][] = $scheduleEntry;
             $groupedPayments[$feeHead]['duration']++;
         }
-           
 
         foreach ($groupedPayments as $feeHead => $data) {
             if (isset($existingData[$feeHead])) {
                 $existingData[$feeHead]['schedule'] = array_merge($existingData[$feeHead]['schedule'], $data['schedule']);
                 $existingData[$feeHead]['duration'] += $data['duration'];
-               
             } else {
                 $existingData[$feeHead] = $data;
             }
         }
 
-          $totalPaidAmount = 0;
-          foreach ($existingData as $feeHead => $feeData) {
+        $totalPaidAmount = 0;
+        foreach ($existingData as $feeHead => $feeData) {
             foreach ($feeData['schedule'] as $schedule) {
-                   $totalPaidAmount += $schedule['amount'];
-                
-                }
+                $totalPaidAmount += $schedule['amount'];
             }
-        
-
+        }
 
         $payment->fee_heads_durations = json_encode($existingData);
-
-       
         $payment->paid_amount = $totalPaidAmount;
-       
-
         $payment->save();
+        
+        $now = now()->setTimezone('Asia/Kolkata');
+         $dueDateParts = explode('/', $item['due_date']);
+            $formattedDueDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+
+            $detail = SportPaymentDetail::where('user_id', $request->user_id)
+                ->where('payment_id', $payment->id)
+                ->whereDate('due_date', $formattedDueDate)
+                ->first();
+
+           if ($request->type === 'confirm') {
+    foreach ($requestPayments as $item) {
+        $dueDateParts = explode('/', $item['due_date']);
+        $formattedDueDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+
+        $existingDetail = SportPaymentDetail::where('user_id', $request->user_id)
+            ->where('payment_id', $payment->id)
+            ->whereDate('due_date', $formattedDueDate)
+            ->first();
+
+        if ($existingDetail) {
+            $existingDetail->payment_status = 'paid';
+            $existingDetail->pay_confirmation_date = $now->format('Y-m-d');
+            $existingDetail->pay_confirmation_time = $now->format('H:i:s');
+            $existingDetail->save();
+        }
+    }
+}
+
+    if (!$detail) {
+    foreach ($requestPayments as $item) {
+        $dueDateParts = explode('/', $item['due_date']);
+        $formattedDueDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+
+        $existingDetail = SportPaymentDetail::where('user_id', $request->user_id)
+            ->where('payment_id', $payment->id)
+            ->whereDate('due_date', $formattedDueDate)
+            ->first();
+
+        if ($existingDetail) {
+            continue; // Skip this due date; already recorded
+        }
+
+        $now = now()->setTimezone('Asia/Kolkata');
+
+        $detail = new SportPaymentDetail();
+        $detail->payment_id = $payment->id;
+        $detail->user_id = $request->user_id;
+        $detail->pay_collector = $request->collected_by;
+        $detail->bank_name = $request->bank_name ?? null;
+        $detail->pay_mode = $request->pay_mode ?? null;
+        $detail->ref_no = $request->ref_no ?? null;
+        $detail->due_date = $formattedDueDate;
+
+        if ($request->hasFile('pay_doc') && !isset($filename)) {
+            $file = $request->file('pay_doc');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/pay_docs'), $filename);
+        }
+
+        if (isset($filename)) {
+            $detail->pay_doc = $filename;
+        }
+
+        $detail->paid_amount = $item['amount'];
+        $detail->payment_status = 'paid';
+        $detail->remarks = $request->pay_remark ?? null;
+        $detail->pay_confirmation_date = $now->format('Y-m-d');
+        $detail->pay_confirmation_time = $now->format('H:i:s');
+
+        $detail->save();
+    }
+}
 
         return response()->json([
             'success' => true,
-            'message' => 'Payment status updated successfully!'
+            'message' => 'Payment status updated and details saved successfully!'
         ]);
     } catch (\Exception $e) {
         return response()->json([
@@ -2505,48 +2732,157 @@ public function update_payment(Request $request)
     }
 }
 
-public function update_payment_status(Request $request)
+// public function UserSideData(Request $request)
+// {
+
+//         dd($request->all());
+ 
+//     try {
+//         $payment = SportPayment::firstOrNew(['user_id' => $request->user_id]);
+        
+                                                                                            
+
+//         $existingData = json_decode($payment->user_side_data ?? '{}', true);
+
+//         $groupedPayments = [];
+//         if (is_string($request->payments)) {
+//     $requestPayments = json_decode($request->payments, true);
+// } else {
+//     $requestPayments = $request->payments; 
+// }
+
+//         foreach ($requestPayments as $item) {
+//             $feeHead = $item['feeHead'];
+            
+//             if (!isset($groupedPayments[$feeHead])) {
+//                 $groupedPayments[$feeHead] = [
+//                     'duration' => 0,
+//                     'schedule' => []
+//                 ];
+//             }
+// $dueDateParts = explode('/', $item['due_date']);
+// $reformattedDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+// $selectedAtParts = explode(',', $item['selected_at']);
+// $selectedDateParts = explode('/', trim($selectedAtParts[0]));
+// $selectedDateFormatted = $selectedDateParts[2] . '-' . $selectedDateParts[1] . '-' . $selectedDateParts[0];
+// $selectedDateTime = $selectedDateFormatted . ' ' . trim($selectedAtParts[1]);
+//             $scheduleEntry = [
+//                 'type'=> $item['type'],
+//                 'index' => $item['index'],
+//                 'amount' => $item['amount'],
+//                 'month' => date('F', strtotime($reformattedDate)),
+//                 'status' => $item['status'],
+//                 'due_date' => date('d/m/Y', strtotime($reformattedDate)), 
+//                 'payment_date' => date('d/m/Y', strtotime($selectedDateTime)),
+//                 'payment_time' => date('h:i a', strtotime($selectedDateTime))
+//             ];
+
+//             $groupedPayments[$feeHead]['schedule'][] = $scheduleEntry;
+
+//             $groupedPayments[$feeHead]['duration']++;
+//         }
+
+//         foreach ($groupedPayments as $feeHead => $data) {
+//             if (isset($existingData[$feeHead])) {
+//                 $existingData[$feeHead]['schedule'] = array_merge($existingData[$feeHead]['schedule'], $data['schedule']);
+//                 $existingData[$feeHead]['duration'] += $data['duration'];
+//             } else {
+//                 $existingData[$feeHead] = $data;
+//             }
+//         }
+
+//         $payment->user_side_data = json_encode($existingData);
+//         $payment->save();
+        
+//      foreach ($requestPayments as $item) {
+//     $dueDateParts = explode('/', $item['due_date']);
+//     $formattedDueDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+
+//     $now = now()->setTimezone('Asia/Kolkata');
+
+//     $detail = new SportPaymentDetail();
+//     $detail->payment_id = $payment->id;
+//     $detail->user_id = $request->user_id;
+//     $detail->bank_name = $request->bank_name ?? null;
+//     $detail->pay_mode = $request->pay_mode ?? null;
+//     $detail->ref_no = $request->ref_no ?? null;
+//     $detail->due_date = $formattedDueDate;
+
+//     if ($request->hasFile('pay_doc') && !isset($filename)) {
+//         $file = $request->file('pay_doc');
+//         $filename = time() . '_' . $file->getClientOriginalName();
+//         $file->move(public_path('uploads/pay_docs'), $filename);
+//     }
+
+//     if (isset($filename)) {
+//         $detail->pay_doc = $filename;
+//     }
+
+//     $detail->paid_amount = $item['amount'];
+//     $detail->payment_status = 'confirmation required';
+//     $detail->pay_confirmation_date = $now->format('Y-m-d'); 
+//     $detail->pay_confirmation_time = $now->format('H:i:s');
+
+//     $detail->save();
+// }
+
+          
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Payment status updated successfully!'
+//         ]);
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => $e->getMessage()
+//         ], 500);
+//     }
+// }
+
+public function UserSideData(Request $request)
 {
-    //  dd($request->all());
     try {
         $payment = SportPayment::firstOrNew(['user_id' => $request->user_id]);
-        $payment->ref_no = $request->ref_no;
-        $payment->pay_mode= $request->pay_mode; 
-        $payment->bank_name=$request->bank_name;                                                                                        
 
         $existingData = json_decode($payment->user_side_data ?? '{}', true);
 
         $groupedPayments = [];
+        if (is_string($request->payments)) {
+            $requestPayments = json_decode($request->payments, true);
+        } else {
+            $requestPayments = $request->payments;
+        }
 
-        foreach ($request->payments as $item) {
+        foreach ($requestPayments as $item) {
             $feeHead = $item['feeHead'];
-            
+
             if (!isset($groupedPayments[$feeHead])) {
                 $groupedPayments[$feeHead] = [
                     'duration' => 0,
                     'schedule' => []
                 ];
             }
-$dueDateParts = explode('/', $item['due_date']);
-$reformattedDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
-$selectedAtParts = explode(',', $item['selected_at']);
-$selectedDateParts = explode('/', trim($selectedAtParts[0]));
-$selectedDateFormatted = $selectedDateParts[2] . '-' . $selectedDateParts[1] . '-' . $selectedDateParts[0];
-$selectedDateTime = $selectedDateFormatted . ' ' . trim($selectedAtParts[1]);
+
+            $dueDateParts = explode('/', $item['due_date']);
+            $reformattedDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+
+            $selectedAtParts = explode(',', $item['selected_at']);
+            $selectedDateParts = explode('/', trim($selectedAtParts[0]));
+            $selectedDateFormatted = $selectedDateParts[2] . '-' . $selectedDateParts[1] . '-' . $selectedDateParts[0];
+            $selectedDateTime = $selectedDateFormatted . ' ' . trim($selectedAtParts[1]);
+
             $scheduleEntry = [
                 'type'=> $item['type'],
                 'index' => $item['index'],
                 'amount' => $item['amount'],
                 'month' => date('F', strtotime($reformattedDate)),
-
                 'status' => $item['status'],
                 'due_date' => date('d/m/Y', strtotime($reformattedDate)), 
-'payment_date' => date('d/m/Y', strtotime($selectedDateTime)),
-'payment_time' => date('h:i a', strtotime($selectedDateTime))
+                'payment_date' => date('d/m/Y', strtotime($selectedDateTime)),
+                'payment_time' => date('h:i a', strtotime($selectedDateTime))
             ];
 
             $groupedPayments[$feeHead]['schedule'][] = $scheduleEntry;
-
             $groupedPayments[$feeHead]['duration']++;
         }
 
@@ -2562,6 +2898,42 @@ $selectedDateTime = $selectedDateFormatted . ' ' . trim($selectedAtParts[1]);
         $payment->user_side_data = json_encode($existingData);
         $payment->save();
 
+        // $filename = null;
+        // // dd($request->pay_doc);
+        
+        //     $file = $request->pay_doc;
+        //     $filename = time() . '_' . $file->getClientOriginalName();
+        //     $file->move(public_path('uploads/pay_docs'), $filename);
+        
+
+        $groupedByDueDate = collect($requestPayments)->groupBy('due_date');
+        $now = now()->setTimezone('Asia/Kolkata');
+
+        foreach ($groupedByDueDate as $dueDate => $items) {
+            $dueDateParts = explode('/', $dueDate);
+            if (count($dueDateParts) !== 3) continue;
+
+            $formattedDueDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+            $totalAmount = collect($items)->sum('amount');
+
+            $detail = new SportPaymentDetail();
+            $detail->payment_id = $payment->id;
+            $detail->user_id = $request->user_id;
+            $detail->bank_name = $request->bank_name ?? null;
+            $detail->pay_mode = $request->pay_mode ?? null;
+            $detail->ref_no = $request->ref_no ?? null;
+            $detail->due_date = $formattedDueDate;
+            $detail->paid_amount = $totalAmount;
+            $detail->payment_status = 'confirmation required';
+           
+
+            // if ($filename !== null) {
+            //     $detail->pay_doc = $filename;
+            // }
+
+            $detail->save();
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Payment status updated successfully!'
@@ -2575,7 +2947,6 @@ $selectedDateTime = $selectedDateFormatted . ' ' . trim($selectedAtParts[1]);
 }
 
 
-    
     
     public function get_batch_year(Request $request)
     {
@@ -2608,6 +2979,12 @@ public function getSectionsByBatch(Request $request)
         ->get()
         ->unique('section')
         ->values();
+
+     
+   
+
+     
+    
 
     // Get "General" quota name safely
     $quota = SportQuota::where('quota_name', 'General')->first();

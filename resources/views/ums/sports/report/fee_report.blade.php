@@ -35,8 +35,13 @@
                 <div class="card border overflow-hidden">
                     <div class="row">
                         <!-- Filter Box -->
-                        <div class="col-md-12  p-2 bg-light  bg-shadow border-bottom mb-1 po-reportfileterBox">
+                        <div class="col-md-12 bg-light border-bottom mb-1 po-reportfileterBox">
+                            <div class="row pofilterhead action-button align-items-center">
+                                <div class="col-md-4">
+                                    <h3></h3>
+                                </div>
 
+                            </div>
 
                             <div class="customernewsection-form poreportlistview p-1">
 
@@ -46,19 +51,26 @@
                                     <!-- Batch -->
 
                                     <div class="col-md">
-                                        <label class="form-label" for="batch_name">Batch</label>
-                                        <select class="form-select @error('batch_name') is-invalid @enderror" name="batch_name" id="batch_name">
+                                        <label class="form-label" for="batch_name">Batch
+                                            @error('batch_name')
+                                            <span class="text-danger">*</span>
+                                            @enderror
+                                        </label>
+                                        <select class="form-select @error('batch_name') is-invalid @enderror"
+                                            name="batch_name" id="batch_name">
                                             <option value="">Select</option>
-                                            <option value="all" {{ old('batch_name') == 'all' ? 'selected' : '' }}>All</option>
+                                            <option value="all" {{ old('batch_name') == 'all' ? 'selected' : '' }}>
+                                                All</option>
                                             @foreach ($batches as $batch)
-                                            <option value="{{ $batch->id }}" {{ old('batch_name') == $batch->id ? 'selected' : '' }}>
+                                            <option value="{{ $batch->id }}"
+                                                {{ old('batch_name') == $batch->id ? 'selected' : '' }}>
                                                 {{ $batch->batch_name }}
                                             </option>
                                             @endforeach
                                         </select>
                                         @error('batch_name')
                                         <div class="invalid-feedback">
-                                            Required
+                                            {{ $message }}
                                         </div>
                                         @enderror
                                     </div>
@@ -87,11 +99,13 @@
                                     <!-- Start & End Date (optional) -->
                                     <div class="col-md">
                                         <label class="form-label">Start Date</label>
-                                        <input type="date" class="form-control" name="start_date" value="{{ request('start_date') }}">
+                                        <input type="date" class="form-control" name="start_date"
+                                            value="{{ request('start_date') }}">
                                     </div>
                                     <div class="col-md">
                                         <label class="form-label">End Date</label>
-                                        <input type="date" class="form-control" name="end_date" value="{{ request('end_date') }}">
+                                        <input type="date" class="form-control" name="end_date"
+                                            value="{{ request('end_date') }}">
                                     </div>
 
 
@@ -169,10 +183,4 @@
         }, false)
     })()
 </script>
-
-
-
-
-
-
 @endsection

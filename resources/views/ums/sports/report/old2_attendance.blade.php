@@ -28,9 +28,7 @@
                                     </div>
                                   
 <!--                                        <button data-bs-toggle="modal" data-bs-target="#addcoulmn" class="btn btn-outline-primary btn-sm columnfilterbtn me-1"><i data-feather="plus-square"></i> Add Columns</button>-->
-<a class="btn btn-dark btn-sm mb-50 mb-sm-0 me-1" href="{{ url('attendance') }}"><i data-feather="refresh-ccw"></i> Reset</a>
-<button type="submit"  form="Attendance_form" class="btn btn-primary btn-sm mb-50 mb-sm-0 " href="{{url('attendance_report')}}"><i data-feather="file-text"></i> Get Report</button>
-
+<button type="submit"  form="Attendance_form" class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('attendance_report')}}"><i data-feather="file-text"></i> Get Report</button>
                                 </div>
                             </div>
                             <form method="GET" action="{{ url('/attendance_report') }}" id="Attendance_form">
@@ -38,7 +36,7 @@
                                 <div class="row"> 
                                     <div class="col-md-4">
                                         <div class="mb-6 mb-sm-0"> 
-                                            <label class="form-label">Batch  <span class="text-danger">*</span></label>
+                                            <label class="form-label">Batch</label>
                                             <!-- Batch -->
                                      <select name="batch" id="batch"  class="form-select">
                                    <option value="">Select Batch</option>
@@ -83,7 +81,7 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="mb-6 mb-sm-0">
-                                            <label class="form-label"> Start Date <span class="text-danger">*</span></label>
+                                            <label class="form-label">Start Date</label>
                                             <input type="date" name="start_date" id="startDate" class="form-control" value="{{ old('start_date') }}">
                                             @error('start_date')
                                                 <small class="text-danger">{{ $message }}</small>
@@ -92,7 +90,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-6 mb-sm-0">
-                                            <label class="form-label"> End Date <span class="text-danger">*</span></label>
+                                            <label class="form-label">End Date</label>
                                             {{-- <input type="date" name="end_date" id="endDate" class="form-control" /> --}}
                                             <input type="date" name="end_date" class="form-control" id="endDate" value="{{ old('end_date') }}">
                                             @error('end_date')

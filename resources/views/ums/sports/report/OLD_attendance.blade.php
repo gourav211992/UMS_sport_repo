@@ -23,14 +23,28 @@
                                 <div class="col-md-8 text-sm-end pofilterboxcenter mb-0 d-flex flex-wrap align-items-center justify-content-sm-end">
                                     <div class="customernewsection-form">
                                         <div class="demo-inline-spacing">
-                                          
+                                            <!-- <div class="form-check form-check-primary mt-0">
+                                                <input type="radio" id="customColorRadio1" name="goodsservice" class="form-check-input" checked="">
+                                                <label class="form-check-label fw-bolder" for="customColorRadio1">Goods</label>
+                                            </div> 
+                                            <div class="form-check form-check-primary mt-0">
+                                                <input type="radio" id="service" name="goodsservice" class="form-check-input">
+                                                <label class="form-check-label fw-bolder" for="service">Service</label>
+                                            </div>  -->
                                         </div>
                                     </div>
-                                  
-<!--                                        <button data-bs-toggle="modal" data-bs-target="#addcoulmn" class="btn btn-outline-primary btn-sm columnfilterbtn me-1"><i data-feather="plus-square"></i> Add Columns</button>-->
-<a class="btn btn-dark btn-sm mb-50 mb-sm-0 me-1" href="{{ url('attendance') }}"><i data-feather="refresh-ccw"></i> Reset</a>
-<button type="submit"  form="Attendance_form" class="btn btn-primary btn-sm mb-50 mb-sm-0 " href="{{url('attendance_report')}}"><i data-feather="file-text"></i> Get Report</button>
+                                    <!-- <div class="btn-group new-btn-group my-1 my-sm-0 ps-0">
+                                        <input type="radio" class="btn-check" name="Peroid" id="Current" checked />
+                                        <label class="btn btn-outline-primary mb-0" for="Current">Current Month</label>
 
+                                        <input type="radio" class="btn-check" name="Peroid" id="Last" />
+                                        <label class="btn btn-outline-primary mb-0" for="Last">Last Month</label> 
+
+                                        <input type="radio" class="btn-check" name="Peroid" id="Custom" />
+                                        <label class="btn btn-outline-primary mb-0" for="Custom">Custom</label> 
+                                    </div> -->
+<!--                                        <button data-bs-toggle="modal" data-bs-target="#addcoulmn" class="btn btn-outline-primary btn-sm columnfilterbtn me-1"><i data-feather="plus-square"></i> Add Columns</button>-->
+<button type="submit"  form="Attendance_form" class="btn btn-primary btn-sm mb-50 mb-sm-0" href="{{url('attendance_report')}}"><i data-feather="file-text"></i> Get Report</button>
                                 </div>
                             </div>
                             <form method="GET" action="{{ url('/attendance_report') }}" id="Attendance_form">
@@ -38,18 +52,18 @@
                                 <div class="row"> 
                                     <div class="col-md-4">
                                         <div class="mb-6 mb-sm-0"> 
-                                            <label class="form-label">Batch  <span class="text-danger">*</span></label>
+                                            <label class="form-label">Batch</label>
                                             <!-- Batch -->
-                                     <select name="batch" id="batch"  class="form-select">
-                                   <option value="">Select Batch</option>
-                                   <option value="all">All</option>
-                                   @foreach($batches as $id => $name)
-                                   <option value="{{ $id }}" {{ old('batch') == $id ? 'selected' : '' }}>{{ $name }}</option>
-                               @endforeach
-                               </select>
-                               @error('batch')
-                                   <small class="text-danger">{{ $message }}</small>
-                               @enderror
+<select name="batch" id="batch"  class="form-select">
+    <option value="">Select Batch</option>
+    <option value="all">All</option>
+    @foreach($batches as $id => $name)
+    <option value="{{ $id }}" {{ old('batch') == $id ? 'selected' : '' }}>{{ $name }}</option>
+@endforeach
+</select>
+@error('batch')
+    <small class="text-danger">{{ $message }}</small>
+@enderror
 
                                          </div>
                                     </div>
@@ -83,7 +97,7 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="mb-6 mb-sm-0">
-                                            <label class="form-label"> Start Date <span class="text-danger">*</span></label>
+                                            <label class="form-label">Start Date</label>
                                             <input type="date" name="start_date" id="startDate" class="form-control" value="{{ old('start_date') }}">
                                             @error('start_date')
                                                 <small class="text-danger">{{ $message }}</small>
@@ -92,7 +106,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-6 mb-sm-0">
-                                            <label class="form-label"> End Date <span class="text-danger">*</span></label>
+                                            <label class="form-label">End Date</label>
                                             {{-- <input type="date" name="end_date" id="endDate" class="form-control" /> --}}
                                             <input type="date" name="end_date" class="form-control" id="endDate" value="{{ old('end_date') }}">
                                             @error('end_date')
@@ -740,79 +754,62 @@
 </script> --}}
 
 <script>
-    // Old values from server
-    const oldBatch = "{{ old('batch') }}";
-    const oldSection = "{{ old('section') }}";
-    const oldGroup = "{{ old('group') }}";
+    $('#batch').on('change', function () {
+        let batchId = $(this).val();
+        $('#section').html('<option value="">Loading...</option>');
+        $('#group').html('<option value="">Select Group</option>');
 
-    $(document).ready(function () {
-        if (oldBatch) {
-            $('#batch').val(oldBatch);
-            loadSections(oldBatch, oldSection, oldGroup);
-        }
-
-        // On batch change
-        $('#batch').on('change', function () {
-            const batchId = $(this).val();
-            $('#section').html('<option value="">Loading...</option>');
-            $('#group').html('<option value="">Select Group</option>');
-            loadSections(batchId, null, null);
-        });
-
-        // On section change
-        $('#section').on('change', function () {
-            const batchId = $('#batch').val();
-            const sectionId = $(this).val();
-            $('#group').html('<option value="">Loading...</option>');
-            loadGroups(batchId, sectionId, null);
-        });
-    });
-
-    function loadSections(batchId, selectedSection = null, selectedGroup = null) {
         if (batchId === 'all') {
+            // Load all sections
             $.get('/get-all-sections', function (sections) {
                 let options = '<option value="">Select Section</option>';
                 sections.forEach(section => {
-                    let selected = (selectedSection == section.id) ? 'selected' : '';
-                    options += `<option value="${section.id}" ${selected}>${section.name}</option>`;
+                    options += `<option value="${section.id}">${section.name}</option>`;
                 });
                 $('#section').html(options);
-
-                if (selectedSection) {
-                    loadGroups(batchId, selectedSection, selectedGroup);
-                }
             });
-        } else {
+        } else if (batchId) {
+            // Load sections for selected batch
             $.get(`/get-sections/${batchId}`, function (sections) {
                 let options = '<option value="">Select Section</option>';
                 sections.forEach(section => {
-                    let selected = (selectedSection == section.id) ? 'selected' : '';
-                    options += `<option value="${section.id}" ${selected}>${section.name}</option>`;
+                    options += `<option value="${section.id}">${section.name}</option>`;
                 });
                 $('#section').html(options);
-
-                if (selectedSection) {
-                    loadGroups(batchId, selectedSection, selectedGroup);
-                }
             });
         }
-    }
+    });
 
-    function loadGroups(batchId, sectionId, selectedGroup = null) {
-        let url = (batchId === 'all') ? `/get-groups-by-section/${sectionId}` : `/get-groups/${batchId}/${sectionId}`;
+    $('#section').on('change', function () {
+        const batchId = $('#batch').val();
+        const sectionId = $(this).val();
 
-        $.get(url, function (groups) {
-            let options = '<option value="">Select Group</option>';
-            groups.forEach(group => {
-                let selected = (selectedGroup == group.id) ? 'selected' : '';
-                options += `<option value="${group.id}" ${selected}>${group.name}</option>`;
-            });
-            $('#group').html(options);
-        });
-    }
+        $('#group').html('<option value="">Loading...</option>');
+
+        if (sectionId) {
+            if (batchId === 'all') {
+                $.get(`/get-groups-by-section/${sectionId}`, function (groups) {
+                    let options = '<option value="">Select Group</option>';
+                    groups.forEach(group => {
+                        options += `<option value="${group.id}">${group.name}</option>`;
+                    });
+                    $('#group').html(options);
+                });
+            } else {
+                // Load groups for specific batch + section
+                $.get(`/get-groups/${batchId}/${sectionId}`, function (groups) {
+                    let options = '<option value="">Select Group</option>';
+                    groups.forEach(group => {
+                        options += `<option value="${group.id}">${group.name}</option>`;
+                    });
+                    $('#group').html(options);
+                });
+            }
+        } else {
+            $('#group').html('<option value="">Select Group</option>');
+        }
+    });
 </script>
-
-
 
 <script>
     // Get today's date in YYYY-MM-DD format

@@ -15,8 +15,8 @@ class SportStudentReportController extends Controller
 {
     function StudentReport()
     {
-        $batch = SportBatch::get();
-        $quota = SportQuota::get();
+        $batch = SportBatch::all();
+        $quota = SportQuota::all();
 
         return view('ums.sports.report.student_report', compact('batch', 'quota'));
     }
@@ -78,6 +78,9 @@ class SportStudentReportController extends Controller
         }
 
         $totalFees = 0;
+        $feeDetails = is_array($feeDetails) ? $feeDetails : json_decode($feeDetails,true);
+        // dd($feeDetails);
+
         foreach ($feeDetails as $key => $fee) {
             $netFeePayable = $fee['total_fees'] - ($fee['fee_discount_value'] ?? 0);
             $feeDetails[$key]['net_fee_payable'] = $netFeePayable;

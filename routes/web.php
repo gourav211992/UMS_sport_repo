@@ -279,8 +279,8 @@ Route::get('/view-registration/{id}', [SportRegisterController::class, 'viewRegi
 Route::get('/sports-students', [SportRegisterController::class, 'fetch'])->name('sports-students');
 Route::get('/get-states/{countryId}', [SportRegisterController::class, 'getStates'])->name('get.states');
 Route::get('/get-cities/{stateId}', [SportRegisterController::class, 'getCities'])->name('get.cities');
-Route::post('update-payment', [SportRegisterController::class, 'update_payment'])->name('update-payment');
-Route::post('update-payment-status', [SportRegisterController::class, 'update_payment_status'])->name('update-payment-status');
+Route::post('update-payment', [SportRegisterController::class, 'AdminSideData'])->name('update-payment');
+Route::post('update-payment-status', [SportRegisterController::class, 'UserSideData'])->name('update-payment-status');
 
 Route::post('/update-fee-mandatory-status', [SportRegisterController::class, 'updateMandatoryStatus'])->name('update.fee.mandatory.status');
 
@@ -3529,9 +3529,11 @@ Route::get('md_marksheet_list', [MdResultController::class, 'mdMarksheetList'])-
 
 // start attendance
 Route::get('attendance',[AttendanceReportController::class,'index']);
-
+// Route::view('attendance_report', 'ums.sports.report.attendance_report');
 Route::get('/get-sections/{batch_id}', [AttendanceReportController::class, 'getSections']);
 Route::get('/get-groups/{batch_id}/{section_id}', [AttendanceReportController::class, 'getGroups']);
 Route::get('/get-dates/{batch_id}/{section_id}', [AttendanceReportController::class, 'getDates']);
 Route::get('/attendance_report', [AttendanceReportController::class, 'getAttendanceReport']);
+Route::get('/get-all-sections', [AttendanceReportController::class, 'getAllSections']);
+Route::get('/get-groups-by-section/{section_id}', [AttendanceReportController::class, 'getAllGroups']);
 // end attendance

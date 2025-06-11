@@ -1507,7 +1507,10 @@
                                                             </thead>
                                                             <tbody>
                                                                 {{-- @dump($feeDetails) --}}
-                                                                @foreach ($feeDetails as $key => $fees)
+                                                                @php
+                                                                    $feeDetails = is_array($feeDetails) ? $feeDetails : [];
+                                                                @endphp
+                                                                @foreach ($feeDetails ?? [] as $key => $fees)
                                                                     @php
                                                                         $totalFees = $fees['total_fees'] ?? 0;
                                                                         $feeSponsorshipPercent =
@@ -2293,7 +2296,7 @@
 
 
                                                 </div>
-                                                <div class="tab-pane" id="payment">
+                                                {{-- <div class="tab-pane" id="payment">
                                                     <div class="row">
 
                                                         <h2 class="mb-3">Payment Details</h2>
@@ -2371,7 +2374,174 @@
                                                     </div>
 
 
-                                                </div>
+                                                </div> --}}
+                                                                                             <div class="tab-pane" id="payment">
+    <div class="row">
+        <h2 class="mb-4">Payment Details</h2>
+
+        @if ($sportPaymentDetail->isNotEmpty())
+            @php
+                $sortedPayment = $sportPaymentDetail->sortBy('due_date');
+            @endphp
+
+            <div class="table-responsive">
+                <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad">
+
+                    <thead class="table-primary">
+                        <tr>
+                            <th>#</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Bank</th>
+                            <th>Mode</th>
+                            <th>Reference No</th>
+                            <th>Amount Paid</th>
+                            <th>Pay Confirmed On</th>
+                            <th>Collector</th>
+                            <th>Remarks</th>
+                            <th>Transaction Date</th>
+                            <th>Document</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($sortedPayment as $index => $item)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->due_date)->format('d F Y') }}</td>                           
+                         <td>
+    @if (strtolower($item->payment_status) === 'paid')
+        <span class="badge bg-success">Paid</span>
+    @elseif (strtolower($item->payment_status) === 'pending')
+        <span class="badge bg-warning text-dark">Pending</span>
+    @else
+        <span class="badge bg-secondary">{{ ucfirst($item->payment_status ?? 'Unknown') }}</span>
+    @endif
+</td>
+
+                                <td>{{ $item->bank_name ?? 'N/A' }}</td>
+                                <td>{{ $item->pay_mode ?? 'N/A' }}</td>
+                                <td>{{ $item->ref_no ?? 'N/A' }}</td>
+                                <td>₹{{ number_format($item->paid_amount, 2) }}</td>
+                                <td>
+                                    {{ \Carbon\Carbon::parse($item->pay_confirmation_date)->format('d-m-Y') }}
+                                    <br>
+                                    {{ \Carbon\Carbon::parse($item->pay_confirmation_time)->format('h:i A') }}
+                                </td>
+                                <td>{{ $item->pay_collector ?? 'N/A' }}</td>
+                                <td>{{ $item->remarks ?? 'N/A' }}</td>
+                                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y h:i A') }}</td>
+                                {{-- <td>
+                             <!-- Trigger Button -->
+@if($item->pay_doc)
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#docModal">
+        View Document
+    </button>
+@endif
+
+<!-- Modal -->
+<div class="modal fade" id="docModal" tabindex="-1" aria-labelledby="docModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="docModalLabel">Payment Document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+
+        @php
+            $filePath = asset('uploads/pay_docs/' . $item->pay_doc);
+            $ext = pathinfo($item->pay_doc, PATHINFO_EXTENSION);
+        @endphp
+
+        @if(in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif']))
+            <img src="{{ $filePath }}" alt="Payment Document" class="img-fluid rounded">
+        @elseif(strtolower($ext) == 'pdf')
+            <embed src="{{ $filePath }}" type="application/pdf" width="100%" height="600px" />
+        @else
+            <p>Preview not available for this file type.</p>
+        @endif
+
+      </div>
+      <div class="modal-footer">
+        <a href="{{ $filePath }}" class="btn btn-success" download>
+            Download File
+        </a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</td> --}}
+
+<td>
+    <!-- Button with unique target -->
+    @if (!empty($item->pay_doc))
+
+    <button type="button" class="btn btn-primary  px-25 font-small-2 py-25 " data-bs-toggle="modal" data-bs-target="#docModal{{ $item->id }}">
+        View Document
+    </button>
+    
+    @else
+<b>N/A</b>
+        
+    @endif
+
+
+<!-- Modal with unique ID -->
+<div class="modal fade" id="docModal{{ $item->id }}" tabindex="-1" aria-labelledby="docModalLabel{{ $item->id }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered"> <!-- smaller width -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="docModalLabel{{ $item->id }}">Payment Document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+   <div class="modal-body text-center" style="max-height: 70vh; overflow-y: auto;">
+    @php
+        $filePath = asset('uploads/pay_docs/' . $item->pay_doc);
+        $ext = pathinfo($item->pay_doc, PATHINFO_EXTENSION);
+    @endphp
+
+    @if(in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif']))
+        <img src="{{ $filePath }}" alt="Payment Document" 
+             style="max-width: 100%; max-height: 60vh; object-fit: contain;" 
+             class="img-fluid rounded shadow-sm">
+    @elseif(strtolower($ext) == 'pdf')
+        <embed src="{{ $filePath }}" type="application/pdf" 
+               width="100%" height="500px" style="border: 1px solid #ccc;" />
+    @else
+        <p>Preview not available for this file type.</p>
+    @endif
+</div>
+
+
+      <div class="modal-footer">
+        <a href="{{ $filePath }}" class="btn btn-sm px-25 font-small-2 py-25 btn-success" download>
+            Download File
+        </a>
+        <button type="button" class="btn btn-secondary btn-sm px-25 font-small-2 py-25 pay-now-btn" data-bs-dismiss="modal">
+            Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</td>
+
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="alert alert-warning">No payment information available.</div>
+        @endif
+    </div>
+</div>
                                                 <div class="tab-pane" id="payment_schedule">
 
                                                     @php
@@ -2742,6 +2912,85 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form id="paymentForm" method="post" enctype="multipart/form-data">
+        @csrf
+        <input type="hidden" name="user_id" value="{{ $user->id }}">
+        <div class="modal-header">
+          <h5 class="modal-title" id="paymentModalLabel">Payment Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mt-2">
+
+            <!-- Payment Mode -->
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
+              <select class="form-control" name="pay_mode" id="pay_mode" required>
+                <option value="">Select</option>
+                <option value="IMPS/RTGS">IMPS/RTGS</option>
+                <option value="NEFT">NEFT</option>
+                <option value="By Cheque">By Cheque</option>
+                <option value="Cash">Cash</option>
+              </select>
+            </div>
+
+            <!-- Bank Name -->
+            <div class="col-md-12 mb-3" id="bankNameDiv">
+              <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+              <select class="form-control" name="bank_name" id="bank_name">
+                <option value="">Select</option>
+                <option value="HDFC Bank">HDFC Bank</option>
+                <option value="ICICI Bank">ICICI Bank</option>
+                <option value="Axis Bank">Axis Bank</option>
+                <option value="State Bank of India">State Bank of India</option>
+                <option value="Bank of Baroda">Bank of Baroda</option>
+              </select>
+            </div>
+
+            <!-- Ref No -->
+            <div class="col-md-12 mb-3" id="refNoDiv">
+              <label class="form-label">Ref No. <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="ref_no" id="ref_no" />
+            </div>
+
+            <!-- Paid Amount -->
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Paid Amount</label>
+              <input type="text" class="form-control" name="paid_amount" />
+            </div>
+
+            <!-- Fee Collected By -->
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Fee Collected By <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="collected_by" required />
+            </div>
+
+            <!-- Payment Document -->
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Payment Document</label>
+              <input type="file" class="form-control" name="pay_doc" />
+            </div>
+
+            <!-- Remarks -->
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Remarks</label>
+              <textarea class="form-control" name="pay_remark"></textarea>
+            </div>
+
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-outline-secondary me-1" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit"  id="paysubmit"class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 
     <div class="modal fade" id="confirmPaymentModal" tabindex="-1" aria-labelledby="confirmModalLabel"
@@ -3271,7 +3520,7 @@
 
 
 
-    <script>
+    {{-- <script>
         let itemsToConfirm = [];
 
         $(document).on('click', '.confirm-btn', function() {
@@ -3456,6 +3705,264 @@
             "positionClass": "toast-top-right",
             "timeOut": "3000"
         };
+    </script> --}}
+
+
+     <script>
+        let selectedPayments = [];
+
+        $(document).ready(function() {
+            $('.due-check').on('change', function() {
+                const dueDate = $(this).data('date');
+                const feeItems = JSON.parse($(this).attr('data-items'));
+
+                const formattedDueDate = new Date(dueDate).toLocaleDateString('en-GB');
+                const currentDate = new Date();
+                const formattedDateTime = currentDate.toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+
+                if ($(this).is(':checked')) {
+                    feeItems.forEach(item => {
+                        if (item.status === 'Pending') {
+                            item.status = 'Paid';
+                            item.due_date = formattedDueDate;
+                            item.selected_at = formattedDateTime;
+
+                            const key = `${item.due_date}-${item.feeHead}`;
+                            const exists = selectedPayments.find(sp =>
+                                `${sp.due_date}-${sp.feeHead}` === key);
+
+                            if (!exists) selectedPayments.push(item);
+                        }
+                    });
+                } else {
+                    feeItems.forEach(item => {
+                        selectedPayments = selectedPayments.filter(sp =>
+                            !(sp.due_date === formattedDueDate && sp.feeHead === item.feeHead)
+                        );
+                    });
+                }
+                
+
+                console.log('Selected Payments:', selectedPayments);
+            });
+
+         });
+
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000"
+        };
+    </script>
+<script>
+  
+
+    $(document).ready(function () {
+        const $bankNameDiv = $('#bankNameDiv');
+        const $refNoDiv = $('#refNoDiv');
+        const $payMode = $('#pay_mode');
+        const $bankName = $('#bank_name');
+        const $refNo = $('#ref_no');
+        const $collectedBy = $('input[name="collected_by"]');
+        const $paidAmount = $('input[name="paid_amount"]');
+        const $userIdInput = $('input[name="user_id"]');
+
+        
+
+        $bankNameDiv.hide();
+        $refNoDiv.hide();
+
+        $payMode.on('change', function () {
+            const mode = $(this).val();
+
+            if (mode === 'Cash') {
+                $bankNameDiv.hide();
+                $refNoDiv.hide();
+                $bankName.prop('required', false);
+                $refNo.prop('required', false);
+            } else {
+                $bankNameDiv.show();
+                $refNoDiv.show();
+                $bankName.prop('required', true);
+                $refNo.prop('required', true);
+            }
+        });
+
+        $('#payNowBtn').on('click', function () {
+            const userId = $(this).data('user-id');
+            $userIdInput.val(userId); 
+
+            if (selectedPayments.length === 0) {
+                toastr.info("Please select at least one due month.");
+                return;
+            }
+            const totalAmount = selectedPayments.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+            $('input[name="paid_amount"]').val(totalAmount );
+        console.log("Total Amount:", totalAmount);
+
+            $('#paymentModal').modal('show');
+        });
+
+        
+        $('#paymentForm').on('submit', function (e) {
+            e.preventDefault();
+            console.log("Submitting form...");
+
+            if (!validateForm()) {
+                alert('Please fill all required fields correctly.');
+                return;
+            }
+
+            const formData = new FormData(this);
+            formData.set('user_id', $userIdInput.val()); 
+            formData.append('payments', JSON.stringify(selectedPayments));
+
+            $.ajax({
+                url: "{{ url('update-payment') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success("Payment submitted successfully!");
+
+                        $('.due-check:checked:not(:disabled)').each(function () {
+                            $(this).prop('disabled', true);
+                            const row = $(this).closest('tr');
+                            row.find('span.badge').removeClass().addClass('badge bg-secondary text-white').text('Confirmation required');
+                        });
+
+                        selectedPayments = [];
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        toastr.error("Failed to submit payment.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                    toastr.error("Something went wrong.");
+                }
+            });
+        });
+
+        // Validation function
+        function validateForm() {
+            const mode = $payMode.val();
+            const collectedBy = $collectedBy.val().trim();
+            const paidAmount = $paidAmount.val().trim();
+
+            if (!mode) return false;
+
+            if (['IMPS/RTGS', 'NEFT', 'By Cheque'].includes(mode)) {
+                if (!$bankName.val() || !$refNo.val().trim()) return false;
+            }
+
+            if (!collectedBy) return false;
+
+            if (paidAmount && isNaN(paidAmount)) {
+                alert('Paid amount must be a number.');
+                return false;
+            }
+
+            return true;
+        }
+    });
+</script>
+
+    <script>
+        let itemsToConfirm = [];
+
+        $(document).on('click', '.confirm-btn', function() {
+            const dueDate = $(this).data('date');
+            const items = JSON.parse($(this).attr('data-items'));
+
+            itemsToConfirm = items.map(item => ({
+                ...item,
+                due_date: new Date(dueDate).toLocaleDateString('en-GB'),
+                selected_at: new Date().toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                })
+            }));
+
+            $('#confirm-due-date').val(dueDate);
+            const itemList = itemsToConfirm.map(item => `<li>${item.feeHead} - ₹${item.amount}</li>`);
+            $('#confirm-items-list').html(itemList.join(''));
+
+
+            $('#confirmPaymentModal').modal('show');
+        });
+
+        $('#confirmPaymentBtn').on('click', function() {
+            const dueDate = $('#confirm-due-date').val();
+            const userId = $('#payNowBtn').data('user-id');
+
+            if (!itemsToConfirm.length) return;
+
+            $.ajax({
+                url: "{{ url('update-payment') }}",
+                type: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                data: JSON.stringify({
+                    user_id: userId,
+                    type:'confirm',
+                    payments: itemsToConfirm
+                }),
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success("Payment confirmed successfully!");
+                        $('#confirmPaymentModal').modal('hide');
+
+
+                        // Update UI
+                        $(`.due-check[data-date="${dueDate}"]`).each(function() {
+                            $(this).prop('checked', true).prop('disabled', true);
+
+                            const row = $(this).closest('tr');
+                            const badge = row.find('span.badge');
+                            badge
+                                .removeClass()
+                                .addClass('badge bg-success')
+                                .text('Paid');
+
+                            // Remove Confirm Button
+                            row.find('.confirm-btn').remove();
+                           
+                        });
+                         setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                    } else {
+                        toastr.error("Confirmation failed.");
+                    }
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    alert("An error occurred.");
+                }
+            });
+        });
     </script>
 
     {{-- @php
