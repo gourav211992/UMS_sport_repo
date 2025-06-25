@@ -726,6 +726,7 @@ public function confirm(  Request $request, $id){
         }else{
             $feeDetails = $sportFeeMaster->fee_details;
         }
+        // dd($feeDetails);
 
         $groups = SportGroupMaster::where('status', 'active')->get();
 
@@ -796,6 +797,9 @@ public function confirm(  Request $request, $id){
         $registration = SportRegister::findOrFail($id);
 
         $user = Helper::getAuthenticatedUser();
+         $userId=User::find($registration->userable_id);
+          $sportPaymentDetail=SportPaymentDetail::where('user_id', $userId->id)->get();
+        
         $parentURL = request()->segments()[0];
         $parentURL = 'sport-registration';
         $servicesBooks = Helper::getAccessibleServicesFromMenuAlias($parentURL);
@@ -826,6 +830,10 @@ public function confirm(  Request $request, $id){
         }else{
             $feeDetails = $sportFeeMaster->fee_details;
         }
+
+        if(!is_array($feeDetails)){
+            $feeDetails=json_decode($feeDetails,true);
+        };
         $groups = SportGroupMaster::where('status', 'active')->get();
 //        $selectedCountry = Country::where('id', $familyDetails[0]->permanent_country)->first();
 //        $selectedState = State::where('id', $familyDetails[0]->permanent_state)->first();
@@ -883,7 +891,8 @@ public function confirm(  Request $request, $id){
             'selectedCorrespondenceCity',
             'selectedCorrespondenceState',
             'selectedCorrespondenceCountry',
-            'user'
+            'user',
+            'sportPaymentDetail'
         ));
     }
 
@@ -892,6 +901,7 @@ public function confirm(  Request $request, $id){
         $registration = SportRegister::findOrFail($id);
 
         $user = Helper::getAuthenticatedUser();
+         
         $parentURL = request()->segments()[0];
         $parentURL = 'sport-registration';
         $servicesBooks = Helper::getAccessibleServicesFromMenuAlias($parentURL);
@@ -983,7 +993,8 @@ public function confirm(  Request $request, $id){
             'selectedCorrespondenceState',
             'selectedCorrespondenceCountry',
             'user',
-            'otherStates'
+            'otherStates',
+            
         ));
     }
 
@@ -1835,7 +1846,7 @@ if ($sportRegister) {
 
        
         if (!is_array($feeDetails)) {
-            $feeDetails = [];
+            $feeDetails = json_decode($feeDetails,true);
         }
 
         $totalFees = 0;
@@ -1852,6 +1863,7 @@ if ($sportRegister) {
             $feeDetails[$key]['net_fee_payable'] = $netFeePayable;
             $totalFees += $netFeePayable;
         }
+        // dd($feeDetails);
 
         $user = User::with('payments')->findOrFail($id);
         return view('ums.sports.profile', compact('student', 'UsersideData','sportFeeMaster',  'existingData','feeDetails', 'totalFees','familyDetails', 'previousStudentActivities',
@@ -1864,7 +1876,8 @@ if ($sportRegister) {
     public function profileRegistration($id)
     { 
         $registration = SportRegister::findOrFail($id);
-
+         $userId=User::find($registration->userable_id);
+          $sportPaymentDetail=SportPaymentDetail::where('user_id', $userId->id)->get();
         $user = Helper::getAuthenticatedUser();
         $parentURL = request()->segments()[0];
         $parentURL = 'sport-registration';
@@ -1894,6 +1907,9 @@ if ($sportRegister) {
             $feeDetails = $registration->fee_details;
         }else{
             $feeDetails = $sportFeeMaster->fee_details;
+        }
+        if(!is_array($feeDetails)){
+            $feeDetails=json_decode($feeDetails,true);
         }
         $groups = SportGroupMaster::where('status', 'active')->get();
         if ($familyDetails->isNotEmpty()) {
@@ -1949,7 +1965,8 @@ if ($sportRegister) {
             'selectedCorrespondenceCity',
             'selectedCorrespondenceState',
             'selectedCorrespondenceCountry',
-            'otherStates'
+            'otherStates',
+            'sportPaymentDetail'
         ));
     }
     public function profileRegistrationUpdate(Request $request, $id){
@@ -2676,48 +2693,113 @@ if (is_string($request->payments)) {
 }
 
     if (!$detail) {
-    foreach ($requestPayments as $item) {
-        $dueDateParts = explode('/', $item['due_date']);
-        $formattedDueDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+        
+    // foreach ($requestPayments as $item) {
+    //     // dd($item);
+    //     $dueDateParts = explode('/', $item['due_date']);
+    //     $formattedDueDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
 
-        $existingDetail = SportPaymentDetail::where('user_id', $request->user_id)
-            ->where('payment_id', $payment->id)
-            ->whereDate('due_date', $formattedDueDate)
-            ->first();
+    //     $existingDetail = SportPaymentDetail::where('user_id', $request->user_id)
+    //         ->where('payment_id', $payment->id)
+    //         ->whereDate('due_date', $formattedDueDate)
+    //         ->first();
 
-        if ($existingDetail) {
-            continue; // Skip this due date; already recorded
-        }
+    //     if ($existingDetail) {
+    //         continue; // Skip this due date; already recorded
+    //     }
 
-        $now = now()->setTimezone('Asia/Kolkata');
+    //     $now = now()->setTimezone('Asia/Kolkata');
 
-        $detail = new SportPaymentDetail();
-        $detail->payment_id = $payment->id;
-        $detail->user_id = $request->user_id;
-        $detail->pay_collector = $request->collected_by;
-        $detail->bank_name = $request->bank_name ?? null;
-        $detail->pay_mode = $request->pay_mode ?? null;
-        $detail->ref_no = $request->ref_no ?? null;
-        $detail->due_date = $formattedDueDate;
+    //     $detail = new SportPaymentDetail();
+    //     $detail->payment_id = $payment->id;
+    //     $detail->user_id = $request->user_id;
+    //     $detail->pay_collector = $request->collected_by;
+    //     $detail->bank_name = $request->bank_name ?? null;
+    //     $detail->pay_mode = $request->pay_mode ?? null;
+    //     $detail->ref_no = $request->ref_no ?? null;
+    //     $detail->due_date = $formattedDueDate;
 
-        if ($request->hasFile('pay_doc') && !isset($filename)) {
-            $file = $request->file('pay_doc');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/pay_docs'), $filename);
-        }
+    //     if ($request->hasFile('pay_doc') && !isset($filename)) {
+    //         $file = $request->file('pay_doc');
+    //         $filename = time() . '_' . $file->getClientOriginalName();
+    //         $file->move(public_path('uploads/pay_docs'), $filename);
+    //     }
 
-        if (isset($filename)) {
-            $detail->pay_doc = $filename;
-        }
+    //     if (isset($filename)) {
+    //         $detail->pay_doc = $filename;
+    //     }
+    //       $total_paid+= $item['amount'];
 
-        $detail->paid_amount = $item['amount'];
-        $detail->payment_status = 'paid';
-        $detail->remarks = $request->pay_remark ?? null;
-        $detail->pay_confirmation_date = $now->format('Y-m-d');
-        $detail->pay_confirmation_time = $now->format('H:i:s');
+    //     $detail->paid_amount =  $item['amount'];
+    //     $detail->payment_status = 'paid';
+    //     $detail->remarks = $request->pay_remark ?? null;
+    //     $detail->pay_confirmation_date = $now->format('Y-m-d');
+    //     $detail->pay_confirmation_time = $now->format('H:i:s');
 
-        $detail->save();
+    //     $detail->save();
+    // }
+    // 1️⃣ Group payments by due_date (dd/mm/yyyy based item data)
+$groupedPayments = [];
+
+foreach ($requestPayments as $item) {
+    // Due date from item
+    $dueDateParts = explode('/', $item['due_date']);
+    $formattedDueDate = $dueDateParts[2] . '-' . $dueDateParts[1] . '-' . $dueDateParts[0];
+    $amount = $item['amount'];
+
+    if (!isset($groupedPayments[$formattedDueDate])) {
+        $groupedPayments[$formattedDueDate] = [
+            'due_date' => $formattedDueDate,
+            'amount' => 0,
+        ];
     }
+    $groupedPayments[$formattedDueDate]['amount'] += $amount;
+}
+
+// 2️⃣ Save one entry per due_date
+foreach ($groupedPayments as $date => $data) {
+    $existingDetail = SportPaymentDetail::where('user_id', $request->user_id)
+        ->where('payment_id', $payment->id)
+        ->whereDate('due_date', $date)
+        ->first();
+
+    if ($existingDetail) {
+        continue; // Skip if this due date already has an entry
+    }
+
+    $now = now()->setTimezone('Asia/Kolkata');
+
+    $detail = new SportPaymentDetail();
+    $detail->payment_id = $payment->id;
+    $detail->user_id = $request->user_id;
+    $detail->pay_collector = $request->collected_by;
+    $detail->bank_name = $request->bank_name ?? null;
+    $detail->pay_mode = $request->pay_mode ?? null;
+    $detail->ref_no = $request->ref_no ?? null;
+    $detail->due_date = $date;
+
+    // Save uploaded pay_doc if available
+    if ($request->hasFile('pay_doc') && !isset($filename)) {
+        $file = $request->file('pay_doc');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads/pay_docs'), $filename);
+    }
+
+    if (isset($filename)) {
+        $detail->pay_doc = $filename;
+    }
+
+    $paidAmount = $data['amount'];
+   
+
+    $detail->paid_amount = $paidAmount;
+    $detail->payment_status = 'paid';
+    $detail->remarks = $request->pay_remark ?? null;
+    $detail->pay_confirmation_date = $now->format('Y-m-d');
+    $detail->pay_confirmation_time = $now->format('H:i:s');
+    $detail->save();
+}
+
 }
 
         return response()->json([

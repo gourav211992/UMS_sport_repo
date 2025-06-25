@@ -167,7 +167,9 @@ data-scroll-to-active="true">
                     <li><a class="d-flex align-items-center" href="{{url('attendance')}}"><i
                                 data-feather="circle"></i><span class="menu-item text-truncate">Attendance</span></a>
                     </li>
-
+                    <li><a class="d-flex align-items-center" href="{{url('assessment-report')}}"><i
+                                data-feather="circle"></i><span class="menu-item text-truncate">Assessment Report</span></a>
+                    </li>
                 </ul>
             </li>
         </ul>

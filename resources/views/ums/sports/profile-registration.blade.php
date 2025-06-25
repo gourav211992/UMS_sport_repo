@@ -1488,63 +1488,128 @@ foreach ($feeDetails as $fees) {
                                                     </div>
                                                 </div>
                                                 <div class="tab-pane" id="payment">
-                                                    <div class="row">
+    <div class="row">
+        <h2 class="mb-4">Payment Details</h2>
 
-                                                        <h2 class="mb-3">Payment Details</h2>
+        @if ($sportPaymentDetail->isNotEmpty())
+            @php
+                $sortedPayment = $sportPaymentDetail->sortBy('due_date');
+            @endphp
 
-                                                        <table class="table table-bordered">
-                                                            <tr>
-                                                                <th>User Name</th>
-                                                                <td>{{ $user->first_name . ' '. ($user->middle_name ?? ''). ' '. $user->last_name }}</td>
-                                                            </tr>
+            <div class="table-responsive">
+                <table class="table myrequesttablecbox table-striped po-order-detail custnewpo-detail border newdesignerptable newdesignpomrnpad">
 
-                                                            @if($user->payments)
-                                                                <tr>
-                                                                    <th>Payment Status</th>
-                                                                    <td>{{ $user->payments->status ?? 'Pending' }}</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th>Bank Name</th>
-                                                                    <td>{{ $user->payments->bank_name ?? 'N/A' }}</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th>Payment Mode</th>
-                                                                    <td>{{ $user->payments->pay_mode ?? 'N/A' }}</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th>Reference No.</th>
-                                                                    <td>{{ $user->payments->ref_no ?? 'N/A' }}</td>
-                                                                </tr>
-                                                                  <tr>
-                                                                    <th>Paid Amount</th>
-                                                                    <td>{{ $user->payments->paid_amount ?? 'N/A' }}</td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th>Payment Document</th>
-                                                                    <td>
-                                                                        @if(!empty($user->payments->pay_doc))
-                                                                            <a href="{{ $user->payments->pay_doc }}" target="_blank">View Document</a>
-                                                                        @else
-                                                                            No document uploaded
-                                                                        @endif
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th>Remarks</th>
-                                                                    <td>{{ $user->payments->remarks ?? 'N/A' }}</td>
-                                                                </tr>
-                                                            @else
-                                                                <tr>
-                                                                    <th colspan="2">No payment information available</th>
-                                                                </tr>
-                                                            @endif
-                                                        </table>
+                    <thead class="table-primary">
+                        <tr>
+                            <th>#</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Bank</th>
+                            <th>Mode</th>
+                            <th>Reference No</th>
+                            <th>Amount Paid</th>
+                            <th>Pay Confirmed On</th>
+                            <th>Collector</th>
+                            <th>Remarks</th>
+                            <th>Transaction Date</th>
+                            <th>Document</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($sortedPayment as $index => $item)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->due_date)->format('d F Y') }}</td>                           
+                         <td>
+    @if (strtolower($item->payment_status) === 'paid')
+        <span class="badge bg-success">Paid</span>
+    @elseif (strtolower($item->payment_status) === 'pending')
+        <span class="badge bg-warning text-dark">Pending</span>
+    @else
+        <span class="badge bg-secondary">{{ ucfirst($item->payment_status ?? 'Unknown') }}</span>
+    @endif
+</td>
+
+                                <td>{{ $item->bank_name ?? 'N/A' }}</td>
+                                <td>{{ $item->pay_mode ?? 'N/A' }}</td>
+                                <td>{{ $item->ref_no ?? 'N/A' }}</td>
+                                <td>₹{{ number_format($item->paid_amount, 2) }}</td>
+                                <td>
+                                    {{ \Carbon\Carbon::parse($item->pay_confirmation_date)->format('d-m-Y') }}
+                                    <br>
+                                    {{ \Carbon\Carbon::parse($item->pay_confirmation_time)->format('h:i A') }}
+                                </td>
+                                <td>{{ $item->pay_collector ?? 'N/A' }}</td>
+                                <td>{{ $item->remarks ?? 'N/A' }}</td>
+                                <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y h:i A') }}</td>
+
+<td>
+    <!-- Button with unique target -->
+    @if (!empty($item->pay_doc))
+
+    <button type="button" class="btn btn-primary  px-25 font-small-2 py-25 " data-bs-toggle="modal" data-bs-target="#docModal{{ $item->id }}">
+        View Document
+    </button>
+    
+    @else
+<b>N/A</b>
+        
+    @endif
 
 
-                                                    </div>
+<!-- Modal with unique ID -->
+<div class="modal fade" id="docModal{{ $item->id }}" tabindex="-1" aria-labelledby="docModalLabel{{ $item->id }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered"> <!-- smaller width -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="docModalLabel{{ $item->id }}">Payment Document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+   <div class="modal-body text-center" style="max-height: 70vh; overflow-y: auto;">
+    @php
+        $filePath = asset('uploads/pay_docs/' . $item->pay_doc);
+        $ext = pathinfo($item->pay_doc, PATHINFO_EXTENSION);
+    @endphp
+
+    @if(in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif']))
+        <img src="{{ $filePath }}" alt="Payment Document" 
+             style="max-width: 100%; max-height: 60vh; object-fit: contain;" 
+             class="img-fluid rounded shadow-sm">
+    @elseif(strtolower($ext) == 'pdf')
+        <embed src="{{ $filePath }}" type="application/pdf" 
+               width="100%" height="500px" style="border: 1px solid #ccc;" />
+    @else
+        <p>Preview not available for this file type.</p>
+    @endif
+</div>
 
 
-                                                </div>
+      <div class="modal-footer">
+        <a href="{{ $filePath }}" class="btn btn-sm px-25 font-small-2 py-25 btn-success" download>
+            Download File
+        </a>
+        <button type="button" class="btn btn-secondary btn-sm px-25 font-small-2 py-25 pay-now-btn" data-bs-dismiss="modal">
+            Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</td>
+
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="alert alert-warning">No payment information available.</div>
+        @endif
+    </div>
+</div>
 
                                                 <!-- Other tabs like Address, Family, Emergency, Medical, Sponsor, Fee, Hostel, Document -->
                                                 <!-- You can follow the same pattern as above to pre-fill the data in these tabs -->

@@ -35,6 +35,107 @@ use Illuminate\Http\Request;
 
 class ScreeningAssesmentController extends Controller
 {
+ public function assessmentReport()
+    {
+        $batch = SportBatch::all();
+        $trainers = Employee::with('designation')
+            ->where('status', 'active')
+            ->whereHas('designation', function ($query) {
+                $query->whereIn('name', ['S & C COACH', 'YOGA,ASST. COACH', 'SR COACH', 'Coach']);
+            })
+            ->get();
+
+        return view('ums.sports.report.assessment_report', compact('batch', 'trainers'));
+    }
+
+
+    public function getAssementReport(Request $request)
+    {
+        $request->validate([
+            'batch_name' => 'required',
+        ]);
+        $batch = SportBatch::all();
+        $trainers = Employee::with('designation')
+            ->where('status', 'active')
+            ->whereHas('designation', function ($query) {
+                $query->whereIn('name', ['S & C COACH', 'YOGA,ASST. COACH', 'SR COACH', 'Coach']);
+            })
+            ->get();
+
+        if (!$request->filled('batch_name') && !$request->filled('section') && !$request->filled('group') && !$request->filled('screening_date') && !$request->filled('trainer')) {
+            return view('ums.sports.report.assessment_report', [
+                'screeningSummary' => [],
+                'batch' => $batch,
+                'trainers' => $trainers
+            ]);
+        }
+
+        $query = DB::table('sport_screening_details')
+            ->leftJoin('sport_screening_masters', 'sport_screening_details.screening_id', '=', 'sport_screening_masters.id')
+            ->leftJoin('sport_registers', 'sport_screening_details.registration_id', '=', 'sport_registers.id')
+            ->leftJoin('sport_master_group', 'sport_screening_details.sports_group_id', '=', 'sport_master_group.id')
+            ->leftJoin('sport_sections', 'sport_screening_details.section_id', '=', 'sport_sections.id')
+            ->leftJoin('sport_batches', 'sport_screening_details.batch_id', '=', 'sport_batches.id')
+            ->leftJoin('employees', 'sport_screening_details.trainer_id', '=', 'employees.id')
+            ->where('sport_screening_masters.status', 'active');
+
+        if ($request->filled('batch_name')) {
+            $query->where('sport_screening_details.batch_id', $request->batch_name);
+        }
+
+        if ($request->filled('section')) {
+            $query->where('sport_screening_details.section_id', $request->section);
+        }
+
+        if ($request->filled('group')) {
+            $query->where('sport_screening_details.sports_group_id', $request->group);
+        }
+
+        if ($request->filled('screening_date')) {
+            $query->whereDate('sport_screening_details.screening_date', $request->screening_date);
+        }
+
+        if ($request->filled('trainer')) {
+            $query->where('sport_screening_details.trainer_id', $request->trainer);
+        }
+
+        $screeningSummary = $query->select(
+            DB::raw('MIN(sport_screening_details.id) as id'),
+            'sport_screening_details.screening_date',
+            'sport_master_group.name as groupName',
+            'sport_sections.name as sectionName',
+            'sport_batches.batch_name as batchName',
+            'employees.name as trainerName',
+            DB::raw('GROUP_CONCAT(DISTINCT sport_screening_masters.screening_name SEPARATOR ", ") as screening_name'),
+            'sport_screening_details.registration_id',
+            'sport_registers.name as name',
+            'sport_registers.document_number',
+            'sport_registers.id as sport_register_id',
+            'sport_screening_details.trainer_id'
+        )
+            ->groupBy(
+                'sport_screening_details.screening_date',
+                'sport_screening_details.registration_id',
+                'sport_master_group.name',
+                'sport_sections.name',
+                'sport_batches.batch_name',
+                'employees.name',
+                'sport_screening_details.trainer_id',
+                'sport_registers.name',
+                'sport_registers.document_number',
+                'sport_registers.id'
+            )
+            ->orderByDesc('sport_screening_details.screening_date')
+            ->get();
+
+        return view('ums.sports.report.assessment_report', compact('screeningSummary', 'batch', 'trainers'));
+    }
+
+    public function getGroupBySection($sectionId)
+    {
+        $group = SportGroupMaster::where('section_id', $sectionId)->get();
+        return response()->json($group);
+    }
     public function listScreeningOuter(Request $request)
     {
         $screening_name = $request->input('screening_name');

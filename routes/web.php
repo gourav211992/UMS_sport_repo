@@ -486,6 +486,10 @@ Route::group(['middleware' => ['admin']], function () {
     //Screen Assessment routes start
 
     Route::controller(ScreeningAssesmentController::class)->group(function () {
+        Route::get('/assessment-report','assessmentReport')->name('assessment');
+        Route::get('/get-assessment-report', 'getAssementReport')->name('get-assessment-report');
+        Route::get('/get-groups-by-sections/{section_id}', 'getGroupBySection')->name('get.groups.by.sections');
+        
         Route::get('screening-assessment', 'listScreeningOuter');
         Route::get('screening-assessment-inner/{date}/{id}', 'activityAssessment');
 

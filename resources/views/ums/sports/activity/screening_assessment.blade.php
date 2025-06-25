@@ -45,7 +45,7 @@
 
                                 <div class="table-responsive candidates-tables">
                                     <table
-                                        class="datatables-basic table table-striped myrequesttablecbox loanapplicationlist tasklist ">
+                                        class="datatables-basic table table-striped myrequesttablecbox tasklist ">
                                         <thead>
                                             <tr>
                                                 <th>#</th>
@@ -82,7 +82,7 @@
                                                     </td>
 
                                                     <td class="tableactionnew">
-                                                        <div class="dropdown">
+                                                        <div class="">
                                                             <button type="button"
                                                                 class="btn btn-sm dropdown-toggle hide-arrow py-0"
                                                                 data-bs-toggle="dropdown">
